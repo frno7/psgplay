@@ -69,8 +69,10 @@ static ssize_t parse_stop_auto(int frequency, struct file file)
 {
 	float duration;
 
-	return sndh_tag_time(&duration, file) ?
-		roundf(duration * frequency) : OPTION_TIME_UNDEFINED;
+	if (!sndh_tag_time(&duration, file))
+		return OPTION_TIME_UNDEFINED;
+
+	return duration > 0 ?  roundf(duration * frequency) : OPTION_STOP_NEVER;
 }
 
 static ssize_t parse_stop(const char *s, int frequency, struct file file)
