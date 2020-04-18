@@ -1,0 +1,23 @@
+#!/bin/sh
+
+set -e
+set -o pipefail
+
+[ $# = 1 ]
+f="$1"
+
+mod=$([ -z "$(git status -suno)" ] || echo "+")
+tag="$(git describe --always --tags)"
+ver="$(echo "$tag" | sed 's/^v//')$mod"
+src=$(echo "#include "'"'"psgplay/version.h"'"'"
+
+const char *program_version(void) { return "'"'"$ver"'"'"; }")
+
+if [ ! -f "$f" ] || ! echo "$src" | cmp --quiet - "$f"
+then
+	echo "$src" >"$f".tmp
+	mv "$f".tmp "$f"
+	echo "$f"
+else
+	:
+fi

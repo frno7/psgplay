@@ -1,0 +1,14 @@
+#!/bin/sh
+
+if [ $# != 2 ]
+then
+	echo "tos <input> <output>" >&2
+	exit 1
+fi
+
+src="$1"
+dst="$2"
+
+echo 'static u8 tos[] = {' >"$dst"
+xxd -i <"$src" >>"$dst"
+echo '};' >>"$dst"
