@@ -13,6 +13,13 @@
 #include "psgplay/sndh-print.h"
 #include "psgplay/string.h"
 
+struct tag_time_state {
+	int t;
+	int track;
+
+	float *duration;
+};
+
 static bool subtune_count(const char *name, const char *value, void *arg)
 {
 	int *track_count = arg;
@@ -49,17 +56,22 @@ bool sndh_tag_default_subtune(int *track, struct file file)
 
 static bool tag_time(const char *name, const char *value, void *arg)
 {
-	float *duration = arg;
+	struct tag_time_state *state = arg;
 
 	if (strcmp(name, "TIME") != 0)
 		return true;
 
-	*duration = atof(value);
+	if (++state->t != state->track)
+		return true;
+
+	*state->duration = atof(value);
 
 	return false;
 }
 
-bool sndh_tag_time(float *duration, struct file file)
+bool sndh_tag_time(float *duration, int track, struct file file)
 {
-	return !sndh_tags(file, NULL, tag_time, duration);
+	struct tag_time_state state = { .track = track, .duration = duration };
+
+	return !sndh_tags(file, NULL, tag_time, &state);
 }

@@ -65,20 +65,21 @@ static ssize_t parse_start(const char *s, int frequency)
 	return !s ? 0 : parse_time(s, frequency);
 }
 
-static ssize_t parse_stop_auto(int frequency, struct file file)
+static ssize_t parse_stop_auto(int track, int frequency, struct file file)
 {
 	float duration;
 
-	if (!sndh_tag_time(&duration, file))
+	if (!sndh_tag_time(&duration, track, file))
 		return OPTION_TIME_UNDEFINED;
 
 	return duration > 0 ?  roundf(duration * frequency) : OPTION_STOP_NEVER;
 }
 
-static ssize_t parse_stop(const char *s, int frequency, struct file file)
+static ssize_t parse_stop(const char *s,
+	int track, int frequency, struct file file)
 {
 	return !s                      ? OPTION_TIME_UNDEFINED :
-	       strcmp(s, "auto") == 0  ? parse_stop_auto(frequency, file) :
+	       strcmp(s, "auto") == 0  ? parse_stop_auto(track, frequency, file) :
 	       strcmp(s, "never") == 0 ? OPTION_STOP_NEVER :
 					 parse_time(s, frequency);
 }
@@ -101,7 +102,8 @@ void replay(const struct options *options, struct file file,
 	const char *auto_stop = options->stop ? options->stop :
 		!options->stop && !options->length ? "auto" : NULL;
 	const ssize_t start = parse_start(options->start, options->frequency);
-	const ssize_t stop = parse_stop(auto_stop, options->frequency, file);
+	const ssize_t stop = parse_stop(
+		auto_stop, options->track, options->frequency, file);
 	const ssize_t length = parse_length(
 		options->length, options->frequency, start);
 

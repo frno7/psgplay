@@ -13,6 +13,6 @@ bool sndh_tag_subtune_count(int *track_count, struct file file);
 
 bool sndh_tag_default_subtune(int *track, struct file file);
 
-bool sndh_tag_time(float *duration, struct file file);
+bool sndh_tag_time(float *duration, int track, struct file file);
 
 #endif /* PSGPLAY_SNDH_TAG_H */
