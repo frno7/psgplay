@@ -3,8 +3,10 @@
 # Define V=1 for more verbose compile.
 # Define S=1 for sanitation checks.
 #
-# Define ALSA=1 for Advanced Linux Sound Architecture (ALSA) support
-# Define TOS=1 to compile TOS stub
+# Define ALSA=1 for Advanced Linux Sound Architecture (ALSA) support.
+#
+# Define CROSS_COMPILE=m68k-unknown-linux-gnu- (or m68-atari-mint-) to
+# build TOS stub from source.
 
 CFLAGS += -g -O2 -Wall -Iinclude -D_GNU_SOURCE
 
@@ -48,12 +50,12 @@ m68k/m68kcpu.c: $(M68K_GEN_H)
 
 M68K_C := $(M68K_GEN_C) m68k/m68kcpu.c m68k/m68kdasm.c m68k/softfloat.c
 
-ifeq "$(TOS)" "1"
+ifneq "x$(CROSS_COMPILE)" "x"
 tos/tos.o: tos/tos.s
-	$(QUIET_AS)m68k-as -o $@ $<
+	$(QUIET_AS)$(CROSS_COMPILE)as -o $@ $<
 tos/tos: script/tos.ld script/tos
 tos/tos: tos/tos.o
-	$(QUIET_LINK)m68k-ld --orphan-handling=error			\
+	$(QUIET_LINK)$(CROSS_COMPILE)ld --orphan-handling=error		\
 		--discard-all -nostdlib --no-relax			\
 		--script=script/tos.ld -o $@ $<
 	@chmod a-x $@
