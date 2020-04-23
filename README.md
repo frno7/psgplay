@@ -1,5 +1,11 @@
-`psgplay` is an YM2149 PSG music player for files in the
-[SNDH archive](http://sndh.atari.org/).
+`psgplay` is an [Atari ST](https://en.wikipedia.org/wiki/Atari_ST)
+[Programmable Sound Generator](https://en.wikipedia.org/wiki/Programmable_sound_generator) (PSG)
+[YM2149](https://en.wikipedia.org/wiki/General_Instrument_AY-3-8910) music
+player for files in the [SNDH archive](http://sndh.atari.org/).
+
+Do `make` to compile `tool/psgplay` for Linux or Mac OS. To use
+[Advanced Linux Sound Architecture](https://en.wikipedia.org/wiki/Advanced_Linux_Sound_Architecture)
+(ALSA), do `make ALSA=1`. Do `make help` to list further targets and options.
 
 ```
 Usage: psgplay [options]... <sndh-file>

@@ -1,12 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Define V=1 for more verbose compile.
-# Define S=1 for sanitation checks.
-#
-# Define ALSA=1 for Advanced Linux Sound Architecture (ALSA) support.
-#
-# Define CROSS_COMPILE=m68k-unknown-linux-gnu- (or m68-atari-mint-) to
-# build TOS stub from source.
+# Do "make help" for targets and options.
 
 CFLAGS += -g -O2 -Wall -Iinclude -D_GNU_SOURCE
 
@@ -91,6 +85,21 @@ clean:
 .PHONY: gtags
 gtags:
 	gtags
+
+.PHONY: help
+help:
+	@echo "Targets:"
+	@echo "  all            - compile the PSG player (default)"
+	@echo "  clean          - remove generated files"
+	@echo
+	@echo "Options:"
+	@echo "  V              - set to 1 to compile verbosely"
+	@echo "  S              - set to 1 for sanitation checks"
+	@echo "  ALSA           - set to 1 to support ALSA for Linux"
+	@echo "  CROSS_COMPILE  - set m68k cross assembler to use to build the TOS stub"
+	@echo
+	@echo "Example:"
+	@echo "  make ALSA=1 CROSS_COMPILE=m68k-unknown-linux-gnu-"
 
 V             = @
 Q             = $(V:1=)
