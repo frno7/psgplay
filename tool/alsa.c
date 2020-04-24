@@ -140,6 +140,7 @@ static void alsa_close(void *arg)
 	alsa_sample_flush(state);
 
 	snd_pcm_drain(state->pcm_handle);
+	snd_pcm_close(state->pcm_handle);
 
 	free(state);
 }
