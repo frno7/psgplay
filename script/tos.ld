@@ -4,7 +4,7 @@ OUTPUT_FORMAT("binary")
 
 MEMORY
 {
-	ram(rwx) : ORIGIN = 0, LENGTH = 14M
+	sys(rwx) : ORIGIN = 0, LENGTH = 0x4000	/* 16 KiB */
 	rom(rx)	 : ORIGIN = 0xe00000, LENGTH = 1M
 }
 
@@ -12,19 +12,25 @@ SECTIONS
 {
 	.exception_vector : {
 		. += 1K;
-	} >ram
+	} >sys
 
 	.system_variable : {
 		. += 1K;
-	} >ram
+	} >sys
 
 	.stack : ALIGN(4) {
 		_stack_bottom = .;
 		. += 2K;
 		_stack_top = .;
-	} >ram
+	} >sys
+
+	.bss : ALIGN(4) {
+		*(.bss)
+		*(.bss.*)
+	} >sys
 
 	.text : ALIGN(4) {
+		*(.text.reset)
 		*(.text)
 		*(.text.*)
 	} >rom
@@ -42,6 +48,6 @@ SECTIONS
 	/DISCARD/ : {
 		*(.comment)
 		*(.debug)
-		*(.bss)
+		*(.note.*)
 	}
 }

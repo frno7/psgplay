@@ -28,11 +28,7 @@
 
 	.equ	TOS_REGION_SE, (TOS_COUNTRY_SE << 1) | TOS_PAL
 
-	.equ	_ev_vbl, 0x70		/* FIXME: Linker script */
-
-	.equ	_mfp_vr, 0xfffffa17	/* FIXME: Linker script */
-
-	.text
+	.section ".text.reset"
 
 	/*
 	 * The first 8 bytes of the ROM are mirrored at address zero:
@@ -43,9 +39,9 @@
 	 *  The SSP is repurposed to contain a bra.s instruction and
 	 *  the TOS version.
 	 */
-	bra.s	reset
+	bra.s	.reset
 	.dc.w	TOS_VERSION
-	.dc.l	reset
+	.dc.l	.reset
 
 	.dc.l	0		/* FIXME: Base of OS */
 	.dc.l	0		/* FIXME */
@@ -59,22 +55,44 @@
 	.dc.l	0		/* FIXME */
 	.dc.l	0		/* FIXME */
 
-reset:	lea	_stack_top,%sp	/* Set a valid stack pointer */
-	move	#0x2700,%sr	/* Disable interrupts */
-	move.b	#0x48,_mfp_vr	/* Set MFP exception vector base */
+.reset:	move	#0x2700,%sr	/* Disable interrupts */
+	lea	_stack_top,%sp	/* Set a valid stack pointer */
+	move.b	#0x48,0xfffa17	/* Set MFP exception vector base */
 
-	move.l	#0x8,%a0
-excopy:	move.l	#ignore,(%a0)+
-	cmp.l	#0x13c,%a0
-	bne.s	excopy
+	/* Ignore all exceptions by default */
+	move.l	#0x8,%a1
+.loop:	move.l	#.ignore,(%a1)+
+	cmp.l	#0x13c,%a1
+	bne.s	.loop
 
-	move.l	#vbl,_ev_vbl
+	/* Install VBL and timer A, B, C and D vectors */
+	move.l	#.vbl,0x70
+	move.l	#.timer_a,0x134
+	move.l	#.timer_b,0x120
+	move.l	#.timer_c,0x114
+	move.l	#.timer_d,0x110
 
-	jsr	0x1000		/* Call the init function */
-loop:	stop	#0x2000		/* Enable and wait for interrupts */
-	bra.s	loop
+	move.l	%d1,-(%sp)	/* u32 track */
+	move.l	%a0,-(%sp)	/* void *sndh */
+	move.l	%d0,-(%sp)	/* size_t size */
+	jsr	start
+	sub.l	#12,%sp
 
-vbl:	jsr	0x1008		/* Call the play function */
+.halt:	stop	#0x2700
+	bra.s	.halt
+
+.ignore:
 	rte
 
-ignore:	rte
+.macro	exception	name
+.\name:	movem.l	%d0-%a6,-(%sp)
+	jsr	\name\()_exception
+	movem.l	(%sp)+,%d0-%a6
+	rte
+.endm
+
+	exception vbl
+	exception timer_a
+	exception timer_b
+	exception timer_c
+	exception timer_d

@@ -49,9 +49,9 @@ u64 machine_cycle(void)
 }
 
 static void atari_st_init(const void *prg, size_t size,
-	u32 d0, int sample_frequency, sample_f sample, void *sample_arg)
+	u32 track, int sample_frequency, sample_f sample, void *sample_arg)
 {
-	const size_t offset = 0x1000;
+	const size_t offset = 0x4000;	/* 16 KiB */
 	const u8 *p = prg;
 
 	if (offset + size >= ram_device.bus.size)
@@ -60,7 +60,9 @@ static void atari_st_init(const void *prg, size_t size,
 
 	device_reset();
 
-	m68k_set_reg(M68K_REG_D0, d0);
+	m68k_set_reg(M68K_REG_D0, size);
+	m68k_set_reg(M68K_REG_A0, offset);
+	m68k_set_reg(M68K_REG_D1, track);
 
 	for (size_t i = 0; i < size; i++)
 		ram_device.wr_u8(&ram_device, offset + i, p[i]);

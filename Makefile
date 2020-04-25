@@ -18,6 +18,8 @@ endif
 
 ALL_CFLAGS += $(CFLAGS) $(BASIC_CFLAGS)
 
+TOS_CFLAGS += -march=68000 -fno-PIC -O2 -Wall -Iinclude -nostdlib
+
 .PHONY: all
 all: tool
 
@@ -45,13 +47,15 @@ m68k/m68kcpu.c: $(M68K_GEN_H)
 M68K_C := $(M68K_GEN_C) m68k/m68kcpu.c m68k/m68kdasm.c m68k/softfloat.c
 
 ifneq "x$(CROSS_COMPILE)" "x"
-tos/tos.o: tos/tos.s
+tos/reset.o: tos/reset.S
 	$(QUIET_AS)$(CROSS_COMPILE)as -o $@ $<
+tos/sndh.o: tos/sndh.c
+	$(QUIET_CC)$(CROSS_COMPILE)gcc $(TOS_CFLAGS) -c -o $@ $<
 tos/tos: script/tos.ld script/tos
-tos/tos: tos/tos.o
+tos/tos: tos/reset.o tos/sndh.o
 	$(QUIET_LINK)$(CROSS_COMPILE)ld --orphan-handling=error		\
-		--discard-all -nostdlib --no-relax			\
-		--script=script/tos.ld -o $@ $<
+		--discard-all -nostdlib --no-relax -no-PIE		\
+		--script=script/tos.ld -o $@ tos/reset.o tos/sndh.o
 	@chmod a-x $@
 else
 tos/tos:
@@ -96,7 +100,7 @@ help:
 	@echo "  V              - set to 1 to compile verbosely"
 	@echo "  S              - set to 1 for sanitation checks"
 	@echo "  ALSA           - set to 1 to support ALSA for Linux"
-	@echo "  CROSS_COMPILE  - set m68k cross assembler to use to build the TOS stub"
+	@echo "  CROSS_COMPILE  - set m68k cross compiler to use to build the TOS stub"
 	@echo
 	@echo "Example:"
 	@echo "  make ALSA=1 CROSS_COMPILE=m68k-unknown-linux-gnu-"

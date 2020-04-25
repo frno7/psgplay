@@ -13,7 +13,7 @@
 #define MACHINE_FREQUENCY 8000000
 
 struct machine {
-	void (*init)(const void *prg, size_t size, u32 d0,
+	void (*init)(const void *prg, size_t size, u32 track,
 		int sample_frequency, sample_f sample, void *sample_arg);
 	bool (*run)(void);
 };
