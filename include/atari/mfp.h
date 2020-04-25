@@ -77,7 +77,7 @@ struct mfp_##type {							\
 	__BITFIELD_FIELD(u8 data_carrier_detect : 1,			\
 	__BITFIELD_FIELD(u8 centronics_busy : 1,			\
 	;))))))))							\
-};
+}
 
 enum mfp_ctrl {
 	mfp_ctrl_stop,
@@ -97,7 +97,7 @@ struct mfp_##type {							\
 	__BITFIELD_FIELD(u8 pulse_width_mode : 1,			\
 	__BITFIELD_FIELD(u8 ctrl : 3,					\
 	;))))								\
-};
+}
 
 DEFINE_MFP_PORT(gpip);
 DEFINE_MFP_PORT(aer);
@@ -175,32 +175,25 @@ struct mfp_tsr {
 	;)))))))
 };
 
+#define DEFINE_MFP_TDR(type)						\
+struct mfp_##type {							\
+	u8 count;							\
+}
+
+DEFINE_MFP_TDR(tadr);
+DEFINE_MFP_TDR(tbdr);
+DEFINE_MFP_TDR(tcdr);
+DEFINE_MFP_TDR(tddr);
+
+struct mfp_udr {
+	u8 data;
+};
+
 union mfp {
 	struct {
-		struct mfp_gpip gpip;
-		struct mfp_aer aer;
-		struct mfp_ddr ddr;
-		struct mfp_iera iera;
-		struct mfp_ierb ierb;
-		struct mfp_ipra ipra;
-		struct mfp_iprb iprb;
-		struct mfp_isra isra;
-		struct mfp_isrb isrb;
-		struct mfp_imra imra;
-		struct mfp_imrb imrb;
-		struct mfp_vr vr;
-		struct mfp_tacr tacr;
-		struct mfp_tbcr tbcr;
-		struct mfp_tcdcr tcdcr;
-		u8 tadr;
-		u8 tbdr;
-		u8 tcdr;
-		u8 tddr;
-		struct mfp_scr scr;
-		struct mfp_ucr ucr;
-		struct mfp_rsr rsr;
-		struct mfp_tsr tsr;
-		u8 udr;
+#define MFP_REG_STRUCT(register_, symbol_, label_, description_)	\
+	struct mfp_##symbol_ symbol_;
+MFP_REGISTERS(MFP_REG_STRUCT)
 	};
 	u8 reg[24];
 };
