@@ -101,13 +101,9 @@ DEFINE_MFP_IR(imr, IMR);	/* 16-bit interrupt mask register */
 static u32 mfp_ctrl_prescale(const enum mfp_ctrl ctrl)
 {
 	switch (ctrl) {
-	case mfp_ctrl_div_4:   return   4;
-	case mfp_ctrl_div_10:  return  10;
-	case mfp_ctrl_div_16:  return  16;
-	case mfp_ctrl_div_50:  return  50;
-	case mfp_ctrl_div_64:  return  64;
-	case mfp_ctrl_div_100: return 100;
-	case mfp_ctrl_div_200: return 200;
+#define MFP_CTRL_DIV_PRESCALE(div)					\
+	case mfp_ctrl_div_##div: return div;
+MFP_CTRL_DIV(MFP_CTRL_DIV_PRESCALE)
 	default:
 		BUG();
 	}

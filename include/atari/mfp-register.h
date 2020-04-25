@@ -79,15 +79,20 @@ struct mfp_##type {							\
 	;))))))))							\
 }
 
+#define MFP_CTRL_DIV(div)						\
+	div(4)								\
+	div(10)								\
+	div(16)								\
+	div(50)								\
+	div(64)								\
+	div(100)							\
+	div(200)
+
 enum mfp_ctrl {
 	mfp_ctrl_stop,
-	mfp_ctrl_div_4,
-	mfp_ctrl_div_10,
-	mfp_ctrl_div_16,
-	mfp_ctrl_div_50,
-	mfp_ctrl_div_64,
-	mfp_ctrl_div_100,
-	mfp_ctrl_div_200
+#define MFP_CTRL_DIV_ENUM(div)						\
+	mfp_ctrl_div_##div,
+MFP_CTRL_DIV(MFP_CTRL_DIV_ENUM)
 };
 
 #define DEFINE_MFP_TABCR(type)						\
