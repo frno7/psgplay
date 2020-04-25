@@ -72,11 +72,12 @@
 	move.l	#.timer_c,0x114
 	move.l	#.timer_d,0x110
 
+	move.l	%d2,-(%sp)	/* u32 timer */
 	move.l	%d1,-(%sp)	/* u32 track */
 	move.l	%a0,-(%sp)	/* void *sndh */
 	move.l	%d0,-(%sp)	/* size_t size */
 	jsr	start
-	sub.l	#12,%sp
+	sub.l	#16,%sp
 
 .halt:	stop	#0x2700
 	bra.s	.halt

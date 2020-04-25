@@ -96,6 +96,16 @@ static ssize_t stop_or_length(ssize_t stop, ssize_t length)
 		 stop == OPTION_STOP_NEVER     ? length : min(stop, length);
 }
 
+static u32 parse_timer(struct file file)
+{
+	struct sndh_timer timer;
+
+	if (!sndh_tag_timer(&timer, file))
+		return 0;
+
+	return sndh_timer_to_u32(timer);
+}
+
 void replay(const struct options *options, struct file file,
 	const struct output *output, const struct machine *machine)
 {
@@ -106,6 +116,7 @@ void replay(const struct options *options, struct file file,
 		auto_stop, options->track, options->frequency, file);
 	const ssize_t length = parse_length(
 		options->length, options->frequency, start);
+	const u32 timer = parse_timer(file);
 
 	struct replay_state state = {
 		.sample_start = start,
@@ -116,7 +127,7 @@ void replay(const struct options *options, struct file file,
 			options->track, options->frequency),
 	};
 
-	machine->init(file.data, file.size, options->track,
+	machine->init(file.data, file.size, options->track, timer,
 		options->frequency, replay_sample, &state);
 
 	for (;;)

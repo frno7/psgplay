@@ -59,7 +59,7 @@ static void idle_indefinitely(void)
 		idle();
 }
 
-void start(size_t size, void *sndh, u32 track)
+void start(size_t size, void *sndh, u32 track, u32 timer)
 {
 	record = (struct record) { .size = size, .sndh = sndh };
 
