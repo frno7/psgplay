@@ -7,6 +7,7 @@
 #define PSGPLAY_SNDH_TAG_H
 
 #include "psgplay/file.h"
+#include "psgplay/sndh-timer.h"
 #include "psgplay/types.h"
 
 bool sndh_tag_subtune_count(int *track_count, struct file file);
@@ -14,5 +15,7 @@ bool sndh_tag_subtune_count(int *track_count, struct file file);
 bool sndh_tag_default_subtune(int *track, struct file file);
 
 bool sndh_tag_time(float *duration, int track, struct file file);
+
+bool sndh_tag_timer(struct sndh_timer *timer, struct file file);
 
 #endif /* PSGPLAY_SNDH_TAG_H */
