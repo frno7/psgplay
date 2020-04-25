@@ -12,6 +12,7 @@
 #include "atari/glue.h"
 #include "atari/machine.h"
 #include "atari/mfp.h"
+#include "atari/mfp-map.h"
 
 #include "psgplay/build-bug.h"
 
@@ -429,7 +430,7 @@ const struct device mfp_device = {
 	.name = "mfp",
 	.frequency = MFP_FREQUENCY,
 	.bus = {
-		.address = 0xfffa00,
+		.address = MFP_BUS_ADDRESS,
 		.size = 64,
 	},
 	.reset = mfp_reset,
