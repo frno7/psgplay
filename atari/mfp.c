@@ -16,7 +16,6 @@
 #include "psgplay/build-bug.h"
 
 #define MFP_FREQUENCY	4000000
-#define TIMER_FREQUENCY	2457600
 
 union mfp {
 	struct {
@@ -73,7 +72,7 @@ static struct timer_cycle timer_from_mfp_cycle(
 {
 	return (struct timer_cycle) {
 		.c = cycle_transform(
-			TIMER_FREQUENCY, MFP_FREQUENCY, mfp_cycle.c)
+			MFP_TIMER_FREQUENCY, MFP_FREQUENCY, mfp_cycle.c)
 	};
 }
 
@@ -82,7 +81,7 @@ static struct device_cycle mfp_from_timer_cycle_align(
 {
 	return (struct device_cycle) {
 		.c = cycle_transform_align(
-			MFP_FREQUENCY, TIMER_FREQUENCY, timer_cycle.c)
+			MFP_FREQUENCY, MFP_TIMER_FREQUENCY, timer_cycle.c)
 	};
 }
 

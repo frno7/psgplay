@@ -8,6 +8,8 @@
 
 #include "psgplay/types.h"
 
+#define MFP_TIMER_FREQUENCY	2457600		/* Hz */
+
 #define MFP_REGISTERS(mfp)						\
 	mfp( 0, gpip,  GPIP,  "General-purpose I/O data register")	\
 	mfp( 1, aer,   AER,   "Active edge register")			\
