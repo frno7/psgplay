@@ -18,6 +18,15 @@
 #define MFP_FREQUENCY	4000000
 #define TIMER_FREQUENCY	2457600
 
+union mfp {
+	struct {
+#define MFP_REG_STRUCT(register_, symbol_, label_, description_)	\
+	struct mfp_##symbol_ symbol_;
+MFP_REGISTERS(MFP_REG_STRUCT)
+	};
+	u8 reg[24];
+};
+
 static union mfp mfp;
 
 struct timer_cycle {
