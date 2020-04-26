@@ -2,6 +2,8 @@
 
 OUTPUT_FORMAT("binary")
 
+ENTRY(_rom)
+
 MEMORY
 {
 	sys(rwx) : ORIGIN = 0, LENGTH = 0x4000	/* 16 KiB */
@@ -30,7 +32,6 @@ SECTIONS
 	} >sys
 
 	.text : ALIGN(4) {
-		*(.text.reset)
 		*(.text)
 		*(.text.*)
 	} >rom

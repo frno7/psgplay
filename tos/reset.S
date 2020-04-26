@@ -28,7 +28,7 @@
 
 	.equ	TOS_REGION_SE, (TOS_COUNTRY_SE << 1) | TOS_PAL
 
-	.section ".text.reset"
+	.text
 
 	/*
 	 * The first 8 bytes of the ROM are mirrored at address zero:
@@ -39,7 +39,8 @@
 	 *  The SSP is repurposed to contain a bra.s instruction and
 	 *  the TOS version.
 	 */
-	bra.s	.reset
+	.globl	_rom
+_rom:	bra.s	.reset
 	.dc.w	TOS_VERSION
 	.dc.l	.reset
 
