@@ -1,5 +1,7 @@
 /* The Operating System (TOS) */
 
+#include "tos/stddef.S"
+
 	.equ	TOS_VERSION, 0x0162	/* <major><minor> in BCD */
 	.equ	TOS_RELEASE, 0x01011990	/* <month><day><year> in BCD */
 
@@ -56,14 +58,14 @@ _rom:	bra.s	.reset
 	.dc.l	0		/* FIXME */
 	.dc.l	0		/* FIXME */
 
-.reset:	move	#0x2700,%sr	/* Disable interrupts */
-	lea	_stack_top,%sp	/* Set a valid stack pointer */
+.reset:	move	#0x2700,sr	/* Disable interrupts */
+	lea	_stack_top,sp	/* Set a valid stack pointer */
 	move.b	#0x48,0xfffa17	/* Set MFP exception vector base */
 
 	/* Ignore all exceptions by default */
-	move.l	#0x8,%a1
-.loop:	move.l	#.ignore,(%a1)+
-	cmp.l	#0x13c,%a1
+	move.l	#0x8,a1
+.loop:	move.l	#.ignore,(a1)+
+	cmp.l	#0x13c,a1
 	bne.s	.loop
 
 	/* Install VBL and timer A, B, C and D vectors */
@@ -73,12 +75,12 @@ _rom:	bra.s	.reset
 	move.l	#.timer_c,0x114
 	move.l	#.timer_d,0x110
 
-	move.l	%d2,-(%sp)	/* u32 timer */
-	move.l	%d1,-(%sp)	/* u32 track */
-	move.l	%a0,-(%sp)	/* void *sndh */
-	move.l	%d0,-(%sp)	/* size_t size */
+	move.l	d2,-(sp)	/* u32 timer */
+	move.l	d1,-(sp)	/* u32 track */
+	move.l	a0,-(sp)	/* void *sndh */
+	move.l	d0,-(sp)	/* size_t size */
 	jsr	start
-	sub.l	#16,%sp
+	sub.l	#16,sp
 
 .halt:	stop	#0x2700
 	bra.s	.halt
@@ -87,9 +89,9 @@ _rom:	bra.s	.reset
 	rte
 
 .macro	exception	name
-.\name:	movem.l	%d0-%a6,-(%sp)
+.\name:	movem.l	d0-a6,-(sp)
 	jsr	\name\()_exception
-	movem.l	(%sp)+,%d0-%a6
+	movem.l	(sp)+,d0-a6
 	rte
 .endm
 
