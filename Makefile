@@ -48,7 +48,7 @@ M68K_C := $(M68K_GEN_C) m68k/m68kcpu.c m68k/m68kdasm.c m68k/softfloat.c
 
 ifneq "x$(CROSS_COMPILE)" "x"
 tos/reset.o: tos/reset.S
-	$(QUIET_AS)$(CROSS_COMPILE)as -o $@ $<
+	$(QUIET_AS)$(CROSS_COMPILE)gcc $(TOS_CFLAGS) -c -o $@ $<
 tos/sndh.o: tos/sndh.c
 	$(QUIET_CC)$(CROSS_COMPILE)gcc $(TOS_CFLAGS) -c -o $@ $<
 tos/tos: script/tos.ld script/tos
