@@ -62,7 +62,7 @@
 /* Default filenames */
 #define FILENAME_INPUT      "m68k/m68k_in.c"
 #define FILENAME_PROTOTYPE  "include/m68k/m68kops.h"
-#define FILENAME_TABLE      "m68k/m68kops.c"
+#define FILENAME_TABLE      "lib/m68k/m68kops.c"
 
 
 /* Identifier sequences recognized by this program */

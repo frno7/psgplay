@@ -28,23 +28,7 @@ PSGPLAY := tool/psgplay
 .PHONY: tool
 tool: $(PSGPLAY)
 
-M68KMAKE := m68k/m68kmake
-
-$(M68KMAKE).o: $(M68KMAKE).c
-	$(QUIET_CC)$(CC) $(ALL_CFLAGS) -c -o $@ $<
-$(M68KMAKE): $(M68KMAKE).o
-	$(QUIET_LINK)$(CC) $(ALL_CFLAGS) -o $@ $^
-
-M68K_GEN_H := include/m68k/m68kops.h
-M68K_GEN_C := m68k/m68kops.c
-
-m68k/%ops.c include/m68k/%ops.h: m68k/%_in.c $(M68KMAKE)
-	$(Q:@=@echo    '  GEN     '$(M68K_GEN_H)			\
-		$(M68K_GEN_C);)$(M68KMAKE) . $<
-
-m68k/m68kcpu.c: $(M68K_GEN_H)
-
-M68K_C := $(M68K_GEN_C) m68k/m68kcpu.c m68k/m68kdasm.c m68k/softfloat.c
+include lib/Makefile
 
 ifneq "x$(CROSS_COMPILE)" "x"
 tos/reset.o: tos/reset.S
@@ -67,7 +51,7 @@ atari/rom.c: include/tos/tos.h
 
 VER := tool/version.c
 SRC := $(filter-out $(VER), $(wildcard tool/*.c))			\
-	$(wildcard atari/*.c) $(M68K_C) $(VER)
+	$(wildcard atari/*.c) $(M68K_SRC) $(VER)
 OBJ = $(patsubst %.c, %.o, $(SRC))
 
 $(PSGPLAY): $(OBJ)
@@ -82,7 +66,7 @@ $(VER):
 
 .PHONY: clean
 clean:
-	$(QUIET_RM)$(RM) -f */*.o */*.o.d include/tos/tos.h		\
+	$(QUIET_RM)$(RM) -f */*.o* */*/*.o* include/tos/tos.h		\
 		GPATH GRTAGS GTAGS 					\
 		$(M68K_GEN_H) $(M68K_GEN_C) $(VER) $(PSGPLAY) $(M68KMAKE)
 
