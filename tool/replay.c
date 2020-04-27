@@ -19,7 +19,8 @@
 #include "psgplay/replay.h"
 #include "psgplay/output.h"
 #include "psgplay/tool.h"
-#include "psgplay/sndh-tag.h"
+
+#include "sndh/tag.h"
 
 struct replay_state {
 	ssize_t sample_start;

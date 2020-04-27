@@ -7,8 +7,9 @@
 #define PSGPLAY_SNDH_TAG_H
 
 #include "psgplay/file.h"
-#include "psgplay/sndh-timer.h"
 #include "psgplay/types.h"
+
+#include "sndh/timer.h"
 
 bool sndh_tag_subtune_count(int *track_count, struct file file);
 

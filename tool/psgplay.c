@@ -13,12 +13,13 @@
 #include "psgplay/compare.h"
 #include "psgplay/file.h"
 #include "psgplay/print.h"
-#include "psgplay/sndh.h"
 #include "psgplay/sndh-print.h"
-#include "psgplay/sndh-tag.h"
 #include "psgplay/types.h"
 #include "psgplay/option.h"
 #include "psgplay/replay.h"
+
+#include "sndh/sndh.h"
+#include "sndh/tag.h"
 
 #include "out/alsa.h"
 #include "out/wave.h"

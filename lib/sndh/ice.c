@@ -3,7 +3,8 @@
 #include <string.h>
 
 #include "psgplay/build-bug.h"
-#include "psgplay/ice.h"
+
+#include "sndh/ice.h"
 
 struct ice_decrunch_state
 {

@@ -7,7 +7,8 @@
 
 #include "psgplay/macro.h"
 #include "psgplay/types.h"
-#include "psgplay/sndh-timer.h"
+
+#include "sndh/timer.h"
 
 #include "atari/mfp-map.h"
 

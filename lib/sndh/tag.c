@@ -10,10 +10,10 @@
 
 #include "psgplay/file.h"
 #include "psgplay/print.h"
-#include "psgplay/sndh.h"
-#include "psgplay/sndh-print.h"
-#include "psgplay/sndh-tag.h"
 #include "psgplay/string.h"
+
+#include "sndh/sndh.h"
+#include "sndh/tag.h"
 
 struct tag_time_state {
 	int t;

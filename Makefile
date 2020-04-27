@@ -50,7 +50,7 @@ include/tos/tos.h: tos/tos
 
 VER := tool/version.c
 SRC := $(filter-out $(VER), $(wildcard tool/*.c))			\
-	$(ATARI_SRC) $(M68K_SRC) $(OUT_SRC) $(VER)
+	$(ATARI_SRC) $(M68K_SRC) $(OUT_SRC) $(SNDH_SRC) $(VER)
 OBJ = $(patsubst %.c, %.o, $(SRC))
 
 $(PSGPLAY): $(OBJ)

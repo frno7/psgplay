@@ -9,9 +9,10 @@
 
 #include "psgplay/file.h"
 #include "psgplay/print.h"
-#include "psgplay/sndh.h"
 #include "psgplay/sndh-print.h"
 #include "psgplay/string.h"
+
+#include "sndh/sndh.h"
 
 struct print_context {
 	struct file file;

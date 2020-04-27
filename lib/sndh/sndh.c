@@ -10,13 +10,14 @@
 #include "psgplay/assert.h"
 #include "psgplay/compare.h"
 #include "psgplay/file.h"
-#include "psgplay/ice.h"
 #include "psgplay/memory.h"
 #include "psgplay/print.h"
-#include "psgplay/sndh.h"
 #include "psgplay/string.h"
 #include "psgplay/tool.h"
 #include "psgplay/unicode-atari-st.h"
+
+#include "sndh/ice.h"
+#include "sndh/sndh.h"
 
 struct tag {
 	char *value;
