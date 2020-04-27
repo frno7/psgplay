@@ -10,7 +10,8 @@
 #include "psgplay/print.h"
 #include "psgplay/string.h"
 #include "psgplay/types.h"
-#include "psgplay/unicode.h"
+
+#include "unicode/utf8.h"
 
 struct utf8_table {
 	u32 cmask;
@@ -22,13 +23,13 @@ struct utf8_table {
 
 static const struct utf8_table utf8_table[] =
 {
-	{ 0x80, 0x00, 0*6, 0x7f,       0,         }, /* 1 byte sequence */
-	{ 0xe0, 0xc0, 1*6, 0x7ff,      0x80,      }, /* 2 byte sequence */
-	{ 0xf0, 0xe0, 2*6, 0xffff,     0x800,     }, /* 3 byte sequence */
-	{ 0xf8, 0xf0, 3*6, 0x1fffff,   0x10000,   }, /* 4 byte sequence */
-	{ 0xfc, 0xf8, 4*6, 0x3ffffff,  0x200000,  }, /* 5 byte sequence */
-	{ 0xfe, 0xfc, 5*6, 0x7fffffff, 0x4000000, }, /* 6 byte sequence */
-	{ 0 }					     /* End of table    */
+	{ 0x80, 0x00, 0*6, 0x7f,       0         },	/* 1 byte sequence */
+	{ 0xe0, 0xc0, 1*6, 0x7ff,      0x80      },	/* 2 byte sequence */
+	{ 0xf0, 0xe0, 2*6, 0xffff,     0x800     },	/* 3 byte sequence */
+	{ 0xf8, 0xf0, 3*6, 0x1fffff,   0x10000   },	/* 4 byte sequence */
+	{ 0xfc, 0xf8, 4*6, 0x3ffffff,  0x200000  },	/* 5 byte sequence */
+	{ 0xfe, 0xfc, 5*6, 0x7fffffff, 0x4000000 },	/* 6 byte sequence */
+	{ 0 }						/* End of table */
 };
 
 #define UNICODE_MAX	0x0010ffff

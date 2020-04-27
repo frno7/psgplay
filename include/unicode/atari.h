@@ -4,7 +4,8 @@
 #define PSGPLAY_UNICODE_ATARI_ST_H
 
 #include "psgplay/types.h"
-#include "psgplay/unicode.h"
+
+#include "unicode/utf8.h"
 
 unicode_t charset_atari_st_to_utf32(u8 c, void *arg);
 

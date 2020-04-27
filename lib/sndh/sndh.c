@@ -14,10 +14,11 @@
 #include "psgplay/print.h"
 #include "psgplay/string.h"
 #include "psgplay/tool.h"
-#include "psgplay/unicode-atari-st.h"
 
 #include "sndh/ice.h"
 #include "sndh/sndh.h"
+
+#include "unicode/atari.h"
 
 struct tag {
 	char *value;

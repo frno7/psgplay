@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0
 
 #include "psgplay/macro.h"
-#include "psgplay/unicode.h"
-#include "psgplay/unicode-atari-st.h"
+
+#include "unicode/atari.h"
+#include "unicode/utf8.h"
 
 static const u16 atari_st_charset[256] = {
 	0x0000,	// <NUL>	NULL
