@@ -14,9 +14,10 @@
 #include "psgplay/file.h"
 #include "psgplay/print.h"
 #include "psgplay/types.h"
-#include "psgplay/version.h"
 #include "psgplay/option.h"
 #include "psgplay/tool.h"
+
+#include "version/version.h"
 
 static struct options option;
 

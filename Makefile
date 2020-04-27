@@ -28,7 +28,6 @@ tool: $(PSGPLAY)
 
 include lib/Makefile
 
-VER := tool/version.c
 SRC := $(filter-out $(VER), $(wildcard tool/*.c))			\
 	$(ATARI_SRC) $(M68K_SRC) $(OUT_SRC) $(SNDH_SRC) $(UNICODE_SRC) $(VER)
 OBJ = $(patsubst %.c, %.o, $(SRC))
@@ -38,10 +37,6 @@ $(PSGPLAY): $(OBJ)
 
 $(OBJ): %.o : %.c
 	$(QUIET_CC)$(CC) $(ALL_CFLAGS) -c -o $@ $<
-
-.PHONY: $(shell script/version $(VER))
-$(VER):
-	@script/version $@
 
 .PHONY: clean
 clean:
