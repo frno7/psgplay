@@ -7,7 +7,6 @@
 #include <stdio.h>
 
 #include "psgplay/macro.h"
-#include "psgplay/sha256.h"
 
 void pr_info(const char *fmt, ...)
 	__attribute__((format(printf, 1, 2)));
@@ -31,8 +30,6 @@ void pr_bug_warn(const char *file, int line,
 
 void NORETURN pr_bug(const char *file, int line,
 	const char *func, const char *expr);
-
-void pr_sha256(struct sha256 sha256);
 
 void pr_mem(FILE *f, const void *data, size_t size, size_t offset);
 

@@ -10,7 +10,6 @@
 #include "psgplay/compare.h"
 #include "psgplay/macro.h"
 #include "psgplay/print.h"
-#include "psgplay/sha256.h"
 #include "psgplay/string.h"
 #include "psgplay/tool.h"
 
@@ -104,12 +103,6 @@ void NORETURN pr_bug(const char *file, int line,
 		progname, file, line, func, expr);
 
 	exit(EXIT_FAILURE);
-}
-
-void pr_sha256(struct sha256 sha256)
-{
-	for (size_t i = 0; i < ARRAY_SIZE(sha256.d); i++)
-		printf("%02x", sha256.d[i]);
 }
 
 static void pr_printables(FILE *f,

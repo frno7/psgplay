@@ -87,17 +87,6 @@ static bool print_tag(const char *name, const char *value, void *arg)
 	return true;
 }
 
-static void print_data_sha256(size_t tag_size, struct file file)
-{
-	const u8 *b = file.data;
-	struct sha256 sha256 =
-		sha256_digest(&b[tag_size], file.size - tag_size);
-
-	printf("data sha256 ");
-	pr_sha256(sha256);
-	printf("\n");
-}
-
 void sndh_print(struct file file)
 {
 	struct print_context context = {
@@ -112,6 +101,4 @@ void sndh_print(struct file file)
 	else
 		printf("tag size %zu invalid\n", tag_size);
 	printf("data size %zu\n", file.size - tag_size);
-
-	print_data_sha256(tag_size, file);
 }
