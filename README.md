@@ -3,7 +3,7 @@
 [YM2149](https://en.wikipedia.org/wiki/General_Instrument_AY-3-8910) music
 player for files in the [SNDH archive](http://sndh.atari.org/).
 
-Do `make` to compile `tool/psgplay` for Linux or Mac OS. To use
+Do `make` to compile `psgplay` for Linux or Mac OS. To use
 [Advanced Linux Sound Architecture](https://en.wikipedia.org/wiki/Advanced_Linux_Sound_Architecture)
 (ALSA), do `make ALSA=1`. Do `make help` to list further targets and options.
 

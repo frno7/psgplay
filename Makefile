@@ -18,18 +18,16 @@ endif
 
 ALL_CFLAGS += $(CFLAGS) $(HAVE_CFLAGS) $(S_CFLAGS) $(BASIC_CFLAGS)
 
+PSGPLAY := psgplay
+
 .PHONY: all
-all: tool
-
-PSGPLAY := tool/psgplay
-
-.PHONY: tool
-tool: $(PSGPLAY)
+all: $(PSGPLAY)
 
 include lib/Makefile
+include system/Makefile
 
-SRC := $(filter-out $(VER), $(wildcard tool/*.c))			\
-	$(ATARI_SRC) $(M68K_SRC) $(OUT_SRC) $(SNDH_SRC) $(UNICODE_SRC) $(VER)
+SRC := $(ATARI_SRC) $(M68K_SRC) $(OUT_SRC) $(SNDH_SRC)			\
+	$(SYSTEM_UNIX_SRC) $(UNICODE_SRC) $(VER)
 OBJ = $(patsubst %.c, %.o, $(SRC))
 
 $(PSGPLAY): $(OBJ)

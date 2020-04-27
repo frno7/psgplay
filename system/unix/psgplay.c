@@ -13,7 +13,7 @@
 #include "psgplay/compare.h"
 #include "psgplay/file.h"
 #include "psgplay/print.h"
-#include "psgplay/sndh-print.h"
+#include "psgplay/info.h"
 #include "psgplay/types.h"
 #include "psgplay/option.h"
 #include "psgplay/replay.h"

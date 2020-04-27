@@ -9,7 +9,7 @@
 
 #include "psgplay/file.h"
 #include "psgplay/print.h"
-#include "psgplay/sndh-print.h"
+#include "psgplay/info.h"
 #include "psgplay/string.h"
 
 #include "sndh/sndh.h"
