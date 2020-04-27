@@ -47,11 +47,10 @@ tos/tos:
 endif
 include/tos/tos.h: tos/tos
 	$(QUIET_GEN)script/tos $< $@
-atari/rom.c: include/tos/tos.h
 
 VER := tool/version.c
 SRC := $(filter-out $(VER), $(wildcard tool/*.c))			\
-	$(wildcard atari/*.c) $(M68K_SRC) $(VER)
+	$(ATARI_SRC) $(M68K_SRC) $(VER)
 OBJ = $(patsubst %.c, %.o, $(SRC))
 
 $(PSGPLAY): $(OBJ)

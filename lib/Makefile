@@ -1,3 +1,4 @@
 # SPDX-License-Identifier: GPL-2.0
 
+include lib/atari/Makefile
 include lib/m68k/Makefile
