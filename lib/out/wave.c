@@ -9,12 +9,13 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "out/wave.h"
+
 #include "psgplay/assert.h"
 #include "psgplay/compare.h"
 #include "psgplay/file.h"
 #include "psgplay/memory.h"
 #include "psgplay/print.h"
-#include "psgplay/wave.h"
 
 typedef char wave_str[4];
 typedef u8 wave_u16[2];
@@ -52,7 +53,7 @@ struct wave_riff {
 };
 
 struct wave_chunk {
-	wave_str ckid;			/* "FMT " */
+	wave_str ckid;			/* "fmt " */
 	wave_u32 cksize;		/* Frame size, 16 */
 	wave_u16 format;		/* Format tag, 1 PCM */
 	wave_u16 n_channels;		/* Number of channels */

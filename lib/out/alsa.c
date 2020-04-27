@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "psgplay/alsa.h"
+#include "out/alsa.h"
 
 #ifdef HAVE_ALSA
 

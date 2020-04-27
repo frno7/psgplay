@@ -19,8 +19,9 @@
 #include "psgplay/types.h"
 #include "psgplay/option.h"
 #include "psgplay/replay.h"
-#include "psgplay/alsa.h"
-#include "psgplay/wave.h"
+
+#include "out/alsa.h"
+#include "out/wave.h"
 
 char progname[] = "psgplay";
 

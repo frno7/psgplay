@@ -2,3 +2,4 @@
 
 include lib/atari/Makefile
 include lib/m68k/Makefile
+include lib/out/Makefile
