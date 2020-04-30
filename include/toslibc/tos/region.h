@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0
 
-#ifndef TOS_REGION_H
-#define TOS_REGION_H
+#ifndef _TOSLIBC_TOS_REGION_H
+#define _TOSLIBC_TOS_REGION_H
+
+#if defined(_TOSLIBC_SOURCE)
 
 #define TOS_COUNTRY_US  0	/* USA */
 #define TOS_COUNTRY_DE  1	/* Germany */
@@ -26,4 +28,6 @@
 #define TOS_NTSC 0
 #define TOS_PAL  1
 
-#endif /* TOS_REGION_H */
+#endif /* defined(_TOSLIBC_SOURCE) */
+
+#endif /* _TOSLIBC_TOS_REGION_H */

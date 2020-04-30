@@ -1,8 +1,7 @@
 /* The Operating System (TOS) */
 
+#include <tos/region.h>
 #include <tos/stddef.S>
-
-#include "tos/region.h"
 
 	.equ	TOS_VERSION, 0x0162	/* <major><minor> in BCD */
 	.equ	TOS_RELEASE, 0x01011990	/* <month><day><year> in BCD */
