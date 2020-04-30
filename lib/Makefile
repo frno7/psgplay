@@ -5,5 +5,6 @@ include lib/m68k/Makefile
 include lib/out/Makefile
 include lib/sndh/Makefile
 include lib/tos/Makefile
+include lib/toslibc/Makefile
 include lib/unicode/Makefile
 include lib/version/Makefile
