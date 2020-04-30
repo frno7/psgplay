@@ -5,6 +5,7 @@
 
 #include "tos/stdlib.h"
 
+#include "psgplay/limits.h"
 #include "psgplay/macro.h"
 #include "psgplay/types.h"
 
@@ -66,31 +67,32 @@ MFP_CTRL_DIV(MFP_CTRL_DIV_PRESCALE)
 	bool valid = false;
 	int best = -1;
 
-	/*
-	 * FIXME: The somewhat contrived looping and limitations here are to
-	 * avoid linking with __mulsi3, __divsi3, etc. for the time being.
-	 */
-
-	if (frequency < 1 || 320 < frequency) /* FIXME: 65536 / 200 = 327 */
+	if (frequency < 1)
 		return false;
 
 	for (size_t i = 0; i < ARRAY_SIZE(prescale_div); i++) {
-		const u16 div = frequency * prescale_div[i];
+		if (frequency > U32_MAX / prescale_div[i])
+			continue;
 
-		for (u16 count = 1; count <= 256; count++) {
-			const int f = count * div;
-			const int diff = abs(f - MFP_TIMER_FREQUENCY);
+		const u32 count = DIV_ROUND_CLOSEST_U32(
+			MFP_TIMER_FREQUENCY, prescale_div[i] * (u32)frequency);
 
-			if (best >= 0 && diff >= best)
-				continue;
+		if (count < 1 || 256 < count)
+			continue;
 
-			best = diff;
-			valid = true;
-			*prescale = (struct timer_prescale) {
-				.ctrl = 1 + i,
-				.count = count & 0xff,
-			};
-		}
+		const u32 f = DIV_ROUND_CLOSEST_U32(
+			MFP_TIMER_FREQUENCY, prescale_div[i] * count);
+		const int diff = abs(f - frequency);
+
+		if (best >= 0 && diff >= best)
+			continue;
+
+		best = diff;
+		valid = true;
+		*prescale = (struct timer_prescale) {
+			.ctrl = 1 + i,
+			.count = count & 0xff,
+		};
 	}
 
 	return valid;
