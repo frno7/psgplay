@@ -16,7 +16,8 @@ HAVE_CFLAGS += -DHAVE_ALSA
 LIBS += -lasound
 endif
 
-ALL_CFLAGS += $(CFLAGS) $(HAVE_CFLAGS) $(S_CFLAGS) $(BASIC_CFLAGS)
+DEP_CFLAGS += $(CFLAGS) $(BASIC_CFLAGS)
+ALL_CFLAGS += $(DEP_CFLAGS) $(HAVE_CFLAGS) $(S_CFLAGS)
 
 PSGPLAY := psgplay
 
@@ -74,6 +75,6 @@ QUIET_RM      = $(Q:@=@echo    '  RM      '$@;)
 BASIC_CFLAGS += -Wp,-MMD,$(@D)/$(@F).d -MT $(@D)/$(@F)
 
 ifneq "$(MAKECMDGOALS)" "clean"
-    DEP_FILES := $(addsuffix .d, $(OBJ))
-    $(if $(DEP_FILES),$(eval -include $(DEP_FILES)))
+    DEP_FILES := $(shell find . -name '*'.d -printf '%P\n' | sort)
+    $(if $(DEP_FILES),$(eval include $(DEP_FILES)))
 endif
