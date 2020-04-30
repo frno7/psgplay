@@ -5,13 +5,8 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-
-#if defined(__m68k__)
-#include "tos/types.h"
-#else
 #include <stdint.h>
 #include <sys/types.h>
-#endif /* defined(__m68k__) */
 
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #define __BITFIELD_FIELD(field, more)					\
