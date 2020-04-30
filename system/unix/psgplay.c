@@ -18,6 +18,7 @@
 #include "psgplay/option.h"
 #include "psgplay/replay.h"
 
+#include "sndh/read.h"
 #include "sndh/sndh.h"
 #include "sndh/tag.h"
 
