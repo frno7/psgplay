@@ -23,6 +23,14 @@
 
 #define __UNIQUE_ID(prefix) __PASTE(__PASTE(__UNIQUE_ID_, prefix), __COUNTER__)
 
+#define DIV_ROUND_CLOSEST_U32(x_, divisor_)(				\
+{									\
+	const typeof(divisor_) __d = divisor_;				\
+	const u32 _tmp = (x_) + (__d / 2);				\
+	_tmp / __d;							\
+}									\
+)
+
 /*
  * This returns a constant expression while determining if an argument is
  * a constant expression, most importantly without evaluating the argument.
