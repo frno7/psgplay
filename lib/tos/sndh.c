@@ -3,7 +3,7 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#include "tos/stdlib.h"
+#include <stdlib.h>
 
 #include "psgplay/limits.h"
 #include "psgplay/macro.h"
