@@ -9,8 +9,12 @@ TOSLIBC_S_SRC +=							\
 	lib/toslibc/__mulsi3.S
 
 TOSLIBC_C_SRC +=							\
+	lib/toslibc/__divsi3.c						\
+	lib/toslibc/__udivdi3.c						\
+	lib/toslibc/__udivmoddi4.c					\
 	lib/toslibc/__udivmodsi4.c					\
-	lib/toslibc/__udivsi3.c
+	lib/toslibc/__udivsi3.c						\
+	lib/toslibc/__umoddi3.c
 
 TOSLIBC_S_OBJ += $(patsubst %.S, %.o, $(TOSLIBC_S_SRC))
 TOSLIBC_C_OBJ += $(patsubst %.c, %.o, $(TOSLIBC_C_SRC))
