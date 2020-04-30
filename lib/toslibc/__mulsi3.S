@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GCC-exception-2.0
 
-#include "tos/stddef.S"
+#include <tos/stddef.S>
 
 	.pushsection .text.__mulsi3
 	.globl	__mulsi3

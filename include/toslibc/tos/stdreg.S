@@ -3,8 +3,10 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#ifndef TOS_STDREG_S
-#define TOS_STDREG_S
+#ifndef _TOSLIBC_TOS_STDREG_S
+#define _TOSLIBC_TOS_STDREG_S
+
+#if defined(_TOSLIBC_SOURCE)
 
 #define REG_(r) % ## r
 
@@ -27,4 +29,6 @@
 #define sr REG_(sr)
 #define pc REG_(pc)
 
-#endif /* TOS_STDREG_S */
+#endif /* defined(_TOSLIBC_SOURCE) */
+
+#endif /* _TOSLIBC_TOS_STDREG_S */

@@ -72,7 +72,7 @@ QUIET_LINK    = $(Q:@=@echo    '  LD      '$@;)
 QUIET_TEST    = $(Q:@=@echo    '  TEST    '$@;)
 QUIET_RM      = $(Q:@=@echo    '  RM      '$@;)
 
-BASIC_CFLAGS += -Wp,-MMD,$(@D)/$(@F).d -MT $(@D)/$(@F)
+BASIC_CFLAGS += -Wp,-MD,$(@D)/$(@F).d -MT $(@D)/$(@F)
 
 ifneq "$(MAKECMDGOALS)" "clean"
     DEP_FILES := $(shell find . -name '*'.d -printf '%P\n' | sort)
