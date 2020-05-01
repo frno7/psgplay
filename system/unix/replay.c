@@ -17,11 +17,11 @@
 #include "psgplay/print.h"
 #include "psgplay/replay.h"
 #include "psgplay/output.h"
-#include "psgplay/tool.h"
 
 #include "sndh/tag.h"
 
 #include "system/unix/file.h"
+#include "system/unix/option.h"
 
 struct replay_state {
 	ssize_t sample_start;

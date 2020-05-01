@@ -9,12 +9,12 @@
 
 #include "psgplay/assert.h"
 #include "psgplay/memory.h"
-#include "psgplay/option.h"
 
 #include "sndh/ice.h"
 #include "sndh/read.h"
 
 #include "system/unix/file.h"
+#include "system/unix/option.h"
 
 struct file sndh_read_file(const char *path)
 {

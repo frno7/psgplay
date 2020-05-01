@@ -9,10 +9,10 @@
 #include "atari/machine.h"
 
 #include "psgplay/types.h"
-#include "psgplay/option.h"
 #include "psgplay/output.h"
 
 #include "system/unix/file.h"
+#include "system/unix/option.h"
 
 void replay(const struct options *options, struct file file,
 	const struct output *output, const struct machine *machine);

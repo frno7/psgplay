@@ -13,7 +13,6 @@
 #include "psgplay/compare.h"
 #include "psgplay/diagnostic.h"
 #include "psgplay/info.h"
-#include "psgplay/option.h"
 #include "psgplay/print.h"
 #include "psgplay/replay.h"
 #include "psgplay/types.h"
@@ -26,6 +25,7 @@
 #include "out/wave.h"
 
 #include "system/unix/file.h"
+#include "system/unix/option.h"
 
 char progname[] = "psgplay";
 

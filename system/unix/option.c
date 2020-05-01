@@ -13,12 +13,11 @@
 #include "psgplay/compare.h"
 #include "psgplay/print.h"
 #include "psgplay/types.h"
-#include "psgplay/option.h"
-#include "psgplay/tool.h"
 
 #include "version/version.h"
 
 #include "system/unix/file.h"
+#include "system/unix/option.h"
 
 static struct options option;
 

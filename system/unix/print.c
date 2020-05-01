@@ -11,7 +11,8 @@
 #include "psgplay/macro.h"
 #include "psgplay/print.h"
 #include "psgplay/string.h"
-#include "psgplay/tool.h"
+
+#include "system/unix/option.h"
 
 static void report(const char *prefix, const char *suffix,
 	const char *fmt, va_list ap)

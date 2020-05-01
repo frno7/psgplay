@@ -3,13 +3,15 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#ifndef PSGPLAY_OPTION_H
-#define PSGPLAY_OPTION_H
+#ifndef PSGPLAY_SYSTEM_UNIX_OPTION_H
+#define PSGPLAY_SYSTEM_UNIX_OPTION_H
 
-#include "psgplay/types.h"
+#include <stdbool.h>
 
 #define OPTION_TIME_UNDEFINED -1
 #define OPTION_STOP_NEVER     -2
+
+extern char progname[];
 
 struct options {
 	int verbose;
@@ -31,4 +33,6 @@ int option_verbosity(void);
 
 struct options *parse_options(int argc, char **argv);
 
-#endif /* PSGPLAY_OPTION_H */
+int option_verbosity(void);
+
+#endif /* PSGPLAY_SYSTEM_UNIX_OPTION_H */
