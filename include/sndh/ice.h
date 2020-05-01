@@ -3,7 +3,7 @@
 #ifndef PSGPLAY_ICE_H
 #define PSGPLAY_ICE_H
 
-#include "psgplay/types.h"
+#include <stddef.h>
 
 /**
  * ice_identify - is data ICE compressed?
