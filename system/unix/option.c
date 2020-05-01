@@ -14,8 +14,7 @@
 #include "internal/types.h"
 
 #include "psgplay/print.h"
-
-#include "version/version.h"
+#include "psgplay/version.h"
 
 #include "system/unix/file.h"
 #include "system/unix/option.h"
@@ -62,7 +61,7 @@ static void NORETURN help_exit(int code)
 
 static void NORETURN version_exit(void)
 {
-	printf("%s version %s\n", progname, program_version());
+	printf("%s version %s\n", progname, psgplay_version());
 
 	exit(EXIT_SUCCESS);
 }

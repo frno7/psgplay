@@ -9,9 +9,9 @@ f="$1"
 mod=$([ -z "$(git status -suno)" ] || echo "+")
 tag="$(git describe --always --tags)"
 ver="$(echo "$tag" | sed 's/^v//')$mod"
-src=$(echo "#include "'"'"version/version.h"'"'"
+src=$(echo "#include "'"'"psgplay/version.h"'"'"
 
-const char *program_version(void) { return "'"'"$ver"'"'"; }")
+const char *psgplay_version(void) { return "'"'"$ver"'"'"; }")
 
 if [ ! -f "$f" ] || ! echo "$src" | cmp --quiet - "$f"
 then
