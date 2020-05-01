@@ -14,7 +14,6 @@
 #include "atari/machine.h"
 
 #include "psgplay/print.h"
-#include "psgplay/replay.h"
 
 #include "sndh/read.h"
 #include "sndh/sndh.h"
@@ -27,6 +26,7 @@
 #include "system/unix/file.h"
 #include "system/unix/info.h"
 #include "system/unix/option.h"
+#include "system/unix/replay.h"
 
 char progname[] = "psgplay";
 

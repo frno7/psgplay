@@ -3,8 +3,8 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#ifndef PSGPLAY_REPLAY_H
-#define PSGPLAY_REPLAY_H
+#ifndef PSGPLAY_SYSTEM_UNIX_REPLAY_H
+#define PSGPLAY_SYSTEM_UNIX_REPLAY_H
 
 #include "internal/types.h"
 
@@ -18,4 +18,4 @@
 void replay(const struct options *options, struct file file,
 	const struct output *output, const struct machine *machine);
 
-#endif /* PSGPLAY_REPLAY_H */
+#endif /* PSGPLAY_SYSTEM_UNIX_REPLAY_H */

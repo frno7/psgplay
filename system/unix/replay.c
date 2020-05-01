@@ -12,17 +12,17 @@
 
 #include "internal/compare.h"
 
-#include "atari/machine.h"
+#include "atari/machine.h"	/* FIXME: psgplay/machine.h */
 
 #include "psgplay/assert.h"
 #include "psgplay/print.h"
-#include "psgplay/replay.h"
 #include "psgplay/output.h"
 
 #include "sndh/tag.h"
 
 #include "system/unix/file.h"
 #include "system/unix/option.h"
+#include "system/unix/replay.h"
 
 struct replay_state {
 	ssize_t sample_start;
