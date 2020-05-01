@@ -9,11 +9,11 @@
 
 #include "psgplay/print.h"
 #include "psgplay/diagnostic.h"
-#include "psgplay/string.h"
 
 #include "sndh/sndh.h"
 
 #include "system/unix/file.h"
+#include "system/unix/string.h"
 
 static void diag_warn(void *arg, const char *fmt, ...)
 {

@@ -10,8 +10,9 @@
 #include "psgplay/assert.h"
 #include "psgplay/memory.h"
 #include "psgplay/print.h"
-#include "psgplay/string.h"
 #include "psgplay/types.h"
+
+#include "system/unix/string.h"
 
 char *xstrdup(const char *s)
 {
@@ -46,12 +47,12 @@ char *xstrndup(const char *s, size_t n)
 	return t;
 }
 
-bool strtoint(int *n, const char *s, int base)
+bool strtoint(int *n, const char *s, int base)	/* FIXME: Move to psgplay */
 {
 	char *e;
 
 	errno = 0;
-	*n = strtoll(s, &e, base);
+	*n = strtoll(s, &e, base);	/* FIXME: Check INT_MAX */
 
 	return e == &s[strlen(s)] && errno != ERANGE;
 }

@@ -8,10 +8,11 @@
 #include "psgplay/assert.h"
 #include "psgplay/memory.h"
 #include "psgplay/print.h"
-#include "psgplay/string.h"
 #include "psgplay/types.h"
 
 #include "unicode/utf8.h"
+
+#include "system/unix/string.h"
 
 struct utf8_table {
 	u32 cmask;

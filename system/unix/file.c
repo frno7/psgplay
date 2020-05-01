@@ -15,10 +15,10 @@
 
 #include "psgplay/compare.h"
 #include "psgplay/macro.h"
-#include "psgplay/string.h"
 #include "psgplay/types.h"
 
 #include "system/unix/file.h"
+#include "system/unix/string.h"
 
 static struct file file_read_fd__(int fd, char *path)
 {
