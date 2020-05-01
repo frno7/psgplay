@@ -3,9 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "psgplay/memory.h"
 #include "psgplay/print.h"
 #include "psgplay/types.h"
+
+#include "system/unix/memory.h"
 
 void *xmalloc(size_t size)
 {

@@ -8,10 +8,9 @@
 #include <string.h>
 
 #include "psgplay/assert.h"
-#include "psgplay/memory.h"
 #include "psgplay/print.h"
-#include "psgplay/types.h"
 
+#include "system/unix/memory.h"
 #include "system/unix/string.h"
 
 char *xstrdup(const char *s)

@@ -13,10 +13,10 @@
 
 #include "psgplay/assert.h"
 #include "psgplay/compare.h"
-#include "psgplay/memory.h"
 #include "psgplay/print.h"
 
 #include "system/unix/file.h"
+#include "system/unix/memory.h"
 
 typedef char wave_str[4];
 typedef u8 wave_u16[2];
