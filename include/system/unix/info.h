@@ -3,11 +3,11 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#ifndef PSGPLAY_INFO_H
-#define PSGPLAY_INFO_H
+#ifndef PSGPLAY_SYSTEM_UNIX_INFO_H
+#define PSGPLAY_SYSTEM_UNIX_INFO_H
 
 #include "system/unix/file.h"
 
 void sndh_print(struct file file);
 
-#endif /* PSGPLAY_INFO_H */
+#endif /* PSGPLAY_SYSTEM_UNIX_INFO_H */

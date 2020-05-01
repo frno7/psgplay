@@ -8,13 +8,13 @@
 #include <string.h>
 
 #include "psgplay/print.h"
-#include "psgplay/info.h"
 
 #include "sndh/sndh.h"
 
 #include "unicode/atari.h"
 
 #include "system/unix/file.h"
+#include "system/unix/info.h"
 #include "system/unix/string.h"
 
 static void print_flags(const char *flags, struct file file)
