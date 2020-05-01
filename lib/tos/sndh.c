@@ -7,8 +7,7 @@
 
 #include "internal/macro.h"
 #include "internal/types.h"
-
-#include "psgplay/limits.h"
+#include "internal/limits.h"
 
 #include "sndh/timer.h"
 

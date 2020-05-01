@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 
-#ifndef PSGPLAY_LIMITS_H
-#define PSGPLAY_LIMITS_H
+#ifndef INTERNAL_LIMITS_H
+#define INTERNAL_LIMITS_H
 
 #include "internal/types.h"
 
@@ -33,4 +33,4 @@
 #define S64_MAX		((s64)(U64_MAX >> 1))
 #define S64_MIN		((s64)(-S64_MAX - 1))
 
-#endif /* PSGPLAY_LIMITS_H */
+#endif /* INTERNAL_LIMITS_H */
