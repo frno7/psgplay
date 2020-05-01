@@ -7,7 +7,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "psgplay/macro.h"
+#include "internal/macro.h"
+
 #include "psgplay/string.h"
 
 #include "sndh/sndh.h"

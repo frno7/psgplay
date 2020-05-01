@@ -6,7 +6,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include "psgplay/macro.h"
+#include "internal/macro.h"
 
 void pr_info(const char *fmt, ...)
 	__attribute__((format(printf, 1, 2)));

@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "internal/build-assert.h"
+#include "internal/macro.h"
 
 #include "atari/device.h"
 #include "atari/glue.h"
@@ -19,7 +20,6 @@
 
 #include "psgplay/assert.h"
 #include "psgplay/compare.h"
-#include "psgplay/macro.h"
 
 static u64 cycle = 0;
 

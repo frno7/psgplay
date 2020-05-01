@@ -5,7 +5,7 @@
 
 #include <string.h>
 
-#include "psgplay/macro.h"
+#include "internal/macro.h"
 
 #include "sndh/sndh.h"
 #include "sndh/tag.h"

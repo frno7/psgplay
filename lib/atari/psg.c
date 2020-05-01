@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "internal/macro.h"
+
 #include "atari/bus.h"
 #include "atari/device.h"
 #include "atari/irq.h"
@@ -14,7 +16,6 @@
 #include "atari/machine.h"
 #include "atari/psg.h"
 
-#include "psgplay/macro.h"
 #include "psgplay/assert.h"
 
 #define PSG_FREQUENCY	2000000

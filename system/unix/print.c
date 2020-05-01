@@ -7,10 +7,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "internal/macro.h"
 #include "internal/types.h"
 
 #include "psgplay/compare.h"
-#include "psgplay/macro.h"
 #include "psgplay/print.h"
 
 #include "system/unix/option.h"

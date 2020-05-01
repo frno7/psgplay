@@ -5,7 +5,7 @@
 
 #include "atari/system-variable.h"
 
-#include "psgplay/macro.h"
+#include "internal/macro.h"
 
 struct system_variable {
 	u32 address;

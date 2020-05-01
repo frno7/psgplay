@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 
-#include "psgplay/macro.h"
+#include "internal/macro.h"
 
 #include "unicode/atari.h"
 #include "unicode/utf8.h"

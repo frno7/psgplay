@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 
-#ifndef PSGPLAY_MACRO_H
-#define PSGPLAY_MACRO_H
+#ifndef INTERNAL_MACRO_H
+#define INTERNAL_MACRO_H
 
 /* Macro definitions from the Linux kernel. */
 
@@ -50,4 +50,4 @@
 
 #define NORETURN __attribute__((__noreturn__))
 
-#endif /* PSGPLAY_MACRO_H */
+#endif /* INTERNAL_MACRO_H */

@@ -4,8 +4,7 @@
 #define PSGPLAY_COMPARE_H
 
 #include "internal/build-assert.h"
-
-#include "psgplay/macro.h"
+#include "internal/macro.h"
 
 /* Macro definitions from the Linux kernel. */
 
