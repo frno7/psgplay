@@ -3,8 +3,9 @@
 #ifndef PSGPLAY_ASSERT_H
 #define PSGPLAY_ASSERT_H
 
+#include "internal/types.h"
+
 #include "psgplay/print.h"
-#include "psgplay/types.h"
 
 /* Macro definitions from the Linux kernel. */
 

@@ -3,7 +3,7 @@
 #ifndef PSGPLAY_UNICODE_H
 #define PSGPLAY_UNICODE_H
 
-#include "psgplay/types.h"
+#include "internal/types.h"
 
 typedef u32 unicode_t;
 

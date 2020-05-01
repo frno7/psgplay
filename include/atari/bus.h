@@ -6,9 +6,9 @@
 #ifndef ATARI_BUS_H
 #define ATARI_BUS_H
 
-#include "atari/device.h"
+#include "internal/types.h"
 
-#include "psgplay/types.h"
+#include "atari/device.h"
 
 #define BUS_FREQUENCY 8000000
 

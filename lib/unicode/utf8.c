@@ -5,9 +5,10 @@
 #include <limits.h>
 #include <stdlib.h>
 
+#include "internal/types.h"
+
 #include "psgplay/assert.h"
 #include "psgplay/print.h"
-#include "psgplay/types.h"
 
 #include "unicode/utf8.h"
 

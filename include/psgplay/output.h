@@ -6,7 +6,7 @@
 #ifndef PSGPLAY_OUTPUT_H
 #define PSGPLAY_OUTPUT_H
 
-#include "psgplay/types.h"
+#include "internal/types.h"
 
 struct output {
 	void *(*open)(const char *output, int track, int frequency);

@@ -5,9 +5,10 @@
 
 #include <stdlib.h>
 
+#include "internal/types.h"
+
 #include "psgplay/limits.h"
 #include "psgplay/macro.h"
-#include "psgplay/types.h"
 
 #include "sndh/timer.h"
 

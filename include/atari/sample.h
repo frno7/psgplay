@@ -6,7 +6,7 @@
 #ifndef ATARI_SAMPLE_H
 #define ATARI_SAMPLE_H
 
-#include "psgplay/types.h"
+#include "internal/types.h"
 
 typedef bool (*sample_f)(s16 left, s16 right, void *arg);
 

@@ -6,9 +6,10 @@
 #ifndef PSGPLAY_REPLAY_H
 #define PSGPLAY_REPLAY_H
 
+#include "internal/types.h"
+
 #include "atari/machine.h"
 
-#include "psgplay/types.h"
 #include "psgplay/output.h"
 
 #include "system/unix/file.h"

@@ -13,9 +13,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "internal/types.h"
+
 #include "psgplay/compare.h"
 #include "psgplay/macro.h"
-#include "psgplay/types.h"
 
 #include "system/unix/file.h"
 #include "system/unix/string.h"

@@ -6,9 +6,9 @@
 #ifndef ATARI_MACHINE_H
 #define ATARI_MACHINE_H
 
-#include "atari/sample.h"
+#include "internal/types.h"
 
-#include "psgplay/types.h"
+#include "atari/sample.h"
 
 #define MACHINE_FREQUENCY 8000000
 

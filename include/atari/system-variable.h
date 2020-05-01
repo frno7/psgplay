@@ -3,7 +3,7 @@
 #ifndef ATARI_SYSTEM_VARIABLE_H
 #define ATARI_SYSTEM_VARIABLE_H
 
-#include "psgplay/types.h"
+#include "internal/types.h"
 
 #define SYSTEM_VARIABLE(v)						\
 	v(0x400, 1, 4, evt_timer,   "Timer handoff")			\

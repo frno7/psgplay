@@ -3,7 +3,7 @@
 #ifndef ATARI_EXCEPTION_VECTOR_H
 #define ATARI_EXCEPTION_VECTOR_H
 
-#include "psgplay/types.h"
+#include "internal/types.h"
 
 #define EXCEPTION_VECTOR(e)						\
 	e(  0, "Reset initial interrupt stack pointer")			\

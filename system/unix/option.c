@@ -9,10 +9,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "internal/types.h"
+
 #include "psgplay/build-bug.h"
 #include "psgplay/compare.h"
 #include "psgplay/print.h"
-#include "psgplay/types.h"
 
 #include "version/version.h"
 

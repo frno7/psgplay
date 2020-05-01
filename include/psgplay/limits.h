@@ -3,7 +3,7 @@
 #ifndef PSGPLAY_LIMITS_H
 #define PSGPLAY_LIMITS_H
 
-#include <psgplay/types.h>
+#include "internal/types.h"
 
 #define USHRT_MAX	((unsigned short)~0U)
 #define SHRT_MAX	((short)(USHRT_MAX >> 1))

@@ -7,10 +7,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "internal/types.h"
+
 #include "atari/bus.h"
 #include "atari/machine.h"
-
-#include "psgplay/types.h"
 
 static void mmu_trace(const char *op, u32 dev_address,
 	const char *spacing, int size, u32 value,

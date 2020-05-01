@@ -6,7 +6,7 @@
 #ifndef ATARI_DEVICE_H
 #define ATARI_DEVICE_H
 
-#include "psgplay/types.h"
+#include "internal/types.h"
 
 struct device_cycle {
 	u64 c;

@@ -3,7 +3,7 @@
 #ifndef PSGPLAY_UNICODE_ATARI_ST_H
 #define PSGPLAY_UNICODE_ATARI_ST_H
 
-#include "psgplay/types.h"
+#include "internal/types.h"
 
 #include "unicode/utf8.h"
 

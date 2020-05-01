@@ -6,7 +6,7 @@
 #ifndef ATARI_MFP_REGISTER_H
 #define ATARI_MFP_REGISTER_H
 
-#include "psgplay/types.h"
+#include "internal/types.h"
 
 #define MFP_TIMER_FREQUENCY	2457600		/* Hz */
 

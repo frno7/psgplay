@@ -7,13 +7,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "internal/types.h"
+
 #include "atari/machine.h"
 
 #include "psgplay/build-bug.h"
 #include "psgplay/compare.h"
 #include "psgplay/print.h"
 #include "psgplay/replay.h"
-#include "psgplay/types.h"
 
 #include "sndh/read.h"
 #include "sndh/sndh.h"

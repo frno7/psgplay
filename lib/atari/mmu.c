@@ -3,6 +3,8 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
+#include "internal/types.h"
+
 #include "atari/bus.h"
 #include "atari/mfp.h"
 #include "atari/machine.h"
@@ -14,7 +16,6 @@
 #include "m68k/m68kcpu.h"
 
 #include "psgplay/assert.h"
-#include "psgplay/types.h"
 
 static void mmu_bus_wait(const struct device *dev)
 {
