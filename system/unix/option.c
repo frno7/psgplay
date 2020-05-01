@@ -10,9 +10,9 @@
 #include <string.h>
 
 #include "internal/build-assert.h"
+#include "internal/compare.h"
 #include "internal/types.h"
 
-#include "psgplay/compare.h"
 #include "psgplay/print.h"
 
 #include "version/version.h"

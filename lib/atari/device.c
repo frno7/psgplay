@@ -4,6 +4,7 @@
  */
 
 #include "internal/types.h"
+#include "internal/compare.h"
 
 #include "atari/bus.h"
 #include "atari/cpu.h"
@@ -18,7 +19,6 @@
 #include "atari/shifter.h"
 
 #include "psgplay/assert.h"
-#include "psgplay/compare.h"
 #include "psgplay/struct.h"
 
 static struct machine_device {

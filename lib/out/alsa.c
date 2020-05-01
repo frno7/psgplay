@@ -12,8 +12,9 @@
 
 #include <alsa/asoundlib.h>
 
+#include "internal/compare.h"
+
 #include "psgplay/assert.h"
-#include "psgplay/compare.h"
 #include "psgplay/print.h"
 
 #include "system/unix/file.h"

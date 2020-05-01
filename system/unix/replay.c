@@ -10,10 +10,11 @@
 #include <math.h>
 #include <string.h>
 
+#include "internal/compare.h"
+
 #include "atari/machine.h"
 
 #include "psgplay/assert.h"
-#include "psgplay/compare.h"
 #include "psgplay/print.h"
 #include "psgplay/replay.h"
 #include "psgplay/output.h"

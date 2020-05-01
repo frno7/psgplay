@@ -9,10 +9,11 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "internal/compare.h"
+
 #include "out/wave.h"
 
 #include "psgplay/assert.h"
-#include "psgplay/compare.h"
 #include "psgplay/print.h"
 
 #include "system/unix/file.h"

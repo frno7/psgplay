@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 
-#ifndef PSGPLAY_COMPARE_H
-#define PSGPLAY_COMPARE_H
+#ifndef INTERNAL_COMPARE_H
+#define INTERNAL_COMPARE_H
 
 #include "internal/build-assert.h"
 #include "internal/macro.h"
@@ -122,4 +122,4 @@
  */
 #define clamp_val(val, lo, hi) clamp_t(typeof(val), val, lo, hi)
 
-#endif /* PSGPLAY_COMPARE_H */
+#endif /* INTERNAL_COMPARE_H */
