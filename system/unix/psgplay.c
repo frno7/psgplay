@@ -17,7 +17,6 @@
 
 #include "sndh/read.h"
 #include "sndh/sndh.h"
-#include "sndh/tag.h"
 
 #include "out/alsa.h"
 #include "out/wave.h"

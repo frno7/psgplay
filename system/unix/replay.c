@@ -18,7 +18,7 @@
 #include "psgplay/print.h"
 #include "psgplay/output.h"
 
-#include "sndh/tag.h"
+#include "sndh/sndh.h"
 
 #include "system/unix/file.h"
 #include "system/unix/option.h"
