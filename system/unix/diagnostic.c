@@ -7,12 +7,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "psgplay/file.h"
 #include "psgplay/print.h"
 #include "psgplay/diagnostic.h"
 #include "psgplay/string.h"
 
 #include "sndh/sndh.h"
+
+#include "system/unix/file.h"
 
 static void diag_warn(void *arg, const char *fmt, ...)
 {

@@ -12,7 +12,6 @@
 #include "psgplay/build-bug.h"
 #include "psgplay/compare.h"
 #include "psgplay/diagnostic.h"
-#include "psgplay/file.h"
 #include "psgplay/info.h"
 #include "psgplay/option.h"
 #include "psgplay/print.h"
@@ -25,6 +24,8 @@
 
 #include "out/alsa.h"
 #include "out/wave.h"
+
+#include "system/unix/file.h"
 
 char progname[] = "psgplay";
 

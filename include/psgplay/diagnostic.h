@@ -6,8 +6,7 @@
 #ifndef PSGPLAY_DIAGNOSTIC_H
 #define PSGPLAY_DIAGNOSTIC_H
 
-#include "psgplay/file.h"
-#include "psgplay/types.h"
+#include "system/unix/file.h"
 
 void sndh_diagnostic(struct file file);
 

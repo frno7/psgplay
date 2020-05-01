@@ -10,8 +10,9 @@
 
 #include "psgplay/types.h"
 #include "psgplay/option.h"
-#include "psgplay/file.h"
 #include "psgplay/output.h"
+
+#include "system/unix/file.h"
 
 void replay(const struct options *options, struct file file,
 	const struct output *output, const struct machine *machine);

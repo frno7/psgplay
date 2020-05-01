@@ -6,8 +6,7 @@
 #ifndef PSGPLAY_SNDH_FILE_H
 #define PSGPLAY_SNDH_FILE_H
 
-#include "psgplay/file.h"
-#include "psgplay/types.h"
+#include "system/unix/file.h"
 
 struct file sndh_read_file(const char *path);
 

@@ -8,12 +8,13 @@
 #include <stdlib.h>
 
 #include "psgplay/assert.h"
-#include "psgplay/file.h"
 #include "psgplay/memory.h"
 #include "psgplay/option.h"
 
 #include "sndh/ice.h"
 #include "sndh/read.h"
+
+#include "system/unix/file.h"
 
 struct file sndh_read_file(const char *path)
 {

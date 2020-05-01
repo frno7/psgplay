@@ -6,8 +6,7 @@
 #ifndef PSGPLAY_INFO_H
 #define PSGPLAY_INFO_H
 
-#include "psgplay/file.h"
-#include "psgplay/types.h"
+#include "system/unix/file.h"
 
 void sndh_print(struct file file);
 

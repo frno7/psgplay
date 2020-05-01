@@ -3,12 +3,11 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#ifndef PSGPLAY_FILE_H
-#define PSGPLAY_FILE_H
+#ifndef PSGPLAY_SYSTEM_UNIX_FILE_H
+#define PSGPLAY_SYSTEM_UNIX_FILE_H
 
-#include <sys/types.h>
-
-#include "psgplay/types.h"
+#include <stdbool.h>
+#include <stddef.h>
 
 /**
  * struct file - file container
@@ -40,4 +39,4 @@ ssize_t xread(int fd, void *buf, size_t nbyte);
 
 ssize_t xwrite(int fd, const void *buf, size_t nbyte);
 
-#endif /* PSGPLAY_FILE_H */
+#endif /* PSGPLAY_SYSTEM_UNIX_FILE_H */

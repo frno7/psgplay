@@ -3,13 +3,8 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include "psgplay/file.h"
-
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "atari/bus.h"

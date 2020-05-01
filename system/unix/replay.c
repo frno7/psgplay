@@ -14,13 +14,14 @@
 
 #include "psgplay/assert.h"
 #include "psgplay/compare.h"
-#include "psgplay/file.h"
 #include "psgplay/print.h"
 #include "psgplay/replay.h"
 #include "psgplay/output.h"
 #include "psgplay/tool.h"
 
 #include "sndh/tag.h"
+
+#include "system/unix/file.h"
 
 struct replay_state {
 	ssize_t sample_start;

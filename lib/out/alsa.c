@@ -14,9 +14,10 @@
 
 #include "psgplay/assert.h"
 #include "psgplay/compare.h"
-#include "psgplay/file.h"
 #include "psgplay/memory.h"
 #include "psgplay/print.h"
+
+#include "system/unix/file.h"
 
 #define ALSA_SAMPLE(s) ((struct alsa_sample) { .lo = (s), .hi = (s) >> 8 })
 
