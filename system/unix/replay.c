@@ -70,7 +70,7 @@ static ssize_t parse_stop_auto(int track, int frequency, struct file file)
 {
 	float duration;
 
-	if (!sndh_tag_time(&duration, track, file))
+	if (!sndh_tag_subtune_time(&duration, track, file.data, file.size))
 		return OPTION_TIME_UNDEFINED;
 
 	return duration > 0 ?  roundf(duration * frequency) : OPTION_STOP_NEVER;
@@ -101,7 +101,7 @@ static u32 parse_timer(struct file file)
 {
 	struct sndh_timer timer;
 
-	if (!sndh_tag_timer(&timer, file))
+	if (!sndh_tag_timer(&timer, file.data, file.size))
 		return 0;
 
 	return sndh_timer_to_u32(timer);

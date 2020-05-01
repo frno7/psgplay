@@ -39,7 +39,7 @@ static int default_subtune(struct file file)
 {
 	int track;
 
-	if (!sndh_tag_default_subtune(&track, file))
+	if (!sndh_tag_default_subtune(&track, file.data, file.size))
 		track = 1;
 
 	return track;
@@ -52,7 +52,7 @@ static void select_subtune(int *track, struct file file)
 	if (*track < 1)
 		*track = default_subtune(file);
 
-	if (sndh_tag_subtune_count(&track_count, file))
+	if (sndh_tag_subtune_count(&track_count, file.data, file.size))
 		if (*track > track_count)
 			pr_fatal_error("%s: track %d out of range 1 to %d\n",
 				file.path, *track, track_count);

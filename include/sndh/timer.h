@@ -6,6 +6,8 @@
 #ifndef PSGPLAY_SNDH_TIMER_H
 #define PSGPLAY_SNDH_TIMER_H
 
+#include <stdint.h>
+
 enum sndh_timer_type {
 	SNDH_TIMER_A = 'A',
 	SNDH_TIMER_B = 'B',
@@ -19,12 +21,12 @@ struct sndh_timer {
 	int frequency;
 };
 
-static inline u32 sndh_timer_to_u32(const struct sndh_timer timer)
+static inline uint32_t sndh_timer_to_u32(const struct sndh_timer timer)
 {
 	return (timer.frequency << 8) | (timer.type & 0xff);
 }
 
-static inline struct sndh_timer u32_to_sndh_timer(const u32 timer)
+static inline struct sndh_timer u32_to_sndh_timer(const uint32_t timer)
 {
 	return (struct sndh_timer) {
 		.type = timer & 0xff,
