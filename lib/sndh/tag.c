@@ -17,7 +17,7 @@
 
 bool sndh_tag_subtune_count(int *track_count, struct file file)
 {
-	sndh_for_each_tag (file)
+	sndh_for_each_tag (file.data, file.size)
 		if (strcmp(sndh_tag_name, "##") == 0) {
 			*track_count = sndh_tag_integer;
 
@@ -29,7 +29,7 @@ bool sndh_tag_subtune_count(int *track_count, struct file file)
 
 bool sndh_tag_default_subtune(int *track, struct file file)
 {
-	sndh_for_each_tag (file)
+	sndh_for_each_tag (file.data, file.size)
 		if (strcmp(sndh_tag_name, "!#") == 0) {
 			*track = sndh_tag_integer;
 
@@ -43,7 +43,7 @@ bool sndh_tag_time(float *duration, int track, struct file file)
 {
 	int t = 0;
 
-	sndh_for_each_tag (file)
+	sndh_for_each_tag (file.data, file.size)
 		if (strcmp(sndh_tag_name, "TIME") == 0 && ++t == track) {
 			*duration = sndh_tag_integer;
 
@@ -66,7 +66,7 @@ bool sndh_tag_timer(struct sndh_timer *timer, struct file file)
 		{ "!V", SNDH_TIMER_V },
 	};
 
-	sndh_for_each_tag (file)
+	sndh_for_each_tag (file.data, file.size)
 		for (size_t i = 0; i < ARRAY_SIZE(timers); i++)
 			if (strcmp(sndh_tag_name, timers[i].name) == 0) {
 				*timer = (struct sndh_timer) {

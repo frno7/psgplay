@@ -6,8 +6,8 @@
 #ifndef PSGPLAY_SNDH_H
 #define PSGPLAY_SNDH_H
 
-#include "psgplay/file.h"
-#include "psgplay/types.h"
+#include <stdbool.h>
+#include <stddef.h>
 
 #define SNDH_FLAG(f)							\
 	f('y', PSG, "YM2149 PSG")					\
@@ -33,43 +33,47 @@
 
 /**
  * sndh_for_each_tag - iterate over SNDH tags
- * @file: file with SNDH data
+ * @data: SNDH data
+ * @size: size in bytes of SNDH data
  *
  * Note that some tags such as "TIME" and "#!SN" may have multiple values
  * and be given more than once.
  */
-#define sndh_for_each_tag(file)						\
-	sndh_for_each_tag_with_header_size_and_diagnostic((file), NULL, NULL)
+#define sndh_for_each_tag(data, size)					\
+	sndh_for_each_tag_with_header_size_and_diagnostic((data), (size), NULL, NULL)
 
 /**
  * sndh_for_each_tag_with_diagnostic - iterate over SNDH tags with diagnostic
- * @file: file with SNDH data
+ * @data: SNDH data
+ * @size: size in bytes of SNDH data
  * @diag: pointer to &struct sndh_diagnostic with warning and error callbacks,
  * 	or %NULL to ignore
  *
  * Note that some tags such as "TIME" and "#!SN" may have multiple values
  * and be given more than once.
  */
-#define sndh_for_each_tag_with_diagnostic(file, diag)			\
-	sndh_for_each_tag_with_header_size_and_diagnostic((file), NULL, (diag))
+#define sndh_for_each_tag_with_diagnostic(data, size, diag)		\
+	sndh_for_each_tag_with_header_size_and_diagnostic((data), (size), NULL, (diag))
 
 /**
  * sndh_for_each_tag_with_header_size - iterate over SNDH tags and compute
  * 	SNDH header size
- * @file: file with SNDH data
+ * @data: SNDH data
+ * @size: size in bytes of SNDH data
  * @header_size: pointer to &size_t to store SNDH header size, or %NULL to
  * 	ignore
  *
  * Note that some tags such as "TIME" and "#!SN" may have multiple values
  * and be given more than once.
  */
-#define sndh_for_each_tag_with_header_size(file, header_size)		\
-	sndh_for_each_tag_with_header_size_and_diagnostic((file), (header_size), NULL)
+#define sndh_for_each_tag_with_header_size(data, size, header_size)	\
+	sndh_for_each_tag_with_header_size_and_diagnostic((data), (size), (header_size), NULL)
 
 /**
  * sndh_for_each_tag_with_header_size_and_diagnostic - iterate over SNDH tags
  * 	and compute size with diagnostic
- * @file: file with SNDH data
+ * @data: SNDH data
+ * @size: size in bytes of SNDH data
  * @header_size: pointer to &size_t to store SNDH header size, or %NULL to
  * 	ignore
  * @diag: pointer to &struct sndh_diagnostic with warning and error callbacks,
@@ -78,9 +82,9 @@
  * Note that some tags such as "TIME" and "#!SN" may have multiple values
  * and be given more than once.
  */
-#define sndh_for_each_tag_with_header_size_and_diagnostic(file, header_size, diag)\
+#define sndh_for_each_tag_with_header_size_and_diagnostic(data, size, header_size, diag)\
 	for (struct sndh_cursor sndh_cursor__ =				\
-	     sndh_first_tag((file), (header_size), (diag));		\
+	     sndh_first_tag((data), (size), (header_size), (diag));	\
 	     sndh_valid_tag(&sndh_cursor__);				\
 	     sndh_next_tag(&sndh_cursor__))
 
@@ -98,9 +102,7 @@ struct sndh_diagnostic {
 	void *arg;
 };
 
-/*
- * Private SNDH structures and functions.
- */
+/* Private SNDH structures and functions. */
 
 struct sndh_cursor;
 
@@ -113,7 +115,7 @@ struct sndh_tag {
 struct sndh_cursor {
 	const struct {
 		size_t size;
-		void *data;
+		const void *data;
 	} file;
 
 	struct {
@@ -144,7 +146,7 @@ struct sndh_cursor {
 	const struct sndh_diagnostic diag;
 };
 
-struct sndh_cursor sndh_first_tag(struct file file,
+struct sndh_cursor sndh_first_tag(const void *data, const size_t size,
 	size_t *header_size, const struct sndh_diagnostic *diag);
 
 bool sndh_valid_tag(const struct sndh_cursor *cursor);

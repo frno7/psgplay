@@ -58,7 +58,7 @@ void sndh_diagnostic(struct file file)
 		.arg = &file
 	};
 
-	sndh_for_each_tag_with_diagnostic (file, &diag) {
+	sndh_for_each_tag_with_diagnostic (file.data, file.size, &diag) {
 		const char *name = sndh_tag_name;
 		const char *value = sndh_tag_value;
 		const size_t length = strlen(value);

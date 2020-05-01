@@ -3,11 +3,11 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#include <string.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
-#include "psgplay/assert.h"
-#include "psgplay/file.h"
+#include "psgplay/macro.h"
 #include "psgplay/string.h"
 
 #include "sndh/sndh.h"
@@ -71,7 +71,7 @@ static bool sndh_nul(struct sndh_cursor *cursor)
 
 static bool sndh_string__(struct sndh_cursor *cursor)
 {
-	char *c = cursor->file.data;
+	const char *c = cursor->file.data;
 
 	if (!cursor->tag->length) {
 		cursor->value = &c[cursor->offset];
@@ -132,8 +132,8 @@ static size_t sndh_substrings_subend(size_t o, struct sndh_cursor  *cursor)
 static bool sndh_substrings_subtag(struct sndh_cursor  *cursor)
 {
 	const char *c = cursor->file.data;
-	const u8 *b = cursor->file.data;
-	const u8 *d = &b[cursor->offset];
+	const uint8_t *b = cursor->file.data;
+	const uint8_t *d = &b[cursor->offset];
 	const size_t o = cursor->subtag.start + ((d[0] << 8) | d[1]);
 	const size_t e = sndh_substrings_subend(o, cursor);
 
@@ -213,8 +213,8 @@ static bool sndh_subtunes(struct sndh_cursor *cursor)
 
 static bool sndh_time_subtag(struct sndh_cursor *cursor)
 {
-	const u8 *b = cursor->file.data;
-	const u8 *d = &b[cursor->offset];
+	const uint8_t *b = cursor->file.data;
+	const uint8_t *d = &b[cursor->offset];
 	const int t = (d[0] << 8) | d[1];
 
 	snprintf(cursor->buffer, sizeof(cursor->buffer), "%d", t);
@@ -257,7 +257,7 @@ static bool sndh_hdns(struct sndh_cursor *cursor)
 
 static bool sndh_padding(struct sndh_cursor *cursor)
 {
-	char *c = cursor->file.data;
+	const char *c = cursor->file.data;
 
 	if (cursor->offset < cursor->file.size && c[cursor->offset] == '\0') {
 		cursor->offset++;
@@ -271,12 +271,12 @@ static bool sndh_padding(struct sndh_cursor *cursor)
 static void branch_bound(size_t *bound,
 	size_t offset, const void *data, size_t size)
 {
-	const u8 *b = data;
+	const uint8_t *b = data;
 
 	if (offset + size < 2)
 		return;
 
-	const u16 w = (b[offset + 0] << 8) | b[offset + 1];
+	const uint16_t w = (b[offset + 0] << 8) | b[offset + 1];
 	if (w == 0x4e71)	/* nop */
 		return branch_bound(bound, offset + 2, data, size);
 
@@ -304,13 +304,13 @@ static void branch_bound(size_t *bound,
 	}
 }
 
-static size_t tag_bound(struct file file)
+static size_t tag_bound(const void *data, const size_t size)
 {
-	size_t bound = file.size;
+	size_t bound = size;
 
-	branch_bound(&bound, 0, file.data,  4);
-	branch_bound(&bound, 4, file.data,  8);
-	branch_bound(&bound, 8, file.data, 12);
+	branch_bound(&bound, 0, data,  4);
+	branch_bound(&bound, 4, data,  8);
+	branch_bound(&bound, 8, data, 12);
 
 	return bound;
 }
@@ -364,10 +364,10 @@ restart:
 static void diag_warn_ignore(void *arg, const char *fmt, ...) { }
 static void diag_error_ignore(void *arg, const char *fmt, ...) { }
 
-struct sndh_cursor sndh_first_tag(struct file file,
+struct sndh_cursor sndh_first_tag(const void *data, const size_t size,
 	size_t *header_size, const struct sndh_diagnostic *diag)
 {
-	size_t offset = sndh_head_offset(file.size, file.data);
+	size_t offset = sndh_head_offset(size, data);
 
 	if (header_size)
 		*header_size = 0;
@@ -381,15 +381,15 @@ struct sndh_cursor sndh_first_tag(struct file file,
 
 	struct sndh_cursor cursor = {
 		.file = {
-			.size = file.size,
-			.data = file.data
+			.size = size,
+			.data = data
 		},
 
 		.header = {
 			.size = header_size
 		},
 
-		.bound = tag_bound(file),
+		.bound = tag_bound(data, size),
 		.offset = offset,
 
 		.valid = true,

@@ -39,7 +39,7 @@ void sndh_print(struct file file)
 
 	printf("path %s\n", file.path);
 
-	sndh_for_each_tag_with_header_size (file, &header_size) {
+	sndh_for_each_tag_with_header_size (file.data, file.size, &header_size) {
 		const char *name = sndh_tag_name;
 		const char *value = sndh_tag_value;
 		const size_t length = strlen(value);
