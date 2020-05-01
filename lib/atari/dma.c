@@ -6,11 +6,11 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "internal/build-assert.h"
+
 #include "atari/bus.h"
 #include "atari/device.h"
 #include "atari/dma.h"
-
-#include "psgplay/build-bug.h"
 
 static void dma_event(const struct device *device,
 	const struct device_cycle mfp_cycle)

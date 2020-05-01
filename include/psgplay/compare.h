@@ -3,7 +3,8 @@
 #ifndef PSGPLAY_COMPARE_H
 #define PSGPLAY_COMPARE_H
 
-#include "psgplay/build-bug.h"
+#include "internal/build-assert.h"
+
 #include "psgplay/macro.h"
 
 /* Macro definitions from the Linux kernel. */

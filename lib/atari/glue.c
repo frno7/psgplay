@@ -14,7 +14,7 @@
 
 #include "m68k/m68k.h"
 
-#include "psgplay/build-bug.h"
+#include "psgplay/assert.h"
 
 static struct device_cycle vbl_cycle;
 

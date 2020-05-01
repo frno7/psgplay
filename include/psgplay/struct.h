@@ -3,7 +3,7 @@
 #ifndef PSGPLAY_STRUCT_H
 #define PSGPLAY_STRUCT_H
 
-#include "psgplay/build-bug.h"
+#include "internal/build-assert.h"
 
 #define sizeof_member(type, member) sizeof(((type *)0)->member)
 

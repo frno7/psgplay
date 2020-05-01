@@ -6,6 +6,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "internal/build-assert.h"
+#include "internal/types.h"
+
 #include "atari/bus.h"
 #include "atari/device.h"
 #include "atari/irq.h"
@@ -14,7 +17,7 @@
 #include "atari/mfp.h"
 #include "atari/mfp-map.h"
 
-#include "psgplay/build-bug.h"
+#include "psgplay/assert.h"
 
 #define MFP_FREQUENCY	4000000
 

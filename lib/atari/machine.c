@@ -6,6 +6,8 @@
 #include <inttypes.h>
 #include <string.h>
 
+#include "internal/build-assert.h"
+
 #include "atari/device.h"
 #include "atari/glue.h"
 #include "atari/machine.h"
@@ -16,7 +18,6 @@
 #include "m68k/m68kcpu.h"
 
 #include "psgplay/assert.h"
-#include "psgplay/build-bug.h"
 #include "psgplay/compare.h"
 #include "psgplay/macro.h"
 

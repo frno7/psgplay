@@ -3,11 +3,12 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
+#include "internal/build-assert.h"
+
 #include "atari/bus.h"
 #include "atari/machine.h"
 
 #include "psgplay/assert.h"
-#include "psgplay/build-bug.h"
 #include "psgplay/macro.h"
 
 u8 bus_error_rd_u8(const struct device *device, u32 address)

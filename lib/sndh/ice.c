@@ -2,7 +2,8 @@
 
 #include <string.h>
 
-#include "psgplay/build-bug.h"
+#include "internal/build-assert.h"
+#include "internal/types.h"
 
 #include "sndh/ice.h"
 

@@ -14,7 +14,8 @@
 #include "atari/machine.h"
 #include "atari/psg.h"
 
-#include "psgplay/build-bug.h"
+#include "psgplay/macro.h"
+#include "psgplay/assert.h"
 
 #define PSG_FREQUENCY	2000000
 
