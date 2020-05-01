@@ -5,6 +5,7 @@
 
 #include "internal/types.h"
 #include "internal/compare.h"
+#include "internal/struct.h"
 
 #include "atari/bus.h"
 #include "atari/cpu.h"
@@ -19,7 +20,6 @@
 #include "atari/shifter.h"
 
 #include "psgplay/assert.h"
-#include "psgplay/struct.h"
 
 static struct machine_device {
 	u64 machine_cycle_event;

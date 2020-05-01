@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 
-#ifndef PSGPLAY_STRUCT_H
-#define PSGPLAY_STRUCT_H
+#ifndef INTERNAL_STRUCT_H
+#define INTERNAL_STRUCT_H
 
 #include "internal/build-assert.h"
 
@@ -22,4 +22,4 @@
 			 "pointer type mismatch in container_of()");	\
 	((type *)(__mptr - offsetof(type, member))); })
 
-#endif /* PSGPLAY_STRUCT_H */
+#endif /* INTERNAL_STRUCT_H */
