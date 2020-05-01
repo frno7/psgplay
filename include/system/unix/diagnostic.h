@@ -3,11 +3,11 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#ifndef PSGPLAY_DIAGNOSTIC_H
-#define PSGPLAY_DIAGNOSTIC_H
+#ifndef PSGPLAY_SYSTEM_UNIX_DIAGNOSTIC_H
+#define PSGPLAY_SYSTEM_UNIX_DIAGNOSTIC_H
 
 #include "system/unix/file.h"
 
 void sndh_diagnostic(struct file file);
 
-#endif /* PSGPLAY_DIAGNOSTIC_H */
+#endif /* PSGPLAY_SYSTEM_UNIX_DIAGNOSTIC_H */

@@ -11,7 +11,6 @@
 
 #include "psgplay/build-bug.h"
 #include "psgplay/compare.h"
-#include "psgplay/diagnostic.h"
 #include "psgplay/print.h"
 #include "psgplay/replay.h"
 #include "psgplay/types.h"
@@ -23,6 +22,7 @@
 #include "out/alsa.h"
 #include "out/wave.h"
 
+#include "system/unix/diagnostic.h"
 #include "system/unix/file.h"
 #include "system/unix/info.h"
 #include "system/unix/option.h"

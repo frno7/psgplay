@@ -8,10 +8,10 @@
 #include <string.h>
 
 #include "psgplay/print.h"
-#include "psgplay/diagnostic.h"
 
 #include "sndh/sndh.h"
 
+#include "system/unix/diagnostic.h"
 #include "system/unix/file.h"
 #include "system/unix/string.h"
 
