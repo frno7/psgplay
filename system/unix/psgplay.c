@@ -11,12 +11,13 @@
 
 #include "psgplay/build-bug.h"
 #include "psgplay/compare.h"
+#include "psgplay/diagnostic.h"
 #include "psgplay/file.h"
-#include "psgplay/print.h"
 #include "psgplay/info.h"
-#include "psgplay/types.h"
 #include "psgplay/option.h"
+#include "psgplay/print.h"
 #include "psgplay/replay.h"
+#include "psgplay/types.h"
 
 #include "sndh/read.h"
 #include "sndh/sndh.h"
@@ -79,6 +80,8 @@ int main(int argc, char *argv[])
 	struct file file = sndh_read_file(options->input);
 	if (!file_valid(file))
 		pr_fatal_errno(options->input);
+
+	sndh_diagnostic(file);
 
 	if (options->info)
 		info_exit(file);

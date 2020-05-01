@@ -11,14 +11,15 @@
 void pr_info(const char *fmt, ...)
 	__attribute__((format(printf, 1, 2)));
 
-void pr_warn(const char *msg, ...)
+void pr_warn(const char *fmt, ...)
 	__attribute__((format(printf, 1, 2)));
 
 void pr_warn_errno(const char *s);
 
 void pr_errno(const char *s);
 
-void pr_error(const char *fmt, ...);
+void pr_error(const char *fmt, ...)
+	__attribute__((format(printf, 1, 2)));
 
 void NORETURN pr_fatal_error(const char *fmt, ...)
 	__attribute__((format(printf, 1, 2)));

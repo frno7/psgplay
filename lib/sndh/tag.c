@@ -15,70 +15,45 @@
 #include "sndh/sndh.h"
 #include "sndh/tag.h"
 
-struct tag_time_state {
-	int t;
-	int track;
-
-	float *duration;
-};
-
-static bool subtune_count(const char *name, const char *value, void *arg)
-{
-	int *track_count = arg;
-
-	if (strcmp(name, "##") != 0)
-		return true;
-
-	*track_count = atoi(value);
-
-	return false;
-}
-
 bool sndh_tag_subtune_count(int *track_count, struct file file)
 {
-	return !sndh_tags(file, NULL, subtune_count, track_count);
-}
+	sndh_for_each_tag (file)
+		if (strcmp(sndh_tag_name, "##") == 0) {
+			*track_count = sndh_tag_integer;
 
-static bool tag_default_subtune(const char *name, const char *value, void *arg)
-{
-	int *track = arg;
-
-	if (strcmp(name, "!#") != 0)
-		return true;
-
-	*track = atoi(value);
+			return true;
+		}
 
 	return false;
 }
 
 bool sndh_tag_default_subtune(int *track, struct file file)
 {
-	return !sndh_tags(file, NULL, tag_default_subtune, track);
-}
+	sndh_for_each_tag (file)
+		if (strcmp(sndh_tag_name, "!#") == 0) {
+			*track = sndh_tag_integer;
 
-static bool tag_time(const char *name, const char *value, void *arg)
-{
-	struct tag_time_state *state = arg;
-
-	if (strcmp(name, "TIME") != 0)
-		return true;
-
-	if (++state->t != state->track)
-		return true;
-
-	*state->duration = atof(value);
+			return true;
+		}
 
 	return false;
 }
 
 bool sndh_tag_time(float *duration, int track, struct file file)
 {
-	struct tag_time_state state = { .track = track, .duration = duration };
+	int t = 0;
 
-	return !sndh_tags(file, NULL, tag_time, &state);
+	sndh_for_each_tag (file)
+		if (strcmp(sndh_tag_name, "TIME") == 0 && ++t == track) {
+			*duration = sndh_tag_integer;
+
+			return true;
+		}
+
+	return false;
 }
 
-static bool tag_timer(const char *name, const char *value, void *arg)
+bool sndh_tag_timer(struct sndh_timer *timer, struct file file)
 {
 	static const struct {
 		const char *name;
@@ -90,20 +65,17 @@ static bool tag_timer(const char *name, const char *value, void *arg)
 		{ "TD", SNDH_TIMER_D },
 		{ "!V", SNDH_TIMER_V },
 	};
-	struct sndh_timer *timer = arg;
 
-	for (int i = 0; i < ARRAY_SIZE(timers); i++)
-		if (strcmp(timers[i].name, name) == 0 &&
-		    sscanf(value, "%d", &timer->frequency) == 1) {
-			timer->type = timers[i].type;
+	sndh_for_each_tag (file)
+		for (size_t i = 0; i < ARRAY_SIZE(timers); i++)
+			if (strcmp(sndh_tag_name, timers[i].name) == 0) {
+				*timer = (struct sndh_timer) {
+					.type = timers[i].type,
+					.frequency = sndh_tag_integer
+				};
 
-			return false;
-		}
+				return true;
+			}
 
-	return true;
-}
-
-bool sndh_tag_timer(struct sndh_timer *timer, struct file file)
-{
-	return !sndh_tags(file, NULL, tag_timer, timer);
+	return false;
 }

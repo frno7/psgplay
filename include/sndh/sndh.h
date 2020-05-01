@@ -6,43 +6,149 @@
 #ifndef PSGPLAY_SNDH_H
 #define PSGPLAY_SNDH_H
 
+#include "psgplay/file.h"
 #include "psgplay/types.h"
 
 #define SNDH_FLAG(f)							\
-	f('y', PSG)							\
-	f('e', DMA)							\
-	f('a', MFP_TA)							\
-	f('b', MFP_TB)							\
-	f('c', MFP_TC)							\
-	f('d', MFP_TD)							\
-	f('p', AGA)							\
-	f('l', LMC)							\
-	f('s', DSP)							\
-	f('t', BLT)							\
-	f('h', HBL)
+	f('y', PSG, "YM2149 PSG")					\
+	f('e', DMA, "STE/TT DMA sound")					\
+	f('a', MFP_TA, "MFP timer A")					\
+	f('b', MFP_TB, "MFP timer B")					\
+	f('c', MFP_TC, "MFP timer C")					\
+	f('d', MFP_TD, "MFP timer D")					\
+	f('p', AGA, "Amiga AGA")					\
+	f('l', LMC, "STE/TT LMC1992")					\
+	f('s', DSP, "Falcon DSP 56001")					\
+	f('t', BLT, "BLITTER")						\
+	f('h', HBL, "Horizontal blank")
+
+/** sndh_tag_name - SNDH tag name */
+#define sndh_tag_name (sndh_cursor__.tag->name)
+
+/** sndh_tag_value - SNDH tag string representation */
+#define sndh_tag_value (sndh_cursor__.value)
+
+/** sndh_tag_integer - SNDH tag integer representation */
+#define sndh_tag_integer (sndh_cursor__.integer)
 
 /**
- * sndh_tag_cb - SNDH tag callback
- * @name: tag name
- * @value: tag value
- * @arg: optional pointer supplied to &sndh_tags;
- *
- * Note that some tags such as "TIME" and "#!SN" may have multiple values and
- * this callback will be invoked, in order, for each value separately.
- *
- * Return: %true to continue processing next tag, otherwise %false
- */
-typedef bool (*sndh_tag_cb)(const char *name, const char *value, void *arg);
-
-/**
- * sndh_tags - iterate over all SNDH tags
+ * sndh_for_each_tag - iterate over SNDH tags
  * @file: file with SNDH data
- * @size: store total tag size, unless %NULL
- * @cb: callback to invoke for each tag
- * @arg: optional pointer passed on to the callback; can be %NULL
  *
- * Return: %true on successful completion, otherwise %false
+ * Note that some tags such as "TIME" and "#!SN" may have multiple values
+ * and be given more than once.
  */
-bool sndh_tags(struct file file, size_t *size, sndh_tag_cb cb, void *arg);
+#define sndh_for_each_tag(file)						\
+	sndh_for_each_tag_with_header_size_and_diagnostic((file), NULL, NULL)
+
+/**
+ * sndh_for_each_tag_with_diagnostic - iterate over SNDH tags with diagnostic
+ * @file: file with SNDH data
+ * @diag: pointer to &struct sndh_diagnostic with warning and error callbacks,
+ * 	or %NULL to ignore
+ *
+ * Note that some tags such as "TIME" and "#!SN" may have multiple values
+ * and be given more than once.
+ */
+#define sndh_for_each_tag_with_diagnostic(file, diag)			\
+	sndh_for_each_tag_with_header_size_and_diagnostic((file), NULL, (diag))
+
+/**
+ * sndh_for_each_tag_with_header_size - iterate over SNDH tags and compute
+ * 	SNDH header size
+ * @file: file with SNDH data
+ * @header_size: pointer to &size_t to store SNDH header size, or %NULL to
+ * 	ignore
+ *
+ * Note that some tags such as "TIME" and "#!SN" may have multiple values
+ * and be given more than once.
+ */
+#define sndh_for_each_tag_with_header_size(file, header_size)		\
+	sndh_for_each_tag_with_header_size_and_diagnostic((file), (header_size), NULL)
+
+/**
+ * sndh_for_each_tag_with_header_size_and_diagnostic - iterate over SNDH tags
+ * 	and compute size with diagnostic
+ * @file: file with SNDH data
+ * @header_size: pointer to &size_t to store SNDH header size, or %NULL to
+ * 	ignore
+ * @diag: pointer to &struct sndh_diagnostic with warning and error callbacks,
+ * 	or %NULL to ignore
+ *
+ * Note that some tags such as "TIME" and "#!SN" may have multiple values
+ * and be given more than once.
+ */
+#define sndh_for_each_tag_with_header_size_and_diagnostic(file, header_size, diag)\
+	for (struct sndh_cursor sndh_cursor__ =				\
+	     sndh_first_tag((file), (header_size), (diag));		\
+	     sndh_valid_tag(&sndh_cursor__);				\
+	     sndh_next_tag(&sndh_cursor__))
+
+/**
+ * struct sndh_diagnostic - SNDH tag diagnostic message callbacks
+ * @warn: diagnostic warning message
+ * @error: diagnostic erro message
+ * @arg: optional callback argument, can be %NULL
+ */
+struct sndh_diagnostic {
+	void (*warn)(void *arg, const char *fmt, ...)
+		__attribute__((format(printf, 2, 3)));
+	void (*error)(void *arg, const char *fmt, ...)
+		__attribute__((format(printf, 2, 3)));
+	void *arg;
+};
+
+/*
+ * Private SNDH structures and functions.
+ */
+
+struct sndh_cursor;
+
+struct sndh_tag {
+	const char *name;
+	bool (*read)(struct sndh_cursor *cursor);
+	size_t length;
+};
+
+struct sndh_cursor {
+	const struct {
+		size_t size;
+		void *data;
+	} file;
+
+	struct {
+		size_t *size;
+	} header;
+
+	const size_t bound;
+	size_t offset;
+
+	bool valid;
+
+	const struct sndh_tag *tag;
+
+	int integer;
+	const char *value;
+	char buffer[32];
+
+	int subtunes;
+
+	struct {
+		bool (*read)(struct sndh_cursor *cursor);
+		size_t start;
+		size_t bound;
+	} subtag;
+
+	bool hdns;
+
+	const struct sndh_diagnostic diag;
+};
+
+struct sndh_cursor sndh_first_tag(struct file file,
+	size_t *header_size, const struct sndh_diagnostic *diag);
+
+bool sndh_valid_tag(const struct sndh_cursor *cursor);
+
+void sndh_next_tag(struct sndh_cursor *cursor);
 
 #endif /* PSGPLAY_SNDH_H */

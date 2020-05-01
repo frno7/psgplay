@@ -3,265 +3,264 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#include <errno.h>
 #include <string.h>
-#include <stdlib.h>
+#include <stdio.h>
 
 #include "psgplay/assert.h"
-#include "psgplay/compare.h"
 #include "psgplay/file.h"
-#include "psgplay/print.h"
 #include "psgplay/string.h"
-#include "psgplay/tool.h"
 
 #include "sndh/sndh.h"
 
-#include "unicode/atari.h"
+#define diag_warn(cursor, ...)						\
+	(cursor)->diag.warn((cursor)->diag.arg, __VA_ARGS__)
 
-struct tag {
-	char *value;
-	char buffer[32];
+#define diag_error(cursor, ...)						\
+	(cursor)->diag.error((cursor)->diag.arg, __VA_ARGS__)
 
-	int subtunes;
-	bool hdns;
-
-	bool (*cb)(const char *name, const char *value, void *arg);
-	void *arg;
-
-	bool continuation;
-};
-
-static size_t sndh_head_offset(struct file file)
+static size_t sndh_head_offset(const size_t size, const void *data)
 {
-	char *c = file.data;
+	const char *c = data;
 
 	/*
 	 * 20 bytes is the smallest possible header with "SNDH" at offset 12
 	 * immediately followed by "HDNS".
 	 */
-	return file.size >= 20 &&
+	return size >= 20 &&
 	       c[12] == 'S' &&
 	       c[13] == 'N' &&
 	       c[14] == 'D' &&
 	       c[15] == 'H' ? 16 : 0;
 }
 
-static bool sndh_tag(const char *name, size_t *offset,
-	size_t bound, struct file file)
+static bool sndh_tag(const char *name, struct sndh_cursor *cursor)
 {
 	const size_t len = strlen(name);
-	const char *c = file.data;
+	const char *c = cursor->file.data;
 
-	if (*offset + len > bound)
+	if (cursor->offset + len > cursor->bound)
 		return false;
-	if (strncmp(name, &c[*offset], len) != 0)
+	if (strncmp(name, &c[cursor->offset], len) != 0)
 		return false;
 
-	*offset += len;
+	cursor->offset += len;
 
 	return true;
 }
 
-static void tag_cb(const char *name, const char *value, struct tag *tag)
+static void tag_update(const char *value, const int integer,
+	struct sndh_cursor *cursor)
 {
-	u8 *v = charset_to_utf8_string((const u8 *)value, strlen(value),
-			charset_atari_st_to_utf32, NULL);
+	cursor->value = value;
 
-	tag->continuation = tag->cb(name, (const char *)v, tag->arg);
-
-	free(v);
+	cursor->integer = integer;
 }
 
-static bool sndh_nul(const char *name, size_t *offset,
-	size_t bound, struct file file)
+static bool sndh_nul(struct sndh_cursor *cursor)
 {
-	const char *c = file.data;
+	const char *c = cursor->file.data;
 
-	while (*offset < bound)
-		if (c[(*offset)++] == '\0')
+	while (cursor->offset < cursor->bound)
+		if (c[cursor->offset++] == '\0')
 			return true;
 
-	pr_warn("%s: tag %s missing NUL termination\n", file.path, name);
+	diag_warn(cursor, "tag %s missing NUL termination", cursor->tag->name);
 
 	return false;
 }
 
-static bool sndh_string__(const char *name, struct tag *tag, size_t length,
-	size_t *offset, size_t bound, struct file file)
+static bool sndh_string__(struct sndh_cursor *cursor)
 {
-	char *c = file.data;
+	char *c = cursor->file.data;
 
-	if (!length) {
-		tag->value = &c[*offset];
+	if (!cursor->tag->length) {
+		cursor->value = &c[cursor->offset];
 
-		if (!sndh_nul(name, offset, bound, file))
+		if (!sndh_nul(cursor))
 			return false;
 
 		return true;
 	}
 
-	if (bound < *offset + length + 1)
+	if (cursor->bound < cursor->offset + cursor->tag->length + 1)
 		return false;
 
-	BUG_ON(sizeof(tag->buffer) < length + 1);
+	if (sizeof(cursor->buffer) < cursor->tag->length + 1) {
+		diag_error(cursor, "tag %s too large for %zu",
+			cursor->tag->name, sizeof(cursor->buffer));
 
-	memcpy(tag->buffer, &c[*offset], length);
-	tag->buffer[length] = 0;
-	tag->value = tag->buffer;
-	*offset += length;
+		return false;
+	}
 
-	if (c[*offset] == '\0')
-		(*offset)++;
+	memcpy(cursor->buffer, &c[cursor->offset], cursor->tag->length);
+	cursor->buffer[cursor->tag->length] = 0;
+	cursor->value = cursor->buffer;
+	cursor->offset += cursor->tag->length;
+
+	if (c[cursor->offset] == '\0')
+		(cursor->offset)++;
 	else
-		pr_warn("%s: tag %s missing NUL termination\n",
-			file.path, name);
+		diag_warn(cursor, "tag %s missing NUL termination",
+			cursor->tag->name);
 
 	return true;
 }
 
-static bool sndh_string(const char *name, struct tag *tag, size_t length,
-	size_t *offset, size_t bound, struct file file)
+static bool sndh_string(struct sndh_cursor *cursor)
 {
-	if (!sndh_string__(name, tag, length, offset, bound, file))
+	if (!sndh_string__(cursor))
 		return false;
 
-	tag_cb(name, tag->value, tag);
+	tag_update(cursor->value, 0, cursor);
 
 	return true;
 }
 
-static bool sndh_substrings(const char *name, struct tag *tag, size_t length,
-	size_t *offset, size_t bound, struct file file)
+static size_t sndh_substrings_subend(size_t o, struct sndh_cursor  *cursor)
 {
-	const size_t table_start = *offset - strlen(name);
+	const char *c = cursor->file.data;
 
-	if (!tag->subtunes) {
-		pr_warn("%s: tag %s without any subtunes\n", file.path, name);
+	while (o < cursor->bound)
+		if (c[o++] == '\0')
+			return o;
+
+	diag_warn(cursor, "tag %s missing NUL termination", cursor->tag->name);
+
+	return 0;
+}
+
+static bool sndh_substrings_subtag(struct sndh_cursor  *cursor)
+{
+	const char *c = cursor->file.data;
+	const u8 *b = cursor->file.data;
+	const u8 *d = &b[cursor->offset];
+	const size_t o = cursor->subtag.start + ((d[0] << 8) | d[1]);
+	const size_t e = sndh_substrings_subend(o, cursor);
+
+	if (!e)
+		return false;
+
+	tag_update(&c[o], 0, cursor);
+
+	cursor->offset += 2;
+
+	if (cursor->offset == cursor->subtag.bound)
+		cursor->offset = cursor->subtag.bound = e;
+
+	return true;
+}
+
+static bool sndh_substrings(struct sndh_cursor  *cursor)
+{
+	if (!cursor->subtunes) {
+		diag_warn(cursor, "tag %s without any subtunes",
+			cursor->tag->name);
 
 		return true;
 	}
 
-	if (bound < *offset + tag->subtunes * 2) {
-		pr_error("%s: tag %s too short\n", file.path, name);
+	cursor->subtag.start = cursor->offset - strlen(cursor->tag->name);
+	cursor->subtag.bound = cursor->offset + cursor->subtunes * 2;
+
+	if (cursor->bound < cursor->subtag.bound) {
+		diag_error(cursor, "tag %s too short", cursor->tag->name);
 
 		return false;
 	}
 
-	const u8 *b = file.data;
-	const u8 *t = &b[*offset];
+	cursor->subtag.read = sndh_substrings_subtag;
 
-	*offset += tag->subtunes * 2;
+	return cursor->subtag.read(cursor);
+}
 
-	for (int i = 0; i < tag->subtunes; i++)
-		if (!sndh_nul(name, offset, bound, file))
-			return false;
+static bool sndh_integer(struct sndh_cursor *cursor)
+{
+	int integer;
 
-	const size_t table_size = *offset - table_start;
+	if (!sndh_string__(cursor))
+		return false;
 
-	for (int i = 0; i < tag->subtunes && tag->continuation; i++) {
-		const u16 o = (t[2 * i] << 8) | t[2 * i + 1];
+	if (!strtoint(&integer, cursor->value, 10)) {
+		diag_warn(cursor, "tag %s malformed number: %s",
+			cursor->tag->name, cursor->value);
 
-		if (o < table_size) {
-			tag_cb(name, (const char *)&b[table_start + o], tag);
-		} else {
-			pr_error("%s: tag %s table too short\n",
-				file.path, name);
-
-			return false;
-		}
+		return false;
 	}
 
+	snprintf(cursor->buffer, sizeof(cursor->buffer), "%d", integer);
+	tag_update(cursor->buffer, integer, cursor);
 
 	return true;
 }
 
-static bool sndh_integer(const char *name, struct tag *tag, size_t length,
-	size_t *offset, size_t bound, struct file file)
+static bool sndh_subtunes(struct sndh_cursor *cursor)
 {
-	if (!sndh_string__(name, tag, length, offset, bound, file))
+	if (!sndh_string__(cursor))
 		return false;
 
-	int n;
-
-	if (!strtoint(&n, tag->value, 10)) {
-		pr_warn("%s: tag %s malformed number: %s\n",
-			file.path, name, tag->value);
+	if (!strtoint(&cursor->subtunes, cursor->value, 10)) {
+		diag_warn(cursor, "tag %s malformed number: %s",
+			cursor->tag->name, cursor->value);
 
 		return false;
 	}
 
-	char s[32];
-	snprintf(s, sizeof(s), "%d", n);
-	tag_cb(name, s, tag);
+	snprintf(cursor->buffer, sizeof(cursor->buffer), "%d", cursor->subtunes);
+	tag_update(cursor->buffer, cursor->subtunes, cursor);
 
 	return true;
 }
 
-static bool sndh_subtunes(const char *name, struct tag *tag, size_t length,
-	size_t *offset, size_t bound, struct file file)
+static bool sndh_time_subtag(struct sndh_cursor *cursor)
 {
-	if (!sndh_string__(name, tag, length, offset, bound, file))
-		return false;
+	const u8 *b = cursor->file.data;
+	const u8 *d = &b[cursor->offset];
+	const int t = (d[0] << 8) | d[1];
 
-	if (!strtoint(&tag->subtunes, tag->value, 10)) {
-		pr_warn("%s: tag %s malformed number\n",
-			file.path, name);
+	snprintf(cursor->buffer, sizeof(cursor->buffer), "%d", t);
+	tag_update(cursor->buffer, t, cursor);
 
-		return false;
-	}
-
-	char s[32];
-	snprintf(s, sizeof(s), "%d", tag->subtunes);
-	tag_cb(name, s, tag);
+	cursor->offset += 2;
 
 	return true;
 }
 
-static bool sndh_time(const char *name, struct tag *tag, size_t length,
-	size_t *offset, size_t bound, struct file file)
+static bool sndh_time(struct sndh_cursor *cursor)
 {
-	if (!tag->subtunes) {
-		pr_warn("%s: tag %s without any subtunes\n", file.path, name);
+	if (!cursor->subtunes) {
+		diag_warn(cursor, "tag %s without any subtunes",
+			cursor->tag->name);
 
 		return true;
 	}
 
-	if (bound < *offset + tag->subtunes * 2) {
-		pr_error("%s: tag %s too short\n", file.path, name);
+	cursor->subtag.start = cursor->offset - strlen(cursor->tag->name);
+	cursor->subtag.bound = cursor->offset + cursor->subtunes * 2;
+
+	if (cursor->bound < cursor->subtag.bound) {
+		diag_error(cursor, "tag %s too short", cursor->tag->name);
 
 		return false;
 	}
 
-	const u8 *b = file.data;
-	for (int i = 0; i < tag->subtunes && tag->continuation; i++) {
-		const u8 *t = &b[*offset + i * 2];
-		const u16 n = (t[0] << 8) | t[1];
-		char s[32];
+	cursor->subtag.read = sndh_time_subtag;
 
-		snprintf(s, sizeof(s), "%d", n);
-		tag_cb(name, s, tag);
-	}
+	return cursor->subtag.read(cursor);
+}
 
-	*offset += tag->subtunes * 2;
+static bool sndh_hdns(struct sndh_cursor *cursor)
+{
+	cursor->hdns = true;
 
 	return true;
 }
 
-static bool sndh_hdns(const char *name, struct tag *tag, size_t length,
-	size_t *offset, size_t bound, struct file file)
+static bool sndh_padding(struct sndh_cursor *cursor)
 {
-	tag->hdns = true;
+	char *c = cursor->file.data;
 
-	return true;
-}
-
-static bool sndh_padding(const char *name, struct tag *tag, size_t length,
-	size_t *offset, size_t bound, struct file file)
-{
-	char *c = file.data;
-
-	if (*offset < file.size && c[*offset] == '\0') {
-		(*offset)++;
+	if (cursor->offset < cursor->file.size && c[cursor->offset] == '\0') {
+		cursor->offset++;
 
 		return true;
 	}
@@ -316,15 +315,9 @@ static size_t tag_bound(struct file file)
 	return bound;
 }
 
-static bool match_tag(struct tag *tag, size_t *offset,
-	size_t bound, struct file file)
+static bool match_tag(struct sndh_cursor *cursor)
 {
-	static const struct {
-		const char *name;
-		bool (*read)(const char *name, struct tag *tag, size_t length,
-			size_t *offset, size_t bound, struct file file);
-		size_t length;
-	} tags[] = {
+	static const struct sndh_tag tags[] = {
 		{ "TITL",  sndh_string      },
 		{ "COMM",  sndh_string      },
 		{ "RIPP",  sndh_string      },
@@ -345,58 +338,108 @@ static bool match_tag(struct tag *tag, size_t *offset,
 		{ "",      sndh_padding     }
 	};
 
+	if (cursor->subtag.read && cursor->offset < cursor->subtag.bound)
+		return cursor->subtag.read(cursor);
+	else
+		cursor->subtag.read = NULL;
+
+restart:
 	for (size_t i = 0; i < ARRAY_SIZE(tags); i++)
-		if (sndh_tag(tags[i].name, offset, bound, file) &&
-		    tags[i].read(tags[i].name, tag,
-				 tags[i].length, offset,
-				 bound, file))
-			return true;
+		if (sndh_tag(tags[i].name, cursor)) {
+			cursor->tag = &tags[i];
+
+			if (cursor->tag->read == sndh_padding) {
+				if (!tags[i].read(cursor))
+					return false;
+
+				goto restart;
+			}
+
+			return tags[i].read(cursor);
+		}
 
 	return false;
 }
 
-bool sndh_tags(struct file file, size_t *size, sndh_tag_cb cb, void *arg)
-{
-	size_t offset = sndh_head_offset(file);
+static void diag_warn_ignore(void *arg, const char *fmt, ...) { }
+static void diag_error_ignore(void *arg, const char *fmt, ...) { }
 
-	if (size)
-		*size = 0;
+struct sndh_cursor sndh_first_tag(struct file file,
+	size_t *header_size, const struct sndh_diagnostic *diag)
+{
+	size_t offset = sndh_head_offset(file.size, file.data);
+
+	if (header_size)
+		*header_size = 0;
 
 	if (!offset) {
-		pr_error("%s: invalid SNDH header\n", file.path);
+		if (diag)
+			diag->error(diag->arg, "invalid SNDH header");
+
+		return (struct sndh_cursor) { };
+	}
+
+	struct sndh_cursor cursor = {
+		.file = {
+			.size = file.size,
+			.data = file.data
+		},
+
+		.header = {
+			.size = header_size
+		},
+
+		.bound = tag_bound(file),
+		.offset = offset,
+
+		.valid = true,
+
+		.subtunes = 1,	/* Default to 1, unless the ## tag is given */
+
+		.diag = {
+			.warn  = diag ? diag->warn  : diag_warn_ignore,
+			.error = diag ? diag->error : diag_error_ignore,
+			.arg   = diag ? diag->arg   : NULL
+		}
+	};
+
+	sndh_next_tag(&cursor);
+
+	return cursor;
+}
+
+bool sndh_valid_tag(const struct sndh_cursor *cursor)
+{
+	if (cursor->hdns)
+		return false;
+
+	if (!cursor->valid)
+		return false;
+
+	if (cursor->bound <= cursor->offset) {
+		diag_warn(cursor, "missing HDNS tag");
 
 		return false;
 	}
 
-	const size_t bound = tag_bound(file);
-	struct tag tag = {
-		.subtunes = 1,	/* Default to 1, unless the ## tag is given */
-		.cb = cb,
-		.arg = arg,
-		.continuation = true
-	};
+	return true;
+}
 
-	while (offset < bound && tag.continuation && !tag.hdns)
-		if (!match_tag(&tag, &offset, bound, file)) {
-			const u8 *b = file.data;
+void sndh_next_tag(struct sndh_cursor *cursor)
+{
+	const bool valid = match_tag(cursor);
 
-			pr_error("%s: unrecognised data in %zu bytes:\n",
-				file.path, bound - offset);
-			pr_mem(stderr, &b[offset],
-				min(bound - offset, 256ul), offset);
-			fprintf(stderr, "\n");
+	if (cursor->header.size)
+		*cursor->header.size = cursor->offset;
 
-			if (size)
-				*size = offset;
+	if (!valid) {
+		cursor->valid = false;
 
-			return false;
-		}
-
-	if (size)
-		*size = offset;
-
-	if (tag.continuation && !tag.hdns)
-		pr_warn("%s: missing HDNS tag\n", file.path);
-
-	return tag.continuation;
+		if (cursor->offset == cursor->bound)
+			diag_warn(cursor, "missing HDNS tag");
+		else
+			diag_error(cursor,
+				"unrecognised data in %zu bytes at offset %zu",
+				cursor->bound - cursor->offset, cursor->offset);
+	}
 }
