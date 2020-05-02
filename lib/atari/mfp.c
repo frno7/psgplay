@@ -307,7 +307,7 @@ u32 mfp_irq_vector(void)
 		return (mfp.vr.base << 4) + i;
 	}
 
-	WARN_ONCE("M68K_INT_ACK_SPURIOUS");
+	WARN_ONCE("M68K_INT_ACK_SPURIOUS\n");
 
 	return M68K_INT_ACK_SPURIOUS;
 }
