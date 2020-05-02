@@ -1,3 +1,12 @@
 # SPDX-License-Identifier: GPL-2.0
 
-PSGPLAY_SRC := $(wildcard lib/psgplay/*.c)
+VER := lib/psgplay/version.c
+
+PSGPLAY_SRC :=								\
+	lib/psgplay/ice.c						\
+	lib/psgplay/sndh.c						\
+	$(VER)
+
+.PHONY: $(shell script/version $(VER))
+$(VER):
+	@script/version $@
