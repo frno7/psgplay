@@ -3,6 +3,7 @@
 #ifndef PSGPLAY_ICE_H
 #define PSGPLAY_ICE_H
 
+#include <stdbool.h>
 #include <stddef.h>
 
 /**
