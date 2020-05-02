@@ -15,7 +15,6 @@
 
 #include "psgplay/print.h"
 
-#include "sndh/read.h"
 #include "sndh/sndh.h"
 
 #include "out/alsa.h"

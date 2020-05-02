@@ -3,13 +3,16 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <errno.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <math.h>
+#include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
+#include "psgplay/assert.h"
 #include "internal/compare.h"
 
 #include "atari/machine.h"	/* FIXME: psgplay/machine.h */
@@ -18,9 +21,11 @@
 #include "psgplay/print.h"
 #include "psgplay/output.h"
 
+#include "sndh/ice.h"
 #include "sndh/sndh.h"
 
 #include "system/unix/file.h"
+#include "system/unix/memory.h"
 #include "system/unix/option.h"
 #include "system/unix/replay.h"
 
@@ -138,4 +143,34 @@ void replay(const struct options *options, struct file file,
 			break;
 
 	output->close(state.output_arg);
+}
+
+struct file sndh_read_file(const char *path)
+{
+	struct file file = file_read_or_stdin(path);
+
+	if (!file_valid(file))
+		return file;
+
+	if (ice_identify(file.data, file.size)) {
+		const size_t s = ice_decrunched_size(file.data, file.size);
+		void *b = xmalloc(s);
+
+		if (ice_decrunch(b, file.data, file.size) == -1) {
+			pr_error("%s: ICE decrunch failed\n", file.path);
+
+			free(b);
+			file_free(file);
+			errno = ENOEXEC;
+
+			return (struct file) { };
+		}
+
+		free(file.data);
+		file.size = s;
+		file.data = b;
+	} else if (option_verbosity())
+		pr_warn("%s: not ICE packed\n", file.path);
+
+	return file;
 }
