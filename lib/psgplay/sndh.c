@@ -9,9 +9,8 @@
 
 #include "internal/macro.h"
 
+#include "psgplay/sndh.h"
 #include "psgplay/string.h"
-
-#include "sndh/sndh.h"
 
 #define diag_warn(cursor, ...)						\
 	(cursor)->diag.warn((cursor)->diag.arg, __VA_ARGS__)

@@ -5,7 +5,7 @@
 #include "internal/build-assert.h"
 #include "internal/types.h"
 
-#include "sndh/ice.h"
+#include "psgplay/ice.h"
 
 struct ice_decrunch_state
 {

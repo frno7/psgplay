@@ -18,11 +18,10 @@
 #include "atari/machine.h"	/* FIXME: psgplay/machine.h */
 
 #include "psgplay/assert.h"
-#include "psgplay/print.h"
+#include "psgplay/ice.h"
 #include "psgplay/output.h"
-
-#include "sndh/ice.h"
-#include "sndh/sndh.h"
+#include "psgplay/print.h"
+#include "psgplay/sndh.h"
 
 #include "system/unix/file.h"
 #include "system/unix/memory.h"

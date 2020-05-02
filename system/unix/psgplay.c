@@ -14,8 +14,7 @@
 #include "atari/machine.h"
 
 #include "psgplay/print.h"
-
-#include "sndh/sndh.h"
+#include "psgplay/sndh.h"
 
 #include "out/alsa.h"
 #include "out/wave.h"

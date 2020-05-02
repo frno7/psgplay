@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "sndh/timer.h"
+#include "psgplay/timer.h"
 
 #define SNDH_FLAG(f)							\
 	f('y', PSG, "YM2149 PSG")					\

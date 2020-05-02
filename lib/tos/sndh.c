@@ -9,7 +9,7 @@
 #include "internal/types.h"
 #include "internal/limits.h"
 
-#include "sndh/timer.h"
+#include "psgplay/timer.h"
 
 #include "atari/mfp-map.h"
 
