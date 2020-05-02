@@ -2,6 +2,6 @@
 *.sndh
 *.o
 *.o.d
-GPATH
-GRTAGS
-GTAGS
+/GPATH
+/GRTAGS
+/GTAGS
