@@ -13,6 +13,8 @@
  * @data: compressed data
  * @size: size in bytes of compressed data, or greater
  *
+ * Note that @size must be at least ICE_HEADER_SIZE bytes.
+ *
  * Return: %true if data seems to be ICE compressed, otherwise %false
  */
 bool ice_identify(const void *data, size_t size);
@@ -22,6 +24,8 @@ bool ice_identify(const void *data, size_t size);
  * @data: compressed data
  * @size: size in bytes of compressed data, or greater
  *
+ * Note that @size must be at least ICE_HEADER_SIZE bytes.
+ *
  * Return: size in bytes of compressed data, or zero on failure
  */
 size_t ice_crunched_size(const void *data, size_t size);
@@ -30,6 +34,8 @@ size_t ice_crunched_size(const void *data, size_t size);
  * ice_decrunched_size - determine size of ICE decompressed data
  * @data: compressed data
  * @size: size in bytes of compressed data, or greater
+ *
+ * Note that @size must be at least ICE_HEADER_SIZE bytes.
  *
  * Return: size in bytes of decompressed data, or zero on failure
  */

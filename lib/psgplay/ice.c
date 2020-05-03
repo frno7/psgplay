@@ -48,10 +48,7 @@ static const struct ice_header *ice_header(const void *data, size_t size)
 	    h->magic[3] != '!')
 		return NULL;
 
-	if (size < ice_u32(h->crunched_size))
-		return NULL;
-
-	return data;
+	return h;
 }
 
 bool ice_identify(const void *data, size_t size)
@@ -66,11 +63,26 @@ size_t ice_crunched_size(const void *data, size_t size)
 	return h ? ice_u32(h->crunched_size) : 0;
 }
 
+static size_t ice_valid_crunched_size(const void *data, size_t size)
+{
+	const size_t cs = ice_crunched_size(data, size);
+
+	return cs && size >= cs ? cs : 0;
+}
+
 size_t ice_decrunched_size(const void *data, size_t size)
 {
 	const struct ice_header *h = ice_header(data, size);
 
 	return h ? ice_u32(h->decrunched_size) : 0;
+}
+
+static size_t ice_valid_decrunched_size(const void *data, size_t size)
+{
+	const size_t ds = ice_decrunched_size(data, size);
+	const size_t cs = ice_crunched_size(data, size);
+
+	return ds && cs && size >= cs ? ds : 0;
 }
 
 static void memcpybwd(u8 *to, const u8 *from, size_t n)
@@ -206,8 +218,8 @@ static bool normal_bytes(struct ice_decrunch_state *state)
 
 ssize_t ice_decrunch(void *out, const void *in, size_t insize)
 {
-	const size_t unpacked_length = ice_decrunched_size(in, insize);
-	const size_t packed_length = ice_crunched_size(in, insize);
+	const size_t unpacked_length = ice_valid_decrunched_size(in, insize);
+	const size_t packed_length = ice_valid_crunched_size(in, insize);
 	const u8 *p = in;
 	u8 *u = out;
 
