@@ -11,6 +11,8 @@
 
 #include "psgplay/timer.h"
 
+#define SNDH_PROLOGUE_SIZE 20
+
 #define SNDH_FLAG(f)							\
 	f('y', PSG, "YM2149 PSG")					\
 	f('e', DMA, "STE/TT DMA sound")					\

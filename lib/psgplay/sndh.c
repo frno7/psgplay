@@ -26,7 +26,7 @@ static size_t sndh_head_offset(const size_t size, const void *data)
 	 * 20 bytes is the smallest possible header with "SNDH" at offset 12
 	 * immediately followed by "HDNS".
 	 */
-	return size >= 20 &&
+	return size >= SNDH_PROLOGUE_SIZE &&
 	       c[12] == 'S' &&
 	       c[13] == 'N' &&
 	       c[14] == 'D' &&
