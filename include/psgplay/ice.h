@@ -43,12 +43,14 @@ size_t ice_decrunched_size(const void *data, size_t size);
 
 /**
  * ice_decrunch - ICE decompress data
- * @out: decompressed output data FIXME: Does inplace decompression work?
+ * @out: decompressed output data
  * @in: compressed input data
  * @insize: size in bytes of compressed data, or greater
  *
  * Note that the @out buffer must be large enough to contain all decompressed
  * data. Use &ice_decrunched_size to determine the size.
+ *
+ * Also note that @in and @out memory buffers must not overlap.
  *
  * Return: size in bytes of decompressed data, or -1 on failure
  */
