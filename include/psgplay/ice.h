@@ -6,6 +6,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#define ICE_HEADER_SIZE 12
+
 /**
  * ice_identify - is data ICE compressed?
  * @data: compressed data

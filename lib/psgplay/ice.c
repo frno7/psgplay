@@ -37,7 +37,7 @@ static const struct ice_header *ice_header(const void *data, size_t size)
 {
 	const struct ice_header *h = data;
 
-	BUILD_BUG_ON(sizeof(*h) != 12);
+	BUILD_BUG_ON(sizeof(*h) != ICE_HEADER_SIZE);
 
 	if (size < sizeof(*h))
 		return NULL;
