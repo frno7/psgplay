@@ -27,6 +27,17 @@
 	f('h', HBL, "Horizontal blank")
 
 /**
+ * sndh_identify - is data SNDH?
+ * @data: data
+ * @size: size in bytes of data, or greater
+ *
+ * Note that @size must be at least SNDH_PROLOGUE_SIZE bytes.
+ *
+ * Return: %true if data seems to be SNDH, otherwise %false
+ */
+bool sndh_identify(const void *data, size_t size);
+
+/**
  * sndh_tag_subtune_count - get SNDH subtune count
  * @subtune_count: SNDH subtune count result, if determined
  * @data: SNDH data

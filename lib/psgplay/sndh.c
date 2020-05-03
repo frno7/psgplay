@@ -18,7 +18,7 @@
 #define diag_error(cursor, ...)						\
 	(cursor)->diag.error((cursor)->diag.arg, __VA_ARGS__)
 
-static size_t sndh_head_offset(const size_t size, const void *data)
+static size_t sndh_head_offset(const void *data, const size_t size)
 {
 	const char *c = data;
 
@@ -31,6 +31,11 @@ static size_t sndh_head_offset(const size_t size, const void *data)
 	       c[13] == 'N' &&
 	       c[14] == 'D' &&
 	       c[15] == 'H' ? 16 : 0;
+}
+
+bool sndh_identify(const void *data, size_t size)
+{
+	return sndh_head_offset(data, size) != 0;
 }
 
 static bool sndh_tag(const char *name, struct sndh_cursor *cursor)
@@ -367,7 +372,7 @@ static void diag_error_ignore(void *arg, const char *fmt, ...) { }
 struct sndh_cursor sndh_first_tag(const void *data, const size_t size,
 	size_t *header_size, const struct sndh_diagnostic *diag)
 {
-	size_t offset = sndh_head_offset(size, data);
+	size_t offset = sndh_head_offset(data, size);
 
 	if (header_size)
 		*header_size = 0;
