@@ -46,16 +46,6 @@ char *xstrndup(const char *s, size_t n)
 	return t;
 }
 
-bool strtoint(int *n, const char *s, int base)	/* FIXME: Move to psgplay */
-{
-	char *e;
-
-	errno = 0;
-	*n = strtoll(s, &e, base);	/* FIXME: Check INT_MAX */
-
-	return e == &s[strlen(s)] && errno != ERANGE;
-}
-
 struct string_split first_string_split(
 	const char *s, const char *sep,
 	char *(find)(const char *s, const char *sep))

@@ -3,11 +3,11 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#ifndef PSGPLAY_STRING_H
-#define PSGPLAY_STRING_H
+#ifndef INTERNAL_STRING_H
+#define INTERNAL_STRING_H
 
 #include <stdbool.h>
 
 bool strtoint(int *n, const char *s, int base);
 
-#endif /* PSGPLAY_STRING_H */
+#endif /* INTERNAL_STRING_H */
