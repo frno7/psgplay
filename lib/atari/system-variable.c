@@ -26,8 +26,8 @@ const char *system_variable_label(u32 address)
 {
 	static const struct system_variable list[] = {
 #define SYSTEM_VARIABLE_DESCRIPTION(					\
-		variable_, count_, size_, label_, description_)		\
-		{ variable_, count_, size_, #label_, description_ },
+		address_, count_, size_, label_, type_, description_)	\
+		{ address_, count_, size_, #label_, description_ },
 SYSTEM_VARIABLE(SYSTEM_VARIABLE_DESCRIPTION)
 	};
 	const size_t n = ARRAY_SIZE(list);

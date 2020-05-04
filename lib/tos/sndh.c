@@ -6,12 +6,14 @@
 #include <stdlib.h>
 
 #include "internal/macro.h"
+#include "internal/build-assert.h"
 #include "internal/types.h"
 #include "internal/limits.h"
 
 #include "psgplay/timer.h"
 
 #include "atari/mfp-map.h"
+#include "atari/system-variable.h"
 
 struct timer_prescale {
 	enum mfp_ctrl ctrl;
@@ -172,6 +174,8 @@ static void idle_indefinitely(void)
 
 void start(size_t size, void *sndh, u32 track, u32 timer)
 {
+	BUILD_BUG_ON(sizeof(struct system_variables) != 0x102);
+
 	record = (struct record) { .size = size, .sndh = sndh };
 
 	if (install_sndh_timer(u32_to_sndh_timer(timer)))
