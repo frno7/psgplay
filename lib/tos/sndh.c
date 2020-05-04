@@ -13,7 +13,8 @@
 #include "psgplay/timer.h"
 
 #include "atari/mfp-map.h"
-#include "atari/system-variable.h"
+
+#include "toslibc/tos/system-variable.h"
 
 struct timer_prescale {
 	enum mfp_ctrl ctrl;

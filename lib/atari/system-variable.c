@@ -3,9 +3,9 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#include "atari/system-variable.h"
-
 #include "internal/macro.h"
+
+#include "toslibc/tos/system-variable.h"
 
 struct system_variable {
 	u32 address;

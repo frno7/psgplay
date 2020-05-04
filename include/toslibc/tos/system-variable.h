@@ -3,8 +3,8 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#ifndef ATARI_SYSTEM_VARIABLE_H
-#define ATARI_SYSTEM_VARIABLE_H
+#ifndef _TOSLIBC_TOS_SYSTEM_VARIABLE_H
+#define _TOSLIBC_TOS_SYSTEM_VARIABLE_H
 
 #include "internal/types.h"
 
@@ -58,7 +58,7 @@ struct conterm {
 	v(0x472, 1, 4, hdv_bpb,     u32,		"Hard disk bpb vector, else 0")				\
 	v(0x476, 1, 4, hdv_rw,      u32,		"Hard disk read/write vector, else 0")			\
 	v(0x47A, 1, 4, hdv_boot,    u32,		"Hard disk boot vector, else 0")			\
-	v(0x47E, 1, 4, hdv_mediach, u32,		"Hard disk media change vector else, 0")		\
+	v(0x47E, 1, 4, hdv_mediach, u32,		"Hard disk media change vector, else 0")		\
 	v(0x482, 1, 2, _cmdload,    u16,		"If nonzero execute COMMAND.PRG on boot")		\
 	v(0x484, 1, 1, conterm,     struct conterm,	"Attribute bits for console sys")			\
 	v(0x485, 1, 1, reserved,     u8,		"Reserved,   ")						\
@@ -101,4 +101,4 @@ SYSTEM_VARIABLE(SYSTEM_VARIABLE_STRUCT)
 
 const char *system_variable_label(u32 address);
 
-#endif /* ATARI_SYSTEM_VARIABLE_H */
+#endif /* _TOSLIBC_TOS_SYSTEM_VARIABLE_H */
