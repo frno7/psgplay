@@ -23,7 +23,7 @@
 #include "system/unix/file.h"
 #include "system/unix/info.h"
 #include "system/unix/option.h"
-#include "system/unix/replay.h"
+#include "system/unix/command-mode.h"
 
 char progname[] = "psgplay";
 
@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
 
 	select_subtune(&options->track, file);
 
-	replay(options, file, select_output(options), &atari_st);
+	command_replay(options, file, select_output(options), &atari_st);
 
 	file_free(file);
 

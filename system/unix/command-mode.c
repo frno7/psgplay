@@ -26,7 +26,7 @@
 #include "system/unix/file.h"
 #include "system/unix/memory.h"
 #include "system/unix/option.h"
-#include "system/unix/replay.h"
+#include "system/unix/command-mode.h"
 
 struct replay_state {
 	ssize_t sample_start;
@@ -113,7 +113,7 @@ static u32 parse_timer(struct file file)
 	return sndh_timer_to_u32(timer);
 }
 
-void replay(const struct options *options, struct file file,
+void command_replay(const struct options *options, struct file file,
 	const struct output *output, const struct machine *machine)
 {
 	const char *auto_stop = options->stop ? options->stop :
