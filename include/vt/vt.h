@@ -6,6 +6,8 @@
 #ifndef VT_H
 #define VT_H
 
+#include <stdarg.h>
+
 #include "internal/compare.h"
 #include "internal/fifo.h"
 
@@ -112,6 +114,13 @@ void vt_putc(struct vt_buffer *vtb, int row, int col,
 
 void vt_putc_normal(struct vt_buffer *vtb, int row, int col, vt_char c);
 void vt_putc_reverse(struct vt_buffer *vtb, int row, int col, vt_char c);
+
+int vt_printf(struct vt_buffer *vtb, int row, int col,
+   struct vt_attr attr, const char *fmt, ...)
+   __attribute__((format(printf, 5, 6)));
+
+int vt_vprintf(struct vt_buffer *vtb, int row, int col,
+	struct vt_attr attr, const char *fmt, va_list ap);
 
 u8 vt_getc(struct vt_buffer *vtb);
 

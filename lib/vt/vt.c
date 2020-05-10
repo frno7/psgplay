@@ -50,6 +50,37 @@ void vt_putc_reverse(struct vt_buffer *vtb, int row, int col, vt_char c)
 	vt_putc(vtb, row, col, c, (struct vt_attr) { .reverse = true });
 }
 
+int vt_vprintf(struct vt_buffer *vtb, int row, int col,
+	struct vt_attr attr, const char *fmt, va_list ap)
+{
+	char msg[256];
+	size_t i;
+
+	vsnprintf(msg, sizeof(msg), fmt, ap);
+
+	for (i = 0; msg[i]; i++)
+		if (msg[i] == '\n') {
+			row++;
+			col = 0;
+		} else
+			vt_putc(vtb, row, col++, msg[i], attr);
+
+	return i;
+}
+
+int vt_printf(struct vt_buffer *vtb, int row, int col,
+   struct vt_attr attr, const char *fmt, ...)
+{
+	va_list ap;
+	int r;
+
+	va_start(ap, fmt);
+	r = vt_vprintf(vtb, row, col, attr, fmt, ap);
+	va_end(ap);
+
+	return r;
+}
+
 static inline void vt_output_append(struct vt_buffer *vtb, struct vt_text txt)
 {
 	const char *s = vt_text(txt);
