@@ -28,4 +28,18 @@ bool utf8_valid_in_charset_string(const u8 *u, size_t length,
 	 unicode_t (*charset_to_utf32)(u8 c, void *arg),
 	 u8 (*utf32_to_charset)(unicode_t u, void *arg), void *arg);
 
+struct utf8_to_utf32_adapter {
+	size_t length;
+	u8 s[6];		/* Longest UTF-8 sequence */
+};
+
+unicode_t utf8_to_utf32_first(struct utf8_to_utf32_adapter *uua, char c);
+
+unicode_t utf8_to_utf32_next(struct utf8_to_utf32_adapter *uua);
+
+#define for_each_utf8_to_utf32(symbol, uua, c)				\
+	for (symbol = utf8_to_unicode_first(uua, c);			\
+	     symbol;							\
+	     symbol = utf8_to_utf32_next(uua))
+
 #endif /* PSGPLAY_UNICODE_H */

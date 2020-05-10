@@ -4,6 +4,7 @@
 
 #include <limits.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "internal/types.h"
 
@@ -245,4 +246,34 @@ bool utf8_valid_in_charset_string(const u8 *u, size_t length,
 	}
 
 	return true;
+}
+
+unicode_t utf8_to_utf32_first(struct utf8_to_utf32_adapter *uua, char c)
+{
+	unicode_t u;
+
+	if (c)
+		uua->s[uua->length++] = (u8)c;
+
+	const int r = utf8_to_utf32(&u, uua->s, uua->length);
+
+	if (r < 1) {
+		if (uua->length < sizeof(uua->s))
+			return 0;
+
+		memmove(&uua->s[0], &uua->s[1], --uua->length);
+
+		return utf8_to_utf32_first(uua, 0);
+	}
+
+	memmove(&uua->s[0], &uua->s[r], uua->length - r);
+
+	uua->length -= r;
+
+	return u;
+}
+
+unicode_t utf8_to_utf32_next(struct utf8_to_utf32_adapter *uua)
+{
+	return utf8_to_utf32_first(uua, 0);
 }
