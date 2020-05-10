@@ -123,7 +123,7 @@ int utf32_to_utf8_length(unicode_t u)
 	return utf32_to_utf8(u, s, sizeof(s));
 }
 
-static ssize_t charset_to_utf8_string_length(const u8 *s, size_t length,
+ssize_t charset_to_utf8_string_length(const u8 *s, size_t length,
 	 unicode_t (*charset_to_utf32)(u8 c, void *arg), void *arg)
 {
 	ssize_t size = 0;
@@ -175,7 +175,7 @@ u8 *charset_to_utf8_string(const u8 *s, size_t length,
 	return u;
 }
 
-static ssize_t utf8_to_charset_string_length(const u8 *u, size_t length)
+ssize_t utf8_to_charset_string_length(const u8 *u, size_t length)
 {
 	ssize_t size = 0;
 	size_t i = 0;

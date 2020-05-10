@@ -13,6 +13,11 @@ int utf32_to_utf8(unicode_t u, u8 *s, size_t maxout);
 
 int utf32_to_utf8_length(unicode_t u);
 
+ssize_t charset_to_utf8_string_length(const u8 *s, size_t length,
+	 unicode_t (*charset_to_utf32)(u8 c, void *arg), void *arg);
+
+ssize_t utf8_to_charset_string_length(const u8 *u, size_t length);
+
 u8 *charset_to_utf8_string(const u8 *s, size_t length,
 	 unicode_t (*charset_to_utf32)(u8 c, void *arg), void *arg);
 
