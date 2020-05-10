@@ -8,12 +8,8 @@
 #include "internal/types.h"
 
 #include "psgplay/assert.h"
-#include "psgplay/print.h"
 
 #include "unicode/utf8.h"
-
-#include "system/unix/memory.h"
-#include "system/unix/string.h"
 
 struct utf8_table {
 	u32 cmask;
@@ -152,7 +148,9 @@ u8 *charset_to_utf8_string(const u8 *s, size_t length,
 	if (size == -1)
 		return NULL;
 
-	u8 *u = xmalloc(size + 1);
+	u8 *u = malloc(size + 1);
+	if (!s)
+		return NULL;
 
 	size_t n = 0;
 
@@ -201,7 +199,9 @@ u8 *utf8_to_charset_string(const u8 *u, size_t length,
 	if (size == -1)
 		return NULL;
 
-	u8 *s = xmalloc(size + 1);
+	u8 *s = malloc(size + 1);
+	if (!s)
+		return NULL;
 
 	size_t n = 0;
 	size_t i = 0;

@@ -46,6 +46,8 @@ void sndh_print(struct file file)
 
 		u8 *u = charset_to_utf8_string((const u8 *)value, length,
 				charset_atari_st_to_utf32, NULL);
+		if (!u)
+			continue;
 
 		char *v = strrep((const char *)u, "\n", "\n\t");
 
