@@ -168,10 +168,14 @@ static void handle_winch(int sig)
 	errno = errno_;
 }
 
+bool tty_present(void)
+{
+	return isatty(STDIN_FILENO) && isatty(STDOUT_FILENO);
+}
+
 bool tty_init(const struct tty_events *events)
 {
-	if (!isatty(STDIN_FILENO) ||
-	    !isatty(STDOUT_FILENO))
+	if (!tty_present())
 		return false;
 
 	tty_events = events;

@@ -26,6 +26,8 @@ struct tty_events {
 
 struct tty_size tty_size(void);
 
+bool tty_present(void);
+
 bool tty_init(const struct tty_events *events);
 
 void tty_exit(void);
