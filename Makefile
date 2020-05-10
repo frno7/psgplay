@@ -28,7 +28,7 @@ include lib/Makefile
 include system/Makefile
 
 SRC := $(ATARI_SRC) $(M68K_SRC) $(OUT_SRC) $(PSGPLAY_SRC) $(INTERNAL_SRC)\
-	$(SYSTEM_UNIX_SRC) $(UNICODE_SRC)
+	$(SYSTEM_UNIX_SRC) $(UNICODE_SRC) $(VT_SRC)
 OBJ = $(patsubst %.c, %.o, $(SRC))
 
 $(PSGPLAY): $(OBJ)
