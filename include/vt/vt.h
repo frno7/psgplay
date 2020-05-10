@@ -143,4 +143,7 @@ struct vt_text vt_reset(struct vt_buffer *vtb);
 
 void vt_client_resize(struct vt_buffer *vtb, int rows, int cols);
 
+extern struct vt_attr vt_attr_normal;
+extern struct vt_attr vt_attr_reverse;
+
 #endif /* VT_H */

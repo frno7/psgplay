@@ -16,6 +16,9 @@
 
 #define VT_ESCAPE_TIME	10	/* Time in ms */
 
+struct vt_attr vt_attr_normal  = { };
+struct vt_attr vt_attr_reverse = { .reverse = true };
+
 void vt_putc(struct vt_buffer *vtb, int row, int col,
 	vt_char c, struct vt_attr attr)
 {
