@@ -18,6 +18,7 @@
 
 #include "system/unix/file.h"
 #include "system/unix/option.h"
+#include "system/unix/tty.h"
 
 static struct options option;
 
@@ -46,6 +47,9 @@ static void help(FILE *file)
 "                           if the track has a known duration, or never\n"
 "    --length=<[mm:]ss.ss>  play for the given duration\n"
 "\n"
+"    -m, --mode=<command|text>\n"
+"                           command or interactive text mode\n"
+"\n"
 "    -t, --track=<num>      set track number\n"
 "    -f, --frequency=<num>  set audio frequency in Hz (default 44100)\n"
 "\n",
@@ -66,6 +70,42 @@ static void NORETURN version_exit(void)
 	exit(EXIT_SUCCESS);
 }
 
+static bool command_mode_only_option(void)
+{
+	return option.verbose ||
+	       option.info    ||
+	       option.output  ||
+	       option.start   ||
+	       option.length  ||
+	       option.stop;
+}
+
+bool command_mode_option(void)
+{
+	if (option.mode)
+		return strcmp(option.mode, "command") == 0;
+
+	return command_mode_only_option();
+}
+
+bool text_mode_option(void)
+{
+	if (option.mode) {
+		if (strcmp(option.mode, "text") != 0)
+			return false;
+
+		if (command_mode_only_option())
+			pr_fatal_error("command options in text mode\n");
+
+		if (!tty_present())
+			pr_fatal_error("text mode requires a tty\n");
+
+		return true;
+	}
+
+	return false;
+}
+
 struct options *parse_options(int argc, char **argv)
 {
 	static const struct option options[] = {
@@ -79,6 +119,8 @@ struct options *parse_options(int argc, char **argv)
 		{ "start",     required_argument, NULL, 0 },
 		{ "stop",      required_argument, NULL, 0 },
 		{ "length",    required_argument, NULL, 0 },
+
+		{ "mode",      required_argument, NULL, 0 },
 
 		{ "track",     required_argument, NULL, 0 },
 		{ "frequency", required_argument, NULL, 0 },
@@ -96,7 +138,8 @@ struct options *parse_options(int argc, char **argv)
 	for (;;) {
 		int index = 0;
 
-		switch (getopt_long(argc, argv, "hvit:f:o:", options, &index)) {
+		switch (getopt_long(argc, argv,
+			"hvim:t:f:o:", options, &index)) {
 		case -1:
 			if (optind == argc)
 				help_exit(EXIT_FAILURE);
@@ -122,6 +165,9 @@ struct options *parse_options(int argc, char **argv)
 			else if (OPT("length"))
 				option.length = optarg;
 
+			else if (OPT("mode"))
+				goto opt_m;
+
 			else if (OPT("track"))
 				goto opt_t;
 			else if (OPT("frequency"))
@@ -141,6 +187,10 @@ opt_i:			option.info = true;
 
 		case 'o':
 opt_o:			option.output = optarg;
+			break;
+
+		case 'm':
+opt_m:			option.mode = optarg;
 			break;
 
 		case 't':

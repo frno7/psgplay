@@ -24,8 +24,12 @@
 #include "system/unix/info.h"
 #include "system/unix/option.h"
 #include "system/unix/command-mode.h"
+#include "system/unix/text-mode.h"
 
 char progname[] = "psgplay";
+
+typedef void (*replay_f)(const struct options *options, struct file file,
+	const struct output *output, const struct machine *machine);
 
 static void NORETURN info_exit(struct file file)
 {
@@ -72,6 +76,11 @@ static const struct output *select_output(const struct options *options)
 	return output;
 }
 
+static replay_f select_replay(const struct options *options)
+{
+	return text_mode_option() ? text_replay : command_replay;
+}
+
 int main(int argc, char *argv[])
 {
 	struct options *options = parse_options(argc, argv);
@@ -87,7 +96,7 @@ int main(int argc, char *argv[])
 
 	select_subtune(&options->track, file);
 
-	command_replay(options, file, select_output(options), &atari_st);
+	select_replay(options)(options, file, select_output(options), &atari_st);
 
 	file_free(file);
 

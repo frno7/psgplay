@@ -23,6 +23,8 @@ struct options {
 	const char *length;
 	const char *stop;
 
+	const char *mode;
+
 	int track;
 	int frequency;
 
@@ -30,6 +32,10 @@ struct options {
 };
 
 int option_verbosity(void);
+
+bool command_mode_option(void);
+
+bool text_mode_option(void);
 
 struct options *parse_options(int argc, char **argv);
 
