@@ -18,6 +18,4 @@
 void command_replay(const struct options *options, struct file file,
 	const struct output *output, const struct machine *machine);
 
-struct file sndh_read_file(const char *path);
-
 #endif /* PSGPLAY_SYSTEM_UNIX_COMMAND_MODE_H */

@@ -17,7 +17,11 @@
 #include "internal/macro.h"
 #include "internal/types.h"
 
+#include "psgplay/ice.h"
+#include "psgplay/print.h"
+
 #include "system/unix/file.h"
+#include "system/unix/memory.h"
 #include "system/unix/string.h"
 
 static struct file file_read_fd__(int fd, char *path)
@@ -174,4 +178,33 @@ ssize_t xwrite(int fd, const void *buf, size_t nbyte)
 	}
 
 	return size;
+}
+
+struct file sndh_read_file(const char *path)
+{
+	struct file file = file_read_or_stdin(path);
+
+	if (!file_valid(file))
+		return file;
+
+	if (ice_identify(file.data, file.size)) {
+		const size_t s = ice_decrunched_size(file.data, file.size);
+		void *b = xmalloc(s);
+
+		if (ice_decrunch(b, file.data, file.size) == -1) {
+			pr_error("%s: ICE decrunch failed\n", file.path);
+
+			free(b);
+			file_free(file);
+			errno = ENOEXEC;
+
+			return (struct file) { };
+		}
+
+		free(file.data);
+		file.size = s;
+		file.data = b;
+	}
+
+	return file;
 }

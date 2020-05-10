@@ -18,7 +18,6 @@
 #include "atari/machine.h"	/* FIXME: psgplay/machine.h */
 
 #include "psgplay/assert.h"
-#include "psgplay/ice.h"
 #include "psgplay/output.h"
 #include "psgplay/print.h"
 #include "psgplay/sndh.h"
@@ -142,34 +141,4 @@ void command_replay(const struct options *options, struct file file,
 			break;
 
 	output->close(state.output_arg);
-}
-
-struct file sndh_read_file(const char *path)
-{
-	struct file file = file_read_or_stdin(path);
-
-	if (!file_valid(file))
-		return file;
-
-	if (ice_identify(file.data, file.size)) {
-		const size_t s = ice_decrunched_size(file.data, file.size);
-		void *b = xmalloc(s);
-
-		if (ice_decrunch(b, file.data, file.size) == -1) {
-			pr_error("%s: ICE decrunch failed\n", file.path);
-
-			free(b);
-			file_free(file);
-			errno = ENOEXEC;
-
-			return (struct file) { };
-		}
-
-		free(file.data);
-		file.size = s;
-		file.data = b;
-	} else if (option_verbosity())
-		pr_warn("%s: not ICE packed\n", file.path);
-
-	return file;
 }
