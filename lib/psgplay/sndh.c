@@ -517,3 +517,20 @@ bool sndh_tag_timer(struct sndh_timer *timer,
 
 	return false;
 }
+
+bool sndh_tag_title(char *title, size_t length,
+	const void *data, const size_t size)
+{
+	if (!length)
+		return false;
+
+	sndh_for_each_tag (data, size)
+		if (strcmp(sndh_tag_name, "TITL") == 0) {
+			strncpy(title, sndh_tag_value, length - 1);
+			title[length - 1] = '\0';
+
+			return true;
+		}
+
+	return false;
+}

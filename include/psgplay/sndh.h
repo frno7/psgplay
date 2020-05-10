@@ -81,6 +81,18 @@ bool sndh_tag_subtune_time(float *duration, int subtune,
 bool sndh_tag_timer(struct sndh_timer *timer,
 	const void *data, const size_t size);
 
+/**
+ * sndh_tag_title - get SNDH title
+ * @title: SNDH title result, if determined
+ * @length: maximum length of title buffer including NUL
+ * @data: SNDH data
+ * @size: size in bytes of SNDH data
+ *
+ * Return: %true on success, otherwise %false
+ */
+bool sndh_tag_title(char *title, size_t length,
+	const void *data, const size_t size);
+
 /** sndh_tag_name - SNDH tag name */
 #define sndh_tag_name (sndh_cursor__.tag->name)
 
