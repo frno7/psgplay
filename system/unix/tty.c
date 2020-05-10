@@ -13,6 +13,7 @@
 
 #include "psgplay/print.h"
 
+#include "system/clock.h"
 #include "system/unix/tty.h"
 
 static struct termios tty_original;
@@ -120,6 +121,8 @@ static void handle_stp(int sig)
 {
 	const int errno_ = errno;
 
+	clock_suspend();
+
 	struct termios t = tty_save_restore();
 
 	if (signal(SIGTSTP, SIG_DFL) == SIG_ERR)
@@ -136,6 +139,8 @@ static void handle_stp(int sig)
 	install_signal(SIGTSTP, handle_stp, SA_RESTART);
 
 	tty_reinstall(t);
+
+	clock_resume();
 
 	errno = errno_;
 }
