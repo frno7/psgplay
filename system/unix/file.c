@@ -180,6 +180,12 @@ ssize_t xwrite(int fd, const void *buf, size_t nbyte)
 	return size;
 }
 
+void file_nonblocking(int fd)
+{
+	if (fcntl(fd, F_SETFL, O_NONBLOCK) == -1)
+		pr_fatal_errno("nonblocking:fcntl");
+}
+
 struct file sndh_read_file(const char *path)
 {
 	struct file file = file_read_or_stdin(path);

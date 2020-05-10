@@ -39,6 +39,8 @@ ssize_t xread(int fd, void *buf, size_t nbyte);
 
 ssize_t xwrite(int fd, const void *buf, size_t nbyte);
 
+void file_nonblocking(int fd);
+
 struct file sndh_read_file(const char *path);
 
 #endif /* PSGPLAY_SYSTEM_UNIX_FILE_H */
