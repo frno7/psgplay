@@ -186,6 +186,17 @@ void file_nonblocking(int fd)
 		pr_fatal_errno("nonblocking:fcntl");
 }
 
+const char *file_basename(const char *path)
+{
+	size_t k = 0;
+
+	for (size_t i = 0; path[i]; i++)
+		if (path[i] == '/')
+			k = i + 1;
+
+	return &path[k];
+}
+
 struct file sndh_read_file(const char *path)
 {
 	struct file file = file_read_or_stdin(path);
