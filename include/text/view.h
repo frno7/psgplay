@@ -3,10 +3,14 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#ifndef PSGPLAY_SYSTEM_UNIX_TEXT_VIEW_H
-#define PSGPLAY_SYSTEM_UNIX_TEXT_VIEW_H
+#ifndef PSGPLAY_TEXT_VIEW_H
+#define PSGPLAY_TEXT_VIEW_H
+
+#include <stdbool.h>
 
 #include "internal/types.h"
+
+#include "text/model.h"
 
 #include "unicode/utf8.h"
 
@@ -22,8 +26,9 @@ struct fifo_utf32 {
 	struct fifo_utf32 id_ = INIT_FIFO(id_)
 
 struct text_view {
-	void (*init)(struct vt_buffer *vtb);
-	void (*event)(struct vt_buffer *vtb, struct fifo_utf32 *in_utf32);
+	void (*init)(struct vt_buffer *vtb, struct text_model *model);
+	bool (*event)(struct vt_buffer *vtb, struct fifo_utf32 *in_utf32,
+		struct text_model *model);
 };
 
 unicode_t fifo_utf32(struct fifo_utf32 *ffu);
@@ -45,4 +50,4 @@ enum unicode_code {
 UNICODE_KEYS(DEFINE_UNICODE_ENUM)
 };
 
-#endif /* PSGPLAY_SYSTEM_UNIX_TEXT_VIEW_H */
+#endif /* PSGPLAY_TEXT_VIEW_H */

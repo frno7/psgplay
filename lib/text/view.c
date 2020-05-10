@@ -7,7 +7,7 @@
 
 #include "unicode/utf8.h"
 
-#include "system/unix/text-view.h"
+#include "text/view.h"
 
 unicode_t fifo_utf32(struct fifo_utf32 *ffu)
 {
