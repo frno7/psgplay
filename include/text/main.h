@@ -8,8 +8,8 @@
 
 #include "internal/types.h"
 
-#include "text/view.h"
+#include "text/mode.h"
 
-extern const struct text_view text_view_main;
+extern const struct text_mode text_mode_main;
 
 #endif /* PSGPLAY_TEXT_MAIN_H */

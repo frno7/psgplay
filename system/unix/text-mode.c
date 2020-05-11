@@ -15,8 +15,8 @@
 #include "psgplay/sndh.h"
 
 #include "text/main.h"
-#include "text/model.h"
-#include "text/view.h"
+#include "text/mode.h"
+#include "text/mvc.h"
 
 #include "system/clock.h"
 
@@ -79,42 +79,40 @@ void text_replay(const struct options *options, struct file file,
 		.arg = &vt.vtb
 	};
 
-	struct text_model tm = {
-		.ctrl = {
-			.track = options->track,
-			.state = TRACK_PLAY,
-		},
-		.sndh = {
-			.path = file.path,
-			.size = file.size,
-			.data = file.data,
-		},
+	struct text_state model = {
+		.cursor = options->track,
+		.track = options->track,
+		.op = TRACK_PLAY,
+	};
+	struct text_state view = { };
+	struct text_state ctrl = { };
+
+	struct text_sndh sndh = {
+		.path = file.path,
+		.size = file.size,
+		.data = file.data,
 	};
 
-	if (!sndh_tag_title(tm.title, sizeof(tm.title), file.data, file.size)) {
-		strncpy(tm.title, file_basename(file.path), sizeof(tm.title) - 1);
-		tm.title[sizeof(tm.title) - 1] = '\0';
+	if (!sndh_tag_title(sndh.title, sizeof(sndh.title), file.data, file.size)) {
+		strncpy(sndh.title, file_basename(file.path), sizeof(sndh.title) - 1);
+		sndh.title[sizeof(sndh.title) - 1] = '\0';
 	}
 
-	if (!sndh_tag_subtune_count(&tm.subtune_count, file.data, file.size))
-		tm.subtune_count = 1;
+	if (!sndh_tag_subtune_count(&sndh.subtune_count, file.data, file.size))
+		sndh.subtune_count = 1;
 
 	clock_init();
 	tty_init(&tty_events);
 
-	const struct text_view *tv = &text_view_main;
+	const struct text_mode *tm = &text_mode_main;
 
 	tty_resize_vt(&vt.vtb, tty_size());
 
 	if (atexit(atexit_) != 0)
 		pr_warn_errno("atexit");
 
-	tv->init(&vt.vtb, &tm);
-
 	file_nonblocking(STDIN_FILENO);
 	file_nonblocking(STDOUT_FILENO);
-
-	bool quit = false;
 
 	for (;;) {
 		vt_write_fifo(&vt.vtb, &tty_out.fifo);
@@ -124,24 +122,36 @@ void text_replay(const struct options *options, struct file file,
 			{ .fd = STDOUT_FILENO, .out = &tty_out.fifo },
 		};
 
-		if (fifo_empty(&tty_out.fifo) && quit) {
+		if (fifo_empty(&tty_out.fifo) && model.quit) {
 			dprintf(STDOUT_FILENO, "%s%s\n",
 				vt_text(vt_reset(&vt.vtb)),
 				vt_text(vt_cursor_end(&vt.vtb)));
 			break;
 		}
 
-		poll_fifo(pfs, ARRAY_SIZE(pfs), clock_poll());
+		const unicode_t key = fifo_utf32(&utf32_in);
+
+		poll_fifo(pfs, ARRAY_SIZE(pfs), key ? 0 : clock_poll());
 
 		clock_update();
 
 		clock_request_ms(vt_event(&vt.vtb, clock_ms()));
-
 		vt_deescape_fifo(&vt.vtb, &utf32_in.fifo,
 			&tty_in.fifo, clock_ms());
 
-		if (!quit)
-			quit = !tv->event(&vt.vtb, &utf32_in, &tm);
+		if (key && tm->ctrl) {
+			ctrl = model;
+
+			tm->ctrl(key, &ctrl, &model, &sndh);
+		}
+
+		if (ctrl.quit)
+			model.quit = true;
+		if (1 <= ctrl.cursor && ctrl.cursor <= sndh.subtune_count)
+			model.cursor = ctrl.cursor;
+
+		if (tm->view)
+			tm->view(&vt.vtb, &view, &model, &sndh);
 	}
 
 	atexit_();
