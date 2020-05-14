@@ -130,7 +130,7 @@ void command_replay(const struct options *options, struct file file,
 
 		.output = output,
 		.output_arg = output->open(options->output,
-			options->track, options->frequency),
+			options->frequency, false),
 	};
 
 	machine->init(file.data, file.size, options->track, timer,

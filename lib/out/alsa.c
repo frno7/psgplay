@@ -80,7 +80,7 @@ static bool alsa_sample(s16 left, s16 right, void *arg)
 	return alsa_sample_flush(state);
 }
 
-static void *alsa_open(const char *output, int track, int frequency)
+static void *alsa_open(const char *output, int frequency, bool nonblocking)
 {
 	struct alsa_state *state = xmalloc(sizeof(struct alsa_state));
 	int err;
@@ -93,7 +93,8 @@ static void *alsa_open(const char *output, int track, int frequency)
 	snd_pcm_hw_params_alloca(&state->hwparams);
 
 	err = snd_pcm_open(&state->pcm_handle,
-		"plughw:0,0", SND_PCM_STREAM_PLAYBACK, 0);
+		"plughw:0,0", SND_PCM_STREAM_PLAYBACK,
+		nonblocking ? SND_PCM_NONBLOCK : 0);
 	if (err < 0)
 		pr_fatal_error("%s: ALSA snd_pcm_open failed: %s\n",
 			output, snd_strerror(err));

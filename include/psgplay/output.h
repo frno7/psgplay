@@ -9,7 +9,7 @@
 #include "internal/types.h"
 
 struct output {
-	void *(*open)(const char *output, int track, int frequency);
+	void *(*open)(const char *output, int frequency, bool nonblocking);
 	bool (*sample)(s16 left, s16 right, void *arg);
 	void (*close)(void *arg);
 };
