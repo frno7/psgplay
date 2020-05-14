@@ -14,9 +14,14 @@
 
 #include "system/unix/poll-fifo.h"
 
-static bool fifo_ready(struct fifo *f)
+static bool fifo_ready_in(struct fifo *f)
 {
 	return f && !fifo_full(f);
+}
+
+static bool fifo_ready_out(struct fifo *f)
+{
+	return f && !fifo_empty(f);
 }
 
 bool poll_fifo(const struct poll_fifo *pfs, size_t n, int timeout)
@@ -26,8 +31,8 @@ bool poll_fifo(const struct poll_fifo *pfs, size_t n, int timeout)
 	for (size_t i = 0; i < n; i++)
 		pfds[i] = (struct pollfd) {
 			.fd = pfs[i].fd,
-			.events = (fifo_ready(pfs[i].in)  ? POLLIN  : 0) |
-				  (fifo_ready(pfs[i].out) ? POLLOUT : 0)
+			.events = (fifo_ready_in(pfs[i].in)   ? POLLIN  : 0) |
+				  (fifo_ready_out(pfs[i].out) ? POLLOUT : 0)
 		};
 
 	const int p = poll(pfds, n, timeout);
