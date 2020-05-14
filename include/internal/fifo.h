@@ -32,7 +32,7 @@ struct fifo {
 #define DEFINE_FIFO(id_, capacity_)					\
 	DECLARE_FIFO(capacity_) id_ = INIT_FIFO(id_)
 
-static inline bool fifo_size(const struct fifo *f)
+static inline size_t fifo_size(const struct fifo *f)
 {
 	return f->size;
 }
