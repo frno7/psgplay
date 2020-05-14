@@ -13,6 +13,7 @@
 #include <alsa/asoundlib.h>
 
 #include "internal/compare.h"
+#include "internal/fifo.h"
 
 #include "psgplay/assert.h"
 #include "psgplay/print.h"
@@ -27,6 +28,11 @@ struct alsa_sample {
 	s8 hi;
 };
 
+struct alsa_stereo_sample {
+	struct alsa_sample left;
+	struct alsa_sample right;
+};
+
 struct alsa_state {
 	const char *output;
 
@@ -35,49 +41,63 @@ struct alsa_state {
 
 	int frequency;
 
-	size_t sample_count;
-
-	size_t buffer_count;
-	struct {
-		struct alsa_sample left;
-		struct alsa_sample right;
-	} buffer[16384];
+	struct alsa_stereo_sample buffer[4096];
+	struct fifo fifo;
 };
 
-static bool alsa_sample_flush(struct alsa_state *state)
+static void alsa_sample_flush(struct alsa_state *state)
 {
-	const size_t buffer_size = state->buffer_count * sizeof(*state->buffer);
-	const ssize_t frame_count = snd_pcm_writei(
-		state->pcm_handle, state->buffer, state->buffer_count);
+	while (!fifo_empty(&state->fifo)) {
+		const struct alsa_stereo_sample *buffer;
+		const size_t r = fifo_peek(&state->fifo,
+			(const void **)&buffer);
 
-	BUG_ON(4 * ARRAY_SIZE(state->buffer) != sizeof(state->buffer));
+		BUG_ON(!r);
+		BUG_ON(r % sizeof(*buffer));
 
-	state->buffer_count = 0;
+		const ssize_t write_count = r / sizeof(*buffer);
+		const ssize_t frame_count = snd_pcm_writei(
+			state->pcm_handle, buffer, write_count);
 
-	if (frame_count < 0)
-		pr_fatal_error("%s: ALSA snd_pcm_writei failed: %s\n",
-			state->output, snd_strerror(frame_count));
-	else if (frame_count * 4 != buffer_size)
-		pr_fatal_error("%s: ALSA snd_pcm_writei failed: Incomplete samples\n",
-			state->output);
+		if (!frame_count || frame_count == -EAGAIN)
+			break;
 
-	return true;
+		if (frame_count < 0)
+			pr_fatal_error("%s: ALSA snd_pcm_writei failed: %zd %s\n",
+				state->output, frame_count,
+				snd_strerror(frame_count));
+
+		fifo_skip(&state->fifo, frame_count * sizeof(*buffer));
+
+		if (frame_count < write_count)
+			break;
+	}
 }
 
 static bool alsa_sample(s16 left, s16 right, void *arg)
 {
 	struct alsa_state *state = arg;
 
-	state->sample_count++;
+	if (fifo_full(&state->fifo)) {
+		alsa_sample_flush(state);
 
-	state->buffer[state->buffer_count].left  = ALSA_SAMPLE(left);
-	state->buffer[state->buffer_count].right = ALSA_SAMPLE(right);
-	state->buffer_count++;
+		return false;
+	}
 
-	if (state->buffer_count < ARRAY_SIZE(state->buffer))
-		return true;
+	const struct alsa_stereo_sample stereo_sample = {
+		.left  = ALSA_SAMPLE(left),
+		.right = ALSA_SAMPLE(right)
+	};
 
-	return alsa_sample_flush(state);
+	const size_t w = fifo_write(&state->fifo,
+		&stereo_sample, sizeof(stereo_sample));
+
+	BUG_ON(w != sizeof(stereo_sample));
+
+	if (fifo_full(&state->fifo))
+		alsa_sample_flush(state);
+
+	return true;
 }
 
 static void *alsa_open(const char *output, int frequency, bool nonblocking)
@@ -88,6 +108,10 @@ static void *alsa_open(const char *output, int frequency, bool nonblocking)
 	*state = (struct alsa_state) {
 		.output = output,
 		.frequency = frequency,
+		.fifo = {
+			.capacity = sizeof(state->buffer),
+			.buffer = state->buffer
+		},
 	};
 
 	snd_pcm_hw_params_alloca(&state->hwparams);
