@@ -18,7 +18,9 @@
 
 #include "psgplay/assert.h"
 
-#define PSG_FREQUENCY	2000000
+#define PSG_FREQUENCY 2000000
+#define PSG_EVENT_FREQUENCY 100		/* 10 ms */
+#define PSG_EVENT_CYCLES (PSG_FREQUENCY / PSG_EVENT_FREQUENCY)
 
 struct psg_state {
 	union psg psg;
@@ -276,7 +278,7 @@ static void psg_event(const struct device *device,
 	psg_emit(psg_cycle);
 
 	request_device_event(device,
-		(struct device_cycle) { .c = psg_cycle.c + 10000 });
+		(struct device_cycle) { .c = psg_cycle.c + PSG_EVENT_CYCLES });
 }
 
 static u8 psg_rd_u8(const struct device *device, u32 dev_address)
