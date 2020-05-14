@@ -11,7 +11,9 @@
 #include "vt/ecma48.h"
 #include "vt/vt.h"
 
+#include "psgplay/assert.h"
 #include "psgplay/print.h"
+#include "psgplay/psgplay.h"
 #include "psgplay/sndh.h"
 
 #include "text/main.h"
@@ -23,6 +25,64 @@
 #include "system/unix/poll-fifo.h"
 #include "system/unix/text-mode.h"
 #include "system/unix/tty.h"
+
+struct sample_buffer {
+	u64 timestamp;
+
+	size_t size;
+	size_t index;
+	struct psgplay_stereo buffer[4096];
+
+	struct psgplay *pp;
+
+	const struct output *output;
+	void *output_arg;
+};
+
+static struct sample_buffer sample_buffer_init(const void *data, size_t size,
+	int track, int frequency, const struct output *output)
+{
+	struct sample_buffer sb = {
+		.pp = psgplay_init(data, size, track, frequency),
+		.output = output,
+		.output_arg = output->open(NULL, frequency, true),
+	};
+
+	if (!sb.pp)
+		pr_fatal_error("Failed to init PSG play\n");
+
+	return sb;
+}
+
+static u64 sample_buffer_update(struct sample_buffer *sb, u64 timestamp)
+{
+	if (timestamp < sb->timestamp)
+		return sb->timestamp;
+
+	if (sb->index == sb->size) {
+		sb->index = 0;
+		sb->size = psgplay_read_stereo(sb->pp,
+			sb->buffer, ARRAY_SIZE(sb->buffer));
+	}
+
+	for (sb->timestamp = timestamp; sb->index < sb->size; sb->index++)
+		if (!sb->output->sample(
+				sb->buffer[sb->index].left,
+				sb->buffer[sb->index].right,
+				sb->output_arg)) {
+			sb->timestamp = timestamp + 100;
+			break;
+		}
+
+	return sb->timestamp;
+}
+
+static void sample_buffer_exit(struct sample_buffer *sb)
+{
+	psgplay_free(sb->pp);
+
+	sb->output->close(sb->output_arg);
+}
 
 static void atexit_(void)
 {
@@ -101,7 +161,12 @@ void text_replay(const struct options *options, struct file file,
 	if (!sndh_tag_subtune_count(&sndh.subtune_count, file.data, file.size))
 		sndh.subtune_count = 1;
 
+	struct sample_buffer sb = sample_buffer_init(file.data, file.size,
+		options->track, options->frequency, output);
+
 	clock_init();
+	clock_request_ms(1);
+
 	tty_init(&tty_events);
 
 	const struct text_mode *tm = &text_mode_main;
@@ -150,9 +215,13 @@ void text_replay(const struct options *options, struct file file,
 		if (1 <= ctrl.cursor && ctrl.cursor <= sndh.subtune_count)
 			model.cursor = ctrl.cursor;
 
+		clock_request_ms(sample_buffer_update(&sb, clock_ms()));
+
 		if (tm->view)
 			tm->view(&vt.vtb, &view, &model, &sndh);
 	}
+
+	sample_buffer_exit(&sb);
 
 	atexit_();
 }
