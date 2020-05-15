@@ -60,4 +60,9 @@ size_t fifo_peek(struct fifo *f, const void **buf);
 
 size_t fifo_skip(struct fifo *f, size_t size);
 
+static inline void fifo_clear(struct fifo *f)
+{
+	f->size = f->index = 0;
+}
+
 #endif /* INTERNAL_FIFO_H */
