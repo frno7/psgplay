@@ -15,6 +15,7 @@ struct text_state {
 		TRACK_PAUSE,
 		TRACK_RESTART,
 	} op;
+	u64 timestamp;
 	bool quit;
 };
 

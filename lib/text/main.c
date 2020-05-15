@@ -90,6 +90,26 @@ static void track_update(struct vt_buffer *vtb,
 	main_track(vtb, view->track, true);
 }
 
+static u64 time_update(struct vt_buffer *vtb, struct text_state *view,
+	const struct text_state *model, u64 timestamp)
+{
+	if (view->timestamp <= timestamp) {
+		const int col = vtb->server.size.cols - 5;
+		const int s = timestamp / 1000;
+		const int m = s / 60;
+
+		if (m < 60)
+			vt_printf(vtb, 0, col, vt_attr_reverse,
+				"%02d:%02d", m, s % 60);
+		else
+			vt_printf(vtb, 0, col, vt_attr_reverse, "--:--");
+
+		view->timestamp = (s + 1) * 1000;
+	}
+
+	return view->timestamp;
+}
+
 static u64 main_view(struct vt_buffer *vtb, struct text_state *view,
 	const struct text_state *model, const struct text_sndh *sndh,
 	u64 timestamp)
@@ -106,9 +126,10 @@ static u64 main_view(struct vt_buffer *vtb, struct text_state *view,
 	}
 
 	cursor_update(vtb, view, model);
+
 	track_update(vtb, view, model);
 
-	return 0;
+	return time_update(vtb, view, model, timestamp);
 }
 
 static void main_ctrl(const unicode_t key, struct text_state *ctrl,
