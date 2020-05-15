@@ -999,6 +999,11 @@ void m68k_end_timeslice(void)
 	SET_CYCLES(0);
 }
 
+void m68k_clear_timeslice(void)
+{
+	m68ki_initial_cycles = 0;
+	SET_CYCLES(0);
+}
 
 /* ASG: rewrote so that the int_level is a mask of the IPL0/IPL1/IPL2 bits */
 /* KS: Modified so that IPL* bits match with mask positions in the SR

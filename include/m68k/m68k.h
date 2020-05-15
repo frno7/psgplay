@@ -308,6 +308,7 @@ int m68k_cycles_run(void);              /* Number of cycles run so far */
 int m68k_cycles_remaining(void);        /* Number of cycles left */
 void m68k_modify_timeslice(int cycles); /* Modify cycles left */
 void m68k_end_timeslice(void);          /* End timeslice now */
+void m68k_clear_timeslice(void);        /* Set timeslice to zero */
 
 /* Set the IPL0-IPL2 pins on the CPU (IRQ).
  * A transition from < 7 to 7 will cause a non-maskable interrupt (NMI).
