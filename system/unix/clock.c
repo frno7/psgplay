@@ -62,11 +62,17 @@ u64 clock_ms(void)
 
 void clock_request_s(const u32 timestamp)
 {
+	if (!timestamp)
+		return;
+
 	clock_request_ms(1000 * timestamp);
 }
 
 void clock_request_ms(const u64 timestamp)
 {
+	if (!timestamp)
+		return;
+
 	const u64 t = timestamp * 1000000;
 
 	request = !request ? t : min(request, t);
