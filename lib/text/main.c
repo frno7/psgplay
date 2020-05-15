@@ -19,10 +19,18 @@ static void main_title(struct vt_buffer *vtb, int row, const char *title)
 		vt_putc_reverse(vtb, row, c, title[i] ? title[i++] : ' ');
 }
 
+static void main_track(struct vt_buffer *vtb, int track, bool playing)
+{
+	if (track)
+		vt_printf(vtb, 3 + track, 1,
+			playing ? vt_attr_reverse : vt_attr_normal,
+			"%2d.", track);
+}
+
 static void main_form(struct vt_buffer *vtb, const struct text_sndh *sndh)
 {
 	for (int i = 0; i < sndh->subtune_count; i++)
-		vt_printf(vtb, 4 + i, 1, vt_attr_normal, "%2d.", i + 1);
+		main_track(vtb, i + 1, false);
 }
 
 static void main_data(struct vt_buffer *vtb, const struct text_sndh *sndh)
@@ -50,20 +58,42 @@ static void main_data(struct vt_buffer *vtb, const struct text_sndh *sndh)
 
 static void cursor_hide(struct vt_buffer *vtb, int cursor)
 {
-	vt_putc_normal(vtb, 3 + cursor, 0, ' ');
+	if (cursor)
+		vt_putc_normal(vtb, 3 + cursor, 0, ' ');
 }
 
 static void cursor_show(struct vt_buffer *vtb, int cursor)
 {
-	vt_putc_normal(vtb, 3 + cursor, 0, '>');
+	if (cursor)
+		vt_putc_normal(vtb, 3 + cursor, 0, '>');
+}
+
+static void cursor_update(struct vt_buffer *vtb,
+	struct text_state *view, const struct text_state *model)
+{
+	if (model->cursor == view->cursor)
+		return;
+
+	cursor_hide(vtb, view->cursor);
+	view->cursor = model->cursor;
+	cursor_show(vtb, view->cursor);
+}
+
+static void track_update(struct vt_buffer *vtb,
+	struct text_state *view, const struct text_state *model)
+{
+	if (model->track == view->track)
+		return;
+
+	main_track(vtb, view->track, false);
+	view->track = model->track;
+	main_track(vtb, view->track, true);
 }
 
 static void main_view(struct vt_buffer *vtb, struct text_state *view,
 	const struct text_state *model, const struct text_sndh *sndh)
 {
 	if (!view->cursor) {
-		*view = *model;
-
 		vt_clear(vtb);
 
 		main_title(vtb, 0, "PSG play");
@@ -72,15 +102,10 @@ static void main_view(struct vt_buffer *vtb, struct text_state *view,
 		main_data(vtb, sndh);
 
 		main_title(vtb, vtb->server.size.rows - 1, "");
-
-		cursor_show(vtb, view->cursor);
-	} else {
-		cursor_hide(vtb, view->cursor);
-
-		*view = *model;
-
-		cursor_show(vtb, view->cursor);
 	}
+
+	cursor_update(vtb, view, model);
+	track_update(vtb, view, model);
 }
 
 static void main_ctrl(const unicode_t key, struct text_state *ctrl,
