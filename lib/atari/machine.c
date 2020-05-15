@@ -21,7 +21,7 @@
 
 #include "psgplay/assert.h"
 
-static u64 cycle = 0;
+static u64 cycle;
 
 u64 cycle_transform(u64 to_frequency, u64 from_frequcy, u64 cycle)
 {
@@ -54,6 +54,9 @@ static void atari_st_init(const void *prg, size_t size, u32 track,
 {
 	const size_t offset = 0x4000;	/* 16 KiB */
 	const u8 *p = prg;
+
+	cycle = 0;
+	m68k_clear_timeslice();
 
 	if (offset + size >= ram_device.bus.size)
 		pr_fatal_error("Program at %zu bytes too large for %u bytes\n",

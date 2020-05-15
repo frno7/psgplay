@@ -14,6 +14,11 @@
 
 static u8 ram[1024 * 1024];	/* 1 MiB of RAM */
 
+static void ram_reset(const struct device *device)
+{
+	memset(ram, 0, sizeof(ram));
+}
+
 static u8 ram_rd_u8(const struct device *device, u32 dev_address)
 {
 	return ram[dev_address];
@@ -64,6 +69,7 @@ const struct device ram_device = {
 		.address = 0,
 		.size = sizeof(ram),
 	},
+	.reset  = ram_reset,
 	.rd_u8  = ram_rd_u8,
 	.rd_u16 = ram_rd_u16,
 	.wr_u8  = ram_wr_u8,

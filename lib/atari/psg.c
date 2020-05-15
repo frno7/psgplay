@@ -225,20 +225,19 @@ static s16 psg_dac3(const u8 lva, const u8 lvb, const u8 lvc)
 	return (sa + sb + sc) / 3;	/* Simplistic linear channel mix. */
 }
 
+static s16 fade_in_v = 0;
 static s16 fade_in(const s16 sample) /* FIXME: Do in replay, with fade_out */
 {
-	static s16 v = 0;
-
-	return v < 0x4000 ? (sample * v++) / 0x4000 : sample;
+	return fade_in_v < 0x4000 ? (sample * fade_in_v++) / 0x4000 : sample;
 }
 
+static u64 downsample_sample_cycle;
 static void downsample(const struct device_cycle psg_cycle, const s16 sample)
 {
-	static u64 sample_cycle = 0;
 
 	const u64 n = (output.sample_frequency * psg_cycle.c) / PSG_FREQUENCY;
 
-	for (; sample_cycle < n && !output.halt; sample_cycle++)
+	for (; downsample_sample_cycle < n && !output.halt; downsample_sample_cycle++)
 		if (!output.sample(sample, sample, output.sample_arg))
 			output.halt = true;
 }
@@ -262,14 +261,13 @@ static void psg_emit_cycle(const struct device_cycle psg_cycle)
 	downsample(psg_cycle, fade_in(lowpass(psg_dac3(lva, lvb, lvc))));
 }
 
+static u64 psg_emit_last_cycle;
 static void psg_emit(const struct device_cycle psg_cycle)
 {
-	static u64 last_cycle = 0;
-
-	for (u64 c = ALIGN(last_cycle, 8); c < psg_cycle.c; c += 8)
+	for (u64 c = ALIGN(psg_emit_last_cycle, 8); c < psg_cycle.c; c += 8)
 		psg_emit_cycle((struct device_cycle) { .c = c });
 
-	last_cycle = psg_cycle.c;
+	psg_emit_last_cycle = psg_cycle.c;
 }
 
 static void psg_event(const struct device *device,
@@ -353,6 +351,10 @@ static void psg_reset(const struct device *device)
 	memset(&psg, 0, sizeof(psg));
 
 	psg.reg[PSG_REG_IOMIX] = 0xff;
+
+	fade_in_v = 0;
+	downsample_sample_cycle = 0;
+	psg_emit_last_cycle = 0;
 
 	psg_event(device, device_cycle(device));
 }
