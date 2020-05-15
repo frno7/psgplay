@@ -71,7 +71,7 @@ static void cursor_show(struct vt_buffer *vtb, int cursor)
 static void cursor_update(struct vt_buffer *vtb,
 	struct text_state *view, const struct text_state *model)
 {
-	if (model->cursor == view->cursor)
+	if (view->cursor == model->cursor)
 		return;
 
 	cursor_hide(vtb, view->cursor);
@@ -82,20 +82,32 @@ static void cursor_update(struct vt_buffer *vtb,
 static void track_update(struct vt_buffer *vtb,
 	struct text_state *view, const struct text_state *model)
 {
-	if (model->track == view->track)
+	if (view->track == model->track &&
+	    view->op == model->op)
 		return;
 
 	main_track(vtb, view->track, false);
+
 	view->track = model->track;
-	main_track(vtb, view->track, true);
+	view->op = model->op;
+
+	if (view->op == TRACK_PLAY)
+		main_track(vtb, view->track, true);
 }
 
 static u64 time_update(struct vt_buffer *vtb, struct text_state *view,
 	const struct text_state *model, u64 timestamp)
 {
+	const int col = vtb->server.size.cols - 5;
+
+	if (view->op != TRACK_PLAY) {
+		vt_printf(vtb, 0, col, vt_attr_reverse, "     ");
+
+		return 0;
+	}
+
 	if (view->timestamp <= timestamp) {
-		const int col = vtb->server.size.cols - 5;
-		const int s = timestamp / 1000;
+		const int s = (timestamp - model->timestamp) / 1000;
 		const int m = s / 60;
 
 		if (m < 60)
@@ -104,7 +116,7 @@ static u64 time_update(struct vt_buffer *vtb, struct text_state *view,
 		else
 			vt_printf(vtb, 0, col, vt_attr_reverse, "--:--");
 
-		view->timestamp = (s + 1) * 1000;
+		view->timestamp = model->timestamp + (s + 1) * 1000;
 	}
 
 	return view->timestamp;
@@ -132,16 +144,46 @@ static u64 main_view(struct vt_buffer *vtb, struct text_state *view,
 	return time_update(vtb, view, model, timestamp);
 }
 
+static bool valid_track(int track, const struct text_sndh *sndh)
+{
+	return 1 <= track && track <= sndh->subtune_count;
+}
+
 static void main_ctrl(const unicode_t key, struct text_state *ctrl,
 	const struct text_state *model, const struct text_sndh *sndh)
 {
-	if (key == 'j' || key == U_ARROW_DOWN)
-		ctrl->cursor++;
-
-	if (key == 'k' || key == U_ARROW_UP)
-		ctrl->cursor--;
-
-	ctrl->quit = (key == 'q' || key == '\033');
+	if (key == '\r') {
+		ctrl->track = ctrl->cursor;
+		ctrl->op = TRACK_RESTART;
+	} else if ('1' <= key && key <= '9') {
+		const int track = key - '0';
+		if (valid_track(track, sndh)) {
+			ctrl->track = ctrl->cursor = track;
+			ctrl->op = TRACK_RESTART;
+		}
+	} else if (key == 's') {
+		ctrl->op = TRACK_STOP;
+	} else if (key == '<') {
+		if (valid_track(ctrl->track - 1, sndh)) {
+			ctrl->track--;
+			ctrl->cursor = ctrl->track;
+			ctrl->op = TRACK_RESTART;
+		}
+	} else if (key == '>') {
+		if (valid_track(ctrl->track + 1, sndh)) {
+			ctrl->track++;
+			ctrl->cursor = ctrl->track;
+			ctrl->op = TRACK_RESTART;
+		}
+	} else if (key == 'k' || key == U_ARROW_UP) {
+		if (valid_track(ctrl->cursor - 1, sndh))
+			ctrl->cursor--;
+	} else if (key == 'j' || key == U_ARROW_DOWN) {
+		if (valid_track(ctrl->cursor + 1, sndh))
+			ctrl->cursor++;
+	} else if (key == 'q' || key == '\033') {
+		ctrl->quit = true;
+	}
 }
 
 const struct text_mode text_mode_main = {

@@ -54,8 +54,37 @@ static struct sample_buffer sample_buffer_init(const void *data, size_t size,
 	return sb;
 }
 
+static bool sample_buffer_stop(struct sample_buffer *sb, u64 timestamp)
+{
+	psgplay_free(sb->pp);
+
+	sb->pp = NULL;
+
+	sb->size = sb->index = 0;
+
+	if (sb->output->drop)
+		sb->output->drop(sb->output_arg);
+
+	return true;
+}
+
+static bool sample_buffer_play(struct sample_buffer *sb,
+	const void *data, size_t size, int track, int frequency, u64 timestamp)
+{
+	BUG_ON(sb->pp);
+
+	sb->pp = psgplay_init(data, size, track, frequency);
+	if (!sb->pp)
+		return false;
+
+	return true;
+}
+
 static u64 sample_buffer_update(struct sample_buffer *sb, u64 timestamp)
 {
+	if (!sb->pp)
+		return 0;
+
 	if (timestamp < sb->timestamp)
 		return sb->timestamp;
 
@@ -204,16 +233,28 @@ void text_replay(const struct options *options, struct file file,
 		vt_deescape_fifo(&vt.vtb, &utf32_in.fifo,
 			&tty_in.fifo, clock_ms());
 
-		if (key && tm->ctrl) {
-			ctrl = model;
-
+		ctrl = model;
+		if (key && tm->ctrl)
 			tm->ctrl(key, &ctrl, &model, &sndh);
-		}
 
 		if (ctrl.quit)
 			model.quit = true;
-		if (1 <= ctrl.cursor && ctrl.cursor <= sndh.subtune_count)
-			model.cursor = ctrl.cursor;
+		model.cursor = ctrl.cursor;
+		if (ctrl.track != model.track || ctrl.op != model.op) {
+			if (sample_buffer_stop(&sb, clock_ms())) {
+				model.op = TRACK_STOP;
+
+				if (ctrl.op == TRACK_PLAY ||
+				    ctrl.op == TRACK_RESTART) {
+					if (sample_buffer_play(&sb, file.data, file.size,
+						ctrl.track, options->frequency, clock_ms())) {
+						model.track = ctrl.track;
+						model.op = TRACK_PLAY;
+						model.timestamp = clock_ms();
+					}
+				}
+			}
+		}
 
 		clock_request_ms(sample_buffer_update(&sb, clock_ms()));
 
