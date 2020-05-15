@@ -11,6 +11,7 @@
 struct output {
 	void *(*open)(const char *output, int frequency, bool nonblocking);
 	bool (*sample)(s16 left, s16 right, void *arg);
+	void (*drop)(void *arg);
 	void (*close)(void *arg);
 };
 

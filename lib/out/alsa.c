@@ -100,6 +100,24 @@ static bool alsa_sample(s16 left, s16 right, void *arg)
 	return true;
 }
 
+static void alsa_drop(void *arg)
+{
+	struct alsa_state *state = arg;
+	int err;
+
+	fifo_clear(&state->fifo);
+
+	err = snd_pcm_drop(state->pcm_handle);
+	if (err < 0)
+		pr_fatal_error("%s: ALSA snd_pcm_drop failed: %s\n",
+			state->output, snd_strerror(err));
+
+	err = snd_pcm_prepare(state->pcm_handle);
+	if (err < 0)
+		pr_fatal_error("%s: ALSA snd_pcm_prepare failed: %s\n",
+			state->output, snd_strerror(err));
+}
+
 static void *alsa_open(const char *output, int frequency, bool nonblocking)
 {
 	struct alsa_state *state = xmalloc(sizeof(struct alsa_state));
@@ -157,6 +175,11 @@ static void *alsa_open(const char *output, int frequency, bool nonblocking)
 		pr_fatal_error("%s: ALSA snd_pcm_hw_params failed: %s\n",
 			output, snd_strerror(err));
 
+	err = snd_pcm_prepare(state->pcm_handle);
+	if (err < 0)
+		pr_fatal_error("%s: ALSA snd_pcm_prepare failed: %s\n",
+			output, snd_strerror(err));
+
 	return state;
 }
 
@@ -178,6 +201,7 @@ const struct output alsa_output = {
 #ifdef HAVE_ALSA
 	.open	= alsa_open,
 	.sample	= alsa_sample,
+	.drop	= alsa_drop,
 	.close	= alsa_close,
 #endif /* HAVE_ALSA */
 };
