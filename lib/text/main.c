@@ -90,8 +90,9 @@ static void track_update(struct vt_buffer *vtb,
 	main_track(vtb, view->track, true);
 }
 
-static void main_view(struct vt_buffer *vtb, struct text_state *view,
-	const struct text_state *model, const struct text_sndh *sndh)
+static u64 main_view(struct vt_buffer *vtb, struct text_state *view,
+	const struct text_state *model, const struct text_sndh *sndh,
+	u64 timestamp)
 {
 	if (!view->cursor) {
 		vt_clear(vtb);
@@ -106,6 +107,8 @@ static void main_view(struct vt_buffer *vtb, struct text_state *view,
 
 	cursor_update(vtb, view, model);
 	track_update(vtb, view, model);
+
+	return 0;
 }
 
 static void main_ctrl(const unicode_t key, struct text_state *ctrl,

@@ -218,7 +218,8 @@ void text_replay(const struct options *options, struct file file,
 		clock_request_ms(sample_buffer_update(&sb, clock_ms()));
 
 		if (tm->view)
-			tm->view(&vt.vtb, &view, &model, &sndh);
+			clock_request_ms(tm->view(&vt.vtb,
+				&view, &model, &sndh, clock_ms()));
 	}
 
 	sample_buffer_exit(&sb);
