@@ -197,13 +197,13 @@ void text_replay(const struct options *options, struct file file,
 	DEFINE_FIFO(tty_in, 256);
 	DEFINE_FIFO(tty_out, 4096);
 	DEFINE_FIFO_UTF32(utf32_in);
-	DEFINE_VT(vt, 40, 25, &ecma48);
+	DEFINE_VT(tty_vt, 40, 25, &ecma48);
 
 	struct tty_events tty_events = {
 		.resize  = tty_resize,
 		.suspend = tty_suspend,
 		.resume  = tty_resume,
-		.arg = &vt.vtb
+		.arg = &tty_vt.vtb
 	};
 
 	struct text_state model = {
@@ -238,7 +238,7 @@ void text_replay(const struct options *options, struct file file,
 
 	const struct text_mode *tm = &text_mode_main;
 
-	tty_resize_vt(&vt.vtb, tty_size());
+	tty_resize_vt(&tty_vt.vtb, tty_size());
 
 	if (atexit(atexit_) != 0)
 		pr_warn_errno("atexit");
@@ -247,7 +247,7 @@ void text_replay(const struct options *options, struct file file,
 	file_nonblocking(STDOUT_FILENO);
 
 	for (;;) {
-		vt_write_fifo(&vt.vtb, &tty_out.fifo);
+		vt_write_fifo(&tty_vt.vtb, &tty_out.fifo);
 
 		const struct poll_fifo pfs[] = {
 			{ .fd = STDIN_FILENO,  .in  = &tty_in.fifo  },
@@ -256,8 +256,8 @@ void text_replay(const struct options *options, struct file file,
 
 		if (fifo_empty(&tty_out.fifo) && model.quit) {
 			dprintf(STDOUT_FILENO, "%s%s\n",
-				vt_text(vt_reset(&vt.vtb)),
-				vt_text(vt_cursor_end(&vt.vtb)));
+				vt_text(vt_reset(&tty_vt.vtb)),
+				vt_text(vt_cursor_end(&tty_vt.vtb)));
 			break;
 		}
 
@@ -267,8 +267,8 @@ void text_replay(const struct options *options, struct file file,
 
 		clock_update();
 
-		clock_request_ms(vt_event(&vt.vtb, clock_ms()));
-		vt_deescape_fifo(&vt.vtb, &utf32_in.fifo,
+		clock_request_ms(vt_event(&tty_vt.vtb, clock_ms()));
+		vt_deescape_fifo(&tty_vt.vtb, &utf32_in.fifo,
 			&tty_in.fifo, clock_ms());
 
 		ctrl = model;
@@ -279,7 +279,7 @@ void text_replay(const struct options *options, struct file file,
 			options, &model, &ctrl, &sndh, clock_ms()));
 
 		if (tm->view)
-			clock_request_ms(tm->view(&vt.vtb,
+			clock_request_ms(tm->view(&tty_vt.vtb,
 				&view, &model, &sndh, clock_ms()));
 	}
 
