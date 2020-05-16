@@ -100,6 +100,32 @@ static bool alsa_sample(s16 left, s16 right, void *arg)
 	return true;
 }
 
+static bool alsa_pause(void *arg)
+{
+	struct alsa_state *state = arg;
+	int err;
+
+	err = snd_pcm_pause(state->pcm_handle, true);
+	if (err < 0)
+		pr_fatal_error("%s: ALSA snd_pcm_pause failed: %s\n",
+			state->output, snd_strerror(err));
+
+	return true;
+}
+
+static bool alsa_resume(void *arg)
+{
+	struct alsa_state *state = arg;
+	int err;
+
+	err = snd_pcm_pause(state->pcm_handle, false);
+	if (err < 0)
+		pr_fatal_error("%s: ALSA snd_pcm_pause failed: %s\n",
+			state->output, snd_strerror(err));
+
+	return true;
+}
+
 static void alsa_drop(void *arg)
 {
 	struct alsa_state *state = arg;
@@ -201,6 +227,8 @@ const struct output alsa_output = {
 #ifdef HAVE_ALSA
 	.open	= alsa_open,
 	.sample	= alsa_sample,
+	.pause	= alsa_pause,
+	.resume	= alsa_resume,
 	.drop	= alsa_drop,
 	.close	= alsa_close,
 #endif /* HAVE_ALSA */
