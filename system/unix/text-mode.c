@@ -153,6 +153,44 @@ static void tty_resume(void *arg)
 	vt_redraw(vtb);
 }
 
+static void model_restart(struct sample_buffer *sb,
+	const struct options *options,
+	struct text_state *model, const struct text_state *ctrl,
+	const struct text_sndh *sndh, u64 timestamp)
+{
+	if (!sample_buffer_stop(sb, timestamp))
+		return;
+
+	model->op = TRACK_STOP;
+
+	if (ctrl->op != TRACK_PLAY &&
+	    ctrl->op != TRACK_RESTART)
+		return;
+
+	if (sample_buffer_play(sb, sndh->data, sndh->size,
+			ctrl->track, options->frequency, timestamp)) {
+		model->track = ctrl->track;
+		model->op = TRACK_PLAY;
+		model->timestamp = timestamp;
+	}
+}
+
+static u64 model_update(struct sample_buffer *sb,
+	const struct options *options,
+	struct text_state *model, const struct text_state *ctrl,
+	const struct text_sndh *sndh, u64 timestamp)
+{
+	if (ctrl->quit)
+		model->quit = true;
+
+	model->cursor = ctrl->cursor;
+
+	if (ctrl->track != model->track || ctrl->op != model->op)
+		model_restart(sb, options, model, ctrl, sndh, timestamp);
+
+	return sample_buffer_update(sb, timestamp);
+}
+
 void text_replay(const struct options *options, struct file file,
 	const struct output *output, const struct machine *machine)
 {
@@ -237,26 +275,8 @@ void text_replay(const struct options *options, struct file file,
 		if (key && tm->ctrl)
 			tm->ctrl(key, &ctrl, &model, &sndh);
 
-		if (ctrl.quit)
-			model.quit = true;
-		model.cursor = ctrl.cursor;
-		if (ctrl.track != model.track || ctrl.op != model.op) {
-			if (sample_buffer_stop(&sb, clock_ms())) {
-				model.op = TRACK_STOP;
-
-				if (ctrl.op == TRACK_PLAY ||
-				    ctrl.op == TRACK_RESTART) {
-					if (sample_buffer_play(&sb, file.data, file.size,
-						ctrl.track, options->frequency, clock_ms())) {
-						model.track = ctrl.track;
-						model.op = TRACK_PLAY;
-						model.timestamp = clock_ms();
-					}
-				}
-			}
-		}
-
-		clock_request_ms(sample_buffer_update(&sb, clock_ms()));
+		clock_request_ms(model_update(&sb,
+			options, &model, &ctrl, &sndh, clock_ms()));
 
 		if (tm->view)
 			clock_request_ms(tm->view(&vt.vtb,
