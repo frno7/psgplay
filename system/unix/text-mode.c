@@ -184,6 +184,7 @@ static u64 model_update(struct sample_buffer *sb,
 		model->quit = true;
 
 	model->cursor = ctrl->cursor;
+	model->redraw = ctrl->redraw;
 
 	if (ctrl->track != model->track || ctrl->op != model->op)
 		model_restart(sb, options, model, ctrl, sndh, timestamp);
@@ -261,7 +262,7 @@ void text_replay(const struct options *options, struct file file,
 			&tty_in.fifo, clock_ms());
 
 		ctrl = model;
-		if (key && tm->ctrl)
+		if (tm->ctrl)
 			tm->ctrl(key, &ctrl, &model, &sndh);
 
 		clock_request_ms(model_update(&sb,

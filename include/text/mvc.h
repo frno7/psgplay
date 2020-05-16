@@ -16,6 +16,7 @@ struct text_state {
 		TRACK_RESTART,
 	} op;
 	u64 timestamp;
+	bool redraw;
 	bool quit;
 };
 

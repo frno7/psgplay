@@ -122,24 +122,33 @@ static u64 time_update(struct vt_buffer *vtb, struct text_state *view,
 	return view->timestamp;
 }
 
+static void main_init(struct vt_buffer *vtb, struct text_state *view,
+	const struct text_state *model, const struct text_sndh *sndh,
+	u64 timestamp)
+{
+	vt_clear(vtb);
+
+	main_title(vtb, 0, "PSG play");
+
+	main_form(vtb, sndh);
+	main_data(vtb, sndh);
+
+	main_title(vtb, vtb->server.size.rows - 1, "");
+}
+
 static u64 main_view(struct vt_buffer *vtb, struct text_state *view,
 	const struct text_state *model, const struct text_sndh *sndh,
 	u64 timestamp)
 {
-	if (!view->cursor) {
-		vt_clear(vtb);
-
-		main_title(vtb, 0, "PSG play");
-
-		main_form(vtb, sndh);
-		main_data(vtb, sndh);
-
-		main_title(vtb, vtb->server.size.rows - 1, "");
-	}
+	if (!view->cursor)
+		main_init(vtb, view, model, sndh, timestamp);
 
 	cursor_update(vtb, view, model);
 
 	track_update(vtb, view, model);
+
+	if (model->redraw)
+		vt_redraw(vtb);
 
 	return time_update(vtb, view, model, timestamp);
 }
@@ -152,7 +161,11 @@ static bool valid_track(int track, const struct text_sndh *sndh)
 static void main_ctrl(const unicode_t key, struct text_state *ctrl,
 	const struct text_state *model, const struct text_sndh *sndh)
 {
-	if (key == '\r') {
+	ctrl->redraw = false;
+
+	if (!key) {
+		return;
+	} else if (key == '\r') {
 		ctrl->track = ctrl->cursor;
 		ctrl->op = TRACK_RESTART;
 	} else if ('1' <= key && key <= '9') {
@@ -181,7 +194,9 @@ static void main_ctrl(const unicode_t key, struct text_state *ctrl,
 	} else if (key == 'j' || key == U_ARROW_DOWN) {
 		if (valid_track(ctrl->cursor + 1, sndh))
 			ctrl->cursor++;
-	} else if (key == 'q' || key == '\033') {
+	} else if (key == '\014') {	/* ^L */
+		ctrl->redraw = true;
+	} else if (key == 'q' || key == '\033') {	/* Escape */
 		ctrl->quit = true;
 	}
 }
