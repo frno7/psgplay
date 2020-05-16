@@ -39,6 +39,12 @@ struct sample_buffer {
 	void *output_arg;
 };
 
+struct tty_arg {
+	struct vt_buffer *vtb;
+	const struct text_state *model;
+	struct sample_buffer *sb;
+};
+
 static struct sample_buffer sample_buffer_init(const void *data, size_t size,
 	int track, int frequency, const struct output *output)
 {
@@ -66,6 +72,22 @@ static bool sample_buffer_stop(struct sample_buffer *sb, u64 timestamp)
 		sb->output->drop(sb->output_arg);
 
 	return true;
+}
+
+static bool sample_buffer_pause(struct sample_buffer *sb)
+{
+	if (!sb->output->pause)
+		return false;
+
+	return sb->output->pause(sb->output_arg);
+}
+
+static bool sample_buffer_resume(struct sample_buffer *sb)
+{
+	if (!sb->output->resume)
+		return false;
+
+	return sb->output->resume(sb->output_arg);
 }
 
 static bool sample_buffer_play(struct sample_buffer *sb,
@@ -130,7 +152,8 @@ static void tty_resize_vt(struct vt_buffer *vtb, struct tty_size size)
 
 static void tty_resize(struct tty_size size, void *arg)
 {
-	struct vt_buffer *vtb = arg;
+	struct tty_arg *tty_arg = arg;
+	struct vt_buffer *vtb = tty_arg->vtb;
 
 	tty_resize_vt(vtb, size);
 
@@ -139,16 +162,28 @@ static void tty_resize(struct tty_size size, void *arg)
 
 static void tty_suspend(void *arg)
 {
-	struct vt_buffer *vtb = arg;
+	struct tty_arg *tty_arg = arg;
+	struct vt_buffer *vtb = tty_arg->vtb;
+	struct sample_buffer *sb = tty_arg->sb;
+	const struct text_state *model = tty_arg->model;
 
 	dprintf(STDOUT_FILENO, "%s%s\n",
 		vt_text(vt_reset(vtb)),
 		vt_text(vt_cursor_end(vtb)));
+
+	if (model->op == TRACK_PLAY)
+		sample_buffer_pause(sb);
 }
 
 static void tty_resume(void *arg)
 {
-	struct vt_buffer *vtb = arg;
+	struct tty_arg *tty_arg = arg;
+	struct vt_buffer *vtb = tty_arg->vtb;
+	struct sample_buffer *sb = tty_arg->sb;
+	const struct text_state *model = tty_arg->model;
+
+	if (model->op == TRACK_PLAY)
+		sample_buffer_resume(sb);
 
 	vt_redraw(vtb);
 }
@@ -200,13 +235,6 @@ void text_replay(const struct options *options, struct file file,
 	DEFINE_FIFO_UTF32(utf32_in);
 	DEFINE_VT(tty_vt, 40, 25, &ecma48);
 
-	struct tty_events tty_events = {
-		.resize  = tty_resize,
-		.suspend = tty_suspend,
-		.resume  = tty_resume,
-		.arg = &tty_vt.vtb
-	};
-
 	struct text_state model = {
 		.cursor = options->track,
 		.track = options->track,
@@ -220,6 +248,19 @@ void text_replay(const struct options *options, struct file file,
 
 	struct sample_buffer sb = sample_buffer_init(file.data, file.size,
 		options->track, options->frequency, output);
+
+	struct tty_arg tty_arg = {
+		.vtb = &tty_vt.vtb,
+		.model = &model,
+		.sb = &sb,
+	};
+
+	struct tty_events tty_events = {
+		.resize  = tty_resize,
+		.suspend = tty_suspend,
+		.resume  = tty_resume,
+		.arg = &tty_arg
+	};
 
 	clock_init();
 	clock_request_ms(1);
