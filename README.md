@@ -1,4 +1,4 @@
-`psgplay` is an [Atari ST](https://en.wikipedia.org/wiki/Atari_ST)
+PSG play is an [Atari ST](https://en.wikipedia.org/wiki/Atari_ST)
 [Programmable Sound Generator](https://en.wikipedia.org/wiki/Programmable_sound_generator) (PSG)
 [YM2149](https://en.wikipedia.org/wiki/General_Instrument_AY-3-8910) music
 player for files in the [SNDH archive](http://sndh.atari.org/).

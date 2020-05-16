@@ -24,7 +24,7 @@ static void main_track(struct vt_buffer *vtb, int track, bool playing)
 	if (track)
 		vt_printf(vtb, 3 + track, 1,
 			playing ? vt_attr_reverse : vt_attr_normal,
-			"%2d.", track);
+			"%2d.", track);		/* FIXME: LED digits */
 }
 
 static void main_form(struct vt_buffer *vtb, const struct text_sndh *sndh)

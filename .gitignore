@@ -1,4 +1,5 @@
 /psgplay
+/PSGPLAY.*
 *.sndh
 *.o
 *.o.d

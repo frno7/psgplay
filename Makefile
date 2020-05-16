@@ -40,8 +40,8 @@ $(OBJ): %.o : %.c
 .PHONY: clean
 clean:
 	$(QUIET_RM)$(RM) -f */*.o* */*/*.o* include/tos/tos.h		\
-		GPATH GRTAGS GTAGS 					\
-		$(M68K_GEN_H) $(M68K_GEN_C) $(VER) $(PSGPLAY) $(M68KMAKE)
+		$(PSGPLAY) PSGPLAY.* GPATH GRTAGS GTAGS 		\
+		$(M68K_GEN_H) $(M68K_GEN_C) $(VER) $(M68KMAKE)
 
 .PHONY: gtags
 gtags:
@@ -50,14 +50,15 @@ gtags:
 .PHONY: help
 help:
 	@echo "Targets:"
-	@echo "  all            - compile the PSG player (default)"
+	@echo "  all            - compile PSG play (default)"
+	@echo "  PSGPLAY.TOS    - compile PSG play for Atari ST"
 	@echo "  clean          - remove generated files"
 	@echo
 	@echo "Options:"
 	@echo "  V              - set to 1 to compile verbosely"
 	@echo "  S              - set to 1 for sanitation checks"
 	@echo "  ALSA           - set to 1 to support ALSA for Linux"
-	@echo "  CROSS_COMPILE  - set m68k cross compiler to use to build the TOS stub"
+	@echo "  CROSS_COMPILE  - set m68k cross compiler to use for Atari ST code"
 	@echo
 	@echo "Example:"
 	@echo "  make ALSA=1 CROSS_COMPILE=m68k-unknown-linux-gnu-"
