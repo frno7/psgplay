@@ -25,6 +25,9 @@ General options:
                            if the track has a known duration, or never
     --length=<[mm:]ss.ss>  play for the given duration
 
+    -m, --mode=<command|text>
+                           command or interactive text mode
+
     -t, --track=<num>      set track number
     -f, --frequency=<num>  set audio frequency in Hz (default 44100)
 ```

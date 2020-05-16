@@ -47,11 +47,9 @@ static void help(FILE *file)
 "                           if the track has a known duration, or never\n"
 "    --length=<[mm:]ss.ss>  play for the given duration\n"
 "\n"
-#if 0	/* FIXME */
 "    -m, --mode=<command|text>\n"
 "                           command or interactive text mode\n"
 "\n"
-#endif
 "    -t, --track=<num>      set track number\n"
 "    -f, --frequency=<num>  set audio frequency in Hz (default 44100)\n"
 "\n",
@@ -105,7 +103,13 @@ bool text_mode_option(void)
 		return true;
 	}
 
-	return false;
+	if (command_mode_only_option())
+		return false;
+
+	if (!tty_present())
+		return false;
+
+	return true;
 }
 
 struct options *parse_options(int argc, char **argv)
