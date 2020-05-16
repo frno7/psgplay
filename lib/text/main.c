@@ -163,41 +163,56 @@ static void main_ctrl(const unicode_t key, struct text_state *ctrl,
 {
 	ctrl->redraw = false;
 
-	if (!key) {
-		return;
-	} else if (key == '\r') {
+	switch (key) {
+	case 0:
+		break;
+	case '\r':
 		ctrl->track = ctrl->cursor;
 		ctrl->op = TRACK_RESTART;
-	} else if ('1' <= key && key <= '9') {
+		break;
+	case '1' ... '9': {
 		const int track = key - '0';
+
 		if (valid_track(track, sndh)) {
 			ctrl->track = ctrl->cursor = track;
 			ctrl->op = TRACK_RESTART;
 		}
-	} else if (key == 's') {
+		break;
+	}
+	case 's':
 		ctrl->op = TRACK_STOP;
-	} else if (key == '<') {
+		break;
+	case '<':
 		if (valid_track(ctrl->track - 1, sndh)) {
 			ctrl->track--;
 			ctrl->cursor = ctrl->track;
 			ctrl->op = TRACK_RESTART;
 		}
-	} else if (key == '>') {
+		break;
+	case '>':
 		if (valid_track(ctrl->track + 1, sndh)) {
 			ctrl->track++;
 			ctrl->cursor = ctrl->track;
 			ctrl->op = TRACK_RESTART;
 		}
-	} else if (key == 'k' || key == U_ARROW_UP) {
+		break;
+	case 'k':
+	case U_ARROW_UP:
 		if (valid_track(ctrl->cursor - 1, sndh))
 			ctrl->cursor--;
-	} else if (key == 'j' || key == U_ARROW_DOWN) {
+		break;
+	case 'j':
+	case U_ARROW_DOWN:
 		if (valid_track(ctrl->cursor + 1, sndh))
 			ctrl->cursor++;
-	} else if (key == '\014') {	/* ^L */
+		break;
+	case '\014':	/* ^L */
 		ctrl->redraw = true;
-	} else if (key == 'q' || key == '\033') {	/* Escape */
+		break;
+	case 'q':
+	case '\033':	/* Escape */
 		ctrl->quit = true;
+		break;
 	}
 }
 
