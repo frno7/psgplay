@@ -50,4 +50,6 @@
 
 #define NORETURN __attribute__((__noreturn__))
 
+#define __mode(x) __attribute__((__mode__(x)))
+
 #endif /* INTERNAL_MACRO_H */
