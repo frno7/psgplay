@@ -91,7 +91,8 @@ static void track_update(struct vt_buffer *vtb,
 	view->track = model->track;
 	view->op = model->op;
 
-	if (view->op == TRACK_PLAY)
+	if (view->op == TRACK_PLAY ||
+	    view->op == TRACK_PAUSE)
 		main_track(vtb, view->track, true);
 }
 
@@ -100,14 +101,17 @@ static u64 time_update(struct vt_buffer *vtb, struct text_state *view,
 {
 	const int col = vtb->server.size.cols - 5;
 
-	if (view->op != TRACK_PLAY) {
+	if (view->op != TRACK_PLAY &&
+	    view->op != TRACK_PAUSE) {
 		vt_printf(vtb, 0, col, vt_attr_reverse, "     ");
 
 		return 0;
 	}
 
 	if (view->timestamp <= timestamp) {
-		const int s = (timestamp - model->timestamp) / 1000;
+		const u64 p = model->pause_offset + (model->pause_timestamp ?
+			timestamp - model->pause_timestamp : 0);
+		const int s = (timestamp - model->timestamp - p) / 1000;
 		const int m = s / 60;
 
 		if (m < 60)
@@ -116,7 +120,7 @@ static u64 time_update(struct vt_buffer *vtb, struct text_state *view,
 		else
 			vt_printf(vtb, 0, col, vt_attr_reverse, "--:--");
 
-		view->timestamp = model->timestamp + (s + 1) * 1000;
+		view->timestamp = model->timestamp + p + (s + 1) * 1000;
 	}
 
 	return view->timestamp;
@@ -181,6 +185,13 @@ static void main_ctrl(const unicode_t key, struct text_state *ctrl,
 	}
 	case 's':
 		ctrl->op = TRACK_STOP;
+		break;
+	case ' ':
+	case 'p':
+		if (ctrl->op == TRACK_PLAY)
+			ctrl->op = TRACK_PAUSE;
+		else if (ctrl->op == TRACK_PAUSE)
+			ctrl->op = TRACK_PLAY;
 		break;
 	case '<':
 		if (valid_track(ctrl->track - 1, sndh)) {

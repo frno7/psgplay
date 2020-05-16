@@ -193,6 +193,21 @@ static void model_restart(struct sample_buffer *sb,
 	struct text_state *model, const struct text_state *ctrl,
 	const struct text_sndh *sndh, u64 timestamp)
 {
+	if (model->op == TRACK_PLAY && ctrl->op == TRACK_PAUSE) {
+		model->pause_timestamp = timestamp;
+		sample_buffer_pause(sb);
+		model->op = ctrl->op;
+		return;
+	}
+
+	if (model->op == TRACK_PAUSE && ctrl->op == TRACK_PLAY) {
+		model->pause_offset += timestamp - model->pause_timestamp;
+		model->pause_timestamp = 0;
+		sample_buffer_resume(sb);
+		model->op = ctrl->op;
+		return;
+	}
+
 	if (!sample_buffer_stop(sb, timestamp))
 		return;
 
@@ -207,6 +222,8 @@ static void model_restart(struct sample_buffer *sb,
 		model->track = ctrl->track;
 		model->op = TRACK_PLAY;
 		model->timestamp = timestamp;
+		model->pause_offset = 0;
+		model->pause_timestamp = 0;
 	}
 }
 
@@ -221,7 +238,8 @@ static u64 model_update(struct sample_buffer *sb,
 	model->cursor = ctrl->cursor;
 	model->redraw = ctrl->redraw;
 
-	if (ctrl->track != model->track || ctrl->op != model->op)
+	if (ctrl->track != model->track ||
+	    ctrl->op != model->op)
 		model_restart(sb, options, model, ctrl, sndh, timestamp);
 
 	return sample_buffer_update(sb, timestamp);
