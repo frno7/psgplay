@@ -32,6 +32,4 @@ void pr_bug_warn(const char *file, int line,
 void NORETURN pr_bug(const char *file, int line,
 	const char *func, const char *expr);
 
-void pr_mem(FILE *f, const void *data, size_t size, size_t offset);
-
 #endif /* PSGPLAY_PRINT_H */

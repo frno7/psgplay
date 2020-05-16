@@ -14,6 +14,7 @@
 #include "psgplay/print.h"
 
 #include "system/unix/option.h"
+#include "system/unix/print.h"
 #include "system/unix/string.h"
 
 static void report(const char *prefix, const char *suffix,
