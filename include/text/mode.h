@@ -52,4 +52,7 @@ enum unicode_code {
 UNICODE_KEYS(DEFINE_UNICODE_ENUM)
 };
 
+struct text_sndh text_sndh_init(const char *title,
+	const char *path, const void *data, size_t size);
+
 #endif /* PSGPLAY_TEXT_MODE_H */

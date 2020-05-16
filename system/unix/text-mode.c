@@ -214,19 +214,8 @@ void text_replay(const struct options *options, struct file file,
 	struct text_state view = { };
 	struct text_state ctrl = { };
 
-	struct text_sndh sndh = {
-		.path = file.path,
-		.size = file.size,
-		.data = file.data,
-	};
-
-	if (!sndh_tag_title(sndh.title, sizeof(sndh.title), file.data, file.size)) {
-		strncpy(sndh.title, file_basename(file.path), sizeof(sndh.title) - 1);
-		sndh.title[sizeof(sndh.title) - 1] = '\0';
-	}
-
-	if (!sndh_tag_subtune_count(&sndh.subtune_count, file.data, file.size))
-		sndh.subtune_count = 1;
+	const struct text_sndh sndh = text_sndh_init(
+		file_basename(file.path), file.path, file.data, file.size);
 
 	struct sample_buffer sb = sample_buffer_init(file.data, file.size,
 		options->track, options->frequency, output);
