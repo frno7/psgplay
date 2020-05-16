@@ -75,5 +75,6 @@ void sndh_print(struct file file)
 		free(u);
 	}
 
+	printf("header size %zu\n", header_size);
 	printf("data size %zu\n", file.size - header_size);
 }
