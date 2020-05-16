@@ -9,8 +9,7 @@
 #include "atari/device.h"
 #include "atari/exception-vector.h"
 #include "atari/ram.h"
-
-#include "toslibc/tos/system-variable.h"
+#include "atari/system-variable.h"
 
 static u8 ram[1024 * 1024];	/* 1 MiB of RAM */
 

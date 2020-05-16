@@ -99,6 +99,10 @@ struct system_variables {
 SYSTEM_VARIABLE(SYSTEM_VARIABLE_STRUCT)
 } __attribute__((__packed__));
 
-const char *system_variable_label(u32 address);
+#if defined(__m68k__)
+
+extern struct system_variables *__system_variables;
+
+#endif /* defined(__m68k__) */
 
 #endif /* _TOSLIBC_TOS_SYSTEM_VARIABLE_H */

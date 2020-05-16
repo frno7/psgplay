@@ -5,7 +5,7 @@
 
 #include "internal/macro.h"
 
-#include "toslibc/tos/system-variable.h"
+#include "atari/system-variable.h"
 
 struct system_variable {
 	u32 address;
