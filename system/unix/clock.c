@@ -83,8 +83,12 @@ int clock_poll(void)
 	if (!request)
 		return -1;
 
-	if (request <= now)
+	const u64 r = request;
+
+	request = 0;
+
+	if (r <= now)
 		return 0;
 
-	return (request - now) / 1000000;
+	return (r - now) / 1000000;
 }
