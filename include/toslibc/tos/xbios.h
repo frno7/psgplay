@@ -19,4 +19,11 @@
 rtype_ xbios_##name_(__VA_ARGS__);
 XBIOS_CALL(XBIOS_DECALARE)
 
+/**
+ * xbios_supexecarg - variant of xbios_supexec with argument
+ * @func: function to be called in supervisor mode
+ * @arg: argument to function
+ */
+void xbios_supexecarg(void (*func)(void *arg), void *arg);
+
 #endif /* _TOSLIBC_TOS_XBIOS_H */
