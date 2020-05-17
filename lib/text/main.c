@@ -144,8 +144,11 @@ static u64 main_view(struct vt_buffer *vtb, struct text_state *view,
 	const struct text_state *model, const struct text_sndh *sndh,
 	u64 timestamp)
 {
-	if (!view->cursor)
+	if (view->mode != model->mode) {
+		view->mode = model->mode;
+
 		main_init(vtb, view, model, sndh, timestamp);
+	}
 
 	cursor_update(vtb, view, model);
 

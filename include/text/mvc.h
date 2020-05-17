@@ -6,7 +6,11 @@
 #ifndef PSGPLAY_TEXT_MVC_H
 #define PSGPLAY_TEXT_MVC_H
 
+struct text_mode;
+
 struct text_state {
+	const struct text_mode *mode;
+
 	int cursor;
 	int track;
 	enum {
@@ -18,6 +22,7 @@ struct text_state {
 	u64 timestamp;
 	u64 pause_offset;
 	u64 pause_timestamp;
+
 	bool redraw;
 	bool quit;
 };

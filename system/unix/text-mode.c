@@ -253,6 +253,7 @@ void text_replay(const struct options *options, struct file file,
 	DEFINE_VT(tty_vt, 40, 25, &ecma48);
 
 	struct text_state model = {
+		.mode = &text_mode_main,
 		.cursor = options->track,
 		.track = options->track,
 		.op = TRACK_PLAY,
@@ -283,8 +284,6 @@ void text_replay(const struct options *options, struct file file,
 	clock_request_ms(1);
 
 	tty_init(&tty_events);
-
-	const struct text_mode *tm = &text_mode_main;
 
 	tty_resize_vt(&tty_vt.vtb, tty_size());
 
@@ -320,14 +319,14 @@ void text_replay(const struct options *options, struct file file,
 			&tty_in.fifo, clock_ms());
 
 		ctrl = model;
-		if (tm->ctrl)
-			tm->ctrl(key, &ctrl, &model, &sndh);
+		if (model.mode->ctrl)
+			model.mode->ctrl(key, &ctrl, &model, &sndh);
 
 		clock_request_ms(model_update(&sb,
 			options, &model, &ctrl, &sndh, clock_ms()));
 
-		if (tm->view)
-			clock_request_ms(tm->view(&tty_vt.vtb,
+		if (model.mode->view)
+			clock_request_ms(model.mode->view(&tty_vt.vtb,
 				&view, &model, &sndh, clock_ms()));
 	}
 
