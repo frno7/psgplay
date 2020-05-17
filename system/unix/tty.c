@@ -13,7 +13,7 @@
 
 #include "psgplay/print.h"
 
-#include "system/clock.h"
+#include "system/unix/clock.h"
 #include "system/unix/tty.h"
 
 static struct termios tty_original;

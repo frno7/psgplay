@@ -9,7 +9,7 @@
 #include "internal/compare.h"
 #include "internal/types.h"
 
-#include "system/clock.h"
+#include "system/unix/clock.h"
 
 #include "psgplay/print.h"
 

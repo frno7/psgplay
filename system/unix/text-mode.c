@@ -20,8 +20,7 @@
 #include "text/mode.h"
 #include "text/mvc.h"
 
-#include "system/clock.h"
-
+#include "system/unix/clock.h"
 #include "system/unix/poll-fifo.h"
 #include "system/unix/text-mode.h"
 #include "system/unix/tty.h"
