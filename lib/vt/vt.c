@@ -170,12 +170,13 @@ static inline vt_char vt_getc_output(struct vt_buffer *vtb)
 	const int col = vtb->output.col +
 		(vtb->client.size.cols - vtb->server.size.cols) / 2;
 	const int offset = vtb->output.offset;
-	const vt_char c = vtb->server.chars[offset] ?
+	const vt_char sc = vtb->server.chars[offset] ?
 		vtb->server.chars[offset] : ' ';
+	const vt_char cc = vtb->client.chars[offset] ?
+		vtb->client.chars[offset] : ' ';
 	const struct vt_attr a = vtb->server.attrs[offset];
 
-	if (vtb->client.chars[offset] == c &&
-	    vtb->client.attrs[offset].state == a.state)
+	if (cc == sc && vtb->client.attrs[offset].state == a.state)
 		return 0;
 
 	if (row < 0 || vtb->client.size.rows <= row ||
@@ -194,9 +195,9 @@ static inline vt_char vt_getc_output(struct vt_buffer *vtb)
 		vtb->cursor.attr.state = a.state;
 	}
 
-	vt_output_append_char(vtb, c);
+	vt_output_append_char(vtb, sc);
 
-	vtb->client.chars[offset] = c;
+	vtb->client.chars[offset] = sc;
 	vtb->client.attrs[offset].state = a.state;
 	vtb->cursor.col++;
 
