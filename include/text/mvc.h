@@ -11,10 +11,13 @@ struct text_mode;
 struct text_state {
 	const struct text_mode *mode;
 
+	const char *path;
+	int progress;
+
 	int cursor;
 	int track;
 	enum {
-		TRACK_STOP,
+		TRACK_STOP = 0,
 		TRACK_PLAY,
 		TRACK_PAUSE,
 		TRACK_RESTART,
