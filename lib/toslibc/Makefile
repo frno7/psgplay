@@ -50,6 +50,7 @@ TOSLIBC_C_SRC +=							\
 	lib/toslibc/vprintf.c						\
 	lib/toslibc/vsnprintf.c						\
 	lib/toslibc/write.c						\
+	lib/toslibc/xbra.c						\
 	lib/toslibc/__divsi3.c						\
 	lib/toslibc/__modsi3.c						\
 	lib/toslibc/__muldi3.c						\
