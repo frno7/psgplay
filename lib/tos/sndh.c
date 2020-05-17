@@ -10,7 +10,7 @@
 #include "internal/types.h"
 #include "internal/limits.h"
 
-#include "psgplay/timer.h"
+#include "psgplay/sndh.h"
 
 #include "atari/mfp-map.h"
 
@@ -21,45 +21,12 @@ struct timer_prescale {
 	u8 count;
 };
 
-static struct record {
-	size_t size;
-	struct {
-		u32 init;
-		u32 exit;
-		u32 play;
-		u8 data[];
-	} *sndh;
-} record;
+struct sndh_file file;
 
 static struct {
 	enum sndh_timer_type type;
 	struct timer_prescale prescale;
 } timer_state;
-
-static void sndh_init(int track)
-{
-	__asm__ __volatile__ (
-		"	movem.l	%%d0-%%a6,-(%%sp)\n"
-		"	move.l	%1,%%d0\n"
-		"	jsr	(%0)\n"
-		"	movem.l	(%%sp)+,%%d0-%%a6\n"
-		:
-		: "a" (&record.sndh->init), "d" (track)
-		: "memory");
-}
-
-static void sndh_play(void)
-{
-	__asm__ __volatile__ (
-		/* Enable interrupts and other timers for effects. */
-		"	move	#0x2200,%%sr\n"
-		"	movem.l	%%d0-%%a6,-(%%sp)\n"
-		"	jsr	(%0)\n"
-		"	movem.l	(%%sp)+,%%d0-%%a6\n"
-		:
-		: "a" (&record.sndh->play)
-		: "memory");
-}
 
 static bool timer_prescale(struct timer_prescale *prescale, int frequency)
 {
@@ -104,7 +71,7 @@ MFP_CTRL_DIV(MFP_CTRL_DIV_PRESCALE)
 void vbl_exception(void)
 {
 	if (timer_state.type == SNDH_TIMER_V)
-		sndh_play();
+		sndh_play(&file);
 }
 
 static bool install_sndh_vbl(int frequency)
@@ -118,7 +85,7 @@ static bool install_sndh_vbl(int frequency)
 	void timer_##name_##_exception(void)				\
 	{								\
 		if (timer_state.type == SNDH_TIMER_##type_)		\
-			sndh_play();					\
+			sndh_play(&file);				\
 									\
 		/* Some SNDH files mess with the counters, restore. */	\
 		mfp_map()->ctrl_ = timer_state.prescale.ctrl;		\
@@ -177,10 +144,10 @@ void start(size_t size, void *sndh, u32 track, u32 timer)
 {
 	BUILD_BUG_ON(sizeof(struct system_variables) != 0x102);
 
-	record = (struct record) { .size = size, .sndh = sndh };
+	file = (struct sndh_file) { .size = size, .sndh = sndh };
 
 	if (install_sndh_timer(u32_to_sndh_timer(timer)))
-		sndh_init(track);
+		sndh_init(track, &file);
 
 	idle_indefinitely();
 }

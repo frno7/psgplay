@@ -224,4 +224,54 @@ bool sndh_valid_tag(const struct sndh_cursor *cursor);
 
 void sndh_next_tag(struct sndh_cursor *cursor);
 
+struct sndh_file {
+	size_t size;
+	struct {
+		uint32_t init;
+		uint32_t exit;
+		uint32_t play;
+		uint8_t data[];
+	} *sndh;
+};
+
+#if defined(__m68k__)
+
+static inline void sndh_init(int track, struct sndh_file *file)
+{
+	__asm__ __volatile__ (
+		"	movem.l	%%d0-%%a6,-(%%sp)\n"
+		"	move.l	%1,%%d0\n"
+		"	jsr	(%0)\n"
+		"	movem.l	(%%sp)+,%%d0-%%a6\n"
+		:
+		: "a" (&file->sndh->init), "d" (track)
+		: "memory");
+}
+
+static inline void sndh_exit(struct sndh_file *file)
+{
+	__asm__ __volatile__ (
+		"	movem.l	%%d0-%%a6,-(%%sp)\n"
+		"	jsr	(%0)\n"
+		"	movem.l	(%%sp)+,%%d0-%%a6\n"
+		:
+		: "a" (&file->sndh->exit)
+		: "memory");
+}
+
+static inline void sndh_play(struct sndh_file *file)
+{
+	__asm__ __volatile__ (
+		/* Enable interrupts and other timers for effects. */
+		"	move	#0x2200,%%sr\n"
+		"	movem.l	%%d0-%%a6,-(%%sp)\n"
+		"	jsr	(%0)\n"
+		"	movem.l	(%%sp)+,%%d0-%%a6\n"
+		:
+		: "a" (&file->sndh->play)
+		: "memory");
+}
+
+#endif /* defined(__m68k__) */
+
 #endif /* PSGPLAY_SNDH_H */
