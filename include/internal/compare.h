@@ -5,6 +5,7 @@
 
 #include "internal/build-assert.h"
 #include "internal/macro.h"
+#include "internal/types.h"
 
 /* Macro definitions from the Linux kernel. */
 

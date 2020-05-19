@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "internal/compare.h"
+
 #include "vt/ecma48.h"
 
 #define ECMA48_STR(s_)		(struct vt_text) { .s = s_ }
@@ -35,7 +37,9 @@ static struct vt_text ecma48_position(int row, int col)
 	struct vt_text t;
 
 	t.s = NULL;
-	snprintf(t.b, sizeof(t.b), ECMA48_CSI "%d;%dH", row + 1, col + 1);
+	snprintf(t.b, sizeof(t.b), ECMA48_CSI "%d;%dH",
+		clamp(row + 1, 1, 1000),
+		clamp(col + 1, 1, 1000));
 
 	return t;
 };
