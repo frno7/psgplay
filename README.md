@@ -30,4 +30,6 @@ General options:
 
     -t, --track=<num>      set track number
     -f, --frequency=<num>  set audio frequency in Hz (default 44100)
+
+    --disassemble          disassemble SNDH file and exit
 ```

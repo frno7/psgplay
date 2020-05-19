@@ -20,6 +20,7 @@
 #include "out/wave.h"
 
 #include "system/unix/diagnostic.h"
+#include "system/unix/disassemble.h"
 #include "system/unix/file.h"
 #include "system/unix/info.h"
 #include "system/unix/option.h"
@@ -34,6 +35,13 @@ typedef void (*replay_f)(const struct options *options, struct file file,
 static void NORETURN info_exit(struct file file)
 {
 	sndh_print(file);
+
+	exit(EXIT_SUCCESS);
+}
+
+static void NORETURN disassemble_exit(struct file file)
+{
+	sndh_disassemble(file);
 
 	exit(EXIT_SUCCESS);
 }
@@ -93,6 +101,9 @@ int main(int argc, char *argv[])
 
 	if (options->info)
 		info_exit(file);
+
+	if (options->disassemble)
+		disassemble_exit(file);
 
 	select_subtune(&options->track, file);
 

@@ -29,6 +29,8 @@ struct options {
 	int frequency;
 
 	const char *input;
+
+	bool disassemble;
 };
 
 int option_verbosity(void);
