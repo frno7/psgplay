@@ -247,6 +247,8 @@ struct sndh_cursor {
 struct sndh_cursor sndh_first_tag(const void *data, const size_t size,
 	size_t *header_size, const struct sndh_diagnostic *diag);
 
+size_t sndh_header_size(const void *data, const size_t size);
+
 bool sndh_valid_tag(const struct sndh_cursor *cursor);
 
 void sndh_next_tag(struct sndh_cursor *cursor);

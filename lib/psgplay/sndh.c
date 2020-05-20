@@ -363,6 +363,15 @@ restart:
 	return false;
 }
 
+size_t sndh_header_size(const void *data, const size_t size)
+{
+	size_t header_size;
+
+	sndh_for_each_tag_with_header_size (data, size, &header_size);
+
+	return header_size;
+}
+
 static void diag_warn_ignore(void *arg, const char *fmt, ...) { }
 static void diag_error_ignore(void *arg, const char *fmt, ...) { }
 
