@@ -531,3 +531,18 @@ bool sndh_tag_title(char *title, size_t length,
 
 	return false;
 }
+
+size_t sndh_init_address(const void *data, const size_t size)
+{
+	return size >= 4 ? branch_address(0, data, 4) : 0;
+}
+
+size_t sndh_exit_address(const void *data, const size_t size)
+{
+	return size >= 8 ? branch_address(4, data, 8) : 0;
+}
+
+size_t sndh_play_address(const void *data, const size_t size)
+{
+	return size >= 12 ? branch_address(8, data, 12) : 0;
+}

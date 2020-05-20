@@ -93,6 +93,33 @@ bool sndh_tag_timer(struct sndh_timer *timer,
 bool sndh_tag_title(char *title, size_t length,
 	const void *data, const size_t size);
 
+/**
+ * sndh_init_address - SNDH init address relative start of data
+ * @data: SNDH data
+ * @size: size in bytes of SNDH data
+ *
+ * Return: address relative start of data, otherwise zero
+ */
+size_t sndh_init_address(const void *data, const size_t size);
+
+/**
+ * sndh_exit_address - SNDH exit address relative start of data
+ * @data: SNDH data
+ * @size: size in bytes of SNDH data
+ *
+ * Return: address relative start of data, otherwise zero
+ */
+size_t sndh_exit_address(const void *data, const size_t size);
+
+/**
+ * sndh_play_address - SNDH play address relative start of data
+ * @data: SNDH data
+ * @size: size in bytes of SNDH data
+ *
+ * Return: address relative start of data, otherwise zero
+ */
+size_t sndh_play_address(const void *data, const size_t size);
+
 /** sndh_tag_name - SNDH tag name */
 #define sndh_tag_name (sndh_cursor__.tag->name)
 
