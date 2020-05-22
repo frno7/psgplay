@@ -30,6 +30,7 @@ struct memory {
 };
 
 struct disassembly {
+	struct options *options;
 	size_t size;
 	const uint8_t *data;
 	size_t header_size;
@@ -233,6 +234,10 @@ static void dasm_mark_target(struct disassembly *dasm, size_t target)
 static void dasm_mark_text_trace(struct disassembly *dasm, size_t i)
 {
 	while (i < dasm->size) {
+		if (dasm->options->disassemble == DISASSEMBLE_TYPE_HEADER &&
+		    i > 12)
+			return;
+
 		if (dasm->m[i].type != MEMORY_UNDEFINED)
 			return;
 
@@ -274,9 +279,10 @@ static void dasm_mark_text_trace(struct disassembly *dasm, size_t i)
 	}
 }
 
-void sndh_disassemble(struct file file)
+void sndh_disassemble(struct options *options, struct file file)
 {
 	struct disassembly dasm = {
+		.options = options,
 		.size = file.size,
 		.data = file.data,
 		.header_size = sndh_header_size(file.data, file.size),

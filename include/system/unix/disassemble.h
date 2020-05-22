@@ -7,7 +7,8 @@
 #define PSGPLAY_SYSTEM_UNIX_DISASSEMBLE_H
 
 #include "system/unix/file.h"
+#include "system/unix/option.h"
 
-void sndh_disassemble(struct file file);
+void sndh_disassemble(struct options *options, struct file file);
 
 #endif /* PSGPLAY_SYSTEM_UNIX_DISASSEMBLE_H */

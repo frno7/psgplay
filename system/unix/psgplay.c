@@ -39,9 +39,9 @@ static void NORETURN info_exit(struct file file)
 	exit(EXIT_SUCCESS);
 }
 
-static void NORETURN disassemble_exit(struct file file)
+static void NORETURN disassemble_exit(struct options *options, struct file file)
 {
-	sndh_disassemble(file);
+	sndh_disassemble(options, file);
 
 	exit(EXIT_SUCCESS);
 }
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
 		info_exit(file);
 
 	if (options->disassemble)
-		disassemble_exit(file);
+		disassemble_exit(options, file);
 
 	select_subtune(&options->track, file);
 

@@ -55,7 +55,7 @@ void model_timer(struct text_sndh *sndh)
 	}
 }
 
-static void sndh_init_super(void *arg)
+void sndh_init_super(void *arg)
 {
 	struct sndh_init_arg *sndh_init_arg = arg;
 	struct sndh_file sndh_file = {

@@ -13,6 +13,12 @@
 
 extern char progname[];
 
+enum disassemble_type {
+	DISASSEMBLE_TYPE_NONE,
+	DISASSEMBLE_TYPE_ALL,
+	DISASSEMBLE_TYPE_HEADER,
+};
+
 struct options {
 	int verbose;
 
@@ -30,7 +36,7 @@ struct options {
 
 	const char *input;
 
-	bool disassemble;
+	enum disassemble_type disassemble;
 };
 
 int option_verbosity(void);

@@ -39,6 +39,9 @@ static void help(FILE *file)
 "    -v, --verbose          increase verbosity\n"
 "\n"
 "    -i, --info             display SNDH file info and exit\n"
+"\n"
+"Play options:\n"
+"\n"
 "    -o, --output=<file>    write audio output to the given file in WAVE format\n"
 "\n"
 "    --start=<[mm:]ss.ss>   start playing at the given time\n"
@@ -53,7 +56,10 @@ static void help(FILE *file)
 "    -t, --track=<num>      set track number\n"
 "    -f, --frequency=<num>  set audio frequency in Hz (default 44100)\n"
 "\n"
+"Disassembly options:\n"
+"\n"
 "    --disassemble          disassemble SNDH file and exit\n"
+"    --disassemble-header   disassemble SNDH file header and exit\n"
 "\n",
 		progname);
 }
@@ -117,23 +123,24 @@ bool text_mode_option(void)
 struct options *parse_options(int argc, char **argv)
 {
 	static const struct option options[] = {
-		{ "help",        no_argument,       NULL, 0 },
-		{ "version",     no_argument,       NULL, 0 },
-		{ "verbose",     no_argument,       NULL, 0 },
+		{ "help",               no_argument,       NULL, 0 },
+		{ "version",            no_argument,       NULL, 0 },
+		{ "verbose",            no_argument,       NULL, 0 },
 
-		{ "info",        no_argument,       NULL, 0 },
-		{ "output",      required_argument, NULL, 0 },
+		{ "info",               no_argument,       NULL, 0 },
+		{ "output",             required_argument, NULL, 0 },
 
-		{ "start",       required_argument, NULL, 0 },
-		{ "stop",        required_argument, NULL, 0 },
-		{ "length",      required_argument, NULL, 0 },
+		{ "start",              required_argument, NULL, 0 },
+		{ "stop",               required_argument, NULL, 0 },
+		{ "length",             required_argument, NULL, 0 },
 
-		{ "mode",        required_argument, NULL, 0 },
+		{ "mode",               required_argument, NULL, 0 },
 
-		{ "track",       required_argument, NULL, 0 },
-		{ "frequency",   required_argument, NULL, 0 },
+		{ "track",              required_argument, NULL, 0 },
+		{ "frequency",          required_argument, NULL, 0 },
 
-		{ "disassemble", no_argument,       NULL, 0 },
+		{ "disassemble",        no_argument,       NULL, 0 },
+		{ "disassemble-header", no_argument,       NULL, 0 },
 
 		{ NULL, 0, NULL, 0 }
 	};
@@ -184,7 +191,9 @@ struct options *parse_options(int argc, char **argv)
 				goto opt_f;
 
 			else if (OPT("disassemble"))
-				option.disassemble = true;
+				option.disassemble = DISASSEMBLE_TYPE_ALL;
+			else if (OPT("disassemble-header"))
+				option.disassemble = DISASSEMBLE_TYPE_HEADER;
 			break;
 
 		case 'h':
