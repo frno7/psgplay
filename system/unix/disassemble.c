@@ -108,7 +108,7 @@ static void dasm_print_data(struct disassembly *dasm, size_t i, size_t size)
 	}
 
 	if (col)
-		dasm_print_nl(dasm, i + 1, col);
+		dasm_print_nl(dasm, i, col);
 }
 
 struct insn_disassembly {
