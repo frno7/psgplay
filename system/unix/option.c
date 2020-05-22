@@ -60,6 +60,7 @@ static void help(FILE *file)
 "\n"
 "    --disassemble          disassemble SNDH file and exit\n"
 "    --disassemble-header   disassemble SNDH file header and exit\n"
+"    --remake-header        remake SNDH file header in disassembly\n"
 "\n",
 		progname);
 }
@@ -141,6 +142,7 @@ struct options *parse_options(int argc, char **argv)
 
 		{ "disassemble",        no_argument,       NULL, 0 },
 		{ "disassemble-header", no_argument,       NULL, 0 },
+		{ "remake-header",      no_argument,       NULL, 0 },
 
 		{ NULL, 0, NULL, 0 }
 	};
@@ -194,6 +196,8 @@ struct options *parse_options(int argc, char **argv)
 				option.disassemble = DISASSEMBLE_TYPE_ALL;
 			else if (OPT("disassemble-header"))
 				option.disassemble = DISASSEMBLE_TYPE_HEADER;
+			else if (OPT("remake-header"))
+				option.remake_header = true;
 			break;
 
 		case 'h':

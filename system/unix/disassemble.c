@@ -16,6 +16,7 @@
 
 #include "system/unix/disassemble.h"
 #include "system/unix/memory.h"
+#include "system/unix/remake.h"
 #include "system/unix/string.h"
 
 struct memory {
@@ -45,9 +46,22 @@ static void dasm_label(struct disassembly *dasm, const char *s, size_t address)
 	dasm->m[address].label = s;
 }
 
+static bool dasm_is_header_remake(struct disassembly *dasm, size_t i)
+{
+	return dasm->options->remake_header && 12 <= i && i < dasm->header_size;
+}
+
+static bool dasm_is_label(struct disassembly *dasm, size_t i)
+{
+	if (dasm->size <= i)
+		return false;
+
+	return dasm->m[i].label != NULL || dasm->m[i].target;
+}
+
 static int dasm_print_nl(struct disassembly *dasm, int i, int col)
 {
-	if (!col)
+	if (!col || dasm_is_header_remake(dasm, i - col))
 		return 0;
 
 	if (12 <= i - col && i - col < dasm->header_size) {
@@ -81,14 +95,6 @@ static void dasm_print_label(struct disassembly *dasm, size_t i)
 		printf("_%zx:\n", i);
 }
 
-static bool dasm_is_label(struct disassembly *dasm, size_t i)
-{
-	if (dasm->size <= i)
-		return false;
-
-	return dasm->m[i].label != NULL || dasm->m[i].target;
-}
-
 static void dasm_print_data(struct disassembly *dasm, size_t i, size_t size)
 {
 	int col;
@@ -99,7 +105,10 @@ static void dasm_print_data(struct disassembly *dasm, size_t i, size_t size)
 			dasm_print_label(dasm, i);
 		}
 
-		if (!col)
+		if (dasm_is_header_remake(dasm, i)) {
+			if (i == 12)
+				remake_header(dasm->data, dasm->size);
+		} else if (!col)
 			printf("\t.dc.b\t0x%02x", dasm->data[i]);
 		else
 			printf(",0x%02x", dasm->data[i]);

@@ -37,6 +37,7 @@ struct options {
 	const char *input;
 
 	enum disassemble_type disassemble;
+	bool remake_header;
 };
 
 int option_verbosity(void);

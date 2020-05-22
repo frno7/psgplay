@@ -17,6 +17,9 @@ General options:
     -v, --verbose          increase verbosity
 
     -i, --info             display SNDH file info and exit
+
+Play options:
+
     -o, --output=<file>    write audio output to the given file in WAVE format
 
     --start=<[mm:]ss.ss>   start playing at the given time
@@ -31,5 +34,9 @@ General options:
     -t, --track=<num>      set track number
     -f, --frequency=<num>  set audio frequency in Hz (default 44100)
 
+Disassembly options:
+
     --disassemble          disassemble SNDH file and exit
+    --disassemble-header   disassemble SNDH file header and exit
+    --remake-header        remake SNDH file header in disassembly
 ```
