@@ -19,7 +19,7 @@ Do `make help` to list further targets and options.
 
 # How to use
 
-PSG play command options for Linux and Mac OS:
+PSG play options for Linux and Mac OS:
 
 
 ```
@@ -61,7 +61,21 @@ Disassembly options:
 PSG play defaults to _interactive text mode_ if it is compiled with ALSA
 for Linux, or is compiled for Atari ST. Mac OS does not support
 _interactive text mode_, only _command mode_ with
-[WAVE](https://en.wikipedia.org/wiki/WAV) format output.
+[WAVE](https://en.wikipedia.org/wiki/WAV) format output,
+as described in issue [#8](https://github.com/frno7/psgplay/issues/8).
+
+For Linux, [TTY](https://en.wikipedia.org/wiki/Tty_(Unix)) mode and
+[ECMA-48](https://en.wikipedia.org/wiki/ANSI_escape_code) are used,
+including support for job control such as process suspension.
+
+For Atari ST, text mode and [VT52](https://en.wikipedia.org/wiki/VT52)
+are used. See issues
+[#5](https://github.com/frno7/psgplay/issues/5) and
+[#6](https://github.com/frno7/psgplay/issues/6)
+for ideas about additional
+[serial port](https://en.wikipedia.org/wiki/Serial_port) and
+[GEM](https://en.wikipedia.org/wiki/GEM_(desktop_environment))
+user interfaces.
 
 The currently playing tune is indicated in reverse video. A cursor is shown
 with `>`. Keyboard controls:
@@ -74,13 +88,18 @@ with `>`. Keyboard controls:
 - `>` to play the next tune;
 - `k` or `up arrow` to move the cursor up;
 - `j` or `down arrow` to move the cursor down;
-- `return` to play the tune at the cursor;
+- `return` to play the tune at the cursor.
 
 ## Command mode
 
-PSG play runs in _command mode_ if is not compiled with ALSA for Linux,
+PSG play runs in _command mode_ if it is not compiled with ALSA for Linux,
 or is compiled for Mac OS, or the options `-o`, `--output`, `--start`,
 `--stop` or `--length` are given. Atari ST does not support _command mode_.
+
+## Library form
+
+Issue [#1](https://github.com/frno7/psgplay/issues/1) describes ideas
+about making PSG play a linkable library.
 
 ## Disassembly
 
@@ -94,6 +113,9 @@ The `--remake-header` can be used to repair broken SNDH metadata such as
 missing tags, excessive whitespace, etc. It can also be used to update or
 add new metadata, by editing the produced assembly source code in an
 editor.
+
+See issue [#4](https://github.com/frno7/psgplay/issues/4) about switching
+from MIT to Motorola syntax.
 
 Excerpt of disassembly with the `--disassemble` option:
 
@@ -228,8 +250,8 @@ in source [patch](https://en.wikipedia.org/wiki/Patch_%28Unix%29) form,
 for quick and easy review, application and SNDH file reassembly:
 
 ```
---- LXCESS.S.orig	2020-05-22 14:56:20.495508523 +0200
-+++ LXCESS.S.new	2020-05-22 15:23:55.260509689 +0200
+--- sndh/Mad_Max/Games/Lethal_Xcess_(ST).S.orig	2020-05-22 14:56:20.495508523 +0200
++++ sndh/Mad_Max/Games/Lethal_Xcess_(ST).S.new	2020-05-22 15:23:55.260509689 +0200
 @@ -6,13 +6,31 @@
  	braw	_play
  sndh:
@@ -265,3 +287,38 @@ for quick and easy review, application and SNDH file reassembly:
  _init:
  	.dc.b	0x2f,0x00,0x41,0xfa,0x00,0x6e,0x4a,0x50
 ```
+
+# How it works
+
+The [SNDH file format](https://github.com/frno7/psgplay/blob/master/doc/sndhv21.txt)
+is an [Atari ST](https://en.wikipedia.org/wiki/Atari_ST)
+machine code executable form of music. A substantial part of Atari ST
+hardware must be emulated to play such files using other kinds of computers.
+The three most complex parts emulated in software by PSG play are:
+
+- the [Motorola 68000](https://en.wikipedia.org/wiki/Motorola_68000)
+  processor, via the [Musashi](https://github.com/kstenerud/Musashi) library
+  in [`lib/m68k`](https://github.com/frno7/psgplay/tree/master/lib/m68k);
+
+- the [Programmable Sound Generator](https://en.wikipedia.org/wiki/Programmable_sound_generator)
+  (PSG) [YM2149](https://en.wikipedia.org/wiki/General_Instrument_AY-3-8910)
+  in [`lib/atari/psg.c`](https://github.com/frno7/psgplay/tree/master/lib/atari/psg.c);
+
+- the [MC68901](https://archive.org/details/Motorola_MC68901_MFP_undated)
+  multifunction peripheral (MFP) timer and interrupt controller in
+  [`lib/atari/mfp.c`](https://github.com/frno7/psgplay/tree/master/lib/atari/mfp.c).
+
+The digital emulation is currently fairly accurate, aiming to be within the
+variation of the compatible models of original Atari hardware. The analogue
+emulation is currently simpler, aiming to be accurate but also avoid unwanted
+artifacts such as the high level of noise produced with original Atari hardware.
+As described in issue [#1](https://github.com/frno7/psgplay/issues/1),
+a library form of PSG play could permit custom mixer and filter functions,
+to obtain any level of analogue emulation.
+
+As described in issues
+[#9](https://github.com/frno7/psgplay/issues/9) and
+[#10](https://github.com/frno7/psgplay/issues/10),
+DMA sound and LMC1992 for tone and volume control specific to
+[Atari STE](https://en.wikipedia.org/wiki/Atari_ST#STE_models)
+and related hardware are not yet emulated by PSG play.
