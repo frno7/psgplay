@@ -79,7 +79,7 @@ static bool atari_st_run(void)
 {
 	cycle += device_run(cycle, 10000);
 
-	return !psg_output_halt();
+	return true;
 }
 
 const struct machine atari_st = {

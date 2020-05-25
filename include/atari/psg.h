@@ -132,6 +132,4 @@ extern const struct device psg_device;
 
 void psg_sample(int sample_frequency, sample_f sample, void *sample_arg);
 
-bool psg_output_halt(void);
-
 #endif /* ATARI_PSG_H */

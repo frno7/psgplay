@@ -29,9 +29,12 @@ struct psgplay {
 	int errno_;
 };
 
-static bool psgplay_sample(s16 left, s16 right, void *arg)
+static void psgplay_sample(s16 left, s16 right, void *arg)
 {
 	struct psgplay *pp = arg;
+
+	if (pp->errno_)
+		return;
 
 	if (pp->capacity <= pp->count) {
 		const size_t capacity = pp->capacity +
@@ -41,7 +44,7 @@ static bool psgplay_sample(s16 left, s16 right, void *arg)
 			capacity * sizeof(*pp->buffer));
 		if (!buffer) {
 			pp->errno_ = errno;
-			return false;
+			return;
 		}
 
 		pp->buffer = buffer;
@@ -51,8 +54,6 @@ static bool psgplay_sample(s16 left, s16 right, void *arg)
 	pp->buffer[pp->count].left = left;
 	pp->buffer[pp->count].right = right;
 	pp->count++;
-
-	return true;
 }
 
 static u32 parse_timer(const void *data, size_t size)

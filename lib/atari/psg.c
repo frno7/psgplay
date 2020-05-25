@@ -38,7 +38,6 @@ static struct {
 	int sample_frequency;
 	sample_f sample;
 	void *sample_arg;
-	bool halt;
 } output;
 
 static char *psg_register_name(u32 reg)
@@ -231,9 +230,8 @@ static void downsample(const struct device_cycle psg_cycle, const s16 sample)
 
 	const u64 n = (output.sample_frequency * psg_cycle.c) / PSG_FREQUENCY;
 
-	for (; downsample_sample_cycle < n && !output.halt; downsample_sample_cycle++)
-		if (!output.sample(sample, sample, output.sample_arg))
-			output.halt = true;
+	for (; downsample_sample_cycle < n; downsample_sample_cycle++)
+		output.sample(sample, sample, output.sample_arg);
 }
 
 static void psg_emit_cycle(const struct device_cycle psg_cycle)
@@ -357,13 +355,6 @@ void psg_sample(int sample_frequency, sample_f sample, void *sample_arg)
 	output.sample_frequency = sample_frequency;
 	output.sample = sample;
 	output.sample_arg = sample_arg;
-
-	output.halt = false;
-}
-
-bool psg_output_halt(void)
-{
-	return output.halt;
 }
 
 const struct device psg_device = {

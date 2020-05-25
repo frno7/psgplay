@@ -8,7 +8,7 @@
 
 #include "internal/types.h"
 
-typedef bool (*sample_f)(s16 left, s16 right, void *arg);
+typedef void (*sample_f)(s16 left, s16 right, void *arg);
 
 typedef bool (*resample_f)(s16 left, s16 right,
 	sample_f sample, void *sample_arg, void *resample_arg);
