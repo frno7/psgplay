@@ -15,9 +15,8 @@
 #include "psgplay/assert.h"
 #include "internal/compare.h"
 
-#include "atari/machine.h"	/* FIXME: psgplay/machine.h */
-
 #include "psgplay/assert.h"
+#include "psgplay/psgplay.h"
 #include "psgplay/output.h"
 #include "psgplay/print.h"
 #include "psgplay/sndh.h"
@@ -36,24 +35,6 @@ struct replay_state {
 
 	ssize_t sample_count;
 };
-
-static bool replay_sample(s16 left, s16 right, void *arg)
-{
-	struct replay_state *state = arg;
-
-	if (state->sample_count < state->sample_start) {
-		state->sample_count++;
-		return true;
-	}
-
-	state->sample_count++;
-
-	if (0 <= state->sample_stop &&
-		 state->sample_stop <= state->sample_count)
-		return false;
-
-	return state->output->sample(left, right, state->output_arg);
-}
 
 static ssize_t parse_time(const char *s, int frequency)
 {
@@ -102,43 +83,54 @@ static ssize_t stop_or_length(ssize_t stop, ssize_t length)
 		 stop == OPTION_STOP_NEVER     ? length : min(stop, length);
 }
 
-static u32 parse_timer(struct file file)
-{
-	struct sndh_timer timer;
-
-	if (!sndh_tag_timer(&timer, file.data, file.size))
-		return 0;
-
-	return sndh_timer_to_u32(timer);
-}
-
 void command_replay(const struct options *options, struct file file,
 	const struct output *output, const struct machine *machine)
 {
 	const char *auto_stop = options->stop ? options->stop :
 		!options->stop && !options->length ? "auto" : NULL;
-	const ssize_t start = parse_start(options->start, options->frequency);
+	const ssize_t sample_start = parse_start(
+		options->start, options->frequency);
 	const ssize_t stop = parse_stop(
 		auto_stop, options->track, options->frequency, file);
 	const ssize_t length = parse_length(
-		options->length, options->frequency, start);
-	const u32 timer = parse_timer(file);
+		options->length, options->frequency, sample_start);
+	const ssize_t sample_stop = stop_or_length(stop, length);
+	void *output_arg = output->open(
+		options->output, options->frequency, false);
+	struct psgplay *pp = psgplay_init(file.data, file.size,
+		options->track, options->frequency);
+	ssize_t sample_count = 0;
 
-	struct replay_state state = {
-		.sample_start = start,
-		.sample_stop = stop_or_length(stop, length),
+	for (;;) {
+		struct psgplay_stereo buffer[256];
 
-		.output = output,
-		.output_arg = output->open(options->output,
-			options->frequency, false),
-	};
+		const ssize_t r = psgplay_read_stereo(
+			pp, buffer, ARRAY_SIZE(buffer));
 
-	machine->init(file.data, file.size, options->track, timer,
-		options->frequency, replay_sample, &state);
-
-	for (;;)
-		if (!machine->run())
+		if (!r)
 			break;
 
-	output->close(state.output_arg);
+		for (size_t i = 0; i < r; i++) {
+			if (sample_count < sample_start) {
+				sample_count++;
+				continue;
+			}
+
+			sample_count++;
+
+			if (0 <= sample_stop &&
+				 sample_stop <= sample_count)
+				goto out;
+
+			if (!output->sample(
+					buffer[i].left,
+					buffer[i].right, output_arg))
+				goto out;
+		}
+	}
+out:
+
+	psgplay_free(pp);
+
+	output->close(output_arg);
 }
