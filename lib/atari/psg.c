@@ -225,12 +225,6 @@ static s16 psg_dac3(const u8 lva, const u8 lvb, const u8 lvc)
 	return (sa + sb + sc) / 3;	/* Simplistic linear channel mix. */
 }
 
-static s16 fade_in_v = 0;
-static s16 fade_in(const s16 sample) /* FIXME: Do in replay, with fade_out */
-{
-	return fade_in_v < 0x4000 ? (sample * fade_in_v++) / 0x4000 : sample;
-}
-
 static u64 downsample_sample_cycle;
 static void downsample(const struct device_cycle psg_cycle, const s16 sample)
 {
@@ -258,7 +252,7 @@ static void psg_emit_cycle(const struct device_cycle psg_cycle)
 	const u8 lvb = psg_lvb(mxb, env);
 	const u8 lvc = psg_lvc(mxc, env);
 
-	downsample(psg_cycle, fade_in(lowpass(psg_dac3(lva, lvb, lvc))));
+	downsample(psg_cycle, lowpass(psg_dac3(lva, lvb, lvc)));
 }
 
 static u64 psg_emit_last_cycle;
@@ -352,7 +346,6 @@ static void psg_reset(const struct device *device)
 
 	psg.reg[PSG_REG_IOMIX] = 0xff;
 
-	fade_in_v = 0;
 	downsample_sample_cycle = 0;
 	psg_emit_last_cycle = 0;
 
