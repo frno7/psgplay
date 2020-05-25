@@ -14,9 +14,7 @@ struct psg_sample {
 	u8 lvc;
 };
 
-typedef void (*sample_f)(const struct psg_sample *sample, void *arg);
-
-typedef bool (*resample_f)(s16 left, s16 right,
-	sample_f sample, void *sample_arg, void *resample_arg);
+typedef void (*sample_f)(
+	const struct psg_sample *sample, size_t count, void *arg);
 
 #endif /* ATARI_SAMPLE_H */

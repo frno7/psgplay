@@ -117,17 +117,21 @@ static s16 psg_dac(const u8 level)
 	return (level < 16 ? dac[level] : 0xffff) - 0x8000;
 }
 
-static void psgplay_dac3(const struct psg_sample *sample, void *arg)
+static void psgplay_dac3(
+	const struct psg_sample *sample, size_t count, void *arg)
 {
-	struct psgplay *pp = arg;
+	for (size_t i = 0; i < count; i++) {
+		struct psgplay *pp = arg;
 
-	const s16 sa = psg_dac(sample->lva);
-	const s16 sb = psg_dac(sample->lvb);
-	const s16 sc = psg_dac(sample->lvc);
+		const s16 sa = psg_dac(sample[i].lva);
+		const s16 sb = psg_dac(sample[i].lvb);
+		const s16 sc = psg_dac(sample[i].lvc);
 
-	const s16 s = (sa + sb + sc) / 3; /* Simplistic linear channel mix. */
+		/* Simplistic linear channel mix. */
+		const s16 s = (sa + sb + sc) / 3;
 
-	psgplay_lowpass(s, pp);
+		psgplay_lowpass(s, pp);
+	}
 }
 
 static u32 parse_timer(const void *data, size_t size)

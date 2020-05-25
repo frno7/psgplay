@@ -169,38 +169,46 @@ PSG_LVN(a)
 PSG_LVN(b)
 PSG_LVN(c)
 
-static void psg_emit_cycle(const struct device_cycle psg_cycle)
-{
-	const bool cha = psg_cha_update(psg_cycle);
-	const bool chb = psg_chb_update(psg_cycle);
-	const bool chc = psg_chc_update(psg_cycle);
-	const bool rng = psg_rng_update(psg_cycle);
-
-	const bool mxa = psg_mxa(cha, rng);
-	const bool mxb = psg_mxb(chb, rng);
-	const bool mxc = psg_mxc(chc, rng);
-
-	const u8 env = psg_env_level(psg_cycle);
-	const u8 lva = psg_lva(mxa, env);
-	const u8 lvb = psg_lvb(mxb, env);
-	const u8 lvc = psg_lvc(mxc, env);
-
-	const struct psg_sample sample = {
-		.lva = lva,
-		.lvb = lvb,
-		.lvc = lvc,
-	};
-
-	output.sample(&sample, output.sample_arg);
-}
-
-static u64 psg_emit_last_cycle;
+static u64 psg_emit_latest_cycle;
 static void psg_emit(const struct device_cycle psg_cycle)
 {
-	for (u64 c = ALIGN(psg_emit_last_cycle, 8); c < psg_cycle.c; c += 8)
-		psg_emit_cycle((struct device_cycle) { .c = c });
+	struct psg_sample buffer[256];
+	size_t count = 0;
 
-	psg_emit_last_cycle = psg_cycle.c;
+	for (u64 c = ALIGN(psg_emit_latest_cycle, 8); c < psg_cycle.c; c += 8) {
+		const struct device_cycle psg_cycle = { .c = c };
+
+		const bool cha = psg_cha_update(psg_cycle);
+		const bool chb = psg_chb_update(psg_cycle);
+		const bool chc = psg_chc_update(psg_cycle);
+		const bool rng = psg_rng_update(psg_cycle);
+
+		const bool mxa = psg_mxa(cha, rng);
+		const bool mxb = psg_mxb(chb, rng);
+		const bool mxc = psg_mxc(chc, rng);
+
+		const u8 env = psg_env_level(psg_cycle);
+		const u8 lva = psg_lva(mxa, env);
+		const u8 lvb = psg_lvb(mxb, env);
+		const u8 lvc = psg_lvc(mxc, env);
+
+		buffer[count++] = (struct psg_sample) {
+			.lva = lva,
+			.lvb = lvb,
+			.lvc = lvc,
+		};
+
+		if (count >= ARRAY_SIZE(buffer)) {
+			if (output.sample)
+				output.sample(buffer, count, output.sample_arg);
+			count = 0;
+		}
+	}
+
+	if (count && output.sample)
+		output.sample(buffer, count, output.sample_arg);
+
+	psg_emit_latest_cycle = psg_cycle.c;
 }
 
 static void psg_event(const struct device *device,
@@ -285,7 +293,7 @@ static void psg_reset(const struct device *device)
 
 	psg.reg[PSG_REG_IOMIX] = 0xff;
 
-	psg_emit_last_cycle = 0;
+	psg_emit_latest_cycle = 0;
 
 	psg_event(device, device_cycle(device));
 }
