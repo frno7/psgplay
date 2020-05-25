@@ -24,15 +24,17 @@ struct psgplay {
 	size_t capacity;
 	struct psgplay_stereo *buffer;
 
+	int frequency;
+	u64 psg_cycle;
+	u64 downsample_sample_cycle;
+
 	const struct machine *machine;
 
 	int errno_;
 };
 
-static void psgplay_sample(s16 left, s16 right, void *arg)
+static void psgplay_sample(s16 left, s16 right, struct psgplay *pp)
 {
-	struct psgplay *pp = arg;
-
 	if (pp->errno_)
 		return;
 
@@ -56,6 +58,17 @@ static void psgplay_sample(s16 left, s16 right, void *arg)
 	pp->count++;
 }
 
+static void psgplay_downsample(s16 left, s16 right, void *arg)
+{
+	struct psgplay *pp = arg;
+	const u64 n = (pp->frequency * pp->psg_cycle) / PSG_FREQUENCY;
+
+	for (; pp->downsample_sample_cycle < n; pp->downsample_sample_cycle++)
+		psgplay_sample(left, right, pp);
+
+	pp->psg_cycle += 8;
+}
+
 static u32 parse_timer(const void *data, size_t size)
 {
 	struct sndh_timer timer;
@@ -76,9 +89,10 @@ struct psgplay *psgplay_init(const void *data, size_t size,
 	if (!pp)
 		return NULL;
 
+	pp->frequency = frequency;
 	pp->machine = &atari_st;
 	pp->machine->init(data, size, track, parse_timer(data, size),
-		frequency, psgplay_sample, pp);
+		psgplay_downsample, pp);
 
 	return pp;
 }

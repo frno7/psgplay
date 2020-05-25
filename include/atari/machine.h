@@ -14,7 +14,7 @@
 
 struct machine {
 	void (*init)(const void *prg, size_t size, u32 track, u32 timer,
-		int sample_frequency, sample_f sample, void *sample_arg);
+		sample_f sample, void *sample_arg);
 	bool (*run)(void);
 };
 

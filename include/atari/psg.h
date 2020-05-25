@@ -9,6 +9,8 @@
 #include "atari/bus.h"
 #include "atari/sample.h"
 
+#define PSG_FREQUENCY 2000000
+
 #define PSG_REGISTERS(psg)						\
 	psg( 0, plo_a,   PLO_A,   "Period of channel A fine tone")	\
 	psg( 1, phi_a,   PHI_A,   "Period of channel A rough tone")	\
@@ -130,6 +132,6 @@ union psg {
 
 extern const struct device psg_device;
 
-void psg_sample(int sample_frequency, sample_f sample, void *sample_arg);
+void psg_sample(sample_f sample, void *sample_arg);
 
 #endif /* ATARI_PSG_H */

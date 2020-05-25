@@ -18,7 +18,6 @@
 
 #include "psgplay/assert.h"
 
-#define PSG_FREQUENCY 2000000
 #define PSG_EVENT_FREQUENCY 100		/* 10 ms */
 #define PSG_EVENT_CYCLES (PSG_FREQUENCY / PSG_EVENT_FREQUENCY)
 
@@ -35,7 +34,6 @@ static u8 reg_select;
 static struct device_cycle env_cycle;
 
 static struct {
-	int sample_frequency;
 	sample_f sample;
 	void *sample_arg;
 } output;
@@ -224,16 +222,6 @@ static s16 psg_dac3(const u8 lva, const u8 lvb, const u8 lvc)
 	return (sa + sb + sc) / 3;	/* Simplistic linear channel mix. */
 }
 
-static u64 downsample_sample_cycle;
-static void downsample(const struct device_cycle psg_cycle, const s16 sample)
-{
-
-	const u64 n = (output.sample_frequency * psg_cycle.c) / PSG_FREQUENCY;
-
-	for (; downsample_sample_cycle < n; downsample_sample_cycle++)
-		output.sample(sample, sample, output.sample_arg);
-}
-
 static void psg_emit_cycle(const struct device_cycle psg_cycle)
 {
 	const bool cha = psg_cha_update(psg_cycle);
@@ -250,7 +238,9 @@ static void psg_emit_cycle(const struct device_cycle psg_cycle)
 	const u8 lvb = psg_lvb(mxb, env);
 	const u8 lvc = psg_lvc(mxc, env);
 
-	downsample(psg_cycle, lowpass(psg_dac3(lva, lvb, lvc)));
+	const s16 sample = lowpass(psg_dac3(lva, lvb, lvc));
+
+	output.sample(sample, sample, output.sample_arg);
 }
 
 static u64 psg_emit_last_cycle;
@@ -344,15 +334,13 @@ static void psg_reset(const struct device *device)
 
 	psg.reg[PSG_REG_IOMIX] = 0xff;
 
-	downsample_sample_cycle = 0;
 	psg_emit_last_cycle = 0;
 
 	psg_event(device, device_cycle(device));
 }
 
-void psg_sample(int sample_frequency, sample_f sample, void *sample_arg)
+void psg_sample(sample_f sample, void *sample_arg)
 {
-	output.sample_frequency = sample_frequency;
 	output.sample = sample;
 	output.sample_arg = sample_arg;
 }

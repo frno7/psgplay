@@ -50,7 +50,7 @@ u64 machine_cycle(void)
 }
 
 static void atari_st_init(const void *prg, size_t size, u32 track,
-	u32 timer, int sample_frequency, sample_f sample, void *sample_arg)
+	u32 timer, sample_f sample, void *sample_arg)
 {
 	const size_t offset = 0x4000;	/* 16 KiB */
 	const u8 *p = prg;
@@ -72,7 +72,7 @@ static void atari_st_init(const void *prg, size_t size, u32 track,
 	for (size_t i = 0; i < size; i++)
 		ram_device.wr_u8(&ram_device, offset + i, p[i]);
 
-	psg_sample(sample_frequency, sample, sample_arg);
+	psg_sample(sample, sample_arg);
 }
 
 static bool atari_st_run(void)
