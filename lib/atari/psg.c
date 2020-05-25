@@ -169,20 +169,6 @@ PSG_LVN(a)
 PSG_LVN(b)
 PSG_LVN(c)
 
-static s16 lowpass(const s16 x0)
-{
-	static s16 xn[8] = { };
-	static int k = 0;
-
-	xn[k++ % ARRAY_SIZE(xn)] = x0;
-
-	s32 x = 0;
-	for (int i = 0; i < ARRAY_SIZE(xn); i++)
-		x += xn[i];		/* Simplistic 8 tap FIR filter. */
-
-	return x / ARRAY_SIZE(xn);
-}
-
 static s16 psg_dac(const u8 level)
 {
 	/*
@@ -238,9 +224,9 @@ static void psg_emit_cycle(const struct device_cycle psg_cycle)
 	const u8 lvb = psg_lvb(mxb, env);
 	const u8 lvc = psg_lvc(mxc, env);
 
-	const s16 sample = lowpass(psg_dac3(lva, lvb, lvc));
+	const s16 sample = psg_dac3(lva, lvb, lvc);
 
-	output.sample(sample, sample, output.sample_arg);
+	output.sample(sample, output.sample_arg);
 }
 
 static u64 psg_emit_last_cycle;

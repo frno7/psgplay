@@ -28,6 +28,11 @@ struct psgplay {
 	u64 psg_cycle;
 	u64 downsample_sample_cycle;
 
+	struct {
+		s16 xn[8];
+		int k;
+	} lowpass;
+
 	const struct machine *machine;
 
 	int errno_;
@@ -58,15 +63,29 @@ static void psgplay_sample(s16 left, s16 right, struct psgplay *pp)
 	pp->count++;
 }
 
-static void psgplay_downsample(s16 left, s16 right, void *arg)
+static void psgplay_downsample(s16 left, s16 right, struct psgplay *pp)
 {
-	struct psgplay *pp = arg;
 	const u64 n = (pp->frequency * pp->psg_cycle) / PSG_FREQUENCY;
 
 	for (; pp->downsample_sample_cycle < n; pp->downsample_sample_cycle++)
 		psgplay_sample(left, right, pp);
 
 	pp->psg_cycle += 8;
+}
+
+static void psgplay_lowpass(s16 sample, void *arg)
+{
+	struct psgplay *pp = arg;
+
+	pp->lowpass.xn[pp->lowpass.k++ % ARRAY_SIZE(pp->lowpass.xn)] = sample;
+
+	s32 x = 0;
+	for (int i = 0; i < ARRAY_SIZE(pp->lowpass.xn); i++)
+		x += pp->lowpass.xn[i];	/* Simplistic 8 tap FIR filter. */
+
+	const s16 y = x / ARRAY_SIZE(pp->lowpass.xn);
+
+	psgplay_downsample(y, y, pp);
 }
 
 static u32 parse_timer(const void *data, size_t size)
@@ -92,7 +111,7 @@ struct psgplay *psgplay_init(const void *data, size_t size,
 	pp->frequency = frequency;
 	pp->machine = &atari_st;
 	pp->machine->init(data, size, track, parse_timer(data, size),
-		psgplay_downsample, pp);
+		psgplay_lowpass, pp);
 
 	return pp;
 }
