@@ -8,7 +8,13 @@
 
 #include "internal/types.h"
 
-typedef void (*sample_f)(s16 sample, void *arg);
+struct psg_sample {
+	u8 lva;
+	u8 lvb;
+	u8 lvc;
+};
+
+typedef void (*sample_f)(const struct psg_sample *sample, void *arg);
 
 typedef bool (*resample_f)(s16 left, s16 right,
 	sample_f sample, void *sample_arg, void *resample_arg);

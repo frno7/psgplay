@@ -169,45 +169,6 @@ PSG_LVN(a)
 PSG_LVN(b)
 PSG_LVN(c)
 
-static s16 psg_dac(const u8 level)
-{
-	/*
-	 * Table is computed with 2^[ (lvl-15)/2 ] although the levels in
-	 * figure 9 in AY-3-8910/8912 Programmable Sound Generator Data Manual,
-	 * February 1979, p. 29 are slightly different as shown in the comment.
-	 */
-
-	static const u16 dac[16] = {
-		0.006 * 0xffff,		/* 0.000 */
-		0.008 * 0xffff,		/* ..... */
-		0.011 * 0xffff,		/* ..... */
-		0.016 * 0xffff,		/* ..... */
-		0.022 * 0xffff,		/* ..... */
-		0.031 * 0xffff,		/* ..... */
-		0.044 * 0xffff,		/* ..... */
-		0.062 * 0xffff,		/* ..... */
-		0.088 * 0xffff,		/* ..... */
-		0.125 * 0xffff,		/* 0.125 */
-		0.177 * 0xffff,		/* 0.152 */
-		0.250 * 0xffff,		/* 0.250 */
-		0.354 * 0xffff,		/* 0.303 */
-		0.500 * 0xffff,		/* 0.500 */
-		0.707 * 0xffff,		/* 0.707 */
-		1.000 * 0xffff,		/* 1.000 */
-	};
-
-	return (level < 16 ? dac[level] : 0xffff) - 0x8000;
-}
-
-static s16 psg_dac3(const u8 lva, const u8 lvb, const u8 lvc)
-{
-	const s16 sa = psg_dac(lva);
-	const s16 sb = psg_dac(lvb);
-	const s16 sc = psg_dac(lvc);
-
-	return (sa + sb + sc) / 3;	/* Simplistic linear channel mix. */
-}
-
 static void psg_emit_cycle(const struct device_cycle psg_cycle)
 {
 	const bool cha = psg_cha_update(psg_cycle);
@@ -224,9 +185,13 @@ static void psg_emit_cycle(const struct device_cycle psg_cycle)
 	const u8 lvb = psg_lvb(mxb, env);
 	const u8 lvc = psg_lvc(mxc, env);
 
-	const s16 sample = psg_dac3(lva, lvb, lvc);
+	const struct psg_sample sample = {
+		.lva = lva,
+		.lvb = lvb,
+		.lvc = lvc,
+	};
 
-	output.sample(sample, output.sample_arg);
+	output.sample(&sample, output.sample_arg);
 }
 
 static u64 psg_emit_last_cycle;

@@ -73,9 +73,8 @@ static void psgplay_downsample(s16 left, s16 right, struct psgplay *pp)
 	pp->psg_cycle += 8;
 }
 
-static void psgplay_lowpass(s16 sample, void *arg)
+static void psgplay_lowpass(s16 sample, struct psgplay *pp)
 {
-	struct psgplay *pp = arg;
 
 	pp->lowpass.xn[pp->lowpass.k++ % ARRAY_SIZE(pp->lowpass.xn)] = sample;
 
@@ -86,6 +85,49 @@ static void psgplay_lowpass(s16 sample, void *arg)
 	const s16 y = x / ARRAY_SIZE(pp->lowpass.xn);
 
 	psgplay_downsample(y, y, pp);
+}
+
+static s16 psg_dac(const u8 level)
+{
+	/*
+	 * Table is computed with 2^[ (lvl-15)/2 ] although the levels in
+	 * figure 9 in AY-3-8910/8912 Programmable Sound Generator Data Manual,
+	 * February 1979, p. 29 are slightly different as shown in the comment.
+	 */
+
+	static const u16 dac[16] = {
+		0.006 * 0xffff,		/* 0.000 */
+		0.008 * 0xffff,		/* ..... */
+		0.011 * 0xffff,		/* ..... */
+		0.016 * 0xffff,		/* ..... */
+		0.022 * 0xffff,		/* ..... */
+		0.031 * 0xffff,		/* ..... */
+		0.044 * 0xffff,		/* ..... */
+		0.062 * 0xffff,		/* ..... */
+		0.088 * 0xffff,		/* ..... */
+		0.125 * 0xffff,		/* 0.125 */
+		0.177 * 0xffff,		/* 0.152 */
+		0.250 * 0xffff,		/* 0.250 */
+		0.354 * 0xffff,		/* 0.303 */
+		0.500 * 0xffff,		/* 0.500 */
+		0.707 * 0xffff,		/* 0.707 */
+		1.000 * 0xffff,		/* 1.000 */
+	};
+
+	return (level < 16 ? dac[level] : 0xffff) - 0x8000;
+}
+
+static void psgplay_dac3(const struct psg_sample *sample, void *arg)
+{
+	struct psgplay *pp = arg;
+
+	const s16 sa = psg_dac(sample->lva);
+	const s16 sb = psg_dac(sample->lvb);
+	const s16 sc = psg_dac(sample->lvc);
+
+	const s16 s = (sa + sb + sc) / 3; /* Simplistic linear channel mix. */
+
+	psgplay_lowpass(s, pp);
 }
 
 static u32 parse_timer(const void *data, size_t size)
@@ -111,7 +153,7 @@ struct psgplay *psgplay_init(const void *data, size_t size,
 	pp->frequency = frequency;
 	pp->machine = &atari_st;
 	pp->machine->init(data, size, track, parse_timer(data, size),
-		psgplay_lowpass, pp);
+		psgplay_dac3, pp);
 
 	return pp;
 }
