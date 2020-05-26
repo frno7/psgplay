@@ -27,21 +27,52 @@ all: $(PSGPLAY)
 include lib/Makefile
 include system/Makefile
 
-SRC := $(ATARI_SRC) $(DISASSEMBLE_SRC) $(ICE_SRC) $(M68K_SRC)		\
-	$(OUT_SRC) $(PSGPLAY_SRC) $(INTERNAL_SRC)			\
-	$(SYSTEM_UNIX_SRC) $(TEXT_SRC) $(UNICODE_SRC) $(VT_SRC)
-OBJ = $(patsubst %.c, %.o, $(SRC))
+LIBPSGPLAY_HIDDEN_SRC :=						\
+	$(ATARI_SRC)							\
+	$(ICE_SRC)							\
+	$(INTERNAL_SRC)							\
+	$(M68K_SRC)
 
-$(PSGPLAY): $(OBJ)
+LIBPSGPLAY_PUBLIC_SRC :=						\
+	$(PSGPLAY_SRC)
+
+PSGPLAY_SRC :=								\
+	$(DISASSEMBLE_SRC) 						\
+	$(OUT_SRC)							\
+	$(SYSTEM_UNIX_SRC)						\
+	$(TEXT_SRC)							\
+	$(UNICODE_SRC)							\
+	$(VT_SRC)
+
+LIBPSGPLAY_HIDDEN_OBJ = $(patsubst %.c, %.o, $(LIBPSGPLAY_HIDDEN_SRC))
+LIBPSGPLAY_PUBLIC_OBJ = $(patsubst %.c, %.o, $(LIBPSGPLAY_PUBLIC_SRC))
+LIBPSGPLAY_OBJ = $(LIBPSGPLAY_HIDDEN_OBJ) $(LIBPSGPLAY_PUBLIC_OBJ)
+
+PSGPLAY_OBJ = $(patsubst %.c, %.o, $(PSGPLAY_SRC))
+
+$(LIBPSGPLAY_STATIC): $(LIBPSGPLAY_OBJ)
+	$(QUIET_AR)$(AR) rcs $@ $^
+
+$(LIBPSGPLAY_SHARED): $(LIBPSGPLAY_OBJ)
+	$(QUIET_CC)$(CC) -shared -o $@ $^
+
+$(PSGPLAY): $(PSGPLAY_OBJ) $(LIBPSGPLAY_STATIC)
 	$(QUIET_LINK)$(CC) $(ALL_CFLAGS) -o $@ $^ $(LIBS)
 
-$(OBJ): %.o : %.c
+$(LIBPSGPLAY_HIDDEN_OBJ): %.o : %.c
+	$(QUIET_CC)$(CC) $(ALL_CFLAGS) -fvisibility=hidden -c -o $@ $<
+
+$(LIBPSGPLAY_PUBLIC_OBJ): %.o : %.c
+	$(QUIET_CC)$(CC) $(ALL_CFLAGS) -c -o $@ $<
+
+$(PSGPLAY_OBJ): %.o : %.c
 	$(QUIET_CC)$(CC) $(ALL_CFLAGS) -c -o $@ $<
 
 .PHONY: clean
 clean:
 	$(QUIET_RM)$(RM) -f */*.o* */*/*.o* include/tos/tos.h		\
 		$(PSGPLAY) PSGPLAY.* GPATH GRTAGS GTAGS 		\
+		$(LIBPSGPLAY_STATIC) $(LIBPSGPLAY_SHARED)		\
 		$(M68K_GEN_H) $(M68K_GEN_C) $(VER) $(M68KMAKE)
 
 .PHONY: gtags

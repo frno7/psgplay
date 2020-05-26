@@ -1,5 +1,8 @@
 # SPDX-License-Identifier: GPL-2.0
 
+LIBPSGPLAY_STATIC := lib/psgplay/psgplay.a
+LIBPSGPLAY_SHARED := lib/psgplay/psgplay.so
+
 VER := lib/psgplay/version.c
 
 PSGPLAY_SRC :=								\
