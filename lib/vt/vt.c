@@ -286,6 +286,21 @@ ssize_t vt_read_utf8_from_charset(struct vt_buffer *vtb,
 	return i;
 }
 
+ssize_t vt_write_fifo_utf8_from_charset(struct vt_buffer *vtb, struct fifo *f,
+	unicode_t (*charset_to_utf32)(u8 c, void *arg), void *arg)
+{
+	u8 buffer[256];
+
+	const size_t r = vt_read_utf8_from_charset(vtb, buffer,
+		min(sizeof(buffer), fifo_remaining(f)),
+		charset_to_utf32, arg);
+	const size_t w = fifo_write(f, buffer, r);
+
+	BUG_ON(w != r);
+
+	return w;
+}
+
 u64 vt_event(struct vt_buffer *vtb, u64 timestamp)
 {
 	if (!vtb->input.escape)
