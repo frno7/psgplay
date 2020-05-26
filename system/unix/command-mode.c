@@ -84,7 +84,7 @@ static ssize_t stop_or_length(ssize_t stop, ssize_t length)
 }
 
 void command_replay(const struct options *options, struct file file,
-	const struct output *output, const struct machine *machine)
+	const struct output *output)
 {
 	const char *auto_stop = options->stop ? options->stop :
 		!options->stop && !options->length ? "auto" : NULL;

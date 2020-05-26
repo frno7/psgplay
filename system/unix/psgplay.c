@@ -12,8 +12,6 @@
 #include "internal/print.h"
 #include "internal/types.h"
 
-#include "atari/machine.h"
-
 #include "psgplay/sndh.h"
 
 #include "out/alsa.h"
@@ -30,7 +28,7 @@
 char progname[] = "psgplay";
 
 typedef void (*replay_f)(const struct options *options, struct file file,
-	const struct output *output, const struct machine *machine);
+	const struct output *output);
 
 static void NORETURN info_exit(struct file file)
 {
@@ -107,7 +105,7 @@ int main(int argc, char *argv[])
 
 	select_subtune(&options->track, file);
 
-	select_replay(options)(options, file, select_output(options), &atari_st);
+	select_replay(options)(options, file, select_output(options));
 
 	file_free(file);
 

@@ -246,7 +246,7 @@ static u64 model_update(struct sample_buffer *sb,
 }
 
 void text_replay(const struct options *options, struct file file,
-	const struct output *output, const struct machine *machine)
+	const struct output *output)
 {
 	DEFINE_FIFO(tty_in, 256);
 	DEFINE_FIFO(tty_out, 4096);
