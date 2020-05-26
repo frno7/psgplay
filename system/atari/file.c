@@ -14,7 +14,8 @@
 
 #include "internal/compare.h"
 
-#include "psgplay/ice.h"
+#include "ice/ice.h"
+
 #include "psgplay/sndh.h"
 
 #include "system/atari/file.h"

@@ -2,6 +2,7 @@
 
 include lib/atari/Makefile
 include lib/disassemble/Makefile
+include lib/ice/Makefile
 include lib/internal/Makefile
 include lib/m68k/Makefile
 include lib/out/Makefile

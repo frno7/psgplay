@@ -18,7 +18,7 @@
 #include "internal/print.h"
 #include "internal/types.h"
 
-#include "psgplay/ice.h"
+#include "ice/ice.h"
 
 #include "system/unix/file.h"
 #include "system/unix/memory.h"

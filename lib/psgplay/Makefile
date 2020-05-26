@@ -3,7 +3,6 @@
 VER := lib/psgplay/version.c
 
 PSGPLAY_SRC :=								\
-	lib/psgplay/ice.c						\
 	lib/psgplay/psgplay.c						\
 	lib/psgplay/sndh.c						\
 	$(VER)

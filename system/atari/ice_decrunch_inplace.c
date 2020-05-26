@@ -3,7 +3,7 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#include "psgplay/ice.h"
+#include "ice/ice.h"
 
 #include "system/atari/ice_decrunch_inplace.h"
 

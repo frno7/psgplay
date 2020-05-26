@@ -24,7 +24,7 @@ system/atari/fifo.o: lib/internal/fifo.c
 system/atari/string.o: lib/internal/string.c
 	$(QUIET_CC)$(CROSS_COMPILE)gcc $(PRG_CFLAGS) -c -o $@ $<
 
-system/atari/ice.o: lib/psgplay/ice.c
+system/atari/ice.o: lib/ice/ice.c
 	$(QUIET_CC)$(CROSS_COMPILE)gcc $(PRG_CFLAGS) -c -o $@ $<
 
 system/atari/sndh.o: lib/psgplay/sndh.c
