@@ -8,9 +8,6 @@
 
 #include "internal/macro.h"
 
-void pr_info(const char *fmt, ...)
-	__attribute__((format(printf, 1, 2)));
-
 void pr_warn(const char *fmt, ...)
 	__attribute__((format(printf, 1, 2)));
 
