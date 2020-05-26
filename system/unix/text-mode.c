@@ -21,6 +21,8 @@
 #include "text/mode.h"
 #include "text/mvc.h"
 
+#include "unicode/atari.h"
+
 #include "system/unix/clock.h"
 #include "system/unix/poll-fifo.h"
 #include "system/unix/text-mode.h"
@@ -295,7 +297,9 @@ void text_replay(const struct options *options, struct file file,
 	file_nonblocking(STDOUT_FILENO);
 
 	for (;;) {
-		vt_write_fifo(&tty_vt.vtb, &tty_out.fifo);
+		vt_write_fifo_utf8_from_charset(
+			&tty_vt.vtb, &tty_out.fifo,
+			charset_atari_st_to_utf32, NULL);
 
 		const struct poll_fifo pfs[] = {
 			{ .fd = STDIN_FILENO,  .in  = &tty_in.fifo  },
