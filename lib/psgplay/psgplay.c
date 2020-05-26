@@ -7,14 +7,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "internal/assert.h"
 #include "internal/compare.h"
-
-#include "psgplay/assert.h"
 
 #include "atari/machine.h"
 #include "atari/psg.h"
 
-#include "psgplay/assert.h"
 #include "psgplay/psgplay.h"
 #include "psgplay/sndh.h"
 

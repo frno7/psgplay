@@ -12,11 +12,10 @@
 
 #include <alsa/asoundlib.h>
 
+#include "internal/assert.h"
 #include "internal/compare.h"
 #include "internal/fifo.h"
 #include "internal/print.h"
-
-#include "psgplay/assert.h"
 
 #include "system/unix/file.h"
 #include "system/unix/memory.h"

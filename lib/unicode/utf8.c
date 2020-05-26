@@ -6,9 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "internal/assert.h"
 #include "internal/types.h"
-
-#include "psgplay/assert.h"
 
 #include "unicode/utf8.h"
 

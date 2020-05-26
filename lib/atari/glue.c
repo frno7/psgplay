@@ -5,6 +5,8 @@
 
 #include <stdio.h>
 
+#include "internal/assert.h"
+
 #include "atari/bus.h"
 #include "atari/glue.h"
 #include "atari/irq.h"
@@ -13,8 +15,6 @@
 #include "atari/machine.h"
 
 #include "m68k/m68k.h"
-
-#include "psgplay/assert.h"
 
 static struct device_cycle vbl_cycle;
 

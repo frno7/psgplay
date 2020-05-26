@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 
-#ifndef PSGPLAY_ASSERT_H
-#define PSGPLAY_ASSERT_H
+#ifndef INTERNAL_ASSERT_H
+#define INTERNAL_ASSERT_H
 
 #include <stdbool.h>
 
@@ -34,4 +34,4 @@
 		warned__ = true;					\
 	} while (0)
 
-#endif /* PSGPLAY_ASSERT_H */
+#endif /* INTERNAL_ASSERT_H */

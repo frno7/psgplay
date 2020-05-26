@@ -7,10 +7,9 @@
 #include <poll.h>
 #include <unistd.h>
 
+#include "internal/assert.h"
 #include "internal/compare.h"
 #include "internal/print.h"
-
-#include "psgplay/assert.h"
 
 #include "system/unix/poll-fifo.h"
 

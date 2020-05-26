@@ -13,9 +13,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "disassemble/m68k.h"
+#include "internal/assert.h"
 
-#include "psgplay/assert.h"
+#include "disassemble/m68k.h"
 
 typedef bool bfd_boolean;
 typedef void *PTR;

@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "internal/assert.h"
 #include "internal/macro.h"
 
 #include "atari/bus.h"
@@ -15,8 +16,6 @@
 #include "atari/glue.h"
 #include "atari/machine.h"
 #include "atari/psg.h"
-
-#include "psgplay/assert.h"
 
 #define PSG_EVENT_FREQUENCY 100		/* 10 ms */
 #define PSG_EVENT_CYCLES (PSG_FREQUENCY / PSG_EVENT_FREQUENCY)

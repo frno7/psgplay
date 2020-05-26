@@ -6,6 +6,7 @@
 #include <inttypes.h>
 #include <string.h>
 
+#include "internal/assert.h"
 #include "internal/build-assert.h"
 #include "internal/compare.h"
 #include "internal/macro.h"
@@ -18,8 +19,6 @@
 
 #include "m68k/m68k.h"
 #include "m68k/m68kcpu.h"
-
-#include "psgplay/assert.h"
 
 static u64 cycle;
 

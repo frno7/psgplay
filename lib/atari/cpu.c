@@ -5,13 +5,13 @@
  * FIXME: Supervisor address access
  */
 
+#include "internal/assert.h"
+
 #include "atari/cpu.h"
 #include "atari/device.h"
 
 #include "m68k/m68k.h"
 #include "m68k/m68kcpu.h"
-
-#include "psgplay/assert.h"
 
 void m68k_instruction_callback(int pc)
 {

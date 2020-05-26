@@ -8,12 +8,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "internal/assert.h"
 #include "internal/print.h"
 
 #include "vt/ecma48.h"
 #include "vt/vt.h"
 
-#include "psgplay/assert.h"
 #include "psgplay/psgplay.h"
 #include "psgplay/sndh.h"
 

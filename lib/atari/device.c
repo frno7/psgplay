@@ -3,9 +3,10 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#include "internal/types.h"
+#include "internal/assert.h"
 #include "internal/compare.h"
 #include "internal/struct.h"
+#include "internal/types.h"
 
 #include "atari/bus.h"
 #include "atari/cpu.h"
@@ -18,8 +19,6 @@
 #include "atari/ram.h"
 #include "atari/rom.h"
 #include "atari/shifter.h"
-
-#include "psgplay/assert.h"
 
 static struct machine_device {
 	u64 machine_cycle_event;

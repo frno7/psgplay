@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "psgplay/assert.h"	/* FIXME: psgplay -> internal */
+#include "internal/assert.h"
 #include "internal/build-assert.h"
 #include "internal/types.h"
 
