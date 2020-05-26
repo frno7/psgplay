@@ -12,6 +12,8 @@
 #include "internal/build-assert.h"
 #include "internal/types.h"
 
+#include "unicode/utf8.h"
+
 #include "vt/vt.h"
 
 #define VT_ESCAPE_TIME	10	/* Time in ms */
@@ -255,6 +257,33 @@ ssize_t vt_write_fifo(struct vt_buffer *vtb, struct fifo *f)
 	BUG_ON(w != r);
 
 	return w;
+}
+
+ssize_t vt_read_utf8_from_charset(struct vt_buffer *vtb,
+	void *data, size_t count,
+	unicode_t (*charset_to_utf32)(u8 c, void *arg), void *arg)
+{
+	u8 *b = data;
+	size_t i = 0;
+
+	while (i + 4 < count) {
+		const u8 c = vt_getc(vtb);
+
+		if (!c)
+			return i;
+
+		const unicode_t u = charset_to_utf32(c, arg);
+		u8 s[4];
+		const int r = utf32_to_utf8(u, s, sizeof(s));
+
+		if (r > 0) {
+			memcpy(&b[i], s, r);
+			i += r;
+		} else
+			b[i++] = '?';
+	}
+
+	return i;
 }
 
 u64 vt_event(struct vt_buffer *vtb, u64 timestamp)

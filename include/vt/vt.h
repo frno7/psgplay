@@ -11,6 +11,8 @@
 #include "internal/compare.h"
 #include "internal/fifo.h"
 
+#include "unicode/utf8.h"
+
 #include "vt-cmd.h"
 
 typedef char vt_char;
@@ -127,6 +129,10 @@ u8 vt_getc(struct vt_buffer *vtb);
 ssize_t vt_read(struct vt_buffer *vtb, void *data, size_t count);
 
 ssize_t vt_write_fifo(struct vt_buffer *vtb, struct fifo *f);
+
+ssize_t vt_read_utf8_from_charset(struct vt_buffer *vtb,
+	void *data, size_t count,
+	unicode_t (*charset_to_utf32)(u8 c, void *arg), void *arg);
 
 u64 vt_event(struct vt_buffer *vtb, u64 timestamp);
 
