@@ -3,7 +3,7 @@
 #ifndef PSGPLAY_WAVE_H
 #define PSGPLAY_WAVE_H
 
-#include "psgplay/output.h"
+#include "out/output.h"
 
 extern const struct output wave_output;
 

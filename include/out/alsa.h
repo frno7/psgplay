@@ -3,7 +3,7 @@
 #ifndef PSGPLAY_ALSA_H
 #define PSGPLAY_ALSA_H
 
-#include "psgplay/output.h"
+#include "out/output.h"
 
 extern const struct output alsa_output;
 

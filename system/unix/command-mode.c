@@ -17,8 +17,9 @@
 #include "internal/print.h"
 
 #include "psgplay/psgplay.h"
-#include "psgplay/output.h"
 #include "psgplay/sndh.h"
+
+#include "out/output.h"
 
 #include "system/unix/file.h"
 #include "system/unix/memory.h"

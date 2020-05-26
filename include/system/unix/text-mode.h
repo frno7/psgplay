@@ -10,7 +10,7 @@
 
 #include "atari/machine.h"
 
-#include "psgplay/output.h"
+#include "out/output.h"
 
 #include "system/unix/file.h"
 #include "system/unix/option.h"
