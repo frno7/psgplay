@@ -8,8 +8,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-
-#include "psgplay/timer.h"
+#include <stdint.h>
 
 #define SNDH_PROLOGUE_SIZE 20
 
@@ -25,6 +24,19 @@
 	f('s', DSP, "Falcon DSP 56001")					\
 	f('t', BLT, "BLITTER")						\
 	f('h', HBL, "Horizontal blank")
+
+enum sndh_timer_type {
+	SNDH_TIMER_A = 'A',
+	SNDH_TIMER_B = 'B',
+	SNDH_TIMER_C = 'C',
+	SNDH_TIMER_D = 'D',
+	SNDH_TIMER_V = 'V',	/* Vertical blank (VBL) */
+};
+
+struct sndh_timer {
+	enum sndh_timer_type type;
+	int frequency;
+};
 
 /**
  * sndh_identify - is data SNDH?
@@ -262,6 +274,19 @@ struct sndh_file {
 		uint8_t data[];
 	} *sndh;
 };
+
+static inline uint32_t sndh_timer_to_u32(const struct sndh_timer timer)
+{
+	return (timer.frequency << 8) | (timer.type & 0xff);
+}
+
+static inline struct sndh_timer u32_to_sndh_timer(const uint32_t timer)
+{
+	return (struct sndh_timer) {
+		.type = timer & 0xff,
+		.frequency = timer >> 8,
+	};
+}
 
 #if defined(__m68k__)
 
