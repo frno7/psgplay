@@ -11,9 +11,9 @@
 
 #include "internal/build-assert.h"
 #include "internal/compare.h"
+#include "internal/print.h"
 #include "internal/types.h"
 
-#include "psgplay/print.h"
 #include "psgplay/version.h"
 
 #include "system/unix/file.h"

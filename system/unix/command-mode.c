@@ -14,11 +14,11 @@
 
 #include "psgplay/assert.h"
 #include "internal/compare.h"
+#include "internal/print.h"
 
 #include "psgplay/assert.h"
 #include "psgplay/psgplay.h"
 #include "psgplay/output.h"
-#include "psgplay/print.h"
 #include "psgplay/sndh.h"
 
 #include "system/unix/file.h"

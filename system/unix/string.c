@@ -8,7 +8,7 @@
 #include <string.h>
 
 #include "psgplay/assert.h"
-#include "psgplay/print.h"
+#include "internal/print.h"
 
 #include "system/unix/memory.h"
 #include "system/unix/string.h"

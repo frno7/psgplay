@@ -7,7 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "psgplay/print.h"
+#include "internal/print.h"
+
 #include "psgplay/sndh.h"
 
 #include "unicode/atari.h"

@@ -8,10 +8,9 @@
 
 #include "internal/compare.h"
 #include "internal/types.h"
+#include "internal/print.h"
 
 #include "system/unix/clock.h"
-
-#include "psgplay/print.h"
 
 static u64 start;
 static u64 suspend;

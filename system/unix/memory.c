@@ -3,9 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "internal/print.h"
 #include "internal/types.h"
-
-#include "psgplay/print.h"
 
 #include "system/unix/memory.h"
 

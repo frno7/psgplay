@@ -6,8 +6,7 @@
 #include <tos/gemdos.h>
 
 #include "internal/macro.h"
-
-#include "psgplay/print.h"
+#include "internal/print.h"
 
 #include "system/atari/option.h"
 

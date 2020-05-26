@@ -6,8 +6,7 @@
 #include <stdbool.h>
 
 #include "internal/build-assert.h"
-
-#include "psgplay/print.h"
+#include "internal/print.h"
 
 /* Macro definitions from the Linux kernel. */
 

@@ -9,11 +9,11 @@
 
 #include "internal/build-assert.h"
 #include "internal/compare.h"
+#include "internal/print.h"
 #include "internal/types.h"
 
 #include "atari/machine.h"
 
-#include "psgplay/print.h"
 #include "psgplay/sndh.h"
 
 #include "out/alsa.h"

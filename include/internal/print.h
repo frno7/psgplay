@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 
-#ifndef PSGPLAY_PRINT_H
-#define PSGPLAY_PRINT_H
+#ifndef INTERNAL_PRINT_H
+#define INTERNAL_PRINT_H
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -29,4 +29,4 @@ void pr_bug_warn(const char *file, int line,
 void NORETURN pr_bug(const char *file, int line,
 	const char *func, const char *expr);
 
-#endif /* PSGPLAY_PRINT_H */
+#endif /* INTERNAL_PRINT_H */

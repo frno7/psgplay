@@ -2,4 +2,5 @@
 
 INTERNAL_SRC :=								\
 	lib/internal/fifo.c						\
+	lib/internal/print.c						\
 	lib/internal/string.c

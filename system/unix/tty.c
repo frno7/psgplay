@@ -11,7 +11,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-#include "psgplay/print.h"
+#include "internal/print.h"
 
 #include "system/unix/clock.h"
 #include "system/unix/tty.h"

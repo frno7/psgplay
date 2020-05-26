@@ -8,9 +8,9 @@
 #include <unistd.h>
 
 #include "internal/compare.h"
+#include "internal/print.h"
 
 #include "psgplay/assert.h"
-#include "psgplay/print.h"
 
 #include "system/unix/poll-fifo.h"
 

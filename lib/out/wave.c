@@ -10,11 +10,11 @@
 #include <unistd.h>
 
 #include "internal/compare.h"
+#include "internal/print.h"
 
 #include "out/wave.h"
 
 #include "psgplay/assert.h"
-#include "psgplay/print.h"
 
 #include "system/unix/file.h"
 #include "system/unix/memory.h"

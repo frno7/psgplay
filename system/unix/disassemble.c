@@ -8,10 +8,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "internal/print.h"
+
 #include "disassemble/m68k.h"
 
 #include "psgplay/assert.h"
-#include "psgplay/print.h"
 #include "psgplay/sndh.h"
 
 #include "system/unix/disassemble.h"
