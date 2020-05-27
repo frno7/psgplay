@@ -77,8 +77,9 @@ for ideas about additional
 [GEM](https://en.wikipedia.org/wiki/GEM_(desktop_environment))
 user interfaces.
 
-The currently playing tune is indicated in reverse video. A cursor is shown
-with `>`. Keyboard controls:
+The currently playing tune is indicated in
+[reverse video](https://en.wikipedia.org/wiki/Reverse_video).
+A cursor is shown with `>`. Keyboard controls:
 
 - `escape` or `q` to quit;
 - `s` to stop;
@@ -98,6 +99,20 @@ or is compiled for Mac OS, or the options `-o`, `--output`, `--start`,
 
 ## Library form
 
+The PSG play shared library is compiled into `lib/psgplay/psgplay.so`. The
+[application programming interface](https://en.wikipedia.org/wiki/Application_programming_interface)
+(API) is documented in
+[`include/psgplay/psgplay.h`](https://github.com/frno7/psgplay/blob/master/include/psgplay/psgplay.h),
+[`include/psgplay/sndh.h`](https://github.com/frno7/psgplay/blob/master/include/psgplay/sndh.h) and
+[`include/psgplay/version.h`](https://github.com/frno7/psgplay/blob/master/include/psgplay/version.h).
+
+There are two simple examples on how to use the PSG play library:
+
+- [`lib/psgplay/example-info.c`](https://github.com/frno7/psgplay/blob/master/lib/psgplay/example-info.c)
+  is an example on how to display SNDH tags;
+- [`lib/psgplay/example-play.c`](https://github.com/frno7/psgplay/blob/master/lib/psgplay/example-play.c)
+  is an example on how to play an SNDH file in 44.1 kHz stereo.
+
 Issue [#1](https://github.com/frno7/psgplay/issues/1) describes ideas
 about making PSG play a linkable library.
 
@@ -109,10 +124,9 @@ for code inspection. The `--disassemble-header` option is the safest
 choice when updating SNDH metadata, because most of the code is retained
 with `dc.b` data bytes for exact reassembly.
 
-The `--remake-header` can be used to repair broken SNDH metadata such as
-missing tags, excessive whitespace, etc. It can also be used to update or
-add new metadata, by editing the produced assembly source code in an
-editor.
+The `--remake-header` option can be used to repair broken SNDH metadata such
+as missing tags, excessive whitespace, etc. It can also be used to update or
+add new metadata, by editing the produced assembly source code in an editor.
 
 See issue [#4](https://github.com/frno7/psgplay/issues/4) about switching
 from MIT to Motorola syntax.
