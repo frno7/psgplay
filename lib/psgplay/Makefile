@@ -13,3 +13,14 @@ PSGPLAY_SRC :=								\
 .PHONY: $(shell script/version $(VER))
 $(VER):
 	@script/version $@
+
+EXAMPLE_INFO_SRC := $(EXAMPLE_INFO).c
+
+EXAMPLE_SRC := $(EXAMPLE_INFO_SRC)
+
+EXAMPLE_LINK_OBJ +=							\
+	lib/ice/ice.o							\
+	system/unix/file.o						\
+	system/unix/memory.o						\
+	system/unix/print.o						\
+	system/unix/string.o

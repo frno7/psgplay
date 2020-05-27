@@ -21,8 +21,10 @@ ALL_CFLAGS += $(DEP_CFLAGS) $(HAVE_CFLAGS) $(S_CFLAGS)
 
 PSGPLAY := psgplay
 
+EXAMPLE_INFO := lib/psgplay/example-info
+
 .PHONY: all
-all: $(PSGPLAY)
+all: $(PSGPLAY) $(EXAMPLE_INFO)
 
 include lib/Makefile
 include system/Makefile
@@ -48,7 +50,11 @@ LIBPSGPLAY_HIDDEN_OBJ = $(patsubst %.c, %.o, $(LIBPSGPLAY_HIDDEN_SRC))
 LIBPSGPLAY_PUBLIC_OBJ = $(patsubst %.c, %.o, $(LIBPSGPLAY_PUBLIC_SRC))
 LIBPSGPLAY_OBJ = $(LIBPSGPLAY_HIDDEN_OBJ) $(LIBPSGPLAY_PUBLIC_OBJ)
 
+INTERNAL_OBJ = $(patsubst %.c, %.o, $(INTERNAL_SRC))
 PSGPLAY_OBJ = $(patsubst %.c, %.o, $(PSGPLAY_SRC))
+
+EXAMPLE_INFO_OBJ = $(patsubst %.c, %.o, $(EXAMPLE_INFO_SRC))
+EXAMPLE_OBJ = $(EXAMPLE_INFO_OBJ)
 
 $(LIBPSGPLAY_STATIC): $(LIBPSGPLAY_OBJ)
 	$(QUIET_AR)$(AR) rcs $@ $^
@@ -59,18 +65,23 @@ $(LIBPSGPLAY_SHARED): $(LIBPSGPLAY_OBJ)
 $(PSGPLAY): $(PSGPLAY_OBJ) $(LIBPSGPLAY_STATIC)
 	$(QUIET_LINK)$(CC) $(ALL_CFLAGS) -o $@ $^ $(LIBS)
 
+$(EXAMPLE_INFO): $(EXAMPLE_INFO_OBJ) $(LIBPSGPLAY_SHARED)		\
+	$(INTERNAL_OBJ) $(EXAMPLE_LINK_OBJ)
+	$(QUIET_LINK)$(CC) $(ALL_CFLAGS) -o $@ $^
+
 $(LIBPSGPLAY_HIDDEN_OBJ): %.o : %.c
 	$(QUIET_CC)$(CC) $(ALL_CFLAGS) -fvisibility=hidden -c -o $@ $<
 
 $(LIBPSGPLAY_PUBLIC_OBJ): %.o : %.c
 	$(QUIET_CC)$(CC) $(ALL_CFLAGS) -c -o $@ $<
 
-$(PSGPLAY_OBJ): %.o : %.c
+$(PSGPLAY_OBJ) $(EXAMPLE_OBJ): %.o : %.c
 	$(QUIET_CC)$(CC) $(ALL_CFLAGS) -c -o $@ $<
 
 .PHONY: clean
 clean:
 	$(QUIET_RM)$(RM) -f */*.o* */*/*.o* include/tos/tos.h		\
+		$(EXAMPLE_INFO)						\
 		$(PSGPLAY) PSGPLAY.* GPATH GRTAGS GTAGS 		\
 		$(LIBPSGPLAY_STATIC) $(LIBPSGPLAY_SHARED)		\
 		$(M68K_GEN_H) $(M68K_GEN_C) $(VER) $(M68KMAKE)
