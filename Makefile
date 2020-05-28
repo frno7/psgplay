@@ -84,6 +84,15 @@ $(LIBPSGPLAY_PUBLIC_OBJ): %.o : %.c
 $(PSGPLAY_OBJ) $(EXAMPLE_OBJ): %.o : %.c
 	$(QUIET_CC)$(CC) $(ALL_CFLAGS) -c -o $@ $<
 
+INSTALL = install
+
+bindir  := $(prefix)/bin
+
+install: all
+	$(if $(prefix),,$(error "prefix" parameter must be set))
+	$(INSTALL) -d $(DESTDIR)$(bindir)
+	$(INSTALL) $(PSGPLAY) $(DESTDIR)$(bindir)
+
 .PHONY: version
 version:
 	@script/version
@@ -104,6 +113,7 @@ gtags:
 help:
 	@echo "Targets:"
 	@echo "  all            - compile PSG play (default)"
+	@echo "  install        - install PSG play"
 	@echo "  PSGPLAY.TOS    - compile PSG play for Atari ST"
 	@echo "  version        - display PSG play version"
 	@echo "  clean          - remove generated files"
@@ -124,8 +134,8 @@ QUIET_AS      = $(Q:@=@echo    '  AS      '$@;)
 QUIET_CC      = $(Q:@=@echo    '  CC      '$@;)
 QUIET_GEN     = $(Q:@=@echo    '  GEN     '$@;)
 QUIET_LINK    = $(Q:@=@echo    '  LD      '$@;)
-QUIET_TEST    = $(Q:@=@echo    '  TEST    '$@;)
 QUIET_RM      = $(Q:@=@echo    '  RM      '$@;)
+QUIET_TEST    = $(Q:@=@echo    '  TEST    '$@;)
 
 BASIC_CFLAGS += -Wp,-MD,$(@D)/$(@F).d -MT $(@D)/$(@F)
 
