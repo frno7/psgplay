@@ -6,6 +6,8 @@ CFLAGS += -g -O2 -Wall -Iinclude -D_GNU_SOURCE
 
 LIBS += -lm
 
+SOFLAGS += -shared
+
 ifeq "$(S)" "1"
 S_CFLAGS += -fsanitize=address -fsanitize=leak -fsanitize=undefined	\
 	  -fsanitize-address-use-after-scope -fstack-check
@@ -62,7 +64,7 @@ $(LIBPSGPLAY_STATIC): $(LIBPSGPLAY_OBJ)
 	$(QUIET_AR)$(AR) rcs $@ $^
 
 $(LIBPSGPLAY_SHARED): $(LIBPSGPLAY_OBJ)
-	$(QUIET_CC)$(CC) -shared -o $@ $^
+	$(QUIET_CC)$(CC) $(SOFLAGS) -o $@ $^
 
 $(PSGPLAY): $(PSGPLAY_OBJ) $(LIBPSGPLAY_STATIC)
 	$(QUIET_LINK)$(CC) $(ALL_CFLAGS) -o $@ $^ $(LIBS)
