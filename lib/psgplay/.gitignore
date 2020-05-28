@@ -1,5 +1,5 @@
 /example-info
 /example-play
-/psgplay.a
-/psgplay.so
+/libpsgplay.a
+/libpsgplay.so
 /version.c
