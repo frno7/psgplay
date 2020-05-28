@@ -3,12 +3,19 @@
 set -e
 set -o pipefail
 
-[ $# = 1 ]
-f="$1"
-
 mod=$([ -z "$(git status -suno)" ] || echo "+")
 tag="$(git describe --always --tags)"
 ver="$(echo "$tag" | sed 's/^v//')$mod"
+
+if [ $# = 0 ]
+then
+	echo "$ver"
+	exit
+fi
+
+[ $# = 1 ]
+f="$1"
+
 src=$(echo "#include "'"'"psgplay/version.h"'"'"
 
 const char *psgplay_version(void) { return "'"'"$ver"'"'"; }")

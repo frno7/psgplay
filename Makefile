@@ -84,6 +84,10 @@ $(LIBPSGPLAY_PUBLIC_OBJ): %.o : %.c
 $(PSGPLAY_OBJ) $(EXAMPLE_OBJ): %.o : %.c
 	$(QUIET_CC)$(CC) $(ALL_CFLAGS) -c -o $@ $<
 
+.PHONY: version
+version:
+	@script/version
+
 .PHONY: clean
 clean:
 	$(QUIET_RM)$(RM) -f */*.o* */*/*.o* include/tos/tos.h		\
@@ -101,6 +105,7 @@ help:
 	@echo "Targets:"
 	@echo "  all            - compile PSG play (default)"
 	@echo "  PSGPLAY.TOS    - compile PSG play for Atari ST"
+	@echo "  version        - display PSG play version"
 	@echo "  clean          - remove generated files"
 	@echo
 	@echo "Options:"
