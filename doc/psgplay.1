@@ -1,0 +1,128 @@
+.TH PSGPLAY 1 2020-05-30 "PSG play manual"
+
+.SH NAME
+psgplay \- music player for Atari ST YM2149 SNDH files
+
+.SH SYNOPSIS
+.B psgplay [\fIOPTIONS\fR]... [\fIsndh-file\fR]
+
+.SH DESCRIPTION
+\fIPSG play\fR is a music player and emulator for the Atari ST
+Programmable Sound Generator (PSG) YM2149 and the SNDH file format.
+
+.SH OPTIONS
+\fIPSG play\fR accepts the following options.
+
+General options:
+
+.RS
+
+.TP
+.BR \-h ", " \-\-help
+Print the synopsis and exit.
+
+.TP
+.BR \-\-version
+Print \fIPSG play\fR version and exit.
+
+.TP
+.BR \-v ", " \-\-verbose
+Increase verbosity. May be repeated.
+
+.TP
+.BR \-i ", " \-\-info
+Print SNDH file information and exit.
+
+.RE
+
+Play options:
+
+.RS
+
+.TP
+.BR \-o ", " \-\-output "=<" \fIfile\fR ">"
+Write audio output to the given file in WAVE format.
+
+.TP
+.BR \-\-start "=<[" \fImm:\fR "]" \fIss\fR "[" \fI.ss\fR "]>"
+Start playing at the given time, given in seconds, or minutes and seconds
+separated with a colon, and optionally subseconds.
+
+.TP
+.BR \-\-stop "=<[" \fImm:\fR "]" \fIss\fR "[" \fI.ss\fR "]|" \fIauto\fR "|" \fInever\fR ">"
+Stop playing at the given time, given in seconds, or minutes and seconds
+separated with a colon, and optionally subseconds, or automatically
+if the track has a known duration, or never.
+
+.TP
+.BR \-\-length "=<[" \fImm:\fR "]" \fIss\fR "[" \fI.ss\fR "]>"
+Play for the given duration, given in seconds, or minutes and seconds
+separated with a colon, and optionally subseconds.
+
+.TP
+.BR \-m ", " \-\-mode "=<" \fIcommand\fR "|" \fItext\fR ">"
+\fIPSG play\fR defaults to \fIinteractive text mode\fR if it is compiled
+with ALSA for Linux. Mac OS does not support interactive text mode, only
+\fIcommand mode\fR with WAVE format output.
+
+.TP
+.BR \-t ", " \-\-track "=<" \fInumber\fR ">"
+Set track number.
+
+.TP
+.BR \-f ", " \-\-frequency "=<" \fIfrequency\fR ">"
+Set audio frequency in Hz (default 44100).
+
+.RE
+
+Disassembly options:
+
+.RS
+
+.TP
+.BR \-\-disassemble
+Disassemble SNDH file and exit.
+
+.TP
+.BR \-\-disassemble-header
+Disassemble SNDH file header and exit. This option is the safest choice
+when updating SNDH metadata, because most of the code is retained with
+\fIdc.b\fR data bytes for exact reassembly.
+
+.TP
+.BR \-\-remake-header
+Remake SNDH file header in disassembly. The can be used to repair broken
+SNDH metadata such as missing tags, excessive whitespace, etc. It can also
+be used to update or add new metadata, by editing the produced assembly
+source code in an editor.
+
+.RE
+
+.SH COMMAND MODE
+PSG play runs in command mode if it is not compiled with ALSA for Linux,
+or is compiled for Mac OS, or the options \fB-o\fR, \fB--output\fR,
+\fB--start\fR, \fB--stop\fR or \fB--length\fR are given.
+
+.SH INTERACTIVE TEXT MODE
+For Linux, terminal mode and ECMA-48 are used, including support for job
+control such as process suspension.
+
+The currently playing tune is indicated in reverse video. A cursor is
+shown with \fI>\fR. Keyboard controls:
+
+    \fIescape\fR or \fIq\fR to quit;
+    \fIs\fR to stop;
+    \fIp\fR or \fIspacebar\fR to pause;
+    \fI1\fR, \fI2\fR, ..., \fI9\fR to play tunes 1, 2, ..., 9;
+    \fI<\fR to play the previous tune;
+    \fI>\fR to play the next tune;
+    \fIk\fR or \fIup arrow\fR to move the cursor up;
+    \fIj\fR or \fIdown arrow\fR to move the cursor down;
+    \fIreturn\fR to play the tune at the cursor.
+
+.SH RESOURCES
+https://github.com/frno7/psgplay
+
+.SH NOTES
+\fIPSG play\fR does not yet emulate Atari STE DMA sound and LMC1992 tone
+and volume hardware.
