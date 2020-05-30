@@ -34,7 +34,6 @@ include system/Makefile
 
 LIBPSGPLAY_HIDDEN_SRC :=						\
 	$(ATARI_SRC)							\
-	$(ICE_SRC)							\
 	$(INTERNAL_SRC)							\
 	$(M68K_SRC)
 
@@ -43,6 +42,7 @@ LIBPSGPLAY_PUBLIC_SRC :=						\
 
 PSGPLAY_SRC :=								\
 	$(DISASSEMBLE_SRC) 						\
+	$(ICE_SRC)							\
 	$(OUT_SRC)							\
 	$(SYSTEM_UNIX_SRC)						\
 	$(TEXT_SRC)							\
