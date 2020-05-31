@@ -17,6 +17,10 @@ For Atari ST, do `make CROSS_COMPILE=m68k-unknown-linux-gnu- PSGPLAY.TOS`.
 
 Do `make help` to list further targets and options.
 
+The package
+[media-sound/psgplay](https://github.com/frno7/gentoo.overlay/tree/master/media-sound/psgplay)
+is available for [Gentoo Linux](https://www.gentoo.org/).
+
 # How to use
 
 PSG play options for Linux and Mac OS:
