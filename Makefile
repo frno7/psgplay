@@ -2,7 +2,7 @@
 #
 # Do "make help" for targets and options.
 
-CFLAGS += -g -O2 -Wall -Iinclude -D_GNU_SOURCE
+CFLAGS += -g -O2 -Wall -fPIC -Iinclude -D_GNU_SOURCE
 
 LIBS += -lm
 
