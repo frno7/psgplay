@@ -225,6 +225,7 @@ static void main_ctrl(const unicode_t key, struct text_state *ctrl,
 		break;
 	case 'q':
 	case '\033':	/* Escape */
+		ctrl->op = TRACK_STOP;
 		ctrl->quit = true;
 		break;
 	}
