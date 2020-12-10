@@ -109,7 +109,7 @@ clean:
 
 .PHONY: gtags
 gtags:
-	gtags
+	@gtags
 
 .PHONY: help
 help:
