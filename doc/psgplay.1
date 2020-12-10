@@ -41,7 +41,9 @@ Play options:
 
 .TP
 .BR \-o ", " \-\-output "=<" \fIfile\fR ">"
-Write audio output to the given file in WAVE format.
+Write audio output to the given file in WAVE format,
+or, if ALSA is available, to an ALSA handle if prefixed with "alsa:"
+(default is "alsa:default").
 
 .TP
 .BR \-\-start "=<[" \fImm:\fR "]" \fIss\fR "[" \fI.ss\fR "]>"

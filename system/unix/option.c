@@ -16,6 +16,8 @@
 
 #include "psgplay/version.h"
 
+#include "out/alsa.h"
+
 #include "system/unix/file.h"
 #include "system/unix/option.h"
 #include "system/unix/tty.h"
@@ -43,6 +45,9 @@ static void help(FILE *file)
 "Play options:\n"
 "\n"
 "    -o, --output=<file>    write audio output to the given file in WAVE format\n"
+#ifdef HAVE_ALSA
+"                           or to an ALSA handle if prefixed with \"alsa:\"\n"
+#endif /* HAVE_ALSA */
 "\n"
 "    --start=<[mm:]ss.ss>   start playing at the given time\n"
 "    --stop=<[mm:]ss.ss|auto|never>\n"
@@ -79,14 +84,24 @@ static void NORETURN version_exit(void)
 	exit(EXIT_SUCCESS);
 }
 
+static bool file_output(void)
+{
+#ifdef HAVE_ALSA
+	if (alsa_output_handle(option.output))
+		return false;
+#endif /* HAVE_ALSA */
+
+	return option.output != NULL;
+}
+
 static bool command_mode_only_option(void)
 {
 	return option.verbose ||
 	       option.info    ||
-	       option.output  ||
 	       option.start   ||
 	       option.length  ||
-	       option.stop;
+	       option.stop    ||
+	       file_output();
 }
 
 bool command_mode_option(void)

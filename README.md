@@ -40,6 +40,7 @@ General options:
 Play options:
 
     -o, --output=<file>    write audio output to the given file in WAVE format
+                           or to an ALSA handle if prefixed with "alsa:"
 
     --start=<[mm:]ss.ss>   start playing at the given time
     --stop=<[mm:]ss.ss|auto|never>

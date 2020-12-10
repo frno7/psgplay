@@ -48,12 +48,13 @@ struct tty_arg {
 };
 
 static struct sample_buffer sample_buffer_init(const void *data, size_t size,
-	int track, int frequency, const struct output *output)
+	const char *option_output, int track, int frequency,
+	const struct output *output)
 {
 	struct sample_buffer sb = {
 		.pp = psgplay_init(data, size, track, frequency),
 		.output = output,
-		.output_arg = output->open(NULL, frequency, true),
+		.output_arg = output->open(option_output, frequency, true),
 	};
 
 	if (!sb.pp)
@@ -268,7 +269,7 @@ void text_replay(const struct options *options, struct file file,
 		file_basename(file.path), file.path, file.data, file.size);
 
 	struct sample_buffer sb = sample_buffer_init(file.data, file.size,
-		options->track, options->frequency, output);
+		options->output, options->track, options->frequency, output);
 
 	struct tty_arg tty_arg = {
 		.vtb = &tty_vt.vtb,

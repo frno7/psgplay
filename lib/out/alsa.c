@@ -44,6 +44,12 @@ struct alsa_state {
 	struct fifo fifo;
 };
 
+const char *alsa_output_handle(const char *output)
+{
+	return !output ? "default" :
+		strncmp(output, "alsa:", 5) == 0 ? &output[5] : NULL;
+}
+
 static void alsa_sample_flush(struct alsa_state *state)
 {
 	while (!fifo_empty(&state->fifo)) {
@@ -160,7 +166,7 @@ static void *alsa_open(const char *output, int frequency, bool nonblocking)
 	snd_pcm_hw_params_alloca(&state->hwparams);
 
 	err = snd_pcm_open(&state->pcm_handle,
-		"default", SND_PCM_STREAM_PLAYBACK,
+		alsa_output_handle(output), SND_PCM_STREAM_PLAYBACK,
 		nonblocking ? SND_PCM_NONBLOCK : 0);
 	if (err < 0)
 		pr_fatal_error("%s: ALSA snd_pcm_open failed: %s\n",

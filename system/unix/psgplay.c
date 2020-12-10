@@ -69,17 +69,15 @@ static void select_subtune(int *track, struct file file)
 
 static const struct output *select_output(const struct options *options)
 {
-	const struct output *output = options->output ? &wave_output : NULL;
-
 #ifdef HAVE_ALSA
-	if (!output)
-		output = &alsa_output;
+	if (alsa_output_handle(options->output))
+		return &alsa_output;
 #endif /* HAVE_ALSA */
 
-	if (!output)
+	if (!options->output)
 		pr_fatal_error("missing output file\n");
 
-	return output;
+	return &wave_output;
 }
 
 static replay_f select_replay(const struct options *options)
