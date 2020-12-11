@@ -10,6 +10,7 @@
 #include "internal/assert.h"
 #include "internal/compare.h"
 
+#include "atari/cpu.h"
 #include "atari/machine.h"
 #include "atari/psg.h"
 
@@ -32,6 +33,11 @@ struct psgplay {
 	} lowpass;
 
 	const struct machine *machine;
+
+	struct {
+		void (*cb)(uint32_t pc, void *arg);
+		void *arg;
+	} instruction_callback;
 
 	int errno_;
 };
@@ -165,6 +171,10 @@ ssize_t psgplay_read_stereo(struct psgplay *pp,
 {
 	size_t index = 0;
 
+	cpu_instruction_callback(
+		pp->instruction_callback.cb,
+		pp->instruction_callback.arg);
+
 	while (index < count) {
 		if (pp->index == pp->count) {
 			pp->index = 0;
@@ -200,4 +210,11 @@ void psgplay_free(struct psgplay *pp)
 
 	free(pp->buffer);
 	free(pp);
+}
+
+void psgplay_instruction_callback(struct psgplay *pp,
+	void (*cb)(uint32_t pc, void *arg), void *arg)
+{
+	pp->instruction_callback.cb = cb;
+	pp->instruction_callback.arg = arg;
 }
