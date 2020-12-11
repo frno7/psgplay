@@ -289,6 +289,13 @@ static void dasm_mark_text_trace(struct disassembly *dasm, size_t i)
 	}
 }
 
+static void dasm_mark_text_trace_entries(struct disassembly *dasm)
+{
+	dasm_mark_text_trace(dasm, 0);	/* init */
+	dasm_mark_text_trace(dasm, 4);	/* exit */
+	dasm_mark_text_trace(dasm, 8);	/* play */
+}
+
 void sndh_disassemble(struct options *options, struct file file)
 {
 	struct disassembly dasm = {
@@ -308,9 +315,7 @@ void sndh_disassemble(struct options *options, struct file file)
 	dasm_label(&dasm, "_play", sndh_play_address(file.data, file.size));
 	dasm_label(&dasm, "_sndh", dasm.header_size);
 
-	dasm_mark_text_trace(&dasm, 0);
-	dasm_mark_text_trace(&dasm, 4);
-	dasm_mark_text_trace(&dasm, 8);
+	dasm_mark_text_trace_entries(&dasm);
 
 	dasm_print(&dasm);
 
