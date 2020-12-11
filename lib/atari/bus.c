@@ -7,35 +7,41 @@
 #include "internal/build-assert.h"
 #include "internal/macro.h"
 
+#include "m68k/m68kcpu.h"
+
 #include "atari/bus.h"
 #include "atari/machine.h"
 
 u8 bus_error_rd_u8(const struct device *device, u32 address)
 {
-	pr_fatal_error("bus error: rd u8 %x\n", device->bus.address + address);
+	/* FIXME: Properly report pr_error("bus error: rd u8 %x\n", device->bus.address + address); */
 
-	/* FIXME: m68k_pulse_bus_error(); */
+	m68k_pulse_bus_error();
+
+	return 0;
 }
 
 u16 bus_error_rd_u16(const struct device *device, u32 address)
 {
-	pr_fatal_error("bus error: rd u16 %x\n", device->bus.address + address);
+	/* FIXME: Properly report pr_error("bus error: rd u16 %x\n", device->bus.address + address); */
 
-	/* FIXME: m68k_pulse_bus_error(); */
+	m68k_pulse_bus_error();
+
+	return 0;
 }
 
 void bus_error_wr_u8(const struct device *device, u32 address, u8 data)
 {
-	pr_fatal_error("bus error: wr u8 %x %x\n", device->bus.address + address, data);
+	/* FIXME: Properly report pr_error("bus error: wr u8 %x %x\n", device->bus.address + address, data); */
 
-	/* FIXME: m68k_pulse_bus_error(); */
+	m68k_pulse_bus_error();
 }
 
 void bus_error_wr_u16(const struct device *device, u32 address, u16 data)
 {
-	pr_fatal_error("bus error: wr u16 %x %x\n", device->bus.address + address, data);
+	/* FIXME: Properly report pr_error("bus error: wr u16 %x %x\n", device->bus.address + address, data); */
 
-	/* FIXME: m68k_pulse_bus_error(); */
+	m68k_pulse_bus_error();
 }
 
 const struct device bus_device_error = {
