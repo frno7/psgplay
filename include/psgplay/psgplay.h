@@ -36,7 +36,7 @@ struct psgplay *psgplay_init(const void *data, size_t size,
 /**
  * psgplay_read_stereo - read PSG play stereo samples
  * @pp: PSG play object
- * @buffer: buffer to read into
+ * @buffer: buffer to read into, can be %NULL to ignore
  * @count: number of stereo samples to read
  *
  * Return: number of read samples, or negative on failure

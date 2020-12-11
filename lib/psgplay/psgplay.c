@@ -182,8 +182,9 @@ ssize_t psgplay_read_stereo(struct psgplay *pp,
 
 		const size_t n = min(count - index, pp->count - pp->index);
 
-		memcpy(&buffer[index], &pp->buffer[pp->index],
-			n * sizeof(*buffer));
+		if (buffer != NULL)
+			memcpy(&buffer[index], &pp->buffer[pp->index],
+				n * sizeof(*buffer));
 
 		index += n;
 		pp->index += n;
