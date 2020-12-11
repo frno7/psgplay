@@ -76,7 +76,7 @@ static void atari_st_init(const void *prg, size_t size, u32 track,
 
 static bool atari_st_run(void)
 {
-	cycle += device_run(cycle, 10000);
+	cycle += device_run(cycle, MACHINE_RUN_SLICE);
 
 	return true;
 }

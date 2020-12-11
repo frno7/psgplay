@@ -11,6 +11,7 @@
 #include "atari/sample.h"
 
 #define MACHINE_FREQUENCY 8000000
+#define MACHINE_RUN_SLICE   10000
 
 struct machine {
 	void (*init)(const void *prg, size_t size, u32 track, u32 timer,
