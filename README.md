@@ -129,6 +129,12 @@ for code inspection. The `--disassemble-header` option is the safest
 choice when updating SNDH metadata, because most of the code is retained
 with `dc.b` data bytes for exact reassembly.
 
+By default, every track is run silently as if it was played for 60 seconds,
+to separate executable instructions from data. The disassembly execution
+length can be set with  the `--length` option (0 to inactivate). Disassembly
+is also guided by instruction reachability from the `init`, `play`, and `exit`
+entry points.
+
 The `--remake-header` option can be used to repair broken SNDH metadata such
 as missing tags, excessive whitespace, etc. It can also be used to update or
 add new metadata, by editing the produced assembly source code in an editor.

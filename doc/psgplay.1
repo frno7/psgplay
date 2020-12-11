@@ -83,7 +83,11 @@ Disassembly options:
 
 .TP
 .BR \-\-disassemble
-Disassemble SNDH file and exit.
+Disassemble SNDH file and exit. By default, every track is run silently as if
+it was played for 60 seconds, to separate executable instructions from data.
+The disassembly execution length can be set with  the \fB--length\fR option
+(0 to inactivate). Disassembly is also guided by instruction reachability
+from the \fIinit\fR, \fIplay\fR, and \fIexit\fR entry points.
 
 .TP
 .BR \-\-disassemble-header

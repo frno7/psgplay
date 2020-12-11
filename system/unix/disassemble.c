@@ -5,6 +5,7 @@
 
 #include <ctype.h>
 #include <inttypes.h>
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -13,7 +14,10 @@
 
 #include "disassemble/m68k.h"
 
+#include "psgplay/psgplay.h"
 #include "psgplay/sndh.h"
+
+#include "atari/machine.h"
 
 #include "system/unix/disassemble.h"
 #include "system/unix/memory.h"
@@ -296,6 +300,57 @@ static void dasm_mark_text_trace_entries(struct disassembly *dasm)
 	dasm_mark_text_trace(dasm, 8);	/* play */
 }
 
+static void dasm_instruction(uint32_t pc, void *arg)
+{
+	struct disassembly *dasm = arg;
+
+	if (pc < MACHINE_PROGRAM)
+		return;
+
+	dasm_mark_text_trace(dasm, pc - MACHINE_PROGRAM);
+}
+
+static ssize_t parse_time(const char *s, int frequency)
+{
+	float a, b;
+	const int r = sscanf(s, "%f:%f", &a, &b);
+
+	if (!r)
+		pr_fatal_error("%s: malformed time '%s'\n", progname, s);
+
+	return roundf((r == 2 ? 60.0f * a + b : a) * frequency);
+}
+
+static void dasm_mark_text_trace_run(
+	struct disassembly *dasm,
+	const struct options *options,
+	struct file file)
+{
+	int subtune_count;
+
+        if (!sndh_tag_subtune_count(&subtune_count, file.data, file.size))
+                subtune_count = 1;
+
+	for (int t = 1; t <= subtune_count; t++) {
+		const int frequency = 1000;
+		struct psgplay *pp = psgplay_init(
+			file.data, file.size, t, frequency);
+
+		if (!pp)
+			continue;
+
+		psgplay_instruction_callback(pp, dasm_instruction, dasm);
+
+		const size_t sample_count = options->length ? parse_time(
+			options->length, frequency) : 60 * frequency;
+
+		if (sample_count)
+			psgplay_read_stereo(pp, NULL, sample_count);
+
+		psgplay_free(pp);
+	}
+}
+
 void sndh_disassemble(struct options *options, struct file file)
 {
 	struct disassembly dasm = {
@@ -316,6 +371,8 @@ void sndh_disassemble(struct options *options, struct file file)
 	dasm_label(&dasm, "_sndh", dasm.header_size);
 
 	dasm_mark_text_trace_entries(&dasm);
+
+	dasm_mark_text_trace_run(&dasm, options, file);
 
 	dasm_print(&dasm);
 
