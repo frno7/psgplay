@@ -10,6 +10,7 @@
 
 #include "atari/sample.h"
 
+#define MACHINE_PROGRAM    0x4000	/* 16 KiB */
 #define MACHINE_FREQUENCY 8000000
 #define MACHINE_RUN_SLICE   10000
 
