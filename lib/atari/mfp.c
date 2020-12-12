@@ -95,10 +95,10 @@ static u16 mfp_##symbol_(void)						\
 		mfp.reg[MFP_REG_##reg_##B];				\
 }
 
-DEFINE_MFP_IR(ier, IER);	/* 16-bit interrupt enable register */
-DEFINE_MFP_IR(ipr, IPR);	/* 16-bit interrupt pending register */
-DEFINE_MFP_IR(isr, ISR);	/* 16-bit interrupt service register */
-DEFINE_MFP_IR(imr, IMR);	/* 16-bit interrupt mask register */
+DEFINE_MFP_IR(ier, IER)		/* 16-bit interrupt enable register */
+DEFINE_MFP_IR(ipr, IPR)		/* 16-bit interrupt pending register */
+DEFINE_MFP_IR(isr, ISR)		/* 16-bit interrupt service register */
+DEFINE_MFP_IR(imr, IMR)		/* 16-bit interrupt mask register */
 
 static u32 mfp_ctrl_prescale(const enum mfp_ctrl ctrl)
 {
