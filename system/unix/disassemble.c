@@ -372,7 +372,8 @@ void sndh_disassemble(struct options *options, struct file file)
 
 	dasm_mark_text_trace_entries(&dasm);
 
-	dasm_mark_text_trace_run(&dasm, options, file);
+	if (options->disassemble != DISASSEMBLE_TYPE_HEADER)
+		dasm_mark_text_trace_run(&dasm, options, file);
 
 	dasm_print(&dasm);
 
