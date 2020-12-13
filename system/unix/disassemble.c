@@ -328,11 +328,17 @@ static void dasm_mark_text_trace_run(
 {
 	int subtune_count;
 
+	const int frequency = 1000;
+	const size_t sample_count = options->length ? parse_time(
+		options->length, frequency) : 60 * frequency;
+
+	if (!sample_count)
+		return;
+
         if (!sndh_tag_subtune_count(&subtune_count, file.data, file.size))
                 subtune_count = 1;
 
 	for (int t = 1; t <= subtune_count; t++) {
-		const int frequency = 1000;
 		struct psgplay *pp = psgplay_init(
 			file.data, file.size, t, frequency);
 
@@ -341,11 +347,7 @@ static void dasm_mark_text_trace_run(
 
 		psgplay_instruction_callback(pp, dasm_instruction, dasm);
 
-		const size_t sample_count = options->length ? parse_time(
-			options->length, frequency) : 60 * frequency;
-
-		if (sample_count)
-			psgplay_read_stereo(pp, NULL, sample_count);
+		psgplay_read_stereo(pp, NULL, sample_count);
 
 		psgplay_free(pp);
 	}
