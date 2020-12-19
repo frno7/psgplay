@@ -17,4 +17,12 @@ struct psg_sample {
 typedef void (*psg_sample_f)(
 	const struct psg_sample *sample, size_t count, void *arg);
 
+struct sound_sample {
+	s16 left;
+	s16 right;
+};
+
+typedef void (*sound_sample_f)(
+	const struct sound_sample *sample, size_t count, void *arg);
+
 #endif /* ATARI_SAMPLE_H */
