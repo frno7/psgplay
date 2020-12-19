@@ -12,7 +12,7 @@
 	sh( 0, vbasehi,   VBASEHI,   "Video display base high byte")	\
 	sh( 1, vbasemid,  VBASEMID,  "Video display base mid byte")	\
 	sh( 2, vcounthi,  VCOUNTHI,  "Video refresh address high byte")	\
-	sh( 3, vcountmid, VCOUNTMID, "Video refresh address mid byte")	\
+	sh( 3, vcountmi,  VCOUNTMI,  "Video refresh address mid byte")	\
 	sh( 4, vcountlo,  VCOUNTLO,  "Video refresh address low byte")	\
 	sh( 5, synch_m,   SYNC_M,    "Synchronisation mode")		\
 	sh( 6, vbaselo,   VBASELO,   "Video display base low byte")	\
