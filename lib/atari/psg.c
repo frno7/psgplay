@@ -33,7 +33,7 @@ static u8 reg_select;
 static struct device_cycle env_cycle;
 
 static struct {
-	sample_f sample;
+	psg_sample_f sample;
 	void *sample_arg;
 } output;
 
@@ -297,7 +297,7 @@ static void psg_reset(const struct device *device)
 	psg_event(device, device_cycle(device));
 }
 
-void psg_sample(sample_f sample, void *sample_arg)
+void psg_sample(psg_sample_f sample, void *sample_arg)
 {
 	output.sample = sample;
 	output.sample_arg = sample_arg;

@@ -49,7 +49,7 @@ u64 machine_cycle(void)
 }
 
 static void atari_st_init(const void *prg, size_t size, u32 track,
-	u32 timer, sample_f sample, void *sample_arg)
+	u32 timer, psg_sample_f sample, void *sample_arg)
 {
 	const size_t offset = MACHINE_PROGRAM;
 	const u8 *p = prg;

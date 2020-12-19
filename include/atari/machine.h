@@ -16,7 +16,7 @@
 
 struct machine {
 	void (*init)(const void *prg, size_t size, u32 track, u32 timer,
-		sample_f sample, void *sample_arg);
+		psg_sample_f sample, void *sample_arg);
 	bool (*run)(void);
 };
 
