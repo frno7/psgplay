@@ -10,7 +10,6 @@
 
 #include "atari/bus.h"
 #include "atari/cpu.h"
-#include "atari/dma.h"
 #include "atari/fdc.h"
 #include "atari/glue.h"
 #include "atari/machine.h"
@@ -31,7 +30,6 @@ static struct machine_device {
 	{ .device = &mfp_device     },
 	{ .device = &shifter_device },
 	{ .device = &psg_device     },
-	{ .device = &dma_device     },
 	{ .device = &fdc_device     },
 	{ .device = &cpu_device     },
 };
