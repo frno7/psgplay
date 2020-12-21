@@ -17,6 +17,11 @@
 #include "psgplay/psgplay.h"
 #include "psgplay/sndh.h"
 
+struct fir8 {
+	s16 xn[8];
+	int k;
+};
+
 struct psgplay {
 	size_t index;
 	size_t count;
@@ -27,10 +32,7 @@ struct psgplay {
 	u64 psg_cycle;
 	u64 downsample_sample_cycle;
 
-	struct {
-		s16 xn[8];
-		int k;
-	} lowpass;
+	struct fir8 lowpass;
 
 	const struct machine *machine;
 
