@@ -158,10 +158,14 @@ struct psgplay *psgplay_init(const void *data, size_t size,
 	if (!pp)
 		return NULL;
 
+	const struct machine_ports ports = {
+		.psg_sample = psg_dac3,
+		.arg = pp
+	};
+
 	pp->frequency = frequency;
 	pp->machine = &atari_st;
-	pp->machine->init(data, size, track, parse_timer(data, size),
-		psg_dac3, pp);
+	pp->machine->init(data, size, track, parse_timer(data, size), &ports);
 
 	return pp;
 }

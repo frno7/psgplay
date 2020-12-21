@@ -14,9 +14,14 @@
 #define MACHINE_FREQUENCY 8000000
 #define MACHINE_RUN_SLICE   10000
 
+struct machine_ports {
+	psg_sample_f psg_sample;
+	void *arg;
+};
+
 struct machine {
 	void (*init)(const void *prg, size_t size, u32 track, u32 timer,
-		psg_sample_f sample, void *sample_arg);
+		const struct machine_ports *ports);
 	bool (*run)(void);
 };
 

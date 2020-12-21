@@ -48,8 +48,8 @@ u64 machine_cycle(void)
 	return cycle + cycles_run;
 }
 
-static void atari_st_init(const void *prg, size_t size, u32 track,
-	u32 timer, psg_sample_f sample, void *sample_arg)
+static void atari_st_init(const void *prg, size_t size, u32 track, u32 timer,
+	const struct machine_ports *ports)
 {
 	const size_t offset = MACHINE_PROGRAM;
 	const u8 *p = prg;
@@ -71,7 +71,7 @@ static void atari_st_init(const void *prg, size_t size, u32 track,
 	for (size_t i = 0; i < size; i++)
 		ram_device.wr_u8(&ram_device, offset + i, p[i]);
 
-	psg_sample(sample, sample_arg);
+	psg_sample(ports->psg_sample, ports->arg);
 }
 
 static bool atari_st_run(void)
