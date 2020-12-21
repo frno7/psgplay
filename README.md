@@ -337,9 +337,6 @@ The digital emulation is currently fairly accurate, aiming to be within the
 variation of the compatible models of original Atari hardware. The analogue
 emulation is currently simpler, aiming to be accurate but also avoid unwanted
 artifacts such as the high level of noise produced with original Atari hardware.
-As described in issue [#1](https://github.com/frno7/psgplay/issues/1),
-a library form of PSG play could permit custom mixer and filter functions,
-to obtain any level of analogue emulation.
 
 As described in issues
 [#9](https://github.com/frno7/psgplay/issues/9) and
