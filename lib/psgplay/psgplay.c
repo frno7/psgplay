@@ -22,11 +22,15 @@ struct fir8 {
 	int k;
 };
 
-struct psgplay {
+struct stereo_buffer {
 	size_t index;
 	size_t count;
 	size_t capacity;
-	struct psgplay_stereo *buffer;
+	struct psgplay_stereo *sample;
+};
+
+struct psgplay {
+	struct stereo_buffer stereo_buffer;
 
 	int frequency;
 	u64 psg_cycle;
@@ -44,29 +48,26 @@ struct psgplay {
 	int errno_;
 };
 
-static void psgplay_sample(s16 left, s16 right, struct psgplay *pp)
+static int buffer_stereo_sample(s16 left, s16 right, struct stereo_buffer *sb)
 {
-	if (pp->errno_)
-		return;
+	if (sb->capacity <= sb->count) {
+		const size_t capacity = sb->capacity +
+			max_t(size_t, sb->capacity, 1024);
 
-	if (pp->capacity <= pp->count) {
-		const size_t capacity = pp->capacity +
-			max_t(size_t, pp->capacity, 1024);
+		void *sample = realloc(sb->sample,
+			capacity * sizeof(*sb->sample));
+		if (!sample)
+			return errno;
 
-		void *buffer = realloc(pp->buffer,
-			capacity * sizeof(*pp->buffer));
-		if (!buffer) {
-			pp->errno_ = errno;
-			return;
-		}
-
-		pp->buffer = buffer;
-		pp->capacity = capacity;
+		sb->sample = sample;
+		sb->capacity = capacity;
 	}
 
-	pp->buffer[pp->count].left = left;
-	pp->buffer[pp->count].right = right;
-	pp->count++;
+	sb->sample[sb->count].left = left;
+	sb->sample[sb->count].right = right;
+	sb->count++;
+
+	return 0;
 }
 
 static void psgplay_downsample(s16 left, s16 right, struct psgplay *pp)
@@ -74,7 +75,9 @@ static void psgplay_downsample(s16 left, s16 right, struct psgplay *pp)
 	const u64 n = (pp->frequency * pp->psg_cycle) / PSG_FREQUENCY;
 
 	for (; pp->downsample_sample_cycle < n; pp->downsample_sample_cycle++)
-		psgplay_sample(left, right, pp);
+		if (!pp->errno_)
+			pp->errno_ = buffer_stereo_sample(left, right,
+				&pp->stereo_buffer);
 
 	pp->psg_cycle += 8;
 }
@@ -179,6 +182,7 @@ struct psgplay *psgplay_init(const void *data, size_t size,
 ssize_t psgplay_read_stereo(struct psgplay *pp,
 	struct psgplay_stereo *buffer, size_t count)
 {
+	struct stereo_buffer *sb = &pp->stereo_buffer;
 	size_t index = 0;
 
 	cpu_instruction_callback(
@@ -186,11 +190,11 @@ ssize_t psgplay_read_stereo(struct psgplay *pp,
 		pp->instruction_callback.arg);
 
 	while (index < count) {
-		if (pp->index == pp->count) {
-			pp->index = 0;
-			pp->count = 0;
+		if (sb->index == sb->count) {
+			sb->index = 0;
+			sb->count = 0;
 
-			while (!pp->count)
+			while (!sb->count)
 				if (pp->errno_) {
 					errno = pp->errno_;
 					return -1;
@@ -200,14 +204,14 @@ ssize_t psgplay_read_stereo(struct psgplay *pp,
 				}
 		}
 
-		const size_t n = min(count - index, pp->count - pp->index);
+		const size_t n = min(count - index, sb->count - sb->index);
 
 		if (buffer != NULL)
-			memcpy(&buffer[index], &pp->buffer[pp->index],
+			memcpy(&buffer[index], &sb->sample[sb->index],
 				n * sizeof(*buffer));
 
 		index += n;
-		pp->index += n;
+		sb->index += n;
 	}
 
 	return index;
@@ -218,7 +222,7 @@ void psgplay_free(struct psgplay *pp)
 	if (!pp)
 		return;
 
-	free(pp->buffer);
+	free(pp->stereo_buffer.sample);
 	free(pp);
 }
 
