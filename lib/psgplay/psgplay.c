@@ -79,18 +79,15 @@ static void psgplay_downsample(s16 left, s16 right, struct psgplay *pp)
 	pp->psg_cycle += 8;
 }
 
-static void psgplay_lowpass(s16 sample, struct psgplay *pp)
+static s16 sample_lowpass(s16 sample, struct fir8 *lowpass)
 {
-
-	pp->lowpass.xn[pp->lowpass.k++ % ARRAY_SIZE(pp->lowpass.xn)] = sample;
+	lowpass->xn[lowpass->k++ % ARRAY_SIZE(lowpass->xn)] = sample;
 
 	s32 x = 0;
-	for (int i = 0; i < ARRAY_SIZE(pp->lowpass.xn); i++)
-		x += pp->lowpass.xn[i];	/* Simplistic 8 tap FIR filter. */
+	for (int i = 0; i < ARRAY_SIZE(lowpass->xn); i++)
+		x += lowpass->xn[i];	/* Simplistic 8 tap FIR filter. */
 
-	const s16 y = x / ARRAY_SIZE(pp->lowpass.xn);
-
-	psgplay_downsample(y, y, pp);
+	return x / ARRAY_SIZE(lowpass->xn);
 }
 
 static s16 psg_dac(const u8 level)
@@ -123,8 +120,7 @@ static s16 psg_dac(const u8 level)
 	return (level < 16 ? dac[level] : 0xffff) - 0x8000;
 }
 
-static void psgplay_dac3(
-	const struct psg_sample *sample, size_t count, void *arg)
+static void psg_dac3(const struct psg_sample *sample, size_t count, void *arg)
 {
 	for (size_t i = 0; i < count; i++) {
 		struct psgplay *pp = arg;
@@ -136,7 +132,9 @@ static void psgplay_dac3(
 		/* Simplistic linear channel mix. */
 		const s16 s = (sa + sb + sc) / 3;
 
-		psgplay_lowpass(s, pp);
+		const s16 y = sample_lowpass(s, &pp->lowpass);
+
+		psgplay_downsample(y, y, pp);
 	}
 }
 
@@ -163,7 +161,7 @@ struct psgplay *psgplay_init(const void *data, size_t size,
 	pp->frequency = frequency;
 	pp->machine = &atari_st;
 	pp->machine->init(data, size, track, parse_timer(data, size),
-		psgplay_dac3, pp);
+		psg_dac3, pp);
 
 	return pp;
 }
