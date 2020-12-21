@@ -109,7 +109,7 @@ clean:
 
 .PHONY: gtags
 gtags:
-	@gtags
+	$(QUIET_GEN)gtags
 
 .PHONY: help
 help:
