@@ -158,6 +158,12 @@ struct psgplay *psgplay_init(const void *data, size_t size,
 	if (!pp)
 		return NULL;
 
+	const u32 offset = MACHINE_PROGRAM;
+	const struct machine_registers regs = {
+		.d = { size, track, parse_timer(data, size) },
+		.a = { offset },
+	};
+
 	const struct machine_ports ports = {
 		.psg_sample = psg_dac3,
 		.arg = pp
@@ -165,7 +171,7 @@ struct psgplay *psgplay_init(const void *data, size_t size,
 
 	pp->frequency = frequency;
 	pp->machine = &atari_st;
-	pp->machine->init(data, size, track, parse_timer(data, size), &ports);
+	pp->machine->init(data, size, offset, &regs, &ports);
 
 	return pp;
 }

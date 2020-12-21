@@ -20,6 +20,24 @@
 #include "m68k/m68k.h"
 #include "m68k/m68kcpu.h"
 
+#define MACHINE_REGISTERS(reg)						\
+	reg(0, d, D)							\
+	reg(1, d, D)							\
+	reg(2, d, D)							\
+	reg(3, d, D)							\
+	reg(4, d, D)							\
+	reg(5, d, D)							\
+	reg(6, d, D)							\
+	reg(7, d, D)							\
+	reg(0, a, A)							\
+	reg(1, a, A)							\
+	reg(2, a, A)							\
+	reg(3, a, A)							\
+	reg(4, a, A)							\
+	reg(5, a, A)							\
+	reg(6, a, A)							\
+	reg(7, a, A)
+
 static u64 cycle;
 
 u64 cycle_transform(u64 to_frequency, u64 from_frequcy, u64 cycle)
@@ -48,10 +66,10 @@ u64 machine_cycle(void)
 	return cycle + cycles_run;
 }
 
-static void atari_st_init(const void *prg, size_t size, u32 track, u32 timer,
+static void atari_st_init(const void *prg, size_t size, size_t offset,
+	const struct machine_registers *regs,
 	const struct machine_ports *ports)
 {
-	const size_t offset = MACHINE_PROGRAM;
 	const u8 *p = prg;
 
 	cycle = 0;
@@ -63,10 +81,9 @@ static void atari_st_init(const void *prg, size_t size, u32 track, u32 timer,
 
 	device_reset();
 
-	m68k_set_reg(M68K_REG_D0, size);
-	m68k_set_reg(M68K_REG_A0, offset);
-	m68k_set_reg(M68K_REG_D1, track);
-	m68k_set_reg(M68K_REG_D2, timer);
+#define MACHINE_REGISTER_SET(index_, field_, label_)			\
+	m68k_set_reg(M68K_REG_##label_##index_, regs->field_[index_]);
+	MACHINE_REGISTERS(MACHINE_REGISTER_SET)
 
 	for (size_t i = 0; i < size; i++)
 		ram_device.wr_u8(&ram_device, offset + i, p[i]);

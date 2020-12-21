@@ -14,13 +14,19 @@
 #define MACHINE_FREQUENCY 8000000
 #define MACHINE_RUN_SLICE   10000
 
+struct machine_registers {
+	u32 d[8];	/* Data registers */
+	u32 a[8];	/* Address registers */
+};
+
 struct machine_ports {
 	psg_sample_f psg_sample;
 	void *arg;
 };
 
 struct machine {
-	void (*init)(const void *prg, size_t size, u32 track, u32 timer,
+	void (*init)(const void *prg, size_t size, size_t offset,
+		const struct machine_registers *regs,
 		const struct machine_ports *ports);
 	bool (*run)(void);
 };
