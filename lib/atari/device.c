@@ -18,6 +18,7 @@
 #include "atari/ram.h"
 #include "atari/rom.h"
 #include "atari/shifter.h"
+#include "atari/sound.h"
 
 static struct machine_device {
 	u64 machine_cycle_event;
@@ -30,6 +31,7 @@ static struct machine_device {
 	{ .device = &mfp_device     },
 	{ .device = &shifter_device },
 	{ .device = &psg_device     },
+	{ .device = &sound_device   },
 	{ .device = &fdc_device     },
 	{ .device = &cpu_device     },
 };

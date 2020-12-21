@@ -33,6 +33,7 @@ struct digital_buffer {
 	size_t index;
 	struct {
 		size_t psg;
+		size_t sound;
 	} count;
 	size_t capacity;
 	struct psgplay_digital *sample;
@@ -116,6 +117,23 @@ static int buffer_digital_psg_sample(const struct psg_sample *sample,
 	return err;
 }
 
+static int buffer_digital_sound_sample(const struct sound_sample *sample,
+	struct digital_buffer *db)
+{
+	int err = 0;
+
+	if (db->capacity <= db->count.sound)
+		err = digital_buffer_allocate(db);
+
+	if (!err) {
+		db->sample[db->count.sound].sound.left  = sample->left;
+		db->sample[db->count.sound].sound.right = sample->right;
+		db->count.sound++;
+	}
+
+	return err;
+}
+
 static void psgplay_downsample(s16 left, s16 right, struct psgplay *pp)
 {
 	const u64 n = (pp->stereo_frequency * pp->psg_cycle) / PSG_FREQUENCY;
@@ -180,9 +198,13 @@ static void digital_to_stereo(const struct psgplay_digital *sample,
 		/* Simplistic linear channel mix. */
 		const s16 s = (sa + sb + sc) / 3;
 
+		/* Simplistic half volume to PSG and sound. */
+		const s16 left  = (sample[i].sound.left  + s) / 2;
+		const s16 right = (sample[i].sound.right + s) / 2;
+
 		psgplay_downsample(
-                       sample_lowpass(s, &pp->lowpass.left),
-                       sample_lowpass(s, &pp->lowpass.right), pp);
+			sample_lowpass(left,  &pp->lowpass.left),
+			sample_lowpass(right, &pp->lowpass.right), pp);
 	}
 }
 
@@ -194,6 +216,17 @@ static void psg_digital(const struct psg_sample *sample,
 	for (size_t i = 0; i < count; i++)
 		if (!pp->errno_)
 			pp->errno_ = buffer_digital_psg_sample(
+				&sample[i], &pp->digital_buffer);
+}
+
+static void sound_digital(const struct sound_sample *sample,
+	size_t count, void *arg)
+{
+	struct psgplay *pp = arg;
+
+	for (size_t i = 0; i < count; i++)
+		if (!pp->errno_)
+			pp->errno_ = buffer_digital_sound_sample(
 				&sample[i], &pp->digital_buffer);
 }
 
@@ -226,6 +259,7 @@ struct psgplay *psgplay_init(const void *data, size_t size,
 
 	const struct machine_ports ports = {
 		.psg_sample = psg_digital,
+		.sound_sample = sound_digital,
 		.arg = pp
 	};
 
@@ -238,12 +272,12 @@ struct psgplay *psgplay_init(const void *data, size_t size,
 
 static size_t digital_buffer_min_count(struct digital_buffer *db)
 {
-	return db->count.psg;
+	return min(db->count.psg, db->count.sound);
 }
 
 static size_t digital_buffer_max_count(struct digital_buffer *db)
 {
-	return db->count.psg;
+	return max(db->count.psg, db->count.sound);
 }
 
 static void digital_buffer_shift(struct digital_buffer *db)
@@ -255,6 +289,7 @@ static void digital_buffer_shift(struct digital_buffer *db)
 			n * sizeof(*db->sample));
 
 	db->count.psg -= db->index;
+	db->count.sound -= db->index;
 
 	db->index = 0;
 }

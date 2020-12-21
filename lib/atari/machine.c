@@ -16,6 +16,7 @@
 #include "atari/machine.h"
 #include "atari/psg.h"
 #include "atari/ram.h"
+#include "atari/sound.h"
 
 #include "m68k/m68k.h"
 #include "m68k/m68kcpu.h"
@@ -89,6 +90,7 @@ static void atari_st_init(const void *prg, size_t size, size_t offset,
 		ram_device.wr_u8(&ram_device, offset + i, p[i]);
 
 	psg_sample(ports->psg_sample, ports->arg);
+	sound_sample(ports->sound_sample, ports->arg);
 }
 
 static bool atari_st_run(void)
