@@ -118,8 +118,8 @@ There are two simple examples on how to use the PSG play library:
 - [`lib/psgplay/example-play.c`](https://github.com/frno7/psgplay/blob/master/lib/psgplay/example-play.c)
   is an example on how to play an SNDH file in 44.1 kHz stereo.
 
-Issue [#1](https://github.com/frno7/psgplay/issues/1) describes ideas
-about making PSG play a linkable library.
+The library also supplies an unaltered 250 kHz digital form for custom
+analogue filters and mixers.
 
 ## Disassembly
 

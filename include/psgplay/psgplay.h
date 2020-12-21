@@ -19,6 +19,21 @@ struct psgplay_stereo {
 	int16_t right;
 };
 
+/**
+ * struct psgplay_digital - PSG play digital sample
+ * @psg: YM2149 Programmable Sound Generator (PSG)
+ * @psg.lva: 0-15 level of channel A
+ * @psg.lvb: 0-15 level of channel B
+ * @psg.lvc: 0-15 level of channel c
+ */
+struct psgplay_digital {
+	struct {
+		uint8_t lva;
+		uint8_t lvb;
+		uint8_t lvc;
+	} psg;
+};
+
 struct psgplay;		/* PSG play object */
 
 /**
@@ -26,7 +41,10 @@ struct psgplay;		/* PSG play object */
  * @data: SNDH data, must not be in compressed form
  * @size: SNDH size
  * @track: subtune to play
- * @frequency: sample frequency in Hz
+ * @stereo_frequency: stereo sample frequency in Hz, or zero for digital reading
+ *
+ * Use psgplay_read_stereo() if @stereo_frequency is nonzero, otherwise
+ * psgplay_read_digital().
  *
  * Return: PSG play object, which must be freed with psgplay_free(),
  * 	or %NULL on failure
@@ -44,6 +62,17 @@ struct psgplay *psgplay_init(const void *data, size_t size,
  */
 ssize_t psgplay_read_stereo(struct psgplay *pp,
 	struct psgplay_stereo *buffer, size_t count);
+
+/**
+ * psgplay_read_digital - read 250 kHz PSG play digital samples
+ * @pp: PSG play object
+ * @buffer: buffer to read into, can be %NULL to ignore
+ * @count: number of digital samples to read
+ *
+ * Return: number of read samples, or negative on failure
+ */
+ssize_t psgplay_read_digital(struct psgplay *pp,
+	struct psgplay_digital *buffer, size_t count);
 
 /**
  * psgplay_free - free a PSG play object previously initialised

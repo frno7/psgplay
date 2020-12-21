@@ -29,10 +29,18 @@ struct stereo_buffer {
 	struct psgplay_stereo *sample;
 };
 
+struct digital_buffer {
+	size_t index;
+	size_t count;
+	size_t capacity;
+	struct psgplay_digital *sample;
+};
+
 struct psgplay {
 	struct stereo_buffer stereo_buffer;
+	struct digital_buffer digital_buffer;
 
-	int frequency;
+	int stereo_frequency;
 	u64 psg_cycle;
 	u64 downsample_sample_cycle;
 
@@ -70,9 +78,33 @@ static int buffer_stereo_sample(s16 left, s16 right, struct stereo_buffer *sb)
 	return 0;
 }
 
+static int buffer_digital_sample(const struct psg_sample *sample,
+	struct digital_buffer *db)
+{
+	if (db->capacity <= db->count) {
+		const size_t capacity = db->capacity +
+			max_t(size_t, db->capacity, 1024);
+
+		void *sample = realloc(db->sample,
+			capacity * sizeof(*db->sample));
+		if (!sample)
+			return errno;
+
+		db->sample = sample;
+		db->capacity = capacity;
+	}
+
+	db->sample[db->count].psg.lva = sample->lva;
+	db->sample[db->count].psg.lvb = sample->lvb;
+	db->sample[db->count].psg.lvc = sample->lvc;
+	db->count++;
+
+	return 0;
+}
+
 static void psgplay_downsample(s16 left, s16 right, struct psgplay *pp)
 {
-	const u64 n = (pp->frequency * pp->psg_cycle) / PSG_FREQUENCY;
+	const u64 n = (pp->stereo_frequency * pp->psg_cycle) / PSG_FREQUENCY;
 
 	for (; pp->downsample_sample_cycle < n; pp->downsample_sample_cycle++)
 		if (!pp->errno_)
@@ -123,14 +155,13 @@ static s16 psg_dac(const u8 level)
 	return (level < 16 ? dac[level] : 0xffff) - 0x8000;
 }
 
-static void psg_dac3(const struct psg_sample *sample, size_t count, void *arg)
+static void digital_to_stereo(const struct psgplay_digital *sample,
+	size_t count, struct psgplay *pp)
 {
 	for (size_t i = 0; i < count; i++) {
-		struct psgplay *pp = arg;
-
-		const s16 sa = psg_dac(sample[i].lva);
-		const s16 sb = psg_dac(sample[i].lvb);
-		const s16 sc = psg_dac(sample[i].lvc);
+		const s16 sa = psg_dac(sample[i].psg.lva);
+		const s16 sb = psg_dac(sample[i].psg.lvb);
+		const s16 sc = psg_dac(sample[i].psg.lvc);
 
 		/* Simplistic linear channel mix. */
 		const s16 s = (sa + sb + sc) / 3;
@@ -139,6 +170,17 @@ static void psg_dac3(const struct psg_sample *sample, size_t count, void *arg)
 
 		psgplay_downsample(y, y, pp);
 	}
+}
+
+static void psg_digital(const struct psg_sample *sample,
+	size_t count, void *arg)
+{
+	struct psgplay *pp = arg;
+
+	for (size_t i = 0; i < count; i++)
+		if (!pp->errno_)
+			pp->errno_ = buffer_digital_sample(
+				&sample[i], &pp->digital_buffer);
 }
 
 static u32 parse_timer(const void *data, size_t size)
@@ -152,9 +194,10 @@ static u32 parse_timer(const void *data, size_t size)
 }
 
 struct psgplay *psgplay_init(const void *data, size_t size,
-	int track, int frequency)
+	int track, int stereo_frequency)
 {
-	if (frequency < 1000 || 250000 < frequency)
+	if (stereo_frequency &&
+			(stereo_frequency < 1000 || 250000 < stereo_frequency))
 		return NULL;
 
 	struct psgplay *pp = calloc(1, sizeof(struct psgplay));
@@ -168,15 +211,53 @@ struct psgplay *psgplay_init(const void *data, size_t size,
 	};
 
 	const struct machine_ports ports = {
-		.psg_sample = psg_dac3,
+		.psg_sample = psg_digital,
 		.arg = pp
 	};
 
-	pp->frequency = frequency;
+	pp->stereo_frequency = stereo_frequency;
 	pp->machine = &atari_st;
 	pp->machine->init(data, size, offset, &regs, &ports);
 
 	return pp;
+}
+
+static ssize_t psgplay_read_digital__(struct psgplay *pp,
+	struct psgplay_digital *buffer, size_t count)
+{
+	struct digital_buffer *db = &pp->digital_buffer;
+	size_t index = 0;
+
+	cpu_instruction_callback(
+		pp->instruction_callback.cb,
+		pp->instruction_callback.arg);
+
+	while (index < count) {
+		if (db->index == db->count) {
+			db->index = 0;
+			db->count = 0;
+
+			while (!db->count)
+				if (pp->errno_) {
+					errno = pp->errno_;
+					return -1;
+				} else if (!pp->machine->run()) {
+					errno = -EIO;
+					return -1;
+				}
+		}
+
+		const size_t n = min(count - index, db->count - db->index);
+
+		if (buffer != NULL)
+			memcpy(&buffer[index], &db->sample[db->index],
+				n * sizeof(*buffer));
+
+		index += n;
+		db->index += n;
+	}
+
+	return index;
 }
 
 ssize_t psgplay_read_stereo(struct psgplay *pp,
@@ -185,23 +266,27 @@ ssize_t psgplay_read_stereo(struct psgplay *pp,
 	struct stereo_buffer *sb = &pp->stereo_buffer;
 	size_t index = 0;
 
-	cpu_instruction_callback(
-		pp->instruction_callback.cb,
-		pp->instruction_callback.arg);
+	if (!pp->stereo_frequency)
+		return -EINVAL;
 
 	while (index < count) {
 		if (sb->index == sb->count) {
 			sb->index = 0;
 			sb->count = 0;
 
-			while (!sb->count)
-				if (pp->errno_) {
-					errno = pp->errno_;
-					return -1;
-				} else if (!pp->machine->run()) {
-					errno = -EIO;
-					return -1;
-				}
+			if (pp->errno_) {
+				errno = pp->errno_;
+				return -1;
+			}
+
+			struct psgplay_digital d[4096];
+			const ssize_t n = psgplay_read_digital__(
+				pp, d, ARRAY_SIZE(d));
+
+			if (n < 0)
+				return n;
+
+			digital_to_stereo(d, n, pp);
 		}
 
 		const size_t n = min(count - index, sb->count - sb->index);
@@ -217,12 +302,22 @@ ssize_t psgplay_read_stereo(struct psgplay *pp,
 	return index;
 }
 
+ssize_t psgplay_read_digital(struct psgplay *pp,
+	struct psgplay_digital *buffer, size_t count)
+{
+	if (pp->stereo_frequency)
+		return -EINVAL;
+
+	return psgplay_read_digital__(pp, buffer, count);
+}
+
 void psgplay_free(struct psgplay *pp)
 {
 	if (!pp)
 		return;
 
 	free(pp->stereo_buffer.sample);
+	free(pp->digital_buffer.sample);
 	free(pp);
 }
 
