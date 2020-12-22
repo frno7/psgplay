@@ -11,7 +11,7 @@
 #include "atari/ram.h"
 #include "atari/system-variable.h"
 
-static u8 ram[1024 * 1024];	/* 1 MiB of RAM */
+static u8 ram[4 * 1024 * 1024];	/* 4 MiB of RAM */
 
 static void ram_reset(const struct device *device)
 {
