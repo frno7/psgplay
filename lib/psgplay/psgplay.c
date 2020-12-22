@@ -44,7 +44,10 @@ struct psgplay {
 	u64 psg_cycle;
 	u64 downsample_sample_cycle;
 
-	struct fir8 lowpass;
+	struct {
+		struct fir8 left;
+		struct fir8 right;
+	} lowpass;
 
 	const struct machine *machine;
 
@@ -166,9 +169,9 @@ static void digital_to_stereo(const struct psgplay_digital *sample,
 		/* Simplistic linear channel mix. */
 		const s16 s = (sa + sb + sc) / 3;
 
-		const s16 y = sample_lowpass(s, &pp->lowpass);
-
-		psgplay_downsample(y, y, pp);
+		psgplay_downsample(
+                       sample_lowpass(s, &pp->lowpass.left),
+                       sample_lowpass(s, &pp->lowpass.right), pp);
 	}
 }
 
