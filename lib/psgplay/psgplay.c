@@ -107,12 +107,13 @@ static int buffer_digital_psg_sample(const struct psg_sample *sample,
 	if (db->capacity <= db->count.psg)
 		err = digital_buffer_allocate(db);
 
-	if (!err) {
-		db->sample[db->count.psg].psg.lva = sample->lva;
-		db->sample[db->count.psg].psg.lvb = sample->lvb;
-		db->sample[db->count.psg].psg.lvc = sample->lvc;
-		db->count.psg++;
-	}
+	if (!err)
+		db->sample[db->count.psg++].psg =
+			(struct psgplay_digital_psg) {
+				.lva = sample->lva,
+				.lvb = sample->lvb,
+				.lvc = sample->lvc,
+			};
 
 	return err;
 }
