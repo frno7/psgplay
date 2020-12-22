@@ -126,11 +126,12 @@ static int buffer_digital_sound_sample(const struct sound_sample *sample,
 	if (db->capacity <= db->count.sound)
 		err = digital_buffer_allocate(db);
 
-	if (!err) {
-		db->sample[db->count.sound].sound.left  = sample->left;
-		db->sample[db->count.sound].sound.right = sample->right;
-		db->count.sound++;
-	}
+	if (!err)
+		db->sample[db->count.sound++].sound =
+			(struct psgplay_digital_sound) {
+				.left  = sample->left,
+				.right = sample->right,
+			};
 
 	return err;
 }

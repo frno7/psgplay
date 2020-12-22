@@ -32,18 +32,23 @@ struct psgplay_digital_psg {
 };
 
 /**
+ * struct psgplay_digital_sound - digital sound sample
+ * @left: -32768..32767 level of left channel
+ * @right: -32768..32767 level of right channel
+ */
+struct psgplay_digital_sound {
+	int16_t left;
+	int16_t right;
+};
+
+/**
  * struct psgplay_digital - PSG play digital sample
  * @psg: YM2149 Programmable Sound Generator (PSG)
- * @sound: Atari STE sound device with 16-bit representation
- * @sound.left: -32768..32767 level of left channel
- * @sound.right: -32768..32767 level of right channel
+ * @sound: Atari STE sound with 16-bit representation
  */
 struct psgplay_digital {
 	struct psgplay_digital_psg psg;
-	struct {
-		int16_t left;
-		int16_t right;
-	} sound;
+	struct psgplay_digital_sound sound;
 };
 
 struct psgplay;		/* PSG play object */
