@@ -49,7 +49,7 @@ static struct machine_device {
 	for_each_device_state(machine_device_)				\
 		if (!(machine_device_)->machine_cycle_event) continue; else
 
-static bool valid_device_bus_address(u32 bus_address, const struct device *dev)
+bool valid_device_bus_address(u32 bus_address, const struct device *dev)
 {
 	return dev->bus.address <= bus_address &&
 		bus_address < dev->bus.address + dev->bus.size;

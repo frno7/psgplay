@@ -52,6 +52,8 @@ struct device {
 		u32 dev_address, char *buf, size_t size);
 };
 
+bool valid_device_bus_address(u32 bus_address, const struct device *dev);
+
 const struct device *device_for_bus_address(u32 bus_address);
 
 struct device_cycle device_cycle(const struct device *device);
