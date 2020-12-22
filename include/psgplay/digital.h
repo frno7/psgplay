@@ -6,6 +6,7 @@
 #ifndef PSGPLAY_DIGITAL_H
 #define PSGPLAY_DIGITAL_H
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -34,13 +35,49 @@ struct psgplay_digital_sound {
 };
 
 /**
+ * struct psgplay_digital_mixer_volume - digital mixer volume
+ * @main: main volume -80..0 dB
+ * @left: left volume -40..0 dB
+ * @right: right volume -40..0 dB
+ */
+struct psgplay_digital_mixer_volume {
+	int8_t main;
+	int8_t left;
+	int8_t right;
+};
+
+/**
+ * struct psgplay_digital_mixer_tone - digital mixer tone
+ * @bass: bass -12..12 dB
+ * @treble: treble -12..12 dB
+ */
+struct psgplay_digital_mixer_tone {
+	int8_t bass;
+	int8_t treble;
+};
+
+/**
+ * struct psgplay_digital_mixer - digital mixer
+ * @volume: main, left and right volumes
+ * @tone: bass and treble
+ * @mix: on true mix both PSG and sampled sound, on false only sampled sound
+ */
+struct psgplay_digital_mixer {
+	struct psgplay_digital_mixer_volume volume;
+	struct psgplay_digital_mixer_tone tone;
+	bool mix;
+};
+
+/**
  * struct psgplay_digital - PSG play digital sample
  * @psg: YM2149 Programmable Sound Generator (PSG)
  * @sound: Atari STE sound with 16-bit representation
+ * @mixer: Atari STE volume and tone mixer
  */
 struct psgplay_digital {
 	struct psgplay_digital_psg psg;
 	struct psgplay_digital_sound sound;
+	struct psgplay_digital_mixer mixer;
 };
 
 /**
