@@ -9,6 +9,7 @@
 #include "atari/bus.h"
 #include "atari/mfp.h"
 #include "atari/machine.h"
+#include "atari/mmu.h"
 #include "atari/mmu-trace.h"
 #include "atari/ram.h"
 #include "atari/rom.h"
@@ -31,6 +32,21 @@ static void mmu_bus_wait(const struct device *dev)
 
 	if (wait_cycles)
 		USE_CYCLES(wait_cycles);
+}
+
+s8 dma_read_memory_8(u32 bus_address)
+{
+	const struct device *dev = &ram_device;
+
+	if (!valid_device_bus_address(bus_address, dev))
+		return 0;
+
+	const u32 dev_address = bus_address - dev->bus.address;
+	const u8 value = dev->rd_u8(dev, dev_address);
+
+	mmu_trace_rd_u8(dev_address, value, dev);
+
+	return value;
 }
 
 u32 m68k_read_memory_8(u32 bus_address)
