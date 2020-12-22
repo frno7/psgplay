@@ -31,7 +31,9 @@ struct stereo_buffer {
 
 struct digital_buffer {
 	size_t index;
-	size_t count;
+	struct {
+		size_t psg;
+	} count;
 	size_t capacity;
 	struct psgplay_digital *sample;
 };
@@ -81,28 +83,37 @@ static int buffer_stereo_sample(s16 left, s16 right, struct stereo_buffer *sb)
 	return 0;
 }
 
-static int buffer_digital_sample(const struct psg_sample *sample,
-	struct digital_buffer *db)
+static int digital_buffer_allocate(struct digital_buffer *db)
 {
-	if (db->capacity <= db->count) {
-		const size_t capacity = db->capacity +
-			max_t(size_t, db->capacity, 1024);
+	const size_t capacity = db->capacity +
+		max_t(size_t, db->capacity, 1024);
 
-		void *sample = realloc(db->sample,
-			capacity * sizeof(*db->sample));
-		if (!sample)
-			return errno;
+	void *sample = realloc(db->sample, capacity * sizeof(*db->sample));
+	if (!sample)
+		return errno;
 
-		db->sample = sample;
-		db->capacity = capacity;
-	}
-
-	db->sample[db->count].psg.lva = sample->lva;
-	db->sample[db->count].psg.lvb = sample->lvb;
-	db->sample[db->count].psg.lvc = sample->lvc;
-	db->count++;
+	db->sample = sample;
+	db->capacity = capacity;
 
 	return 0;
+}
+
+static int buffer_digital_psg_sample(const struct psg_sample *sample,
+	struct digital_buffer *db)
+{
+	int err = 0;
+
+	if (db->capacity <= db->count.psg)
+		err = digital_buffer_allocate(db);
+
+	if (!err) {
+		db->sample[db->count.psg].psg.lva = sample->lva;
+		db->sample[db->count.psg].psg.lvb = sample->lvb;
+		db->sample[db->count.psg].psg.lvc = sample->lvc;
+		db->count.psg++;
+	}
+
+	return err;
 }
 
 static void psgplay_downsample(s16 left, s16 right, struct psgplay *pp)
@@ -182,7 +193,7 @@ static void psg_digital(const struct psg_sample *sample,
 
 	for (size_t i = 0; i < count; i++)
 		if (!pp->errno_)
-			pp->errno_ = buffer_digital_sample(
+			pp->errno_ = buffer_digital_psg_sample(
 				&sample[i], &pp->digital_buffer);
 }
 
@@ -225,6 +236,29 @@ struct psgplay *psgplay_init(const void *data, size_t size,
 	return pp;
 }
 
+static size_t digital_buffer_min_count(struct digital_buffer *db)
+{
+	return db->count.psg;
+}
+
+static size_t digital_buffer_max_count(struct digital_buffer *db)
+{
+	return db->count.psg;
+}
+
+static void digital_buffer_shift(struct digital_buffer *db)
+{
+	const size_t n = digital_buffer_max_count(db) - db->index;
+
+	if (n)
+		memmove(&db->sample[0], &db->sample[db->index],
+			n * sizeof(*db->sample));
+
+	db->count.psg -= db->index;
+
+	db->index = 0;
+}
+
 static ssize_t psgplay_read_digital__(struct psgplay *pp,
 	struct psgplay_digital *buffer, size_t count)
 {
@@ -236,11 +270,10 @@ static ssize_t psgplay_read_digital__(struct psgplay *pp,
 		pp->instruction_callback.arg);
 
 	while (index < count) {
-		if (db->index == db->count) {
-			db->index = 0;
-			db->count = 0;
+		if (db->index == digital_buffer_min_count(db)) {
+			digital_buffer_shift(db);
 
-			while (!db->count)
+			while (!digital_buffer_min_count(db))
 				if (pp->errno_) {
 					errno = pp->errno_;
 					return -1;
@@ -250,7 +283,8 @@ static ssize_t psgplay_read_digital__(struct psgplay *pp,
 				}
 		}
 
-		const size_t n = min(count - index, db->count - db->index);
+		const size_t n = min(count - index,
+			digital_buffer_min_count(db) - db->index);
 
 		if (buffer != NULL)
 			memcpy(&buffer[index], &db->sample[db->index],
