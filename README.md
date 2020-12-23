@@ -319,7 +319,7 @@ The [SNDH file format](https://github.com/frno7/psgplay/blob/master/doc/sndhv21.
 is an [Atari ST](https://en.wikipedia.org/wiki/Atari_ST)
 machine code executable form of music. A substantial part of Atari ST
 hardware must be emulated to play such files using other kinds of computers.
-The three most complex parts emulated in software by PSG play are:
+The five most complex parts emulated in software by PSG play are:
 
 - the [Motorola 68000](https://en.wikipedia.org/wiki/Motorola_68000)
   processor, via the [Musashi](https://github.com/kstenerud/Musashi) library
@@ -328,6 +328,13 @@ The three most complex parts emulated in software by PSG play are:
 - the [Programmable Sound Generator](https://en.wikipedia.org/wiki/Programmable_sound_generator)
   (PSG) [YM2149](https://en.wikipedia.org/wiki/General_Instrument_AY-3-8910)
   in [`lib/atari/psg.c`](https://github.com/frno7/psgplay/tree/master/lib/atari/psg.c);
+
+- the [DMA](https://en.wikipedia.org/wiki/Direct_memory_access) sound of the
+  [Atari STE](https://en.wikipedia.org/wiki/Atari_ST#STE_models)
+  in [`lib/atari/sound.c`](https://github.com/frno7/psgplay/tree/master/lib/atari/sound.c);
+
+- the mixer of the [Atari STE](https://en.wikipedia.org/wiki/Atari_ST#STE_models)
+  in [`lib/atari/mixer.c`](https://github.com/frno7/psgplay/tree/master/lib/atari/mixer.c);
 
 - the [MC68901](https://archive.org/details/Motorola_MC68901_MFP_undated)
   multifunction peripheral (MFP) timer and interrupt controller in
@@ -343,4 +350,4 @@ As described in issues
 [#10](https://github.com/frno7/psgplay/issues/10),
 DMA sound and LMC1992 for tone and volume control specific to
 [Atari STE](https://en.wikipedia.org/wiki/Atari_ST#STE_models)
-and related hardware are not yet emulated by PSG play.
+and related hardware are not yet fully emulated by PSG play.
