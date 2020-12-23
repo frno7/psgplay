@@ -22,6 +22,7 @@ struct machine_registers {
 struct machine_ports {
 	psg_sample_f psg_sample;
 	sound_sample_f sound_sample;
+	mixer_sample_f mixer_sample;
 	void *arg;
 };
 

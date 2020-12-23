@@ -13,6 +13,7 @@
 #include "atari/fdc.h"
 #include "atari/glue.h"
 #include "atari/machine.h"
+#include "atari/mixer.h"
 #include "atari/mfp.h"
 #include "atari/psg.h"
 #include "atari/ram.h"
@@ -32,6 +33,7 @@ static struct machine_device {
 	{ .device = &shifter_device },
 	{ .device = &psg_device     },
 	{ .device = &sound_device   },
+	{ .device = &mixer_device   },
 	{ .device = &fdc_device     },
 	{ .device = &cpu_device     },
 };

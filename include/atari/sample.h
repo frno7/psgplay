@@ -25,4 +25,20 @@ struct sound_sample {
 typedef void (*sound_sample_f)(
 	const struct sound_sample *sample, size_t count, void *arg);
 
+struct mixer_sample {
+	struct {
+		s8 main;
+		s8 left;
+		s8 right;
+	} volume;
+	struct {
+		s8 bass;
+		s8 treble;
+	} tone;
+	bool mix;
+};
+
+typedef void (*mixer_sample_f)(
+	const struct mixer_sample *sample, size_t count, void *arg);
+
 #endif /* ATARI_SAMPLE_H */

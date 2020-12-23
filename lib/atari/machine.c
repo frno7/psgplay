@@ -14,6 +14,7 @@
 #include "atari/device.h"
 #include "atari/glue.h"
 #include "atari/machine.h"
+#include "atari/mixer.h"
 #include "atari/psg.h"
 #include "atari/ram.h"
 #include "atari/sound.h"
@@ -91,6 +92,7 @@ static void atari_st_init(const void *prg, size_t size, size_t offset,
 
 	psg_sample(ports->psg_sample, ports->arg);
 	sound_sample(ports->sound_sample, ports->arg);
+	mixer_sample(ports->mixer_sample, ports->arg);
 }
 
 static bool atari_st_run(void)
