@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-2.0
+// SPDX-License-Identifier: LGPL-2.1
 
 #ifndef _TOSLIBC_TOS_REGION_H
 #define _TOSLIBC_TOS_REGION_H

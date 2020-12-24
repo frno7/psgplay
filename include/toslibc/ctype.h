@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-2.0
+// SPDX-License-Identifier: LGPL-2.1
 
 #ifndef TOSLIBC_CTYPE_H
 #define TOSLIBC_CTYPE_H
