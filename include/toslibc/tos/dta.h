@@ -20,11 +20,11 @@
  * @name: filename
  */
 struct _dta {
-	u8 reserved[21];
-	u8 attribute;
-	u16 time;
-	u16 date;
-	u32 size;
+	uint8_t reserved[21];
+	uint8_t attribute;
+	uint16_t time;
+	uint16_t date;
+	uint32_t size;
 	char name[14];
 };
 

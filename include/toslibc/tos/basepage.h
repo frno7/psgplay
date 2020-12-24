@@ -17,7 +17,7 @@ struct _tpa {
 
 struct _segment {
 	void *base;	/* Base address of segment */
-	u32 size;	/* Size of segment in bytes */
+	uint32_t size;	/* Size of segment in bytes */
 };
 
 struct _basepage {
@@ -29,9 +29,9 @@ struct _basepage {
 	struct _basepage *parent;
 	void *reserved;
 	char *env;
-	u8 unused[8];
-	u32 undefined[18];
-	u8 cmdlen;
+	uint8_t unused[8];
+	uint32_t undefined[18];
+	uint8_t cmdlen;
 	char cmd[127];
 };
 

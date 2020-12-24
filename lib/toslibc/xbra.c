@@ -19,7 +19,7 @@ struct xbra {
 
 struct xbra_arg {
 	void * const f;
-	const u32 vector;
+	const uint32_t vector;
 	const char *cookie;
 };
 
@@ -55,7 +55,7 @@ static void ___xbra_exit(void *arg)
 {
 	struct xbra_arg *xbra_arg = arg;
 	struct xbra *xbra = xbra_from_f(xbra_arg->f);
-	const u32 vector = xbra_arg->vector;
+	const uint32_t vector = xbra_arg->vector;
 	const char *cookie = xbra_arg->cookie;
 
 	if (!xbra_id_match(xbra))
@@ -74,7 +74,7 @@ static void ___xbra_exit(void *arg)
 		}
 }
 
-void __xbra_exit(u32 vector, const char cookie[5])
+void __xbra_exit(uint32_t vector, const char cookie[5])
 {
 	BUILD_BUG_ON(sizeof(struct xbra) != 12);
 

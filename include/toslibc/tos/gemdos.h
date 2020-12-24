@@ -21,9 +21,9 @@
  * @day: day
  */
 struct _date {
-	__BITFIELD_FIELD(u16 year : 7,
-	__BITFIELD_FIELD(u16 month : 4,
-	__BITFIELD_FIELD(u16 day : 5,
+	__BITFIELD_FIELD(uint16_t year : 7,
+	__BITFIELD_FIELD(uint16_t month : 4,
+	__BITFIELD_FIELD(uint16_t day : 5,
 	;)))
 };
 
@@ -34,9 +34,9 @@ struct _date {
  * @second: second divided by 2
  */
 struct _time {
-	__BITFIELD_FIELD(u16 hour : 5,
-	__BITFIELD_FIELD(u16 minute : 6,
-	__BITFIELD_FIELD(u16 second : 5,
+	__BITFIELD_FIELD(uint16_t hour : 5,
+	__BITFIELD_FIELD(uint16_t minute : 6,
+	__BITFIELD_FIELD(uint16_t second : 5,
 	;)))
 };
 

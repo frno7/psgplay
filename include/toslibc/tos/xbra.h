@@ -57,6 +57,6 @@ __asm__ (								\
 "	.popsection\n"							\
 )
 
-void __xbra_exit(u32 vector, const char cookie[5]);
+void __xbra_exit(uint32_t vector, const char cookie[5]);
 
 #endif /* _TOSLIBC_TOS_XBRA_H */

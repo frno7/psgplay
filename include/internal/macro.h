@@ -26,7 +26,7 @@
 #define DIV_ROUND_CLOSEST_U32(x_, divisor_)(				\
 {									\
 	const typeof(divisor_) __d = divisor_;				\
-	const u32 _tmp = (x_) + (__d / 2);				\
+	const uint32_t _tmp = (x_) + (__d / 2);				\
 	_tmp / __d;							\
 }									\
 )
