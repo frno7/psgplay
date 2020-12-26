@@ -9,6 +9,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "internal/macro.h"
 #include "internal/types.h"
 
 #include "dta.h"

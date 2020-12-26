@@ -62,4 +62,8 @@
 
 #define __mode(x) __attribute__((__mode__(x)))
 
+#ifdef _TOSLIBC_SOURCE
+#define __NORETURN NORETURN
+#endif /* _TOSLIBC_SOURCE */
+
 #endif /* INTERNAL_MACRO_H */
