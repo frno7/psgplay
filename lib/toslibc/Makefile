@@ -15,6 +15,7 @@ TOSLIBC_S_SRC +=							\
 	lib/toslibc/__mulsi3.S
 
 TOSLIBC_C_SRC +=							\
+	lib/toslibc/aes.c						\
 	lib/toslibc/close.c						\
 	lib/toslibc/ctype.c						\
 	lib/toslibc/dprintf.c						\
