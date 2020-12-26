@@ -11,6 +11,7 @@ TOSLIBC_S_SRC +=							\
 	lib/toslibc/bios.S						\
 	lib/toslibc/gemdos.S						\
 	lib/toslibc/xbios.S						\
+	lib/toslibc/xgemdos.S						\
 	lib/toslibc/__mulsi3.S
 
 TOSLIBC_C_SRC +=							\
