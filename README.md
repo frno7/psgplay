@@ -104,7 +104,8 @@ or is compiled for Mac OS, or the options `-o`, `--output`, `--start`,
 
 ## Library form
 
-The PSG play shared library is compiled into `lib/psgplay/psgplay.so`. The
+PSG play is compiled into the static library
+`lib/psgplay/psgplay.a` and the shared library `lib/psgplay/psgplay.so`. The
 [application programming interface](https://en.wikipedia.org/wiki/Application_programming_interface)
 (API) is documented in
 [`include/psgplay/psgplay.h`](https://github.com/frno7/psgplay/blob/master/include/psgplay/psgplay.h),
