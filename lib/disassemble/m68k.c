@@ -45,7 +45,6 @@ enum bfd_architecture
   bfd_arch_unknown,    /* File arch not known */
   bfd_arch_m68k,       /* Motorola 68xxx */
 #define bfd_mach_m68000 1
-#define bfd_mach_m68008 2
   bfd_arch_last
   };
 
@@ -131,7 +130,6 @@ typedef struct disassemble_info {
 /* These are used as bit flags for the arch field in the m68k_opcode structure. */
 #define	_m68k_undef  0
 #define	m68000   0x001
-#define	m68008   m68000 /* Synonym for -m68000.  otherwise unused.  */
 
 /* Handy aliases.  */
 #define	m68000up   (m68000)
@@ -1791,9 +1789,6 @@ print_insn_m68k (bfd_vma memaddr, disassemble_info *info)
       break;
     case bfd_mach_m68000:
       arch_mask = m68000;
-      break;
-    case bfd_mach_m68008:
-      arch_mask = m68008;
       break;
     }
 
