@@ -49,7 +49,6 @@ enum bfd_architecture
 #define bfd_mach_m68010 3
 #define bfd_mach_m68020 4
 #define bfd_mach_m68030 5
-#define bfd_mach_m68040 6
   bfd_arch_last
   };
 
@@ -139,11 +138,9 @@ typedef struct disassemble_info {
 #define	m68010   0x002
 #define	m68020   0x004
 #define	m68030   0x008
-#define	m68040   0x010
 
 /* Handy aliases.  */
-#define	m68040up   (m68040)
-#define	m68030up   (m68030 | m68040up)
+#define	m68030up   (m68030)
 #define	m68020up   (m68020 | m68030up)
 #define	m68010up   (m68010 | m68020up)
 #define	m68000up   (m68000 | m68010up)
@@ -1816,9 +1813,6 @@ print_insn_m68k (bfd_vma memaddr, disassemble_info *info)
     case bfd_mach_m68030:
       arch_mask = m68030;
       break;
-    case bfd_mach_m68040:
-      arch_mask = m68040;
-      break;
     }
 
   fetch_data(info, buffer + 2);
@@ -2094,22 +2088,6 @@ const struct m68k_opcode m68k_opcodes[] =
 {"chkl", 2,	one(0040400),		one(0170700), ";lDd", m68000up },
 {"chkw", 2,	one(0040600),		one(0170700), ";wDd", m68000up },
 
-#define SCOPE_LINE (0x1 << 3)
-#define SCOPE_PAGE (0x2 << 3)
-#define SCOPE_ALL  (0x3 << 3)
-
-{"cinva", 2,	one(0xf400|SCOPE_ALL),  one(0xff38), "ce",   m68040up },
-{"cinvl", 2,	one(0xf400|SCOPE_LINE), one(0xff38), "ceas", m68040up },
-{"cinvp", 2,	one(0xf400|SCOPE_PAGE), one(0xff38), "ceas", m68040up },
-
-{"cpusha", 2,	one(0xf420|SCOPE_ALL),  one(0xff38), "ce",   m68040up },
-{"cpushl", 2,	one(0xf420|SCOPE_LINE), one(0xff38), "ceas", m68040up },
-{"cpushp", 2,	one(0xf420|SCOPE_PAGE), one(0xff38), "ceas", m68040up },
-
-#undef SCOPE_LINE
-#undef SCOPE_PAGE
-#undef SCOPE_ALL
-
 {"clrb", 2,	one(0041000),	one(0177700), "$s", m68000up },
 {"clrw", 2,	one(0041100),	one(0177700), "$s", m68000up },
 {"clrl", 2,	one(0041200),	one(0177700), "$s", m68000up },
@@ -2297,12 +2275,6 @@ const struct m68k_opcode m68k_opcodes[] =
 {"movesl", 4,	two(0007200, 0),     two(0177700, 07777), "~sR1", m68010up },
 {"movesl", 4,	two(0007200, 04000), two(0177700, 07777), "R1~s", m68010up },
 
-{"move16", 4,	two(0xf620, 0x8000), two(0xfff8, 0x8fff), "+s+1", m68040up },
-{"move16", 2,	one(0xf600),		one(0xfff8), "+s_L", m68040up },
-{"move16", 2,	one(0xf608),		one(0xfff8), "_L+s", m68040up },
-{"move16", 2,	one(0xf610),		one(0xfff8), "as_L", m68040up },
-{"move16", 2,	one(0xf618),		one(0xfff8), "_Las", m68040up },
-
 {"mulsw", 2,	one(0140700),		one(0170700), ";wDd", m68000up },
 {"mulsl", 4,	two(0046000,004000), two(0177700,0107770), ";lD1", m68020up },
 {"mulsl", 4,	two(0046000,006000), two(0177700,0107770), ";lD3D1",m68020up },
@@ -2359,7 +2331,6 @@ const struct m68k_opcode m68k_opcodes[] =
 
 {"pea", 2,	one(0044100),		one(0177700), "!s", m68000up },
 
-{"pflusha", 2,	one(0xf518),		one(0xfff8), "", m68040up },
 {"pflusha", 4,	two(0xf000,0x2400), two(0xffff,0xffff), "", m68030 },
 
 {"pflush", 4,   two(0xf000,0x3010), two(0xffc0,0xfe10), "T3T9", m68030 },
@@ -2368,12 +2339,6 @@ const struct m68k_opcode m68k_opcodes[] =
 {"pflush", 4,   two(0xf000,0x3808), two(0xffc0,0xfe18), "D3T9&s", m68030 },
 {"pflush", 4,   two(0xf000,0x3000), two(0xffc0,0xfe1e), "f3T9", m68030 },
 {"pflush", 4,   two(0xf000,0x3800), two(0xffc0,0xfe1e), "f3T9&s", m68030 },
-{"pflush", 2,	one(0xf508),		one(0xfff8), "as", m68040up },
-{"pflush", 2,	one(0xf508),		one(0xfff8), "As", m68040up },
-
-{"pflushan", 2,	one(0xf510),		one(0xfff8), "", m68040up },
-{"pflushn", 2,	one(0xf500),		one(0xfff8), "as", m68040up },
-{"pflushn", 2,	one(0xf500),		one(0xfff8), "As", m68040up },
 
 {"ploadr", 4,   two(0xf000,0x2210), two(0xffc0,0xfff0), "T3&s", m68030 },
 {"ploadr", 4,   two(0xf000,0x2208), two(0xffc0,0xfff8), "D3&s", m68030 },
@@ -2401,7 +2366,6 @@ const struct m68k_opcode m68k_opcodes[] =
 {"ptestr", 4, 	two(0xf000,0x8308), two(0xffc0,0xe318), "D3&st8A9", m68030 },
 {"ptestr", 4, 	two(0xf000,0x8200), two(0xffc0,0xe3fe), "f3&st8", m68030 },
 {"ptestr", 4, 	two(0xf000,0x8300), two(0xffc0,0xe31e), "f3&st8A9", m68030 },
-{"ptestr", 2,	one(0xf568),		one(0xfff8), "as", m68040 },
 
 {"ptestw", 4, 	two(0xf000,0x8010), two(0xffc0,0xe3f0), "T3&st8", m68030 },
 {"ptestw", 4, 	two(0xf000,0x8110), two(0xffc0,0xe310), "T3&st8A9", m68030 },
@@ -2409,7 +2373,6 @@ const struct m68k_opcode m68k_opcodes[] =
 {"ptestw", 4, 	two(0xf000,0x8108), two(0xffc0,0xe318), "D3&st8A9", m68030 },
 {"ptestw", 4, 	two(0xf000,0x8000), two(0xffc0,0xe3fe), "f3&st8", m68030 },
 {"ptestw", 4, 	two(0xf000,0x8100), two(0xffc0,0xe31e), "f3&st8A9", m68030 },
-{"ptestw", 2,	one(0xf548),		one(0xfff8), "as", m68040 },
 
 {"reset", 2,	one(0047160),		one(0177777), "", m68000up },
 
