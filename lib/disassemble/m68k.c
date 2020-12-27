@@ -48,7 +48,6 @@ enum bfd_architecture
 #define bfd_mach_m68008 2
 #define bfd_mach_m68010 3
 #define bfd_mach_m68020 4
-#define bfd_mach_m68030 5
   bfd_arch_last
   };
 
@@ -137,11 +136,9 @@ typedef struct disassemble_info {
 #define	m68008   m68000 /* Synonym for -m68000.  otherwise unused.  */
 #define	m68010   0x002
 #define	m68020   0x004
-#define	m68030   0x008
 
 /* Handy aliases.  */
-#define	m68030up   (m68030)
-#define	m68020up   (m68020 | m68030up)
+#define	m68020up   (m68020)
 #define	m68010up   (m68010 | m68020up)
 #define	m68000up   (m68000 | m68010up)
 
@@ -1810,9 +1807,6 @@ print_insn_m68k (bfd_vma memaddr, disassemble_info *info)
     case bfd_mach_m68020:
       arch_mask = m68020;
       break;
-    case bfd_mach_m68030:
-      arch_mask = m68030;
-      break;
     }
 
   fetch_data(info, buffer + 2);
@@ -2330,49 +2324,6 @@ const struct m68k_opcode m68k_opcodes[] =
 {"pack", 4,	one(0100510),	one(0170770), "-s-d#w", m68020up },
 
 {"pea", 2,	one(0044100),		one(0177700), "!s", m68000up },
-
-{"pflusha", 4,	two(0xf000,0x2400), two(0xffff,0xffff), "", m68030 },
-
-{"pflush", 4,   two(0xf000,0x3010), two(0xffc0,0xfe10), "T3T9", m68030 },
-{"pflush", 4,   two(0xf000,0x3810), two(0xffc0,0xfe10), "T3T9&s", m68030 },
-{"pflush", 4,   two(0xf000,0x3008), two(0xffc0,0xfe18), "D3T9", m68030 },
-{"pflush", 4,   two(0xf000,0x3808), two(0xffc0,0xfe18), "D3T9&s", m68030 },
-{"pflush", 4,   two(0xf000,0x3000), two(0xffc0,0xfe1e), "f3T9", m68030 },
-{"pflush", 4,   two(0xf000,0x3800), two(0xffc0,0xfe1e), "f3T9&s", m68030 },
-
-{"ploadr", 4,   two(0xf000,0x2210), two(0xffc0,0xfff0), "T3&s", m68030 },
-{"ploadr", 4,   two(0xf000,0x2208), two(0xffc0,0xfff8), "D3&s", m68030 },
-{"ploadr", 4,   two(0xf000,0x2200), two(0xffc0,0xfffe), "f3&s", m68030 },
-{"ploadw", 4,   two(0xf000,0x2010), two(0xffc0,0xfff0), "T3&s", m68030 },
-{"ploadw", 4,   two(0xf000,0x2008), two(0xffc0,0xfff8), "D3&s", m68030 },
-{"ploadw", 4,   two(0xf000,0x2000), two(0xffc0,0xfffe), "f3&s", m68030 },
-
-{"pmove", 4,    two(0xf000,0x4000), two(0xffc0,0xffff), "*l08", m68030 },
-{"pmove", 4,    two(0xf000,0x4200), two(0xffc0,0xffff), "08%s", m68030 },
-{"pmove", 4,    two(0xf000,0x4000), two(0xffc0,0xe3ff), "|sW8", m68030 },
-{"pmove", 4,    two(0xf000,0x4200), two(0xffc0,0xe3ff), "W8~s", m68030 },
-{"pmove", 4,    two(0xf000,0x6000), two(0xffc0,0xffff), "*wY8", m68030 },
-{"pmove", 4,    two(0xf000,0x6200), two(0xffc0,0xffff), "Y8%s", m68030 },
-{"pmove", 4,    two(0xf000,0x0800), two(0xffc0,0xfbff), "*l38", m68030 },
-{"pmove", 4,    two(0xf000,0x0a00), two(0xffc0,0xfbff), "38%s", m68030 },
-
-{"pmovefd", 4,	two(0xf000, 0x4100),	two(0xffc0, 0xe3ff), "*l08", m68030 },
-{"pmovefd", 4,	two(0xf000, 0x4100),	two(0xffc0, 0xe3ff), "|sW8", m68030 },
-{"pmovefd", 4,	two(0xf000, 0x0900),	two(0xffc0, 0xfbff), "*l38", m68030 },
-
-{"ptestr", 4, 	two(0xf000,0x8210), two(0xffc0, 0xe3f0), "T3&st8", m68030 },
-{"ptestr", 4, 	two(0xf000,0x8310), two(0xffc0,0xe310), "T3&st8A9", m68030 },
-{"ptestr", 4, 	two(0xf000,0x8208), two(0xffc0,0xe3f8), "D3&st8", m68030 },
-{"ptestr", 4, 	two(0xf000,0x8308), two(0xffc0,0xe318), "D3&st8A9", m68030 },
-{"ptestr", 4, 	two(0xf000,0x8200), two(0xffc0,0xe3fe), "f3&st8", m68030 },
-{"ptestr", 4, 	two(0xf000,0x8300), two(0xffc0,0xe31e), "f3&st8A9", m68030 },
-
-{"ptestw", 4, 	two(0xf000,0x8010), two(0xffc0,0xe3f0), "T3&st8", m68030 },
-{"ptestw", 4, 	two(0xf000,0x8110), two(0xffc0,0xe310), "T3&st8A9", m68030 },
-{"ptestw", 4, 	two(0xf000,0x8008), two(0xffc0,0xe3f8), "D3&st8", m68030 },
-{"ptestw", 4, 	two(0xf000,0x8108), two(0xffc0,0xe318), "D3&st8A9", m68030 },
-{"ptestw", 4, 	two(0xf000,0x8000), two(0xffc0,0xe3fe), "f3&st8", m68030 },
-{"ptestw", 4, 	two(0xf000,0x8100), two(0xffc0,0xe31e), "f3&st8A9", m68030 },
 
 {"reset", 2,	one(0047160),		one(0177777), "", m68000up },
 
