@@ -22,7 +22,7 @@ void __attribute__((__noreturn__)) exit(int status)
 
 int atexit(void (*function)(void))
 {
-	if (__atexit_list_count >= ARRAY_SIZE(__atexit_list))
+	if (__atexit_list_count >= __ARRAY_SIZE(__atexit_list))
 		return -1;
 
 	__atexit_list[__atexit_list_count++] = function;
