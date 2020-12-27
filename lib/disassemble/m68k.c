@@ -102,23 +102,24 @@ typedef struct disassemble_info {
 
 } disassemble_info;
 
-/* The structure used to hold information for an opcode.  */
-
+/**
+ * struct m68k_opcode - structure used to hold information for an opcode
+ * @name: the opcode name
+ * @size: the pseudo-size of the instruction (in bytes) used to determine
+ *	number of bytes necessary to disassemble the instruction
+ * @opcode: the opcode itself
+ * @match: the mask used by the disassembler
+ * @args: the arguments
+ * @insn_type: instruction type
+ */
 struct m68k_opcode
 {
-  /* The opcode name.  */
-  const char *name;
-  /* The pseudo-size of the instruction(in bytes).  Used to determine
-     number of bytes necessary to disassemble the instruction.  */
-  unsigned int size;
-  /* The opcode itself.  */
-  unsigned long opcode;
-  /* The mask used by the disassembler.  */
-  unsigned long match;
-  /* The arguments.  */
-  const char *args;
-  /* Instruction type.  */
-  enum m68k_insn_type insn_type;
+	const char *name;
+	unsigned int size;
+	unsigned long opcode;
+	unsigned long match;
+	const char *args;
+	enum m68k_insn_type insn_type;
 };
 
 /* We store four bytes of opcode for all opcodes because that is the
