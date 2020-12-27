@@ -200,35 +200,6 @@ struct m68k_opcode
 
    s  System Control register for the floating point coprocessor.
 
-   J  Misc register for movec instruction, stored in 'j' format.
-	Possible values:
-	0x000	SFC	Source Function Code reg	[60, 40, 30, 20, 10]
-	0x001	DFC	Data Function Code reg		[60, 40, 30, 20, 10]
-	0x002   CACR    Cache Control Register          [60, 40, 30, 20]
-	0x003	TC	MMU Translation Control		[60, 40]
-	0x004	ITT0	Instruction Transparent
-				Translation reg 0	[60, 40]
-	0x005	ITT1	Instruction Transparent
-				Translation reg 1	[60, 40]
-	0x006	DTT0	Data Transparent
-				Translation reg 0	[60, 40]
-	0x007	DTT1	Data Transparent
-				Translation reg 1	[60, 40]
-	0x008	BUSCR	Bus Control Register		[60]
-	0x800	USP	User Stack Pointer		[60, 40, 30, 20, 10]
-        0x801   VBR     Vector Base reg                 [60, 40, 30, 20, 10]
-	0x802	CAAR	Cache Address Register		[        30, 20]
-	0x803	MSP	Master Stack Pointer		[    40, 30, 20]
-	0x804	ISP	Interrupt Stack Pointer		[    40, 30, 20]
-	0x805	MMUSR	MMU Status reg			[    40]
-	0x806	URP	User Root Pointer		[60, 40]
-	0x807	SRP	Supervisor Root Pointer		[60, 40]
-	0x808	PCR	Processor Configuration reg	[60]
-	0xC00	ROMBAR	ROM Base Address Register	[520X]
-	0xC04	RAMBAR0	RAM Base Address Register 0	[520X]
-	0xC05	RAMBAR1	RAM Base Address Register 0	[520X]
-	0xC0F	MBAR0	RAM Base Address Register 0	[520X]
-
     L  Register list of the type d0-d7/a0-a7 etc.
        (New!  Improved!  Can also hold fp0-fp7, as well!)
        The assembler tries to see if the registers match the insn by
@@ -374,7 +345,6 @@ struct m68k_opcode
       Also used for dynamic fmovem instruction.
    C  floating point coprocessor constant - 7 bits.  Also used for static
       K-factors...
-   j  Movec register #, stored in 12 low bits of second word.
    m  For M[S]ACx; 4 bits split with MSB shifted 6 bits in first word
       and remaining 3 bits of register shifted 9 bits in first word.
       Indicate upper/lower in 1 bit shifted 7 bits in second word.
@@ -614,7 +584,6 @@ fetch_arg (unsigned char *buffer,
       break;
 
     case '3':
-    case 'j':
       fetch_data(info, buffer + 3);
       val = (buffer[2] << 8) + buffer[3];
       break;
@@ -964,35 +933,6 @@ print_insn_arg (const char *d,
 
     case 'H':
       (*info->fprintf_func) (info->stream, "%%mask");
-      break;
-
-    case 'J':
-      {
-	/* FIXME: There's a problem here, different m68k processors call the
-	   same address different names. This table can't get it right
-	   because it doesn't know which processor it's disassembling for.  */
-	static const struct { const char *name; int value; } names[]
-	  = {{"%sfc", 0x000}, {"%dfc", 0x001}, {"%cacr", 0x002},
-	     {"%tc",  0x003}, {"%itt0",0x004}, {"%itt1", 0x005},
-             {"%dtt0",0x006}, {"%dtt1",0x007}, {"%buscr",0x008},
-	     {"%usp", 0x800}, {"%vbr", 0x801}, {"%caar", 0x802},
-	     {"%msp", 0x803}, {"%isp", 0x804},
-
-	     /* Should we be calling this psr like we do in case 'Y'?  */
-	     {"%mmusr",0x805},
-
-             {"%urp", 0x806}, {"%srp", 0x807}, {"%pcr", 0x808}};
-
-	val = fetch_arg (buffer, place, 12, info);
-	for (regno = sizeof names / sizeof names[0] - 1; regno >= 0; regno--)
-	  if (names[regno].value == val)
-	    {
-	      (*info->fprintf_func) (info->stream, "%s", names[regno].name);
-	      break;
-	    }
-	if (regno < 0)
-	  (*info->fprintf_func) (info->stream, "%d", val);
-      }
       break;
 
     case 'Q':
