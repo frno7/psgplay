@@ -78,12 +78,6 @@ typedef struct disassemble_info {
   bfd_vma buffer_vma;
   int buffer_length;
 
-  /* This variable may be set by the instruction decoder.  It suggests
-      the number of bytes objdump should display on a single line.  If
-      the instruction decoder sets this, it should always set it to
-      the same value in order to get reasonable looking output.  */
-  int bytes_per_line;
-
   /* Results from instruction decoders.  Not all decoders yet support
      this information.  This info is set each time an instruction is
      decoded, and is only valid for the last such instruction.
@@ -2020,9 +2014,6 @@ print_insn_m68k (bfd_vma memaddr, disassemble_info *info)
     }
 
   info->private_data = (void *)&priv;
-  /* Tell objdump to use two bytes per chunk
-     and six bytes per line for displaying raw data.  */
-  info->bytes_per_line = 6;
   priv.max_fetched = priv.the_buffer;
   priv.insn_start = memaddr;
 
