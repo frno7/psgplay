@@ -34,19 +34,7 @@ struct insn_memory {
 	uint32_t address;
 };
 
-enum bfd_flavour {
-  bfd_target_unknown_flavour
-};
-
-enum bfd_endian { BFD_ENDIAN_BIG, BFD_ENDIAN_LITTLE, BFD_ENDIAN_UNKNOWN };
-
-enum bfd_architecture
-{
-  bfd_arch_unknown,    /* File arch not known */
-  bfd_arch_m68k,       /* Motorola 68xxx */
 #define bfd_mach_m68000 1
-  bfd_arch_last
-  };
 
 /* This struct is passed into the instruction decoding routine,
    and is passed back out into each callback.  The various fields are used
@@ -66,9 +54,8 @@ typedef struct disassemble_info {
   /* Target description.  We could replace this with a pointer to the bfd,
      but that would require one.  There currently isn't any such requirement
      so to avoid introducing one we record these explicitly.  */
-  /* The bfd_flavour.  This can be bfd_target_unknown_flavour.  */
   /* The bfd_arch value.  */
-  enum bfd_architecture arch;
+  unsigned int arch;
   /* The bfd_mach value.  */
   unsigned long mach;
 
