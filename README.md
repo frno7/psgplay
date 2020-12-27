@@ -111,15 +111,16 @@ The PSG play shared library is compiled into `lib/psgplay/psgplay.so`. The
 [`include/psgplay/sndh.h`](https://github.com/frno7/psgplay/blob/master/include/psgplay/sndh.h) and
 [`include/psgplay/version.h`](https://github.com/frno7/psgplay/blob/master/include/psgplay/version.h).
 
+The library also supplies an unaltered 250 kHz digital form for custom
+analogue filters and mixers. This digital interface is documented in
+[`include/psgplay/digital.h`](https://github.com/frno7/psgplay/blob/master/include/psgplay/digital.h).
+
 There are two simple examples on how to use the PSG play library:
 
 - [`lib/psgplay/example-info.c`](https://github.com/frno7/psgplay/blob/master/lib/psgplay/example-info.c)
   is an example on how to display SNDH tags;
 - [`lib/psgplay/example-play.c`](https://github.com/frno7/psgplay/blob/master/lib/psgplay/example-play.c)
   is an example on how to play an SNDH file in 44.1 kHz stereo.
-
-The library also supplies an unaltered 250 kHz digital form for custom
-analogue filters and mixers.
 
 ## Disassembly
 
@@ -333,7 +334,7 @@ The five most complex parts emulated in software by PSG play are:
   [Atari STE](https://en.wikipedia.org/wiki/Atari_ST#STE_models)
   in [`lib/atari/sound.c`](https://github.com/frno7/psgplay/tree/master/lib/atari/sound.c);
 
-- the mixer of the [Atari STE](https://en.wikipedia.org/wiki/Atari_ST#STE_models)
+- the LMC1992 mixer of the [Atari STE](https://en.wikipedia.org/wiki/Atari_ST#STE_models)
   in [`lib/atari/mixer.c`](https://github.com/frno7/psgplay/tree/master/lib/atari/mixer.c);
 
 - the [MC68901](https://archive.org/details/Motorola_MC68901_MFP_undated)
