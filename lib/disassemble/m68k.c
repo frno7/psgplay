@@ -19,7 +19,6 @@
 
 typedef uint64_t bfd_vma;
 typedef int64_t bfd_signed_vma;
-typedef uint8_t bfd_byte;
 #define sprintf_vma(s,x) sprintf (s, "%0" PRIx64, x)
 #define snprintf_vma(s,ss,x) snprintf (s, ss, "%0" PRIx64, x)
 
@@ -65,7 +64,7 @@ typedef struct disassemble_info {
      INFO is a pointer to this struct.
      Returns an errno value or 0 for success.  */
   int (*read_memory_func)
-    (bfd_vma memaddr, bfd_byte *myaddr, int length,
+    (bfd_vma memaddr, uint8_t *myaddr, int length,
 	     struct disassemble_info *info);
 
   /* Function which should be called if we get an error that we can't
@@ -84,7 +83,7 @@ typedef struct disassemble_info {
     (void *arg, uint32_t address);
 
   /* These are for buffer_read_memory.  */
-  bfd_byte *buffer;
+  uint8_t *buffer;
   bfd_vma buffer_vma;
   int buffer_length;
 
@@ -483,8 +482,8 @@ static const char *const reg_half_names[] =
 struct private
 {
   /* Points to first byte not fetched.  */
-  bfd_byte *max_fetched;
-  bfd_byte the_buffer[MAXLEN];
+  uint8_t *max_fetched;
+  uint8_t the_buffer[MAXLEN];
   bfd_vma insn_start;
   sigjmp_buf bailout;
 };
@@ -493,7 +492,7 @@ struct private
    to ADDR (exclusive) are valid.  Returns 1 for success, longjmps
    on error.  */
 static int
-fetch_data2(struct disassemble_info *info, bfd_byte *addr)
+fetch_data2(struct disassemble_info *info, uint8_t *addr)
 {
   int status;
   struct private *priv = (struct private *)info->private_data;
@@ -514,7 +513,7 @@ fetch_data2(struct disassemble_info *info, bfd_byte *addr)
 }
 
 static int
-fetch_data(struct disassemble_info *info, bfd_byte *addr)
+fetch_data(struct disassemble_info *info, uint8_t *addr)
 {
     if (addr <= ((struct private *) (info->private_data))->max_fetched) {
         return 1;
@@ -1577,7 +1576,7 @@ match_insn_m68k (bfd_vma memaddr,
   unsigned char *p;
   const char *d;
 
-  bfd_byte *buffer = priv->the_buffer;
+  uint8_t *buffer = priv->the_buffer;
   fprintf_function save_printer = info->fprintf_func;
   void (* save_print_address) (bfd_vma, struct disassemble_info *)
     = info->print_address_func;
@@ -1721,7 +1720,7 @@ print_insn_m68k (bfd_vma memaddr, disassemble_info *info)
   const char *d;
   unsigned int arch_mask;
   struct private priv;
-  bfd_byte *buffer = priv.the_buffer;
+  uint8_t *buffer = priv.the_buffer;
   int major_opcode;
   static int numopcodes[16];
   static const struct m68k_opcode **opcodes[16];
@@ -2331,7 +2330,7 @@ const struct m68k_opcode m68k_opcodes[] =
 
 const int m68k_numopcodes = sizeof m68k_opcodes / sizeof m68k_opcodes[0];
 
-static int read_buffer(bfd_vma memaddr, bfd_byte *myaddr,
+static int read_buffer(bfd_vma memaddr, uint8_t *myaddr,
 	int length, struct disassemble_info *info)
 {
 	const size_t offset = memaddr - info->insn_memory->address;
