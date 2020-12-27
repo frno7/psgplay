@@ -50,7 +50,6 @@ enum bfd_architecture
 #define bfd_mach_m68020 4
 #define bfd_mach_m68030 5
 #define bfd_mach_m68040 6
-#define bfd_mach_m68060 7
   bfd_arch_last
   };
 
@@ -140,14 +139,10 @@ typedef struct disassemble_info {
 #define	m68010   0x002
 #define	m68020   0x004
 #define	m68030   0x008
-#define m68ec030 m68030 /* Similar enough to -m68030 to ignore differences;
-			   gas will deal with the few differences.  */
 #define	m68040   0x010
-/* There is no 68050.  */
-#define m68060   0x020
 
 /* Handy aliases.  */
-#define	m68040up   (m68040 | m68060)
+#define	m68040up   (m68040)
 #define	m68030up   (m68030 | m68040up)
 #define	m68020up   (m68020 | m68030up)
 #define	m68010up   (m68010 | m68020up)
@@ -1824,9 +1819,6 @@ print_insn_m68k (bfd_vma memaddr, disassemble_info *info)
     case bfd_mach_m68040:
       arch_mask = m68040;
       break;
-    case bfd_mach_m68060:
-      arch_mask = m68060;
-      break;
     }
 
   fetch_data(info, buffer + 2);
@@ -2213,8 +2205,6 @@ const struct m68k_opcode m68k_opcodes[] =
 {"extl", 2,	one(0044300),	one(0177770), "Ds", m68000up },
 {"extbl", 2,	one(0044700),	one(0177770), "Ds", m68020up },
 
-{"halt", 2,	one(0045310),	one(0177777), "",   m68060 },
-
 {"illegal", 2,	one(0045374),	one(0177777), "",   m68000up },
 
 {"jmp", 2,	one(0047300),	one(0177700), "!s", m68000up, m68k_insn_branch },
@@ -2228,8 +2218,6 @@ const struct m68k_opcode m68k_opcodes[] =
 {"jbsr", 2,	one(0047200),	one(0177700), "!s", m68000up },
 
 {"lea", 2,	one(0040700),	one(0170700), "!sAd", m68000up },
-
-{"lpstop", 6,	two(0174000,0000700),two(0177777,0177777),"#w", m68060 },
 
 {"linkw", 4,	one(0047120),	one(0177770), "As#w", m68000up },
 {"linkl", 6,	one(0044010),	one(0177770), "As#l", m68020up },
@@ -2394,9 +2382,6 @@ const struct m68k_opcode m68k_opcodes[] =
 {"ploadw", 4,   two(0xf000,0x2008), two(0xffc0,0xfff8), "D3&s", m68030 },
 {"ploadw", 4,   two(0xf000,0x2000), two(0xffc0,0xfffe), "f3&s", m68030 },
 
-{"plpar", 2,	one(0xf5c8),		one(0xfff8), "as", m68060 },
-{"plpaw", 2,	one(0xf588),		one(0xfff8), "as", m68060 },
-
 {"pmove", 4,    two(0xf000,0x4000), two(0xffc0,0xffff), "*l08", m68030 },
 {"pmove", 4,    two(0xf000,0x4200), two(0xffc0,0xffff), "08%s", m68030 },
 {"pmove", 4,    two(0xf000,0x4000), two(0xffc0,0xe3ff), "|sW8", m68030 },
@@ -2425,8 +2410,6 @@ const struct m68k_opcode m68k_opcodes[] =
 {"ptestw", 4, 	two(0xf000,0x8000), two(0xffc0,0xe3fe), "f3&st8", m68030 },
 {"ptestw", 4, 	two(0xf000,0x8100), two(0xffc0,0xe31e), "f3&st8A9", m68030 },
 {"ptestw", 2,	one(0xf548),		one(0xfff8), "as", m68040 },
-
-{"pulse", 2,	one(0045314),		one(0177777), "", m68060 },
 
 {"reset", 2,	one(0047160),		one(0177777), "", m68000up },
 
