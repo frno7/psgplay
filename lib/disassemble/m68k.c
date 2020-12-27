@@ -722,94 +722,49 @@ fetch_arg (unsigned char *buffer,
 
 static bool m68k_valid_ea(char code, int val)
 {
-  int mode, mask;
-#define M(n0,n1,n2,n3,n4,n5,n6,n70,n71,n72,n73,n74) \
-  (n0 | n1 << 1 | n2 << 2 | n3 << 3 | n4 << 4 | n5 << 5 | n6 << 6 \
-   | n70 << 7 | n71 << 8 | n72 << 9 | n73 << 10 | n74 << 11)
+	int mode, mask;
 
-  switch (code)
-    {
-    case '*':
-      mask = M (1,1,1,1,1,1,1,1,1,1,1,1);
-      break;
-    case '~':
-      mask = M (0,0,1,1,1,1,1,1,1,0,0,0);
-      break;
-    case '%':
-      mask = M (1,1,1,1,1,1,1,1,1,0,0,0);
-      break;
-    case ';':
-      mask = M (1,0,1,1,1,1,1,1,1,1,1,1);
-      break;
-    case '@':
-      mask = M (1,0,1,1,1,1,1,1,1,1,1,0);
-      break;
-    case '!':
-      mask = M (0,0,1,0,0,1,1,1,1,1,1,0);
-      break;
-    case '&':
-      mask = M (0,0,1,0,0,1,1,1,1,0,0,0);
-      break;
-    case '$':
-      mask = M (1,0,1,1,1,1,1,1,1,0,0,0);
-      break;
-    case '?':
-      mask = M (1,0,1,0,0,1,1,1,1,0,0,0);
-      break;
-    case '/':
-      mask = M (1,0,1,0,0,1,1,1,1,1,1,0);
-      break;
-    case '|':
-      mask = M (0,0,1,0,0,1,1,1,1,1,1,0);
-      break;
-    case '>':
-      mask = M (0,0,1,0,1,1,1,1,1,0,0,0);
-      break;
-    case '<':
-      mask = M (0,0,1,1,0,1,1,1,1,1,1,0);
-      break;
-    case 'm':
-      mask = M (1,1,1,1,1,0,0,0,0,0,0,0);
-      break;
-    case 'n':
-      mask = M (0,0,0,0,0,1,0,0,0,1,0,0);
-      break;
-    case 'o':
-      mask = M (0,0,0,0,0,0,1,1,1,0,1,1);
-      break;
-    case 'p':
-      mask = M (1,1,1,1,1,1,0,0,0,0,0,0);
-      break;
-    case 'q':
-      mask = M (1,0,1,1,1,1,0,0,0,0,0,0);
-      break;
-    case 'v':
-      mask = M (1,0,1,1,1,1,0,1,1,0,0,0);
-      break;
-    case 'b':
-      mask = M (1,0,1,1,1,1,0,0,0,1,0,0);
-      break;
-    case 'w':
-      mask = M (0,0,1,1,1,1,0,0,0,1,0,0);
-      break;
-    case 'y':
-      mask = M (0,0,1,0,0,1,0,0,0,0,0,0);
-      break;
-    case 'z':
-      mask = M (0,0,1,0,0,1,0,0,0,1,0,0);
-      break;
-    case '4':
-      mask = M (0,0,1,1,1,1,0,0,0,0,0,0);
-      break;
-    default:
-      BUG();
-    }
+#define M(n0,n1,n2,n3,n4,n5,n6,n70,n71,n72,n73,n74)			\
+	(n0 | n1 << 1 | n2 << 2 | n3 << 3 | n4 << 4 | n5 << 5 | n6 << 6	\
+	 | n70 << 7 | n71 << 8 | n72 << 9 | n73 << 10 | n74 << 11)
+
+	switch (code)
+	{
+		case '*': mask = M (1,1,1,1,1,1,1,1,1,1,1,1); break;
+		case '~': mask = M (0,0,1,1,1,1,1,1,1,0,0,0); break;
+		case '%': mask = M (1,1,1,1,1,1,1,1,1,0,0,0); break;
+		case ';': mask = M (1,0,1,1,1,1,1,1,1,1,1,1); break;
+		case '@': mask = M (1,0,1,1,1,1,1,1,1,1,1,0); break;
+		case '!': mask = M (0,0,1,0,0,1,1,1,1,1,1,0); break;
+		case '&': mask = M (0,0,1,0,0,1,1,1,1,0,0,0); break;
+		case '$': mask = M (1,0,1,1,1,1,1,1,1,0,0,0); break;
+		case '?': mask = M (1,0,1,0,0,1,1,1,1,0,0,0); break;
+		case '/': mask = M (1,0,1,0,0,1,1,1,1,1,1,0); break;
+		case '|': mask = M (0,0,1,0,0,1,1,1,1,1,1,0); break;
+		case '>': mask = M (0,0,1,0,1,1,1,1,1,0,0,0); break;
+		case '<': mask = M (0,0,1,1,0,1,1,1,1,1,1,0); break;
+		case 'm': mask = M (1,1,1,1,1,0,0,0,0,0,0,0); break;
+		case 'n': mask = M (0,0,0,0,0,1,0,0,0,1,0,0); break;
+		case 'o': mask = M (0,0,0,0,0,0,1,1,1,0,1,1); break;
+		case 'p': mask = M (1,1,1,1,1,1,0,0,0,0,0,0); break;
+		case 'q': mask = M (1,0,1,1,1,1,0,0,0,0,0,0); break;
+		case 'v': mask = M (1,0,1,1,1,1,0,1,1,0,0,0); break;
+		case 'b': mask = M (1,0,1,1,1,1,0,0,0,1,0,0); break;
+		case 'w': mask = M (0,0,1,1,1,1,0,0,0,1,0,0); break;
+		case 'y': mask = M (0,0,1,0,0,1,0,0,0,0,0,0); break;
+		case 'z': mask = M (0,0,1,0,0,1,0,0,0,1,0,0); break;
+		case '4': mask = M (0,0,1,1,1,1,0,0,0,0,0,0); break;
+		default:
+			  BUG();
+	}
+
 #undef M
 
-  mode = (val >> 3) & 7;
-  if (mode == 7)
-    mode += val & 7;
-  return (mask & (1 << mode)) != 0;
+	mode = (val >> 3) & 7;
+	if (mode == 7)
+		mode += val & 7;
+
+	return (mask & (1 << mode)) != 0;
 }
 
 /* Print a base register REGNO and displacement DISP, on INFO->STREAM.
