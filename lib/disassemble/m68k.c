@@ -146,13 +146,10 @@ typedef struct disassemble_info {
 #define	m68040   0x010
 /* There is no 68050.  */
 #define m68060   0x020
-#define	m68881   0x040
-#define	m68882   m68881 /* Synonym for -m68881.  otherwise unused.  */
 #define cpu32	 0x100		/* e.g., 68332 */
 
 #define mcfmac   0x200		/* ColdFire MAC. */
 #define mcfemac  0x400		/* ColdFire EMAC. */
-#define cfloat   0x800		/* ColdFire FPU.  */
 #define mcfhwdiv 0x1000		/* ColdFire hardware divide.  */
 
 #define mcfisa_a 0x2000		/* ColdFire ISA_A.  */
@@ -1834,25 +1831,25 @@ print_insn_m68k (bfd_vma memaddr, disassemble_info *info)
       arch_mask = (unsigned int) -1;
       break;
     case bfd_mach_m68000:
-      arch_mask = m68000|m68881;
+      arch_mask = m68000;
       break;
     case bfd_mach_m68008:
-      arch_mask = m68008|m68881;
+      arch_mask = m68008;
       break;
     case bfd_mach_m68010:
-      arch_mask = m68010|m68881;
+      arch_mask = m68010;
       break;
     case bfd_mach_m68020:
-      arch_mask = m68020|m68881;
+      arch_mask = m68020;
       break;
     case bfd_mach_m68030:
-      arch_mask = m68030|m68881;
+      arch_mask = m68030;
       break;
     case bfd_mach_m68040:
-      arch_mask = m68040|m68881;
+      arch_mask = m68040;
       break;
     case bfd_mach_m68060:
-      arch_mask = m68060|m68881;
+      arch_mask = m68060;
       break;
     }
 
