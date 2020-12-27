@@ -1920,28 +1920,6 @@ match_insn_m68k (bfd_vma memaddr,
 	}
     }
 
-  /* pflusha is an exceptions.  It takes no arguments but is two words
-     long.  Recognize it by looking at the lower 16 bits of the mask.  */
-  if (p - buffer < 4 && (best->match & 0xFFFF) != 0)
-    p = buffer + 4;
-
-  /* lpstop is another exception.  It takes a one word argument but is
-     three words long.  */
-  if (p - buffer < 6
-      && (best->match & 0xffff) == 0xffff
-      && best->args[0] == '#'
-      && best->args[1] == 'w')
-    {
-      /* Copy the one word argument into the usual location for a one
-	 word argument, to simplify printing it.  We can get away with
-	 this because we know exactly what the second word is, and we
-	 aren't going to print anything based on it.  */
-      p = buffer + 6;
-      fetch_data(info, p);
-      buffer[2] = buffer[4];
-      buffer[3] = buffer[5];
-    }
-
   fetch_data(info, p);
 
   d = best->args;
