@@ -260,56 +260,6 @@ struct m68k_opcode
    4						(modes 2,3,4,5)
   */
 
-/* For the 68851:  */
-/* I didn't use much imagination in choosing the
-   following codes, so many of them aren't very
-   mnemonic. -rab
-
-   0  32 bit pmmu register
-	Possible values:
-	000	TC	Translation Control Register (68030, 68851)
-
-   1  16 bit pmmu register
-	111	AC	Access Control (68851)
-
-   2  8 bit pmmu register
-	100	CAL	Current Access Level (68851)
-	101	VAL	Validate Access Level (68851)
-	110	SCC	Stack Change Control (68851)
-
-   3  68030-only pmmu registers (32 bit)
-	010	TT0	Transparent Translation reg 0
-			(aka Access Control reg 0 -- AC0 -- on 68ec030)
-	011	TT1	Transparent Translation reg 1
-			(aka Access Control reg 1 -- AC1 -- on 68ec030)
-
-   W  wide pmmu registers
-	Possible values:
-	001	DRP	Dma Root Pointer (68851)
-	010	SRP	Supervisor Root Pointer (68030, 68851)
-	011	CRP	Cpu Root Pointer (68030, 68851)
-
-   f	function code register (68030, 68851)
-	0	SFC
-	1	DFC
-
-   V	VAL register only (68851)
-
-   X	BADx, BACx (16 bit)
-	100	BAD	Breakpoint Acknowledge Data (68851)
-	101	BAC	Breakpoint Acknowledge Control (68851)
-
-   Y	PSR (68851) (MMUSR on 68030) (ACUSR on 68ec030)
-   Z	PCSR (68851)
-
-   |	memory 		(modes 2-6, 7.*)
-
-   t  address test level (68030 only)
-      Stored as 3 bits, range 0-7.
-      Also used for breakpoint instruction now.
-
-*/
-
 /* Places to put an operand, for non-general operands:
    Characters used: BbCcDdFfGgHhIijkLlMmNnostWw123456789/
 
