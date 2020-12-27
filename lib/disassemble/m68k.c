@@ -46,7 +46,6 @@ enum bfd_architecture
   bfd_arch_m68k,       /* Motorola 68xxx */
 #define bfd_mach_m68000 1
 #define bfd_mach_m68008 2
-#define bfd_mach_m68010 3
   bfd_arch_last
   };
 
@@ -133,11 +132,9 @@ typedef struct disassemble_info {
 #define	_m68k_undef  0
 #define	m68000   0x001
 #define	m68008   m68000 /* Synonym for -m68000.  otherwise unused.  */
-#define	m68010   0x002
 
 /* Handy aliases.  */
-#define	m68010up   (m68010)
-#define	m68000up   (m68000 | m68010up)
+#define	m68000up   (m68000)
 
 /* The structure used to hold information for an opcode.  */
 
@@ -1798,9 +1795,6 @@ print_insn_m68k (bfd_vma memaddr, disassemble_info *info)
     case bfd_mach_m68008:
       arch_mask = m68008;
       break;
-    case bfd_mach_m68010:
-      arch_mask = m68010;
-      break;
     }
 
   fetch_data(info, buffer + 2);
@@ -2018,8 +2012,6 @@ const struct m68k_opcode m68k_opcodes[] =
 {"bclr", 2,	one(0000600),	one(0170700), "Dd$s", m68000up },
 {"bclr", 4,	one(0004200),	one(0177700), "#b$s", m68000up },
 
-{"bkpt", 2,	one(0044110),	one(0177770), "ts", m68010up },
-
 {"braw", 2,	one(0060000),	one(0177777), "BW", m68000up, m68k_insn_branch },
 {"bras", 2,	one(0060000),	one(0177400), "BB", m68000up, m68k_insn_branch },
 
@@ -2149,11 +2141,6 @@ const struct m68k_opcode m68k_opcodes[] =
 {"moveal", 2,	one(0020100),	one(0170700), "*lAd", m68000up },
 {"moveaw", 2,	one(0030100),	one(0170700), "*wAd", m68000up },
 
-{"movec", 4,	one(0047173),	one(0177777), "R1Jj", m68010up },
-{"movec", 4,	one(0047173),	one(0177777), "R1#j", m68010up },
-{"movec", 4,	one(0047172),	one(0177777), "JjR1", m68010up },
-{"movec", 4,	one(0047172),	one(0177777), "#jR1", m68010up },
-
 {"movemw", 4,	one(0044200),	one(0177700), "Lw&s", m68000up },
 {"movemw", 4,	one(0044240),	one(0177770), "lw-s", m68000up },
 {"movemw", 4,	one(0044200),	one(0177700), "#w>s", m68000up },
@@ -2178,7 +2165,6 @@ const struct m68k_opcode m68k_opcodes[] =
 
 {"movew", 2,	one(0030000),	one(0170000), "*w%d", m68000up },
 {"movew", 2,	one(0040300),	one(0177700), "Ss$s", m68000up },
-{"movew", 2,	one(0041300),	one(0177700), "Cs$s", m68010up },
 {"movew", 2,	one(0042300),	one(0177700), ";wCd", m68000up },
 {"movew", 2,	one(0043300),	one(0177700), ";wSd", m68000up },
 
@@ -2189,19 +2175,11 @@ const struct m68k_opcode m68k_opcodes[] =
 
 {"move", 2,	one(0030000),	one(0170000), "*w%d", m68000up },
 {"move", 2,	one(0040300),	one(0177700), "Ss$s", m68000up },
-{"move", 2,	one(0041300),	one(0177700), "Cs$s", m68010up },
 {"move", 2,	one(0042300),	one(0177700), ";wCd", m68000up },
 {"move", 2,	one(0043300),	one(0177700), ";wSd", m68000up },
 
 {"move", 2,	one(0047140),	one(0177770), "AsUd", m68000up },
 {"move", 2,	one(0047150),	one(0177770), "UdAs", m68000up },
-
-{"movesb", 4,	two(0007000, 0),     two(0177700, 07777), "~sR1", m68010up },
-{"movesb", 4,	two(0007000, 04000), two(0177700, 07777), "R1~s", m68010up },
-{"movesw", 4,	two(0007100, 0),     two(0177700, 07777), "~sR1", m68010up },
-{"movesw", 4,	two(0007100, 04000), two(0177700, 07777), "R1~s", m68010up },
-{"movesl", 4,	two(0007200, 0),     two(0177700, 07777), "~sR1", m68010up },
-{"movesl", 4,	two(0007200, 04000), two(0177700, 07777), "R1~s", m68010up },
 
 {"mulsw", 2,	one(0140700),		one(0170700), ";wDd", m68000up },
 
@@ -2285,8 +2263,6 @@ const struct m68k_opcode m68k_opcodes[] =
 {"roxrw", 2,	one(0162300),		one(0177700), "~s",   m68000up },
 {"roxrl", 2,	one(0160220),		one(0170770), "QdDs", m68000up },
 {"roxrl", 2,	one(0160260),		one(0170770), "DdDs", m68000up },
-
-{"rtd", 4,	one(0047164),		one(0177777), "#w", m68010up },
 
 {"rte", 2,	one(0047163),		one(0177777), "",   m68000up },
 
