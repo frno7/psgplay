@@ -17,7 +17,6 @@
 
 #include "disassemble/m68k.h"
 
-typedef bool bfd_boolean;
 typedef uint64_t bfd_vma;
 typedef int64_t bfd_signed_vma;
 typedef uint8_t bfd_byte;
@@ -722,8 +721,7 @@ fetch_arg (unsigned char *buffer,
    A similar case exists for the movem instructions where the register
    mask is interpreted differently for different EAs.  */
 
-static bfd_boolean
-m68k_valid_ea (char code, int val)
+static bool m68k_valid_ea(char code, int val)
 {
   int mode, mask;
 #define M(n0,n1,n2,n3,n4,n5,n6,n70,n71,n72,n73,n74) \
