@@ -700,9 +700,9 @@ static const struct m68k_opcode m68k_opcodes[] =
 	{ "roxrl",	2, 0160220, 0170770, "QdDs" },
 	{ "roxrl",	2, 0160260, 0170770, "DdDs" },
 
-	{ "rte",	2, 0047163, 0177777, "" },
+	{ "rte",	2, 0047163, 0177777, "",	m68k_insn_return },
 
-	{ "rtr",	2, 0047167, 0177777, "" },
+	{ "rtr",	2, 0047167, 0177777, "",	m68k_insn_return },
 
 	{ "rts",	2, 0047165, 0177777, "",	m68k_insn_return },
 
