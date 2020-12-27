@@ -14,6 +14,7 @@
 #include <string.h>
 
 #include "internal/assert.h"
+#include "internal/macro.h"
 
 #include "disassemble/m68k.h"
 
@@ -783,8 +784,6 @@ static const struct m68k_opcode m68k_opcodes[] =
 
 {"unlk", 2,	one(0047130),	one(0177770), "As" },
 };
-
-const int m68k_numopcodes = sizeof m68k_opcodes / sizeof m68k_opcodes[0];
 
 /* Local function prototypes.  */
 
@@ -2025,13 +2024,13 @@ print_insn_m68k (bfd_vma memaddr, disassemble_info *info)
       const struct m68k_opcode **opc_pointer[16];
 
       /* First count how many opcodes are in each of the sixteen buckets.  */
-      for (i = 0; i < m68k_numopcodes; i++)
+      for (i = 0; i < ARRAY_SIZE(m68k_opcodes); i++)
 	numopcodes[(m68k_opcodes[i].opcode >> 28) & 15]++;
 
       /* Then create a sorted table of pointers
 	 that point into the unsorted table.  */
       opc_pointer[0] = malloc (sizeof (struct m68k_opcode *)
-                               * m68k_numopcodes);
+                               * ARRAY_SIZE(m68k_opcodes));
       opcodes[0] = opc_pointer[0];
 
       for (i = 1; i < 16; i++)
@@ -2040,7 +2039,7 @@ print_insn_m68k (bfd_vma memaddr, disassemble_info *info)
 	  opcodes[i] = opc_pointer[i];
 	}
 
-      for (i = 0; i < m68k_numopcodes; i++)
+      for (i = 0; i < ARRAY_SIZE(m68k_opcodes); i++)
 	*opc_pointer[(m68k_opcodes[i].opcode >> 28) & 15]++ = &m68k_opcodes[i];
     }
 
