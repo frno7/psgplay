@@ -116,8 +116,8 @@ struct m68k_opcode
 {
 	const char *name;
 	unsigned int size;
-	unsigned long opcode;
-	unsigned long match;
+	unsigned int opcode;
+	unsigned int match;
 	const char *args;
 	enum m68k_insn_type insn_type;
 };
@@ -317,473 +317,470 @@ struct m68k_opcode
    ]  first word, bit 10
 */
 
-#define one(x) ((unsigned int) (x) << 16)
-
 /*
  * The assembler requires that all instances of the same mnemonic must
  * be consecutive. If they aren't, the assembler will bomb at runtime.
  */
-
 static const struct m68k_opcode m68k_opcodes[] =
 {
-{"abcd", 2,	one(0140400),	one(0170770), "DsDd" },
-{"abcd", 2,	one(0140410),	one(0170770), "-s-d" },
-
-{"addaw", 2,	one(0150300),	one(0170700), "*wAd" },
-{"addal", 2,	one(0150700),	one(0170700), "*lAd" },
-
-{"addib", 4,	one(0003000),	one(0177700), "#b$s" },
-{"addiw", 4,	one(0003100),	one(0177700), "#w$s" },
-{"addil", 6,	one(0003200),	one(0177700), "#l$s" },
-
-{"addqb", 2,	one(0050000),	one(0170700), "Qd$b" },
-{"addqw", 2,	one(0050100),	one(0170700), "Qd%w" },
-{"addql", 2,	one(0050200),	one(0170700), "Qd%l" },
-
-/* The add opcode can generate the adda, addi, and addq instructions.  */
-{"addb", 2,	one(0050000),	one(0170700), "Qd$b" },
-{"addb", 4,	one(0003000),	one(0177700), "#b$s" },
-{"addb", 2,	one(0150000),	one(0170700), ";bDd" },
-{"addb", 2,	one(0150400),	one(0170700), "Dd~b" },
-{"addw", 2,	one(0050100),	one(0170700), "Qd%w" },
-{"addw", 2,	one(0150300),	one(0170700), "*wAd" },
-{"addw", 4,	one(0003100),	one(0177700), "#w$s" },
-{"addw", 2,	one(0150100),	one(0170700), "*wDd" },
-{"addw", 2,	one(0150500),	one(0170700), "Dd~w" },
-{"addl", 2,	one(0050200),	one(0170700), "Qd%l" },
-{"addl", 6,	one(0003200),	one(0177700), "#l$s" },
-{"addl", 2,	one(0150700),	one(0170700), "*lAd" },
-{"addl", 2,	one(0150200),	one(0170700), "*lDd" },
-{"addl", 2,	one(0150600),	one(0170700), "Dd~l" },
-
-{"addxb", 2,	one(0150400),	one(0170770), "DsDd" },
-{"addxb", 2,	one(0150410),	one(0170770), "-s-d" },
-{"addxw", 2,	one(0150500),	one(0170770), "DsDd" },
-{"addxw", 2,	one(0150510),	one(0170770), "-s-d" },
-{"addxl", 2,	one(0150600),	one(0170770), "DsDd" },
-{"addxl", 2,	one(0150610),	one(0170770), "-s-d" },
-
-{"andib", 4,	one(0001000),	one(0177700), "#b$s" },
-{"andib", 4,	one(0001074),	one(0177777), "#bCs" },
-{"andiw", 4,	one(0001100),	one(0177700), "#w$s" },
-{"andiw", 4,	one(0001174),	one(0177777), "#wSs" },
-{"andil", 6,	one(0001200),	one(0177700), "#l$s" },
-{"andi", 4,	one(0001100),	one(0177700), "#w$s" },
-{"andi", 4,	one(0001074),	one(0177777), "#bCs" },
-{"andi", 4,	one(0001174),	one(0177777), "#wSs" },
-
-/* The and opcode can generate the andi instruction.  */
-{"andb", 4,	one(0001000),	one(0177700), "#b$s" },
-{"andb", 4,	one(0001074),	one(0177777), "#bCs" },
-{"andb", 2,	one(0140000),	one(0170700), ";bDd" },
-{"andb", 2,	one(0140400),	one(0170700), "Dd~b" },
-{"andw", 4,	one(0001100),	one(0177700), "#w$s" },
-{"andw", 4,	one(0001174),	one(0177777), "#wSs" },
-{"andw", 2,	one(0140100),	one(0170700), ";wDd" },
-{"andw", 2,	one(0140500),	one(0170700), "Dd~w" },
-{"andl", 6,	one(0001200),	one(0177700), "#l$s" },
-{"andl", 2,	one(0140200),	one(0170700), ";lDd" },
-{"andl", 2,	one(0140600),	one(0170700), "Dd~l" },
-{"and", 4,	one(0001100),	one(0177700), "#w$w" },
-{"and", 4,	one(0001074),	one(0177777), "#bCs" },
-{"and", 4,	one(0001174),	one(0177777), "#wSs" },
-{"and", 2,	one(0140100),	one(0170700), ";wDd" },
-{"and", 2,	one(0140500),	one(0170700), "Dd~w" },
-
-{"aslb", 2,	one(0160400),	one(0170770), "QdDs" },
-{"aslb", 2,	one(0160440),	one(0170770), "DdDs" },
-{"aslw", 2,	one(0160500),	one(0170770), "QdDs" },
-{"aslw", 2,	one(0160540),	one(0170770), "DdDs" },
-{"aslw", 2,	one(0160700),	one(0177700), "~s",  },
-{"asll", 2,	one(0160600),	one(0170770), "QdDs" },
-{"asll", 2,	one(0160640),	one(0170770), "DdDs" },
-
-{"asrb", 2,	one(0160000),	one(0170770), "QdDs" },
-{"asrb", 2,	one(0160040),	one(0170770), "DdDs" },
-{"asrw", 2,	one(0160100),	one(0170770), "QdDs" },
-{"asrw", 2,	one(0160140),	one(0170770), "DdDs" },
-{"asrw", 2,	one(0160300),	one(0177700), "~s",  },
-{"asrl", 2,	one(0160200),	one(0170770), "QdDs" },
-{"asrl", 2,	one(0160240),	one(0170770), "DdDs" },
-
-{"bhiw", 2,	one(0061000),	one(0177777), "BW", m68k_insn_condbranch },
-{"blsw", 2,	one(0061400),	one(0177777), "BW", m68k_insn_condbranch },
-{"bccw", 2,	one(0062000),	one(0177777), "BW", m68k_insn_condbranch },
-{"bcsw", 2,	one(0062400),	one(0177777), "BW", m68k_insn_condbranch },
-{"bnew", 2,	one(0063000),	one(0177777), "BW", m68k_insn_condbranch },
-{"beqw", 2,	one(0063400),	one(0177777), "BW", m68k_insn_condbranch },
-{"bvcw", 2,	one(0064000),	one(0177777), "BW", m68k_insn_condbranch },
-{"bvsw", 2,	one(0064400),	one(0177777), "BW", m68k_insn_condbranch },
-{"bplw", 2,	one(0065000),	one(0177777), "BW", m68k_insn_condbranch },
-{"bmiw", 2,	one(0065400),	one(0177777), "BW", m68k_insn_condbranch },
-{"bgew", 2,	one(0066000),	one(0177777), "BW", m68k_insn_condbranch },
-{"bltw", 2,	one(0066400),	one(0177777), "BW", m68k_insn_condbranch },
-{"bgtw", 2,	one(0067000),	one(0177777), "BW", m68k_insn_condbranch },
-{"blew", 2,	one(0067400),	one(0177777), "BW", m68k_insn_condbranch },
-
-{"bhis", 2,	one(0061000),	one(0177400), "BB", m68k_insn_condbranch },
-{"blss", 2,	one(0061400),	one(0177400), "BB", m68k_insn_condbranch },
-{"bccs", 2,	one(0062000),	one(0177400), "BB", m68k_insn_condbranch },
-{"bcss", 2,	one(0062400),	one(0177400), "BB", m68k_insn_condbranch },
-{"bnes", 2,	one(0063000),	one(0177400), "BB", m68k_insn_condbranch },
-{"beqs", 2,	one(0063400),	one(0177400), "BB", m68k_insn_condbranch },
-{"bvcs", 2,	one(0064000),	one(0177400), "BB", m68k_insn_condbranch },
-{"bvss", 2,	one(0064400),	one(0177400), "BB", m68k_insn_condbranch },
-{"bpls", 2,	one(0065000),	one(0177400), "BB", m68k_insn_condbranch },
-{"bmis", 2,	one(0065400),	one(0177400), "BB", m68k_insn_condbranch },
-{"bges", 2,	one(0066000),	one(0177400), "BB", m68k_insn_condbranch },
-{"blts", 2,	one(0066400),	one(0177400), "BB", m68k_insn_condbranch },
-{"bgts", 2,	one(0067000),	one(0177400), "BB", m68k_insn_condbranch },
-{"bles", 2,	one(0067400),	one(0177400), "BB", m68k_insn_condbranch },
-
-{"jhi", 2,	one(0061000),	one(0177400), "Bg", m68k_insn_condbranch },
-{"jls", 2,	one(0061400),	one(0177400), "Bg", m68k_insn_condbranch },
-{"jcc", 2,	one(0062000),	one(0177400), "Bg", m68k_insn_condbranch },
-{"jcs", 2,	one(0062400),	one(0177400), "Bg", m68k_insn_condbranch },
-{"jne", 2,	one(0063000),	one(0177400), "Bg", m68k_insn_condbranch },
-{"jeq", 2,	one(0063400),	one(0177400), "Bg", m68k_insn_condbranch },
-{"jvc", 2,	one(0064000),	one(0177400), "Bg", m68k_insn_condbranch },
-{"jvs", 2,	one(0064400),	one(0177400), "Bg", m68k_insn_condbranch },
-{"jpl", 2,	one(0065000),	one(0177400), "Bg", m68k_insn_condbranch },
-{"jmi", 2,	one(0065400),	one(0177400), "Bg", m68k_insn_condbranch },
-{"jge", 2,	one(0066000),	one(0177400), "Bg", m68k_insn_condbranch },
-{"jlt", 2,	one(0066400),	one(0177400), "Bg", m68k_insn_condbranch },
-{"jgt", 2,	one(0067000),	one(0177400), "Bg", m68k_insn_condbranch },
-{"jle", 2,	one(0067400),	one(0177400), "Bg", m68k_insn_condbranch },
-
-{"bchg", 2,	one(0000500),	one(0170700), "Dd$s" },
-{"bchg", 4,	one(0004100),	one(0177700), "#b$s" },
-
-{"bclr", 2,	one(0000600),	one(0170700), "Dd$s" },
-{"bclr", 4,	one(0004200),	one(0177700), "#b$s" },
-
-{"braw", 2,	one(0060000),	one(0177777), "BW", m68k_insn_branch },
-{"bras", 2,	one(0060000),	one(0177400), "BB", m68k_insn_branch },
-
-{"bset", 2,	one(0000700),	one(0170700), "Dd$s" },
-{"bset", 4,	one(0004300),	one(0177700), "#b$s" },
-
-{"bsrw", 2,	one(0060400),	one(0177777), "BW", m68k_insn_jsr },
-{"bsrs", 2,	one(0060400),	one(0177400), "BB", m68k_insn_jsr },
-
-{"btst", 2,	one(0000400),	one(0170700), "Dd;b" },
-{"btst", 4,	one(0004000),	one(0177700), "#b@s" },
-
-{"chkl", 2,	one(0040400),	one(0170700), ";lDd" },
-{"chkw", 2,	one(0040600),	one(0170700), ";wDd" },
-
-{"clrb", 2,	one(0041000),	one(0177700), "$s" },
-{"clrw", 2,	one(0041100),	one(0177700), "$s" },
-{"clrl", 2,	one(0041200),	one(0177700), "$s" },
-
-{"cmpaw", 2,	one(0130300),	one(0170700), "*wAd" },
-{"cmpal", 2,	one(0130700),	one(0170700), "*lAd" },
-
-{"cmpib", 4,	one(0006000),	one(0177700), "#b@s" },
-{"cmpiw", 4,	one(0006100),	one(0177700), "#w@s" },
-{"cmpil", 6,	one(0006200),	one(0177700), "#l@s" },
-
-{"cmpmb", 2,	one(0130410),	one(0170770), "+s+d" },
-{"cmpmw", 2,	one(0130510),	one(0170770), "+s+d" },
-{"cmpml", 2,	one(0130610),	one(0170770), "+s+d" },
-
-/* The cmp opcode can generate the cmpa, cmpm, and cmpi instructions.  */
-{"cmpb", 4,	one(0006000),	one(0177700), "#b@s" },
-{"cmpb", 2,	one(0130410),	one(0170770), "+s+d" },
-{"cmpb", 2,	one(0130000),	one(0170700), ";bDd" },
-{"cmpw", 2,	one(0130300),	one(0170700), "*wAd" },
-{"cmpw", 4,	one(0006100),	one(0177700), "#w@s" },
-{"cmpw", 2,	one(0130510),	one(0170770), "+s+d" },
-{"cmpw", 2,	one(0130100),	one(0170700), "*wDd" },
-{"cmpl", 2,	one(0130700),	one(0170700), "*lAd" },
-{"cmpl", 6,	one(0006200),	one(0177700), "#l@s" },
-{"cmpl", 2,	one(0130610),	one(0170770), "+s+d" },
-{"cmpl", 2,	one(0130200),	one(0170700), "*lDd" },
-
-{"dbcc", 2,	one(0052310),	one(0177770), "DsBw", m68k_insn_condbranch },
-{"dbcs", 2,	one(0052710),	one(0177770), "DsBw", m68k_insn_condbranch },
-{"dbeq", 2,	one(0053710),	one(0177770), "DsBw", m68k_insn_condbranch },
-{"dbf", 2,	one(0050710),	one(0177770), "DsBw", m68k_insn_condbranch },
-{"dbge", 2,	one(0056310),	one(0177770), "DsBw", m68k_insn_condbranch },
-{"dbgt", 2,	one(0057310),	one(0177770), "DsBw", m68k_insn_condbranch },
-{"dbhi", 2,	one(0051310),	one(0177770), "DsBw", m68k_insn_condbranch },
-{"dble", 2,	one(0057710),	one(0177770), "DsBw", m68k_insn_condbranch },
-{"dbls", 2,	one(0051710),	one(0177770), "DsBw", m68k_insn_condbranch },
-{"dblt", 2,	one(0056710),	one(0177770), "DsBw", m68k_insn_condbranch },
-{"dbmi", 2,	one(0055710),	one(0177770), "DsBw", m68k_insn_condbranch },
-{"dbne", 2,	one(0053310),	one(0177770), "DsBw", m68k_insn_condbranch },
-{"dbpl", 2,	one(0055310),	one(0177770), "DsBw", m68k_insn_condbranch },
-{"dbt", 2,	one(0050310),	one(0177770), "DsBw", m68k_insn_condbranch },
-{"dbvc", 2,	one(0054310),	one(0177770), "DsBw", m68k_insn_condbranch },
-{"dbvs", 2,	one(0054710),	one(0177770), "DsBw", m68k_insn_condbranch },
-
-{"divuw", 2,	one(0100300),	one(0170700), ";wDd" },
-
-{"eorib", 4,	one(0005000),	one(0177700), "#b$s" },
-{"eorib", 4,	one(0005074),	one(0177777), "#bCs" },
-{"eoriw", 4,	one(0005100),	one(0177700), "#w$s" },
-{"eoriw", 4,	one(0005174),	one(0177777), "#wSs" },
-{"eoril", 6,	one(0005200),	one(0177700), "#l$s" },
-{"eori", 4,	one(0005074),	one(0177777), "#bCs" },
-{"eori", 4,	one(0005174),	one(0177777), "#wSs" },
-{"eori", 4,	one(0005100),	one(0177700), "#w$s" },
-
-/* The eor opcode can generate the eori instruction.  */
-{"eorb", 4,	one(0005000),	one(0177700), "#b$s" },
-{"eorb", 4,	one(0005074),	one(0177777), "#bCs" },
-{"eorb", 2,	one(0130400),	one(0170700), "Dd$s" },
-{"eorw", 4,	one(0005100),	one(0177700), "#w$s" },
-{"eorw", 4,	one(0005174),	one(0177777), "#wSs" },
-{"eorw", 2,	one(0130500),	one(0170700), "Dd$s" },
-{"eorl", 6,	one(0005200),	one(0177700), "#l$s" },
-{"eorl", 2,	one(0130600),	one(0170700), "Dd$s" },
-{"eor", 4,	one(0005074),	one(0177777), "#bCs" },
-{"eor", 4,	one(0005174),	one(0177777), "#wSs" },
-{"eor", 4,	one(0005100),	one(0177700), "#w$s" },
-{"eor", 2,	one(0130500),	one(0170700), "Dd$s" },
-
-{"exg", 2,	one(0140500),	one(0170770), "DdDs" },
-{"exg", 2,	one(0140510),	one(0170770), "AdAs" },
-{"exg", 2,	one(0140610),	one(0170770), "DdAs" },
-{"exg", 2,	one(0140610),	one(0170770), "AsDd" },
-
-{"extw", 2,	one(0044200),	one(0177770), "Ds" },
-{"extl", 2,	one(0044300),	one(0177770), "Ds" },
-
-{"illegal", 2,	one(0045374),	one(0177777), "" },
-
-{"jmp", 2,	one(0047300),	one(0177700), "!s", m68k_insn_branch },
-
-{"jra", 2,	one(0060000),	one(0177400), "Bg" },
-{"jra", 2,	one(0047300),	one(0177700), "!s" },
-
-{"jsr", 2,	one(0047200),	one(0177700), "!s", m68k_insn_jsr },
-
-{"jbsr", 2,	one(0060400),	one(0177400), "Bg" },
-{"jbsr", 2,	one(0047200),	one(0177700), "!s" },
-
-{"lea", 2,	one(0040700),	one(0170700), "!sAd" },
-
-{"linkw", 4,	one(0047120),	one(0177770), "As#w" },
-{"link", 4,	one(0047120),	one(0177770), "As#W" },
-
-{"lslb", 2,	one(0160410),	one(0170770), "QdDs" },
-{"lslb", 2,	one(0160450),	one(0170770), "DdDs" },
-{"lslw", 2,	one(0160510),	one(0170770), "QdDs" },
-{"lslw", 2,	one(0160550),	one(0170770), "DdDs" },
-{"lslw", 2,	one(0161700),	one(0177700), "~s",  },
-{"lsll", 2,	one(0160610),	one(0170770), "QdDs" },
-{"lsll", 2,	one(0160650),	one(0170770), "DdDs" },
-
-{"lsrb", 2,	one(0160010),	one(0170770), "QdDs" },
-{"lsrb", 2,	one(0160050),	one(0170770), "DdDs" },
-{"lsrw", 2,	one(0160110),	one(0170770), "QdDs" },
-{"lsrw", 2,	one(0160150),	one(0170770), "DdDs" },
-{"lsrw", 2,	one(0161300),	one(0177700), "~s",  },
-{"lsrl", 2,	one(0160210),	one(0170770), "QdDs" },
-{"lsrl", 2,	one(0160250),	one(0170770), "DdDs" },
-
-{"moveal", 2,	one(0020100),	one(0170700), "*lAd" },
-{"moveaw", 2,	one(0030100),	one(0170700), "*wAd" },
-
-{"movemw", 4,	one(0044200),	one(0177700), "Lw&s" },
-{"movemw", 4,	one(0044240),	one(0177770), "lw-s" },
-{"movemw", 4,	one(0044200),	one(0177700), "#w>s" },
-{"movemw", 4,	one(0046200),	one(0177700), "<sLw" },
-{"movemw", 4,	one(0046200),	one(0177700), "<s#w" },
-{"moveml", 4,	one(0044300),	one(0177700), "Lw&s" },
-{"moveml", 4,	one(0044340),	one(0177770), "lw-s" },
-{"moveml", 4,	one(0044300),	one(0177700), "#w>s" },
-{"moveml", 4,	one(0046300),	one(0177700), "<sLw" },
-{"moveml", 4,	one(0046300),	one(0177700), "<s#w" },
-
-{"movepw", 2,	one(0000410),	one(0170770), "dsDd" },
-{"movepw", 2,	one(0000610),	one(0170770), "Ddds" },
-{"movepl", 2,	one(0000510),	one(0170770), "dsDd" },
-{"movepl", 2,	one(0000710),	one(0170770), "Ddds" },
-
-{"moveq", 2,	one(0070000),	one(0170400), "MsDd" },
-{"moveq", 2,	one(0070000),	one(0170400), "#BDd" },
-
-/* The move opcode can generate the movea and moveq instructions.  */
-{"moveb", 2,	one(0010000),	one(0170000), ";b$d" },
-
-{"movew", 2,	one(0030000),	one(0170000), "*w%d" },
-{"movew", 2,	one(0040300),	one(0177700), "Ss$s" },
-{"movew", 2,	one(0042300),	one(0177700), ";wCd" },
-{"movew", 2,	one(0043300),	one(0177700), ";wSd" },
-
-{"movel", 2,	one(0070000),	one(0170400), "MsDd" },
-{"movel", 2,	one(0020000),	one(0170000), "*l%d" },
-{"movel", 2,	one(0047140),	one(0177770), "AsUd" },
-{"movel", 2,	one(0047150),	one(0177770), "UdAs" },
-
-{"move", 2,	one(0030000),	one(0170000), "*w%d" },
-{"move", 2,	one(0040300),	one(0177700), "Ss$s" },
-{"move", 2,	one(0042300),	one(0177700), ";wCd" },
-{"move", 2,	one(0043300),	one(0177700), ";wSd" },
-
-{"move", 2,	one(0047140),	one(0177770), "AsUd" },
-{"move", 2,	one(0047150),	one(0177770), "UdAs" },
-
-{"mulsw", 2,	one(0140700),	one(0170700), ";wDd" },
-
-{"muluw", 2,	one(0140300),	one(0170700), ";wDd" },
-
-{"nbcd", 2,	one(0044000),	one(0177700), "$s" },
-
-{"negb", 2,	one(0042000),	one(0177700), "$s" },
-{"negw", 2,	one(0042100),	one(0177700), "$s" },
-{"negl", 2,	one(0042200),	one(0177700), "$s" },
-
-{"negxb", 2,	one(0040000),	one(0177700), "$s" },
-{"negxw", 2,	one(0040100),	one(0177700), "$s" },
-{"negxl", 2,	one(0040200),	one(0177700), "$s" },
-
-{"nop", 2,	one(0047161),	one(0177777), "" },
-
-{"notb", 2,	one(0043000),	one(0177700), "$s" },
-{"notw", 2,	one(0043100),	one(0177700), "$s" },
-{"notl", 2,	one(0043200),	one(0177700), "$s" },
-
-{"orib", 4,	one(0000000),	one(0177700), "#b$s" },
-{"orib", 4,	one(0000074),	one(0177777), "#bCs" },
-{"oriw", 4,	one(0000100),	one(0177700), "#w$s" },
-{"oriw", 4,	one(0000174),	one(0177777), "#wSs" },
-{"oril", 6,	one(0000200),	one(0177700), "#l$s" },
-{"ori", 4,	one(0000074),	one(0177777), "#bCs" },
-{"ori", 4,	one(0000100),	one(0177700), "#w$s" },
-{"ori", 4,	one(0000174),	one(0177777), "#wSs" },
-
-/* The or opcode can generate the ori instruction.  */
-{"orb", 4,	one(0000000),	one(0177700), "#b$s" },
-{"orb", 4,	one(0000074),	one(0177777), "#bCs" },
-{"orb", 2,	one(0100000),	one(0170700), ";bDd" },
-{"orb", 2,	one(0100400),	one(0170700), "Dd~s" },
-{"orw", 4,	one(0000100),	one(0177700), "#w$s" },
-{"orw", 4,	one(0000174),	one(0177777), "#wSs" },
-{"orw", 2,	one(0100100),	one(0170700), ";wDd" },
-{"orw", 2,	one(0100500),	one(0170700), "Dd~s" },
-{"orl", 6,	one(0000200),	one(0177700), "#l$s" },
-{"orl", 2,	one(0100200),	one(0170700), ";lDd" },
-{"orl", 2,	one(0100600),	one(0170700), "Dd~s" },
-{"or", 4,	one(0000074),	one(0177777), "#bCs" },
-{"or", 4,	one(0000100),	one(0177700), "#w$s" },
-{"or", 4,	one(0000174),	one(0177777), "#wSs" },
-{"or", 2,	one(0100100),	one(0170700), ";wDd" },
-{"or", 2,	one(0100500),	one(0170700), "Dd~s" },
-
-{"pea", 2,	one(0044100),	one(0177700), "!s" },
-
-{"reset", 2,	one(0047160),	one(0177777), "" },
-
-{"rolb", 2,	one(0160430),	one(0170770), "QdDs" },
-{"rolb", 2,	one(0160470),	one(0170770), "DdDs" },
-{"rolw", 2,	one(0160530),	one(0170770), "QdDs" },
-{"rolw", 2,	one(0160570),	one(0170770), "DdDs" },
-{"rolw", 2,	one(0163700),	one(0177700), "~s" },
-{"roll", 2,	one(0160630),	one(0170770), "QdDs" },
-{"roll", 2,	one(0160670),	one(0170770), "DdDs" },
-
-{"rorb", 2,	one(0160030),	one(0170770), "QdDs" },
-{"rorb", 2,	one(0160070),	one(0170770), "DdDs" },
-{"rorw", 2,	one(0160130),	one(0170770), "QdDs" },
-{"rorw", 2,	one(0160170),	one(0170770), "DdDs" },
-{"rorw", 2,	one(0163300),	one(0177700), "~s" },
-{"rorl", 2,	one(0160230),	one(0170770), "QdDs" },
-{"rorl", 2,	one(0160270),	one(0170770), "DdDs" },
-
-{"roxlb", 2,	one(0160420),	one(0170770), "QdDs" },
-{"roxlb", 2,	one(0160460),	one(0170770), "DdDs" },
-{"roxlw", 2,	one(0160520),	one(0170770), "QdDs" },
-{"roxlw", 2,	one(0160560),	one(0170770), "DdDs" },
-{"roxlw", 2,	one(0162700),	one(0177700), "~s" },
-{"roxll", 2,	one(0160620),	one(0170770), "QdDs" },
-{"roxll", 2,	one(0160660),	one(0170770), "DdDs" },
-
-{"roxrb", 2,	one(0160020),	one(0170770), "QdDs" },
-{"roxrb", 2,	one(0160060),	one(0170770), "DdDs" },
-{"roxrw", 2,	one(0160120),	one(0170770), "QdDs" },
-{"roxrw", 2,	one(0160160),	one(0170770), "DdDs" },
-{"roxrw", 2,	one(0162300),	one(0177700), "~s" },
-{"roxrl", 2,	one(0160220),	one(0170770), "QdDs" },
-{"roxrl", 2,	one(0160260),	one(0170770), "DdDs" },
-
-{"rte", 2,	one(0047163),	one(0177777), "" },
-
-{"rtr", 2,	one(0047167),	one(0177777), "" },
-
-{"rts", 2,	one(0047165),	one(0177777), "", m68k_insn_return },
-
-{"sbcd", 2,	one(0100400),	one(0170770), "DsDd" },
-{"sbcd", 2,	one(0100410),	one(0170770), "-s-d" },
-
-{"scc", 2,	one(0052300),	one(0177700), "$s" },
-{"scs", 2,	one(0052700),	one(0177700), "$s" },
-{"seq", 2,	one(0053700),	one(0177700), "$s" },
-{"sf", 2,	one(0050700),	one(0177700), "$s" },
-{"sge", 2,	one(0056300),	one(0177700), "$s" },
-{"sgt", 2,	one(0057300),	one(0177700), "$s" },
-{"shi", 2,	one(0051300),	one(0177700), "$s" },
-{"sle", 2,	one(0057700),	one(0177700), "$s" },
-{"sls", 2,	one(0051700),	one(0177700), "$s" },
-{"slt", 2,	one(0056700),	one(0177700), "$s" },
-{"smi", 2,	one(0055700),	one(0177700), "$s" },
-{"sne", 2,	one(0053300),	one(0177700), "$s" },
-{"spl", 2,	one(0055300),	one(0177700), "$s" },
-{"st", 2,	one(0050300),	one(0177700), "$s" },
-{"svc", 2,	one(0054300),	one(0177700), "$s" },
-{"svs", 2,	one(0054700),	one(0177700), "$s" },
-
-{"stop", 4,	one(0047162),	one(0177777), "#w" },
-
-{"subal", 2,	one(0110700),	one(0170700), "*lAd" },
-{"subaw", 2,	one(0110300),	one(0170700), "*wAd" },
-
-{"subib", 4,	one(0002000),	one(0177700), "#b$s" },
-{"subiw", 4,	one(0002100),	one(0177700), "#w$s" },
-{"subil", 6,	one(0002200),	one(0177700), "#l$s" },
-
-{"subqb", 2,	one(0050400),	one(0170700), "Qd%s" },
-{"subqw", 2,	one(0050500),	one(0170700), "Qd%s" },
-{"subql", 2,	one(0050600),	one(0170700), "Qd%s" },
-
-/* The sub opcode can generate the suba, subi, and subq instructions.  */
-{"subb", 2,	one(0050400),	one(0170700), "Qd%s" },
-{"subb", 4,	one(0002000),	one(0177700), "#b$s" },
-{"subb", 2,	one(0110000),	one(0170700), ";bDd" },
-{"subb", 2,	one(0110400),	one(0170700), "Dd~s" },
-{"subw", 2,	one(0050500),	one(0170700), "Qd%s" },
-{"subw", 4,	one(0002100),	one(0177700), "#w$s" },
-{"subw", 2,	one(0110300),	one(0170700), "*wAd" },
-{"subw", 2,	one(0110100),	one(0170700), "*wDd" },
-{"subw", 2,	one(0110500),	one(0170700), "Dd~s" },
-{"subl", 2,	one(0050600),	one(0170700), "Qd%s" },
-{"subl", 6,	one(0002200),	one(0177700), "#l$s" },
-{"subl", 2,	one(0110700),	one(0170700), "*lAd" },
-{"subl", 2,	one(0110200),	one(0170700), "*lDd" },
-{"subl", 2,	one(0110600),	one(0170700), "Dd~s" },
-
-{"subxb", 2,	one(0110400),	one(0170770), "DsDd" },
-{"subxb", 2,	one(0110410),	one(0170770), "-s-d" },
-{"subxw", 2,	one(0110500),	one(0170770), "DsDd" },
-{"subxw", 2,	one(0110510),	one(0170770), "-s-d" },
-{"subxl", 2,	one(0110600),	one(0170770), "DsDd" },
-{"subxl", 2,	one(0110610),	one(0170770), "-s-d" },
-
-{"swap", 2,	one(0044100),	one(0177770), "Ds" },
-
-{"tas", 2,	one(0045300),	one(0177700), "$s"},
-
-{"trap", 2,	one(0047100),	one(0177760), "Ts" },
-
-{"trapv", 2,	one(0047166),	one(0177777), "" },
-
-{"tstb", 2,	one(0045000),	one(0177700), "$b" },
-{"tstw", 2,	one(0045100),	one(0177700), "$w" },
-{"tstl", 2,	one(0045200),	one(0177700), "$l" },
-
-{"unlk", 2,	one(0047130),	one(0177770), "As" },
+	{ "abcd",	2, 0140400, 0170770, "DsDd" },
+	{ "abcd",	2, 0140410, 0170770, "-s-d" },
+
+	{ "addaw",	2, 0150300, 0170700, "*wAd" },
+	{ "addal",	2, 0150700, 0170700, "*lAd" },
+
+	{ "addib",	4, 0003000, 0177700, "#b$s" },
+	{ "addiw",	4, 0003100, 0177700, "#w$s" },
+	{ "addil",	6, 0003200, 0177700, "#l$s" },
+
+	{ "addqb",	2, 0050000, 0170700, "Qd$b" },
+	{ "addqw",	2, 0050100, 0170700, "Qd%w" },
+	{ "addql",	2, 0050200, 0170700, "Qd%l" },
+
+	/* The add opcode can generate the adda, addi, and addq instructions. */
+	{ "addb",	2, 0050000, 0170700, "Qd$b" },
+	{ "addb",	4, 0003000, 0177700, "#b$s" },
+	{ "addb",	2, 0150000, 0170700, ";bDd" },
+	{ "addb",	2, 0150400, 0170700, "Dd~b" },
+	{ "addw",	2, 0050100, 0170700, "Qd%w" },
+	{ "addw",	2, 0150300, 0170700, "*wAd" },
+	{ "addw",	4, 0003100, 0177700, "#w$s" },
+	{ "addw",	2, 0150100, 0170700, "*wDd" },
+	{ "addw",	2, 0150500, 0170700, "Dd~w" },
+	{ "addl",	2, 0050200, 0170700, "Qd%l" },
+	{ "addl",	6, 0003200, 0177700, "#l$s" },
+	{ "addl",	2, 0150700, 0170700, "*lAd" },
+	{ "addl",	2, 0150200, 0170700, "*lDd" },
+	{ "addl",	2, 0150600, 0170700, "Dd~l" },
+
+	{ "addxb",	2, 0150400, 0170770, "DsDd" },
+	{ "addxb",	2, 0150410, 0170770, "-s-d" },
+	{ "addxw",	2, 0150500, 0170770, "DsDd" },
+	{ "addxw",	2, 0150510, 0170770, "-s-d" },
+	{ "addxl",	2, 0150600, 0170770, "DsDd" },
+	{ "addxl",	2, 0150610, 0170770, "-s-d" },
+
+	{ "andib",	4, 0001000, 0177700, "#b$s" },
+	{ "andib",	4, 0001074, 0177777, "#bCs" },
+	{ "andiw",	4, 0001100, 0177700, "#w$s" },
+	{ "andiw",	4, 0001174, 0177777, "#wSs" },
+	{ "andil",	6, 0001200, 0177700, "#l$s" },
+	{ "andi",	4, 0001100, 0177700, "#w$s" },
+	{ "andi",	4, 0001074, 0177777, "#bCs" },
+	{ "andi",	4, 0001174, 0177777, "#wSs" },
+
+	/* The and opcode can generate the andi instruction. */
+	{ "andb",	4, 0001000, 0177700, "#b$s" },
+	{ "andb",	4, 0001074, 0177777, "#bCs" },
+	{ "andb",	2, 0140000, 0170700, ";bDd" },
+	{ "andb",	2, 0140400, 0170700, "Dd~b" },
+	{ "andw",	4, 0001100, 0177700, "#w$s" },
+	{ "andw",	4, 0001174, 0177777, "#wSs" },
+	{ "andw",	2, 0140100, 0170700, ";wDd" },
+	{ "andw",	2, 0140500, 0170700, "Dd~w" },
+	{ "andl",	6, 0001200, 0177700, "#l$s" },
+	{ "andl",	2, 0140200, 0170700, ";lDd" },
+	{ "andl",	2, 0140600, 0170700, "Dd~l" },
+	{ "and",	4, 0001100, 0177700, "#w$w" },
+	{ "and",	4, 0001074, 0177777, "#bCs" },
+	{ "and",	4, 0001174, 0177777, "#wSs" },
+	{ "and",	2, 0140100, 0170700, ";wDd" },
+	{ "and",	2, 0140500, 0170700, "Dd~w" },
+
+	{ "aslb",	2, 0160400, 0170770, "QdDs" },
+	{ "aslb",	2, 0160440, 0170770, "DdDs" },
+	{ "aslw",	2, 0160500, 0170770, "QdDs" },
+	{ "aslw",	2, 0160540, 0170770, "DdDs" },
+	{ "aslw",	2, 0160700, 0177700, "~s",  },
+	{ "asll",	2, 0160600, 0170770, "QdDs" },
+	{ "asll",	2, 0160640, 0170770, "DdDs" },
+
+	{ "asrb",	2, 0160000, 0170770, "QdDs" },
+	{ "asrb",	2, 0160040, 0170770, "DdDs" },
+	{ "asrw",	2, 0160100, 0170770, "QdDs" },
+	{ "asrw",	2, 0160140, 0170770, "DdDs" },
+	{ "asrw",	2, 0160300, 0177700, "~s",  },
+	{ "asrl",	2, 0160200, 0170770, "QdDs" },
+	{ "asrl",	2, 0160240, 0170770, "DdDs" },
+
+	{ "bhiw",	2, 0061000, 0177777, "BW",	m68k_insn_condbranch },
+	{ "blsw",	2, 0061400, 0177777, "BW",	m68k_insn_condbranch },
+	{ "bccw",	2, 0062000, 0177777, "BW",	m68k_insn_condbranch },
+	{ "bcsw",	2, 0062400, 0177777, "BW",	m68k_insn_condbranch },
+	{ "bnew",	2, 0063000, 0177777, "BW",	m68k_insn_condbranch },
+	{ "beqw",	2, 0063400, 0177777, "BW",	m68k_insn_condbranch },
+	{ "bvcw",	2, 0064000, 0177777, "BW",	m68k_insn_condbranch },
+	{ "bvsw",	2, 0064400, 0177777, "BW",	m68k_insn_condbranch },
+	{ "bplw",	2, 0065000, 0177777, "BW",	m68k_insn_condbranch },
+	{ "bmiw",	2, 0065400, 0177777, "BW",	m68k_insn_condbranch },
+	{ "bgew",	2, 0066000, 0177777, "BW",	m68k_insn_condbranch },
+	{ "bltw",	2, 0066400, 0177777, "BW",	m68k_insn_condbranch },
+	{ "bgtw",	2, 0067000, 0177777, "BW",	m68k_insn_condbranch },
+	{ "blew",	2, 0067400, 0177777, "BW",	m68k_insn_condbranch },
+
+	{ "bhis",	2, 0061000, 0177400, "BB",	m68k_insn_condbranch },
+	{ "blss",	2, 0061400, 0177400, "BB",	m68k_insn_condbranch },
+	{ "bccs",	2, 0062000, 0177400, "BB",	m68k_insn_condbranch },
+	{ "bcss",	2, 0062400, 0177400, "BB",	m68k_insn_condbranch },
+	{ "bnes",	2, 0063000, 0177400, "BB",	m68k_insn_condbranch },
+	{ "beqs",	2, 0063400, 0177400, "BB",	m68k_insn_condbranch },
+	{ "bvcs",	2, 0064000, 0177400, "BB",	m68k_insn_condbranch },
+	{ "bvss",	2, 0064400, 0177400, "BB",	m68k_insn_condbranch },
+	{ "bpls",	2, 0065000, 0177400, "BB",	m68k_insn_condbranch },
+	{ "bmis",	2, 0065400, 0177400, "BB",	m68k_insn_condbranch },
+	{ "bges",	2, 0066000, 0177400, "BB",	m68k_insn_condbranch },
+	{ "blts",	2, 0066400, 0177400, "BB",	m68k_insn_condbranch },
+	{ "bgts",	2, 0067000, 0177400, "BB",	m68k_insn_condbranch },
+	{ "bles",	2, 0067400, 0177400, "BB",	m68k_insn_condbranch },
+
+	{ "jhi",	2, 0061000, 0177400, "Bg",	m68k_insn_condbranch },
+	{ "jls",	2, 0061400, 0177400, "Bg",	m68k_insn_condbranch },
+	{ "jcc",	2, 0062000, 0177400, "Bg",	m68k_insn_condbranch },
+	{ "jcs",	2, 0062400, 0177400, "Bg",	m68k_insn_condbranch },
+	{ "jne",	2, 0063000, 0177400, "Bg",	m68k_insn_condbranch },
+	{ "jeq",	2, 0063400, 0177400, "Bg",	m68k_insn_condbranch },
+	{ "jvc",	2, 0064000, 0177400, "Bg",	m68k_insn_condbranch },
+	{ "jvs",	2, 0064400, 0177400, "Bg",	m68k_insn_condbranch },
+	{ "jpl",	2, 0065000, 0177400, "Bg",	m68k_insn_condbranch },
+	{ "jmi",	2, 0065400, 0177400, "Bg",	m68k_insn_condbranch },
+	{ "jge",	2, 0066000, 0177400, "Bg",	m68k_insn_condbranch },
+	{ "jlt",	2, 0066400, 0177400, "Bg",	m68k_insn_condbranch },
+	{ "jgt",	2, 0067000, 0177400, "Bg",	m68k_insn_condbranch },
+	{ "jle",	2, 0067400, 0177400, "Bg",	m68k_insn_condbranch },
+
+	{ "bchg",	2, 0000500, 0170700, "Dd$s" },
+	{ "bchg",	4, 0004100, 0177700, "#b$s" },
+
+	{ "bclr",	2, 0000600, 0170700, "Dd$s" },
+	{ "bclr",	4, 0004200, 0177700, "#b$s" },
+
+	{ "braw",	2, 0060000, 0177777, "BW",	m68k_insn_branch },
+	{ "bras",	2, 0060000, 0177400, "BB",	m68k_insn_branch },
+
+	{ "bset",	2, 0000700, 0170700, "Dd$s" },
+	{ "bset",	4, 0004300, 0177700, "#b$s" },
+
+	{ "bsrw",	2, 0060400, 0177777, "BW",	m68k_insn_jsr },
+	{ "bsrs",	2, 0060400, 0177400, "BB",	m68k_insn_jsr },
+
+	{ "btst",	2, 0000400, 0170700, "Dd;b" },
+	{ "btst",	4, 0004000, 0177700, "#b@s" },
+
+	{ "chkl",	2, 0040400, 0170700, ";lDd" },
+	{ "chkw",	2, 0040600, 0170700, ";wDd" },
+
+	{ "clrb",	2, 0041000, 0177700, "$s" },
+	{ "clrw",	2, 0041100, 0177700, "$s" },
+	{ "clrl",	2, 0041200, 0177700, "$s" },
+
+	{ "cmpaw",	2, 0130300, 0170700, "*wAd" },
+	{ "cmpal",	2, 0130700, 0170700, "*lAd" },
+
+	{ "cmpib",	4, 0006000, 0177700, "#b@s" },
+	{ "cmpiw",	4, 0006100, 0177700, "#w@s" },
+	{ "cmpil",	6, 0006200, 0177700, "#l@s" },
+
+	{ "cmpmb",	2, 0130410, 0170770, "+s+d" },
+	{ "cmpmw",	2, 0130510, 0170770, "+s+d" },
+	{ "cmpml",	2, 0130610, 0170770, "+s+d" },
+
+	/* The cmp opcode can generate the cmpa, cmpm, and cmpi instructions. */
+	{ "cmpb",	4, 0006000, 0177700, "#b@s" },
+	{ "cmpb",	2, 0130410, 0170770, "+s+d" },
+	{ "cmpb",	2, 0130000, 0170700, ";bDd" },
+	{ "cmpw",	2, 0130300, 0170700, "*wAd" },
+	{ "cmpw",	4, 0006100, 0177700, "#w@s" },
+	{ "cmpw",	2, 0130510, 0170770, "+s+d" },
+	{ "cmpw",	2, 0130100, 0170700, "*wDd" },
+	{ "cmpl",	2, 0130700, 0170700, "*lAd" },
+	{ "cmpl",	6, 0006200, 0177700, "#l@s" },
+	{ "cmpl",	2, 0130610, 0170770, "+s+d" },
+	{ "cmpl",	2, 0130200, 0170700, "*lDd" },
+
+	{ "dbcc",	2, 0052310, 0177770, "DsBw",	m68k_insn_condbranch },
+	{ "dbcs",	2, 0052710, 0177770, "DsBw",	m68k_insn_condbranch },
+	{ "dbeq",	2, 0053710, 0177770, "DsBw",	m68k_insn_condbranch },
+	{ "dbf",	2, 0050710, 0177770, "DsBw",	m68k_insn_condbranch },
+	{ "dbge",	2, 0056310, 0177770, "DsBw",	m68k_insn_condbranch },
+	{ "dbgt",	2, 0057310, 0177770, "DsBw",	m68k_insn_condbranch },
+	{ "dbhi",	2, 0051310, 0177770, "DsBw",	m68k_insn_condbranch },
+	{ "dble",	2, 0057710, 0177770, "DsBw",	m68k_insn_condbranch },
+	{ "dbls",	2, 0051710, 0177770, "DsBw",	m68k_insn_condbranch },
+	{ "dblt",	2, 0056710, 0177770, "DsBw",	m68k_insn_condbranch },
+	{ "dbmi",	2, 0055710, 0177770, "DsBw",	m68k_insn_condbranch },
+	{ "dbne",	2, 0053310, 0177770, "DsBw",	m68k_insn_condbranch },
+	{ "dbpl",	2, 0055310, 0177770, "DsBw",	m68k_insn_condbranch },
+	{ "dbt",	2, 0050310, 0177770, "DsBw",	m68k_insn_condbranch },
+	{ "dbvc",	2, 0054310, 0177770, "DsBw",	m68k_insn_condbranch },
+	{ "dbvs",	2, 0054710, 0177770, "DsBw",	m68k_insn_condbranch },
+
+	{ "divuw",	2, 0100300, 0170700, ";wDd" },
+
+	{ "eorib",	4, 0005000, 0177700, "#b$s" },
+	{ "eorib",	4, 0005074, 0177777, "#bCs" },
+	{ "eoriw",	4, 0005100, 0177700, "#w$s" },
+	{ "eoriw",	4, 0005174, 0177777, "#wSs" },
+	{ "eoril",	6, 0005200, 0177700, "#l$s" },
+	{ "eori",	4, 0005074, 0177777, "#bCs" },
+	{ "eori",	4, 0005174, 0177777, "#wSs" },
+	{ "eori",	4, 0005100, 0177700, "#w$s" },
+
+	/* The eor opcode can generate the eori instruction. */
+	{ "eorb",	4, 0005000, 0177700, "#b$s" },
+	{ "eorb",	4, 0005074, 0177777, "#bCs" },
+	{ "eorb",	2, 0130400, 0170700, "Dd$s" },
+	{ "eorw",	4, 0005100, 0177700, "#w$s" },
+	{ "eorw",	4, 0005174, 0177777, "#wSs" },
+	{ "eorw",	2, 0130500, 0170700, "Dd$s" },
+	{ "eorl",	6, 0005200, 0177700, "#l$s" },
+	{ "eorl",	2, 0130600, 0170700, "Dd$s" },
+	{ "eor",	4, 0005074, 0177777, "#bCs" },
+	{ "eor",	4, 0005174, 0177777, "#wSs" },
+	{ "eor",	4, 0005100, 0177700, "#w$s" },
+	{ "eor",	2, 0130500, 0170700, "Dd$s" },
+
+	{ "exg",	2, 0140500, 0170770, "DdDs" },
+	{ "exg",	2, 0140510, 0170770, "AdAs" },
+	{ "exg",	2, 0140610, 0170770, "DdAs" },
+	{ "exg",	2, 0140610, 0170770, "AsDd" },
+
+	{ "extw",	2, 0044200, 0177770, "Ds" },
+	{ "extl",	2, 0044300, 0177770, "Ds" },
+
+	{ "illegal",	2, 0045374, 0177777, "" },
+
+	{ "jmp",	2, 0047300, 0177700, "!s",	m68k_insn_branch },
+
+	{ "jra",	2, 0060000, 0177400, "Bg" },
+	{ "jra",	2, 0047300, 0177700, "!s" },
+
+	{ "jsr",	2, 0047200, 0177700, "!s",	m68k_insn_jsr },
+
+	{ "jbsr",	2, 0060400, 0177400, "Bg" },
+	{ "jbsr",	2, 0047200, 0177700, "!s" },
+
+	{ "lea",	2, 0040700, 0170700, "!sAd" },
+
+	{ "linkw",	4, 0047120, 0177770, "As#w" },
+	{ "link",	4, 0047120, 0177770, "As#W" },
+
+	{ "lslb",	2, 0160410, 0170770, "QdDs" },
+	{ "lslb",	2, 0160450, 0170770, "DdDs" },
+	{ "lslw",	2, 0160510, 0170770, "QdDs" },
+	{ "lslw",	2, 0160550, 0170770, "DdDs" },
+	{ "lslw",	2, 0161700, 0177700, "~s",  },
+	{ "lsll",	2, 0160610, 0170770, "QdDs" },
+	{ "lsll",	2, 0160650, 0170770, "DdDs" },
+
+	{ "lsrb",	2, 0160010, 0170770, "QdDs" },
+	{ "lsrb",	2, 0160050, 0170770, "DdDs" },
+	{ "lsrw",	2, 0160110, 0170770, "QdDs" },
+	{ "lsrw",	2, 0160150, 0170770, "DdDs" },
+	{ "lsrw",	2, 0161300, 0177700, "~s",  },
+	{ "lsrl",	2, 0160210, 0170770, "QdDs" },
+	{ "lsrl",	2, 0160250, 0170770, "DdDs" },
+
+	{ "moveal",	2, 0020100, 0170700, "*lAd" },
+	{ "moveaw",	2, 0030100, 0170700, "*wAd" },
+
+	{ "movemw",	4, 0044200, 0177700, "Lw&s" },
+	{ "movemw",	4, 0044240, 0177770, "lw-s" },
+	{ "movemw",	4, 0044200, 0177700, "#w>s" },
+	{ "movemw",	4, 0046200, 0177700, "<sLw" },
+	{ "movemw",	4, 0046200, 0177700, "<s#w" },
+	{ "moveml",	4, 0044300, 0177700, "Lw&s" },
+	{ "moveml",	4, 0044340, 0177770, "lw-s" },
+	{ "moveml",	4, 0044300, 0177700, "#w>s" },
+	{ "moveml",	4, 0046300, 0177700, "<sLw" },
+	{ "moveml",	4, 0046300, 0177700, "<s#w" },
+
+	{ "movepw",	2, 0000410, 0170770, "dsDd" },
+	{ "movepw",	2, 0000610, 0170770, "Ddds" },
+	{ "movepl",	2, 0000510, 0170770, "dsDd" },
+	{ "movepl",	2, 0000710, 0170770, "Ddds" },
+
+	{ "moveq",	2, 0070000, 0170400, "MsDd" },
+	{ "moveq",	2, 0070000, 0170400, "#BDd" },
+
+	/* The move opcode can generate the movea and moveq instructions. */
+	{ "moveb",	2, 0010000, 0170000, ";b$d" },
+
+	{ "movew",	2, 0030000, 0170000, "*w%d" },
+	{ "movew",	2, 0040300, 0177700, "Ss$s" },
+	{ "movew",	2, 0042300, 0177700, ";wCd" },
+	{ "movew",	2, 0043300, 0177700, ";wSd" },
+
+	{ "movel",	2, 0070000, 0170400, "MsDd" },
+	{ "movel",	2, 0020000, 0170000, "*l%d" },
+	{ "movel",	2, 0047140, 0177770, "AsUd" },
+	{ "movel",	2, 0047150, 0177770, "UdAs" },
+
+	{ "move",	2, 0030000, 0170000, "*w%d" },
+	{ "move",	2, 0040300, 0177700, "Ss$s" },
+	{ "move",	2, 0042300, 0177700, ";wCd" },
+	{ "move",	2, 0043300, 0177700, ";wSd" },
+
+	{ "move",	2, 0047140, 0177770, "AsUd" },
+	{ "move",	2, 0047150, 0177770, "UdAs" },
+
+	{ "mulsw",	2, 0140700, 0170700, ";wDd" },
+
+	{ "muluw",	2, 0140300, 0170700, ";wDd" },
+
+	{ "nbcd",	2, 0044000, 0177700, "$s" },
+
+	{ "negb",	2, 0042000, 0177700, "$s" },
+	{ "negw",	2, 0042100, 0177700, "$s" },
+	{ "negl",	2, 0042200, 0177700, "$s" },
+
+	{ "negxb",	2, 0040000, 0177700, "$s" },
+	{ "negxw",	2, 0040100, 0177700, "$s" },
+	{ "negxl",	2, 0040200, 0177700, "$s" },
+
+	{ "nop",	2, 0047161, 0177777, "" },
+
+	{ "notb",	2, 0043000, 0177700, "$s" },
+	{ "notw",	2, 0043100, 0177700, "$s" },
+	{ "notl",	2, 0043200, 0177700, "$s" },
+
+	{ "orib",	4, 0000000, 0177700, "#b$s" },
+	{ "orib",	4, 0000074, 0177777, "#bCs" },
+	{ "oriw",	4, 0000100, 0177700, "#w$s" },
+	{ "oriw",	4, 0000174, 0177777, "#wSs" },
+	{ "oril",	6, 0000200, 0177700, "#l$s" },
+	{ "ori",	4, 0000074, 0177777, "#bCs" },
+	{ "ori",	4, 0000100, 0177700, "#w$s" },
+	{ "ori",	4, 0000174, 0177777, "#wSs" },
+
+	/* The or opcode can generate the ori instruction. */
+	{ "orb",	4, 0000000, 0177700, "#b$s" },
+	{ "orb",	4, 0000074, 0177777, "#bCs" },
+	{ "orb",	2, 0100000, 0170700, ";bDd" },
+	{ "orb",	2, 0100400, 0170700, "Dd~s" },
+	{ "orw",	4, 0000100, 0177700, "#w$s" },
+	{ "orw",	4, 0000174, 0177777, "#wSs" },
+	{ "orw",	2, 0100100, 0170700, ";wDd" },
+	{ "orw",	2, 0100500, 0170700, "Dd~s" },
+	{ "orl",	6, 0000200, 0177700, "#l$s" },
+	{ "orl",	2, 0100200, 0170700, ";lDd" },
+	{ "orl",	2, 0100600, 0170700, "Dd~s" },
+	{ "or",		4, 0000074, 0177777, "#bCs" },
+	{ "or",		4, 0000100, 0177700, "#w$s" },
+	{ "or",		4, 0000174, 0177777, "#wSs" },
+	{ "or",		2, 0100100, 0170700, ";wDd" },
+	{ "or",		2, 0100500, 0170700, "Dd~s" },
+
+	{ "pea",	2, 0044100, 0177700, "!s" },
+
+	{ "reset",	2, 0047160, 0177777, "" },
+
+	{ "rolb",	2, 0160430, 0170770, "QdDs" },
+	{ "rolb",	2, 0160470, 0170770, "DdDs" },
+	{ "rolw",	2, 0160530, 0170770, "QdDs" },
+	{ "rolw",	2, 0160570, 0170770, "DdDs" },
+	{ "rolw",	2, 0163700, 0177700, "~s" },
+	{ "roll",	2, 0160630, 0170770, "QdDs" },
+	{ "roll",	2, 0160670, 0170770, "DdDs" },
+
+	{ "rorb",	2, 0160030, 0170770, "QdDs" },
+	{ "rorb",	2, 0160070, 0170770, "DdDs" },
+	{ "rorw",	2, 0160130, 0170770, "QdDs" },
+	{ "rorw",	2, 0160170, 0170770, "DdDs" },
+	{ "rorw",	2, 0163300, 0177700, "~s" },
+	{ "rorl",	2, 0160230, 0170770, "QdDs" },
+	{ "rorl",	2, 0160270, 0170770, "DdDs" },
+
+	{ "roxlb",	2, 0160420, 0170770, "QdDs" },
+	{ "roxlb",	2, 0160460, 0170770, "DdDs" },
+	{ "roxlw",	2, 0160520, 0170770, "QdDs" },
+	{ "roxlw",	2, 0160560, 0170770, "DdDs" },
+	{ "roxlw",	2, 0162700, 0177700, "~s" },
+	{ "roxll",	2, 0160620, 0170770, "QdDs" },
+	{ "roxll",	2, 0160660, 0170770, "DdDs" },
+
+	{ "roxrb",	2, 0160020, 0170770, "QdDs" },
+	{ "roxrb",	2, 0160060, 0170770, "DdDs" },
+	{ "roxrw",	2, 0160120, 0170770, "QdDs" },
+	{ "roxrw",	2, 0160160, 0170770, "DdDs" },
+	{ "roxrw",	2, 0162300, 0177700, "~s" },
+	{ "roxrl",	2, 0160220, 0170770, "QdDs" },
+	{ "roxrl",	2, 0160260, 0170770, "DdDs" },
+
+	{ "rte",	2, 0047163, 0177777, "" },
+
+	{ "rtr",	2, 0047167, 0177777, "" },
+
+	{ "rts",	2, 0047165, 0177777, "",	m68k_insn_return },
+
+	{ "sbcd",	2, 0100400, 0170770, "DsDd" },
+	{ "sbcd",	2, 0100410, 0170770, "-s-d" },
+
+	{ "scc",	2, 0052300, 0177700, "$s" },
+	{ "scs",	2, 0052700, 0177700, "$s" },
+	{ "seq",	2, 0053700, 0177700, "$s" },
+	{ "sf",		2, 0050700, 0177700, "$s" },
+	{ "sge",	2, 0056300, 0177700, "$s" },
+	{ "sgt",	2, 0057300, 0177700, "$s" },
+	{ "shi",	2, 0051300, 0177700, "$s" },
+	{ "sle",	2, 0057700, 0177700, "$s" },
+	{ "sls",	2, 0051700, 0177700, "$s" },
+	{ "slt",	2, 0056700, 0177700, "$s" },
+	{ "smi",	2, 0055700, 0177700, "$s" },
+	{ "sne",	2, 0053300, 0177700, "$s" },
+	{ "spl",	2, 0055300, 0177700, "$s" },
+	{ "st",		2, 0050300, 0177700, "$s" },
+	{ "svc",	2, 0054300, 0177700, "$s" },
+	{ "svs",	2, 0054700, 0177700, "$s" },
+
+	{ "stop",	4, 0047162, 0177777, "#w" },
+
+	{ "subal",	2, 0110700, 0170700, "*lAd" },
+	{ "subaw",	2, 0110300, 0170700, "*wAd" },
+
+	{ "subib",	4, 0002000, 0177700, "#b$s" },
+	{ "subiw",	4, 0002100, 0177700, "#w$s" },
+	{ "subil",	6, 0002200, 0177700, "#l$s" },
+
+	{ "subqb",	2, 0050400, 0170700, "Qd%s" },
+	{ "subqw",	2, 0050500, 0170700, "Qd%s" },
+	{ "subql",	2, 0050600, 0170700, "Qd%s" },
+
+	/* The sub opcode can generate the suba, subi, and subq instructions. */
+	{ "subb",	2, 0050400, 0170700, "Qd%s" },
+	{ "subb",	4, 0002000, 0177700, "#b$s" },
+	{ "subb",	2, 0110000, 0170700, ";bDd" },
+	{ "subb",	2, 0110400, 0170700, "Dd~s" },
+	{ "subw",	2, 0050500, 0170700, "Qd%s" },
+	{ "subw",	4, 0002100, 0177700, "#w$s" },
+	{ "subw",	2, 0110300, 0170700, "*wAd" },
+	{ "subw",	2, 0110100, 0170700, "*wDd" },
+	{ "subw",	2, 0110500, 0170700, "Dd~s" },
+	{ "subl",	2, 0050600, 0170700, "Qd%s" },
+	{ "subl",	6, 0002200, 0177700, "#l$s" },
+	{ "subl",	2, 0110700, 0170700, "*lAd" },
+	{ "subl",	2, 0110200, 0170700, "*lDd" },
+	{ "subl",	2, 0110600, 0170700, "Dd~s" },
+
+	{ "subxb",	2, 0110400, 0170770, "DsDd" },
+	{ "subxb",	2, 0110410, 0170770, "-s-d" },
+	{ "subxw",	2, 0110500, 0170770, "DsDd" },
+	{ "subxw",	2, 0110510, 0170770, "-s-d" },
+	{ "subxl",	2, 0110600, 0170770, "DsDd" },
+	{ "subxl",	2, 0110610, 0170770, "-s-d" },
+
+	{ "swap",	2, 0044100, 0177770, "Ds" },
+
+	{ "tas",	2, 0045300, 0177700, "$s"},
+
+	{ "trap",	2, 0047100, 0177760, "Ts" },
+
+	{ "trapv",	2, 0047166, 0177777, "" },
+
+	{ "tstb",	2, 0045000, 0177700, "$b" },
+	{ "tstw",	2, 0045100, 0177700, "$w" },
+	{ "tstl",	2, 0045200, 0177700, "$l" },
+
+	{ "unlk",	2, 0047130, 0177770, "As" },
 };
 
 /* Local function prototypes.  */
@@ -2004,7 +2001,7 @@ print_insn_m68k (bfd_vma memaddr, disassemble_info *info)
 
       /* First count how many opcodes are in each of the sixteen buckets.  */
       for (i = 0; i < ARRAY_SIZE(m68k_opcodes); i++)
-	numopcodes[(m68k_opcodes[i].opcode >> 28) & 15]++;
+	numopcodes[(m68k_opcodes[i].opcode >> 12) & 15]++;
 
       /* Then create a sorted table of pointers
 	 that point into the unsorted table.  */
@@ -2019,7 +2016,7 @@ print_insn_m68k (bfd_vma memaddr, disassemble_info *info)
 	}
 
       for (i = 0; i < ARRAY_SIZE(m68k_opcodes); i++)
-	*opc_pointer[(m68k_opcodes[i].opcode >> 28) & 15]++ = &m68k_opcodes[i];
+	*opc_pointer[(m68k_opcodes[i].opcode >> 12) & 15]++ = &m68k_opcodes[i];
     }
 
   info->private_data = (void *)&priv;
@@ -2040,8 +2037,8 @@ print_insn_m68k (bfd_vma memaddr, disassemble_info *info)
   for (i = 0; i < numopcodes[major_opcode]; i++)
     {
       const struct m68k_opcode *opc = opcodes[major_opcode][i];
-      unsigned long opcode = opc->opcode;
-      unsigned long match = opc->match;
+      const unsigned long opcode = opc->opcode << 16;
+      const unsigned long match = opc->match << 16;
 
       if (((0xff & buffer[0] & (match >> 24)) == (0xff & (opcode >> 24)))
 	  && ((0xff & buffer[1] & (match >> 16)) == (0xff & (opcode >> 16)))
