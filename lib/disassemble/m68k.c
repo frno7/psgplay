@@ -18,7 +18,6 @@
 #include "disassemble/m68k.h"
 
 typedef bool bfd_boolean;
-typedef void *PTR;
 typedef uint64_t bfd_vma;
 typedef int64_t bfd_signed_vma;
 typedef uint8_t bfd_byte;
@@ -59,7 +58,7 @@ typedef struct disassemble_info {
   /* The bfd_mach value.  */
   unsigned long mach;
 
-  PTR private_data;
+  void *private_data;
 
   /* Function used to get bytes to disassemble.  MEMADDR is the
      address of the stuff to be disassembled, MYADDR is the address to
@@ -1756,7 +1755,7 @@ print_insn_m68k (bfd_vma memaddr, disassemble_info *info)
 	*opc_pointer[(m68k_opcodes[i].opcode >> 28) & 15]++ = &m68k_opcodes[i];
     }
 
-  info->private_data = (PTR) &priv;
+  info->private_data = (void *)&priv;
   /* Tell objdump to use two bytes per chunk
      and six bytes per line for displaying raw data.  */
   info->bytes_per_line = 6;
