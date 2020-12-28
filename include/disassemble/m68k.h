@@ -6,13 +6,22 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/**
+ * enum m68k_insn_type - instruction type
+ * @m68k_insn_inv: invalid instruction
+ * @m68k_insn_ins: instruction except jump
+ * @m68k_insn_jmp: unconditional jump
+ * @m68k_insn_jcc: conditional jump
+ * @m68k_insn_jsr: jump to subroutine
+ * @m68k_insn_ret: return instruction
+ */
 enum m68k_insn_type {
-	m68k_insn_noninsn,		/* Not a valid instruction */
-	m68k_insn_nonbranch,		/* Not a branch instruction */
-	m68k_insn_branch,		/* Unconditional branch */
-	m68k_insn_condbranch,		/* Conditional branch */
-	m68k_insn_jsr,			/* Jump to subroutine */
-	m68k_insn_return,		/* Subroutine return */
+	m68k_insn_inv,
+	m68k_insn_ins,
+	m68k_insn_jmp,
+	m68k_insn_jcc,
+	m68k_insn_jsr,
+	m68k_insn_ret,
 };
 
 struct m68k_symbol {

@@ -272,20 +272,20 @@ static void dasm_mark_text_trace(struct disassembly *dasm, size_t i)
 		i += insn_size;
 
 		switch (type) {
-		case m68k_insn_noninsn:
+		case m68k_insn_inv:
 			return;
-		case m68k_insn_nonbranch:
+		case m68k_insn_ins:
 			continue;
-		case m68k_insn_branch:
+		case m68k_insn_jmp:
 			dasm_mark_target(dasm, target);
 			i = target;
 			continue;
-		case m68k_insn_condbranch:
+		case m68k_insn_jcc:
 		case m68k_insn_jsr:
 			dasm_mark_target(dasm, target);
 			dasm_mark_text_trace(dasm, target);
 			continue;
-		case m68k_insn_return:
+		case m68k_insn_ret:
 			return;
 		default:
 			BUG();

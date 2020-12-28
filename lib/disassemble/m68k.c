@@ -397,50 +397,50 @@ static const struct m68k_opcode m68k_opcodes[] =
 	{ "asrl",	2, 0160200, 0170770, "QdDs" },
 	{ "asrl",	2, 0160240, 0170770, "DdDs" },
 
-	{ "bhiw",	2, 0061000, 0177777, "BW",	m68k_insn_condbranch },
-	{ "blsw",	2, 0061400, 0177777, "BW",	m68k_insn_condbranch },
-	{ "bccw",	2, 0062000, 0177777, "BW",	m68k_insn_condbranch },
-	{ "bcsw",	2, 0062400, 0177777, "BW",	m68k_insn_condbranch },
-	{ "bnew",	2, 0063000, 0177777, "BW",	m68k_insn_condbranch },
-	{ "beqw",	2, 0063400, 0177777, "BW",	m68k_insn_condbranch },
-	{ "bvcw",	2, 0064000, 0177777, "BW",	m68k_insn_condbranch },
-	{ "bvsw",	2, 0064400, 0177777, "BW",	m68k_insn_condbranch },
-	{ "bplw",	2, 0065000, 0177777, "BW",	m68k_insn_condbranch },
-	{ "bmiw",	2, 0065400, 0177777, "BW",	m68k_insn_condbranch },
-	{ "bgew",	2, 0066000, 0177777, "BW",	m68k_insn_condbranch },
-	{ "bltw",	2, 0066400, 0177777, "BW",	m68k_insn_condbranch },
-	{ "bgtw",	2, 0067000, 0177777, "BW",	m68k_insn_condbranch },
-	{ "blew",	2, 0067400, 0177777, "BW",	m68k_insn_condbranch },
+	{ "bhiw",	2, 0061000, 0177777, "BW",	m68k_insn_jcc },
+	{ "blsw",	2, 0061400, 0177777, "BW",	m68k_insn_jcc },
+	{ "bccw",	2, 0062000, 0177777, "BW",	m68k_insn_jcc },
+	{ "bcsw",	2, 0062400, 0177777, "BW",	m68k_insn_jcc },
+	{ "bnew",	2, 0063000, 0177777, "BW",	m68k_insn_jcc },
+	{ "beqw",	2, 0063400, 0177777, "BW",	m68k_insn_jcc },
+	{ "bvcw",	2, 0064000, 0177777, "BW",	m68k_insn_jcc },
+	{ "bvsw",	2, 0064400, 0177777, "BW",	m68k_insn_jcc },
+	{ "bplw",	2, 0065000, 0177777, "BW",	m68k_insn_jcc },
+	{ "bmiw",	2, 0065400, 0177777, "BW",	m68k_insn_jcc },
+	{ "bgew",	2, 0066000, 0177777, "BW",	m68k_insn_jcc },
+	{ "bltw",	2, 0066400, 0177777, "BW",	m68k_insn_jcc },
+	{ "bgtw",	2, 0067000, 0177777, "BW",	m68k_insn_jcc },
+	{ "blew",	2, 0067400, 0177777, "BW",	m68k_insn_jcc },
 
-	{ "bhis",	2, 0061000, 0177400, "BB",	m68k_insn_condbranch },
-	{ "blss",	2, 0061400, 0177400, "BB",	m68k_insn_condbranch },
-	{ "bccs",	2, 0062000, 0177400, "BB",	m68k_insn_condbranch },
-	{ "bcss",	2, 0062400, 0177400, "BB",	m68k_insn_condbranch },
-	{ "bnes",	2, 0063000, 0177400, "BB",	m68k_insn_condbranch },
-	{ "beqs",	2, 0063400, 0177400, "BB",	m68k_insn_condbranch },
-	{ "bvcs",	2, 0064000, 0177400, "BB",	m68k_insn_condbranch },
-	{ "bvss",	2, 0064400, 0177400, "BB",	m68k_insn_condbranch },
-	{ "bpls",	2, 0065000, 0177400, "BB",	m68k_insn_condbranch },
-	{ "bmis",	2, 0065400, 0177400, "BB",	m68k_insn_condbranch },
-	{ "bges",	2, 0066000, 0177400, "BB",	m68k_insn_condbranch },
-	{ "blts",	2, 0066400, 0177400, "BB",	m68k_insn_condbranch },
-	{ "bgts",	2, 0067000, 0177400, "BB",	m68k_insn_condbranch },
-	{ "bles",	2, 0067400, 0177400, "BB",	m68k_insn_condbranch },
+	{ "bhis",	2, 0061000, 0177400, "BB",	m68k_insn_jcc },
+	{ "blss",	2, 0061400, 0177400, "BB",	m68k_insn_jcc },
+	{ "bccs",	2, 0062000, 0177400, "BB",	m68k_insn_jcc },
+	{ "bcss",	2, 0062400, 0177400, "BB",	m68k_insn_jcc },
+	{ "bnes",	2, 0063000, 0177400, "BB",	m68k_insn_jcc },
+	{ "beqs",	2, 0063400, 0177400, "BB",	m68k_insn_jcc },
+	{ "bvcs",	2, 0064000, 0177400, "BB",	m68k_insn_jcc },
+	{ "bvss",	2, 0064400, 0177400, "BB",	m68k_insn_jcc },
+	{ "bpls",	2, 0065000, 0177400, "BB",	m68k_insn_jcc },
+	{ "bmis",	2, 0065400, 0177400, "BB",	m68k_insn_jcc },
+	{ "bges",	2, 0066000, 0177400, "BB",	m68k_insn_jcc },
+	{ "blts",	2, 0066400, 0177400, "BB",	m68k_insn_jcc },
+	{ "bgts",	2, 0067000, 0177400, "BB",	m68k_insn_jcc },
+	{ "bles",	2, 0067400, 0177400, "BB",	m68k_insn_jcc },
 
-	{ "jhi",	2, 0061000, 0177400, "Bg",	m68k_insn_condbranch },
-	{ "jls",	2, 0061400, 0177400, "Bg",	m68k_insn_condbranch },
-	{ "jcc",	2, 0062000, 0177400, "Bg",	m68k_insn_condbranch },
-	{ "jcs",	2, 0062400, 0177400, "Bg",	m68k_insn_condbranch },
-	{ "jne",	2, 0063000, 0177400, "Bg",	m68k_insn_condbranch },
-	{ "jeq",	2, 0063400, 0177400, "Bg",	m68k_insn_condbranch },
-	{ "jvc",	2, 0064000, 0177400, "Bg",	m68k_insn_condbranch },
-	{ "jvs",	2, 0064400, 0177400, "Bg",	m68k_insn_condbranch },
-	{ "jpl",	2, 0065000, 0177400, "Bg",	m68k_insn_condbranch },
-	{ "jmi",	2, 0065400, 0177400, "Bg",	m68k_insn_condbranch },
-	{ "jge",	2, 0066000, 0177400, "Bg",	m68k_insn_condbranch },
-	{ "jlt",	2, 0066400, 0177400, "Bg",	m68k_insn_condbranch },
-	{ "jgt",	2, 0067000, 0177400, "Bg",	m68k_insn_condbranch },
-	{ "jle",	2, 0067400, 0177400, "Bg",	m68k_insn_condbranch },
+	{ "jhi",	2, 0061000, 0177400, "Bg",	m68k_insn_jcc },
+	{ "jls",	2, 0061400, 0177400, "Bg",	m68k_insn_jcc },
+	{ "jcc",	2, 0062000, 0177400, "Bg",	m68k_insn_jcc },
+	{ "jcs",	2, 0062400, 0177400, "Bg",	m68k_insn_jcc },
+	{ "jne",	2, 0063000, 0177400, "Bg",	m68k_insn_jcc },
+	{ "jeq",	2, 0063400, 0177400, "Bg",	m68k_insn_jcc },
+	{ "jvc",	2, 0064000, 0177400, "Bg",	m68k_insn_jcc },
+	{ "jvs",	2, 0064400, 0177400, "Bg",	m68k_insn_jcc },
+	{ "jpl",	2, 0065000, 0177400, "Bg",	m68k_insn_jcc },
+	{ "jmi",	2, 0065400, 0177400, "Bg",	m68k_insn_jcc },
+	{ "jge",	2, 0066000, 0177400, "Bg",	m68k_insn_jcc },
+	{ "jlt",	2, 0066400, 0177400, "Bg",	m68k_insn_jcc },
+	{ "jgt",	2, 0067000, 0177400, "Bg",	m68k_insn_jcc },
+	{ "jle",	2, 0067400, 0177400, "Bg",	m68k_insn_jcc },
 
 	{ "bchg",	2, 0000500, 0170700, "Dd$s" },
 	{ "bchg",	4, 0004100, 0177700, "#b$s" },
@@ -448,8 +448,8 @@ static const struct m68k_opcode m68k_opcodes[] =
 	{ "bclr",	2, 0000600, 0170700, "Dd$s" },
 	{ "bclr",	4, 0004200, 0177700, "#b$s" },
 
-	{ "braw",	2, 0060000, 0177777, "BW",	m68k_insn_branch },
-	{ "bras",	2, 0060000, 0177400, "BB",	m68k_insn_branch },
+	{ "braw",	2, 0060000, 0177777, "BW",	m68k_insn_jmp },
+	{ "bras",	2, 0060000, 0177400, "BB",	m68k_insn_jmp },
 
 	{ "bset",	2, 0000700, 0170700, "Dd$s" },
 	{ "bset",	4, 0004300, 0177700, "#b$s" },
@@ -491,22 +491,22 @@ static const struct m68k_opcode m68k_opcodes[] =
 	{ "cmpl",	2, 0130610, 0170770, "+s+d" },
 	{ "cmpl",	2, 0130200, 0170700, "*lDd" },
 
-	{ "dbcc",	2, 0052310, 0177770, "DsBw",	m68k_insn_condbranch },
-	{ "dbcs",	2, 0052710, 0177770, "DsBw",	m68k_insn_condbranch },
-	{ "dbeq",	2, 0053710, 0177770, "DsBw",	m68k_insn_condbranch },
-	{ "dbf",	2, 0050710, 0177770, "DsBw",	m68k_insn_condbranch },
-	{ "dbge",	2, 0056310, 0177770, "DsBw",	m68k_insn_condbranch },
-	{ "dbgt",	2, 0057310, 0177770, "DsBw",	m68k_insn_condbranch },
-	{ "dbhi",	2, 0051310, 0177770, "DsBw",	m68k_insn_condbranch },
-	{ "dble",	2, 0057710, 0177770, "DsBw",	m68k_insn_condbranch },
-	{ "dbls",	2, 0051710, 0177770, "DsBw",	m68k_insn_condbranch },
-	{ "dblt",	2, 0056710, 0177770, "DsBw",	m68k_insn_condbranch },
-	{ "dbmi",	2, 0055710, 0177770, "DsBw",	m68k_insn_condbranch },
-	{ "dbne",	2, 0053310, 0177770, "DsBw",	m68k_insn_condbranch },
-	{ "dbpl",	2, 0055310, 0177770, "DsBw",	m68k_insn_condbranch },
-	{ "dbt",	2, 0050310, 0177770, "DsBw",	m68k_insn_condbranch },
-	{ "dbvc",	2, 0054310, 0177770, "DsBw",	m68k_insn_condbranch },
-	{ "dbvs",	2, 0054710, 0177770, "DsBw",	m68k_insn_condbranch },
+	{ "dbcc",	2, 0052310, 0177770, "DsBw",	m68k_insn_jcc },
+	{ "dbcs",	2, 0052710, 0177770, "DsBw",	m68k_insn_jcc },
+	{ "dbeq",	2, 0053710, 0177770, "DsBw",	m68k_insn_jcc },
+	{ "dbf",	2, 0050710, 0177770, "DsBw",	m68k_insn_jcc },
+	{ "dbge",	2, 0056310, 0177770, "DsBw",	m68k_insn_jcc },
+	{ "dbgt",	2, 0057310, 0177770, "DsBw",	m68k_insn_jcc },
+	{ "dbhi",	2, 0051310, 0177770, "DsBw",	m68k_insn_jcc },
+	{ "dble",	2, 0057710, 0177770, "DsBw",	m68k_insn_jcc },
+	{ "dbls",	2, 0051710, 0177770, "DsBw",	m68k_insn_jcc },
+	{ "dblt",	2, 0056710, 0177770, "DsBw",	m68k_insn_jcc },
+	{ "dbmi",	2, 0055710, 0177770, "DsBw",	m68k_insn_jcc },
+	{ "dbne",	2, 0053310, 0177770, "DsBw",	m68k_insn_jcc },
+	{ "dbpl",	2, 0055310, 0177770, "DsBw",	m68k_insn_jcc },
+	{ "dbt",	2, 0050310, 0177770, "DsBw",	m68k_insn_jcc },
+	{ "dbvc",	2, 0054310, 0177770, "DsBw",	m68k_insn_jcc },
+	{ "dbvs",	2, 0054710, 0177770, "DsBw",	m68k_insn_jcc },
 
 	{ "divuw",	2, 0100300, 0170700, ";wDd" },
 
@@ -543,7 +543,7 @@ static const struct m68k_opcode m68k_opcodes[] =
 
 	{ "illegal",	2, 0045374, 0177777, "" },
 
-	{ "jmp",	2, 0047300, 0177700, "!s",	m68k_insn_branch },
+	{ "jmp",	2, 0047300, 0177700, "!s",	m68k_insn_jmp },
 
 	{ "jra",	2, 0060000, 0177400, "Bg" },
 	{ "jra",	2, 0047300, 0177700, "!s" },
@@ -700,11 +700,11 @@ static const struct m68k_opcode m68k_opcodes[] =
 	{ "roxrl",	2, 0160220, 0170770, "QdDs" },
 	{ "roxrl",	2, 0160260, 0170770, "DdDs" },
 
-	{ "rte",	2, 0047163, 0177777, "",	m68k_insn_return },
+	{ "rte",	2, 0047163, 0177777, "",	m68k_insn_ret },
 
-	{ "rtr",	2, 0047167, 0177777, "",	m68k_insn_return },
+	{ "rtr",	2, 0047167, 0177777, "",	m68k_insn_ret },
 
-	{ "rts",	2, 0047165, 0177777, "",	m68k_insn_return },
+	{ "rts",	2, 0047165, 0177777, "",	m68k_insn_ret },
 
 	{ "sbcd",	2, 0100400, 0170770, "DsDd" },
 	{ "sbcd",	2, 0100410, 0170770, "-s-d" },
@@ -1915,7 +1915,7 @@ match_insn_m68k (bfd_vma memaddr,
 
   d = best->args;
 
-  info->insn_type = m68k_insn_noninsn;
+  info->insn_type = m68k_insn_inv;
 
   save_p = p;
   info->print_address_func = dummy_print_address;
@@ -1953,7 +1953,7 @@ match_insn_m68k (bfd_vma memaddr,
 
   d = best->args;
 
-  info->insn_type = best->insn_type ? best->insn_type : m68k_insn_nonbranch;
+  info->insn_type = best->insn_type ? best->insn_type : m68k_insn_ins;
 
   info->fprintf_func (info->stream, "%s", best->name);
 
