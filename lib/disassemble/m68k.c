@@ -405,21 +405,6 @@ static const struct m68k_opcode m68k_opcodes[] =
 	{ "bgt.s",	2, 0067000, 0177400, "BB",	m68k_insn_jcc },
 	{ "ble.s",	2, 0067400, 0177400, "BB",	m68k_insn_jcc },
 
-	{ "jhi",	2, 0061000, 0177400, "Bg",	m68k_insn_jcc },
-	{ "jls",	2, 0061400, 0177400, "Bg",	m68k_insn_jcc },
-	{ "jcc",	2, 0062000, 0177400, "Bg",	m68k_insn_jcc },
-	{ "jcs",	2, 0062400, 0177400, "Bg",	m68k_insn_jcc },
-	{ "jne",	2, 0063000, 0177400, "Bg",	m68k_insn_jcc },
-	{ "jeq",	2, 0063400, 0177400, "Bg",	m68k_insn_jcc },
-	{ "jvc",	2, 0064000, 0177400, "Bg",	m68k_insn_jcc },
-	{ "jvs",	2, 0064400, 0177400, "Bg",	m68k_insn_jcc },
-	{ "jpl",	2, 0065000, 0177400, "Bg",	m68k_insn_jcc },
-	{ "jmi",	2, 0065400, 0177400, "Bg",	m68k_insn_jcc },
-	{ "jge",	2, 0066000, 0177400, "Bg",	m68k_insn_jcc },
-	{ "jlt",	2, 0066400, 0177400, "Bg",	m68k_insn_jcc },
-	{ "jgt",	2, 0067000, 0177400, "Bg",	m68k_insn_jcc },
-	{ "jle",	2, 0067400, 0177400, "Bg",	m68k_insn_jcc },
-
 	{ "bchg",	2, 0000500, 0170700, "Dd$s" },
 	{ "bchg",	4, 0004100, 0177700, "#b$s" },
 
@@ -500,13 +485,7 @@ static const struct m68k_opcode m68k_opcodes[] =
 
 	{ "jmp",	2, 0047300, 0177700, "!s",	m68k_insn_jmp },
 
-	{ "jra",	2, 0060000, 0177400, "Bg" },
-	{ "jra",	2, 0047300, 0177700, "!s" },
-
 	{ "jsr",	2, 0047200, 0177700, "!s",	m68k_insn_jsr },
-
-	{ "jbsr",	2, 0060400, 0177400, "Bg" },
-	{ "jbsr",	2, 0047200, 0177700, "!s" },
 
 	{ "lea",	2, 0040700, 0170700, "!sAd" },
 
