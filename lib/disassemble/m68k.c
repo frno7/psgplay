@@ -528,7 +528,6 @@ static const struct m68k_opcode m68k_opcodes[] =
 	{ "movep.l",	2, 0000710, 0170770, "Ddds" },
 
 	{ "moveq",	2, 0070000, 0170400, "MsDd" },
-	{ "moveq",	2, 0070000, 0170400, "#BDd" },
 
 	{ "move.b",	2, 0010000, 0170000, ";b$d" },
 
