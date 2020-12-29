@@ -130,7 +130,7 @@ struct m68k_opcode
    operand; the second, the place it is stored.  */
 
 /* Kinds of operands:
-   Characters used: AaBbCcDdEeFfGgHIiJkLlMmnOopQqRrSsTtU VvWwXxYyZz01234|*~%;@!&$?/<>#^+-
+   Characters used: AaBbCcDdEeFfGgHIiJkLlMmnOopQqRrSsTtU VvWwXxYyZz01234|*~%;@!&$?/<>#+-
 
    D  data register only.  Stored as 3 bits.
    A  address register only.  Stored as 3 bits.
@@ -154,8 +154,6 @@ struct m68k_opcode
 
    #  immediate data.  Stored in special places (b, w or l)
       which say how many bits to store.
-   ^  immediate data for floating point instructions.   Special places
-      are offset by 2 bytes from '#'...
    B  pc-relative address, converted to an offset
       that is treated as immediate data.
    d  displacement and register.  Stores the register as 3 bits
@@ -1224,7 +1222,6 @@ static int print_insn_arg(const char *d, unsigned char *buffer,
       break;
 
     case '#':
-    case '^':
       p1 = buffer + (*d == '#' ? 2 : 4);
       if (place == 's')
 	val = fetch_arg (buffer, place, 4, info);
