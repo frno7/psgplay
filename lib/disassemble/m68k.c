@@ -672,25 +672,10 @@ static const struct m68k_opcode m68k_opcodes[] =
 
 /* Local function prototypes.  */
 
-static const char * const fpcr_names[] =
-{
-  "", "%fpiar", "%fpsr", "%fpiar/%fpsr", "%fpcr",
-  "%fpiar/%fpcr", "%fpsr/%fpcr", "%fpiar/%fpsr/%fpcr"
-};
-
 static const char *const reg_names[] =
 {
   "%d0", "%d1", "%d2", "%d3", "%d4", "%d5", "%d6", "%d7",
   "%a0", "%a1", "%a2", "%a3", "%a4", "%a5", "%a6", "%sp",
-  "%ps", "%pc"
-};
-
-/* Name of register halves for MAC/EMAC.
-   Separate from reg_names since 'spu', 'fpl' look weird.  */
-static const char *const reg_half_names[] =
-{
-  "%d0", "%d1", "%d2", "%d3", "%d4", "%d5", "%d6", "%d7",
-  "%a0", "%a1", "%a2", "%a3", "%a4", "%a5", "%a6", "%a7",
   "%ps", "%pc"
 };
 
@@ -1032,30 +1017,6 @@ static int print_insn_arg(const char *d, unsigned char *buffer,
 
   switch (*d)
     {
-    case 'c':		/* Cache identifier.  */
-      {
-        static const char *const cacheFieldName[] = { "nc", "dc", "ic", "bc" };
-        val = fetch_arg (buffer, place, 2, info);
-        (*info->fprintf_func) (info->stream, "%s", cacheFieldName[val]);
-        break;
-      }
-
-    case 'a':		/* Address register indirect only. Cf. case '+'.  */
-      {
-        (*info->fprintf_func)
-	  (info->stream,
-	   "%s@",
-	   reg_names[fetch_arg (buffer, place, 3, info) + 8]);
-        break;
-      }
-
-    case '_':		/* 32-bit absolute address for move16.  */
-      {
-        uval = NEXTULONG (p);
-	(*info->print_address_func) (uval, info);
-        break;
-      }
-
     case 'C':
       (*info->fprintf_func) (info->stream, "%%ccr");
       break;
@@ -1068,31 +1029,11 @@ static int print_insn_arg(const char *d, unsigned char *buffer,
       (*info->fprintf_func) (info->stream, "%%usp");
       break;
 
-    case 'E':
-      (*info->fprintf_func) (info->stream, "%%acc");
-      break;
-
-    case 'G':
-      (*info->fprintf_func) (info->stream, "%%macsr");
-      break;
-
-    case 'H':
-      (*info->fprintf_func) (info->stream, "%%mask");
-      break;
-
     case 'Q':
       val = fetch_arg (buffer, place, 3, info);
       /* 0 means 8, except for the bkpt instruction... */
       if (val == 0 && d[1] != 's')
 	val = 8;
-      (*info->fprintf_func) (info->stream, "#%d", val);
-      break;
-
-    case 'x':
-      val = fetch_arg (buffer, place, 3, info);
-      /* 0 means -1.  */
-      if (val == 0)
-	val = -1;
       (*info->fprintf_func) (info->stream, "#%d", val);
       break;
 
@@ -1128,34 +1069,6 @@ static int print_insn_arg(const char *d, unsigned char *buffer,
 	 reg_names[fetch_arg (buffer, place, 3, info) + 010]);
       break;
 
-    case 'R':
-      (*info->fprintf_func)
-	(info->stream, "%s",
-	 reg_names[fetch_arg (buffer, place, 4, info)]);
-      break;
-
-    case 'r':
-      regno = fetch_arg (buffer, place, 4, info);
-      if (regno > 7)
-	(*info->fprintf_func) (info->stream, "%s@", reg_names[regno]);
-      else
-	(*info->fprintf_func) (info->stream, "@(%s)", reg_names[regno]);
-      break;
-
-    case 'F':
-      (*info->fprintf_func)
-	(info->stream, "%%fp%d",
-	 fetch_arg (buffer, place, 3, info));
-      break;
-
-    case 'O':
-      val = fetch_arg (buffer, place, 6, info);
-      if (val & 0x20)
-	(*info->fprintf_func) (info->stream, "%s", reg_names[val & 7]);
-      else
-	(*info->fprintf_func) (info->stream, "%d", val);
-      break;
-
     case '+':
       (*info->fprintf_func)
 	(info->stream, "%s@+",
@@ -1166,22 +1079,6 @@ static int print_insn_arg(const char *d, unsigned char *buffer,
       (*info->fprintf_func)
 	(info->stream, "%s@-",
 	 reg_names[fetch_arg (buffer, place, 3, info) + 8]);
-      break;
-
-    case 'k':
-      if (place == 'k')
-	(*info->fprintf_func)
-	  (info->stream, "{%s}",
-	   reg_names[fetch_arg (buffer, place, 3, info)]);
-      else if (place == 'C')
-	{
-	  val = fetch_arg (buffer, place, 7, info);
-	  if (val > 63)		/* This is a signed constant.  */
-	    val -= 128;
-	  (*info->fprintf_func) (info->stream, "{#%d}", val);
-	}
-      else
-	BUG();
       break;
 
     case '#':
@@ -1243,40 +1140,6 @@ static int print_insn_arg(const char *d, unsigned char *buffer,
 	 reg_names[fetch_arg (buffer, place, 3, info) + 8], val);
       break;
 
-    case 's':
-      (*info->fprintf_func) (info->stream, "%s",
-			     fpcr_names[fetch_arg (buffer, place, 3, info)]);
-      break;
-
-    case 'e':
-      val = fetch_arg(buffer, place, 2, info);
-      (*info->fprintf_func) (info->stream, "%%acc%d", val);
-      break;
-
-    case 'g':
-      val = fetch_arg(buffer, place, 1, info);
-      (*info->fprintf_func) (info->stream, "%%accext%s", val==0 ? "01" : "23");
-      break;
-
-    case 'i':
-      val = fetch_arg(buffer, place, 2, info);
-      if (val == 1)
-	(*info->fprintf_func) (info->stream, "<<");
-      else if (val == 3)
-	(*info->fprintf_func) (info->stream, ">>");
-      else
-	return -1;
-      break;
-
-    case 'I':
-      /* Get coprocessor ID... */
-      val = fetch_arg (buffer, 'd', 3, info);
-
-      if (val != 1)				/* Unusual coprocessor ID?  */
-	(*info->fprintf_func) (info->stream, "(cpid=%d) ", val);
-      break;
-
-    case '4':
     case '*':
     case '~':
     case '%':
@@ -1284,22 +1147,8 @@ static int print_insn_arg(const char *d, unsigned char *buffer,
     case '@':
     case '!':
     case '$':
-    case '?':
-    case '/':
     case '&':
-    case '|':
     case '<':
-    case '>':
-    case 'm':
-    case 'n':
-    case 'o':
-    case 'p':
-    case 'q':
-    case 'v':
-    case 'b':
-    case 'w':
-    case 'y':
-    case 'z':
       if (place == 'd')
 	{
 	  val = fetch_arg (buffer, 'x', 6, info);
@@ -1461,139 +1310,8 @@ static int print_insn_arg(const char *d, unsigned char *buffer,
 					   reg_names[regno]);
 		}
 	  }
-	else if (place == '3')
-	  {
-	    /* `fmovem' insn.  */
-	    char doneany;
-	    val = fetch_arg (buffer, place, 8, info);
-	    if (val == 0)
-	      {
-		(*info->fprintf_func) (info->stream, "#0");
-		break;
-	      }
-	    if (*d == 'l')
-	      {
-		int newval = 0;
-
-		for (regno = 0; regno < 8; ++regno)
-		  if (val & (0x80 >> regno))
-		    newval |= 1 << regno;
-		val = newval;
-	      }
-	    val &= 0xff;
-	    doneany = 0;
-	    for (regno = 0; regno < 8; ++regno)
-	      if (val & (1 << regno))
-		{
-		  int first_regno;
-		  if (doneany)
-		    (*info->fprintf_func) (info->stream, "/");
-		  doneany = 1;
-		  (*info->fprintf_func) (info->stream, "%%fp%d", regno);
-		  first_regno = regno;
-		  while (val & (1 << (regno + 1)))
-		    ++regno;
-		  if (regno > first_regno)
-		    (*info->fprintf_func) (info->stream, "-%%fp%d", regno);
-		}
-	  }
-	else if (place == '8')
-	  {
-	    /* fmoveml for FP status registers.  */
-	    (*info->fprintf_func) (info->stream, "%s",
-				   fpcr_names[fetch_arg (buffer, place, 3,
-							 info)]);
-	  }
 	else
 	  BUG();
-      break;
-
-    case 'X':
-      place = '8';
-      /* fall through */
-    case 'Y':
-    case 'Z':
-    case 'W':
-    case '0':
-    case '1':
-    case '2':
-    case '3':
-      {
-	int val = fetch_arg (buffer, place, 5, info);
-        const char *name = 0;
-
-	switch (val)
-	  {
-	  case 2: name = "%tt0"; break;
-	  case 3: name = "%tt1"; break;
-	  case 0x10: name = "%tc"; break;
-	  case 0x11: name = "%drp"; break;
-	  case 0x12: name = "%srp"; break;
-	  case 0x13: name = "%crp"; break;
-	  case 0x14: name = "%cal"; break;
-	  case 0x15: name = "%val"; break;
-	  case 0x16: name = "%scc"; break;
-	  case 0x17: name = "%ac"; break;
-	  case 0x18: name = "%psr"; break;
-	  case 0x19: name = "%pcsr"; break;
-	  case 0x1c:
-	  case 0x1d:
-	    {
-	      int break_reg = ((buffer[3] >> 2) & 7);
-
-	      (*info->fprintf_func)
-		(info->stream, val == 0x1c ? "%%bad%d" : "%%bac%d",
-		 break_reg);
-	    }
-	    break;
-	  default:
-	    (*info->fprintf_func) (info->stream, "<mmu register %d>", val);
-	  }
-	if (name)
-	  (*info->fprintf_func) (info->stream, "%s", name);
-      }
-      break;
-
-    case 'f':
-      {
-	int fc = fetch_arg (buffer, place, 5, info);
-
-	if (fc == 1)
-	  (*info->fprintf_func) (info->stream, "%%dfc");
-	else if (fc == 0)
-	  (*info->fprintf_func) (info->stream, "%%sfc");
-	else
-	  /* xgettext:c-format */
-	  (*info->fprintf_func) (info->stream, "<function code %d>", fc);
-      }
-      break;
-
-    case 'V':
-      (*info->fprintf_func) (info->stream, "%%val");
-      break;
-
-    case 't':
-      {
-	int level = fetch_arg (buffer, place, 3, info);
-
-	(*info->fprintf_func) (info->stream, "%d", level);
-      }
-      break;
-
-    case 'u':
-      {
-	short is_upper = 0;
-	int reg = fetch_arg (buffer, place, 5, info);
-
-	if (reg & 0x10)
-	  {
-	    is_upper = 1;
-	    reg &= 0xf;
-	  }
-	(*info->fprintf_func) (info->stream, "%s%s",
-			       reg_half_names[reg],
-			       is_upper ? "u" : "l");
-      }
       break;
 
     default:
