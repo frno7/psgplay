@@ -1144,17 +1144,12 @@ print_indexed (int basereg,
   return p;
 }
 
-/* Returns number of bytes "eaten" by the operand, or
-   return -1 if an invalid operand was found, or -2 if
-   an opcode tabe error was found.
-   ADDR is the pc for this arg to be relative to.  */
-
-static int
-print_insn_arg (const char *d,
-		unsigned char *buffer,
-		unsigned char *p0,
-		bfd_vma addr,
-		disassemble_info *info)
+/*
+ * Returns number of bytes "eaten" by the operand, or return -1 if an invalid
+ * operand was found. ADDR is the pc for this arg to be relative to.
+ */
+static int print_insn_arg(const char *d, unsigned char *buffer,
+	unsigned char *p0, bfd_vma addr, disassemble_info *info)
 {
   int val = 0;
   int place = d[1];
@@ -1318,7 +1313,7 @@ print_insn_arg (const char *d,
 	  (*info->fprintf_func) (info->stream, "{#%d}", val);
 	}
       else
-	return -2;
+	BUG();
       break;
 
     case '#':
@@ -1339,7 +1334,7 @@ print_insn_arg (const char *d,
       else if (place == 'l')
 	val = NEXTLONG (p1);
       else
-	return -2;
+	BUG();
       (*info->fprintf_func) (info->stream, "#%d", val);
       break;
 
@@ -1368,7 +1363,7 @@ print_insn_arg (const char *d,
 	    disp = NEXTWORD (p);
 	}
       else
-	return -2;
+	BUG();
 
       (*info->print_address_func) (addr + disp, info);
       break;
@@ -1642,7 +1637,7 @@ print_insn_arg (const char *d,
 							 info)]);
 	  }
 	else
-	  return -2;
+	  BUG();
       break;
 
     case 'X':
@@ -1734,7 +1729,7 @@ print_insn_arg (const char *d,
       break;
 
     default:
-      return -2;
+      BUG();
     }
 
   return p - p0;
@@ -1829,15 +1824,7 @@ match_insn_m68k (bfd_vma memaddr,
 	  return 0;
 	}
       else
-	{
-	  info->fprintf_func (info->stream,
-			      /* xgettext:c-format */
-			      "<internal error in opcode table: %s %s>\n",
-			      best->name,  best->args);
-	  info->fprintf_func = save_printer;
-	  info->print_address_func = save_print_address;
-	  return 2;
-	}
+	      BUG();
     }
 
   p = save_p;
