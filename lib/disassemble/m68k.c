@@ -1349,28 +1349,6 @@ match_insn_m68k (bfd_vma memaddr,
 
       if ((d[0] == 'L' || d[0] == 'l') && d[1] == 'w' && p - buffer < 4)
 	p = buffer + 4;
-
-      switch (d[1])
-	{
-	case '1':
-	case '2':
-	case '3':
-	case '7':
-	case '8':
-	case '9':
-	case 'i':
-	  if (p - buffer < 4)
-	    p = buffer + 4;
-	  break;
-	case '4':
-	case '5':
-	case '6':
-	  if (p - buffer < 6)
-	    p = buffer + 6;
-	  break;
-	default:
-	  break;
-	}
     }
 
   fetch_data(info, p);
