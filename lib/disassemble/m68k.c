@@ -769,50 +769,42 @@ dummy_print_address (bfd_vma vma, struct disassemble_info *info)
 {
 }
 
+static int fetch_arg_val(uint8_t *buffer, int code)
+{
+	switch (code)
+	{
+		case 's':
+			return buffer[1];
+		case 'd':	/* Destination, for register or quick. */
+			return ((buffer[0] << 8) + buffer[1]) >> 9;
+		case 'x':	/* Destination, for general arg. */
+			return ((buffer[0] << 8) + buffer[1]) >> 6;
+		default:
+			BUG();
+	}
+}
+
+static int fetch_mask(int val, int bits)
+{
+	switch (bits)
+	{
+		case  3: return val & 07;
+		case  4: return val & 017;
+		case  6: return val & 077;
+		case  8: return val & 0377;
+		default:
+			BUG();
+	}
+}
+
 /*
  * Fetch BITS bits from a position in the instruction specified by CODE.
  * CODE is a "place to put an argument", or 'x' for a destination that is
  * a general address (mode and register). BUFFER contains the instruction.
  */
-static int fetch_arg(unsigned char *buffer,
-   int code, int bits, disassemble_info *info)
+static int fetch_arg(uint8_t *buffer, int code, int bits)
 {
-	int val = 0;
-
-	switch (code)
-	{
-		case 's':
-			val = buffer[1];
-			break;
-
-		case 'd':	/* Destination, for register or quick. */
-			val = (buffer[0] << 8) + buffer[1];
-			val >>= 9;
-			break;
-
-		case 'x':	/* Destination, for general arg. */
-			val = (buffer[0] << 8) + buffer[1];
-			val >>= 6;
-			break;
-
-		default:
-			BUG();
-	}
-
-	switch (bits)
-	{
-		case  1: return val & 1;
-		case  2: return val & 3;
-		case  3: return val & 7;
-		case  4: return val & 017;
-		case  5: return val & 037;
-		case  6: return val & 077;
-		case  7: return val & 0177;
-		case  8: return val & 0377;
-		case 12: return val & 07777;
-		default:
-			BUG();
-	}
+	return fetch_mask(fetch_arg_val(buffer, code), bits);
 }
 
 /* Check if an EA is valid for a particular code.  This is required
@@ -1052,10 +1044,10 @@ static unsigned char *op_ea(const char *d, int place, unsigned char *buffer,
 	int val;
 
 	if (place == 'd') {
-		val = fetch_arg (buffer, 'x', 6, info);
+		val = fetch_arg(buffer, 'x', 6);
 		val = ((val & 7) << 3) + ((val >> 3) & 7);
 	} else
-		val = fetch_arg (buffer, 's', 6, info);
+		val = fetch_arg(buffer, 's', 6);
 
 	/* If the <ea> is invalid for *d, then reject this match.  */
 	if (!m68k_valid_ea(*d, val))
@@ -1170,45 +1162,45 @@ static int print_insn_arg(const char *d, unsigned char *buffer,
       break;
 
     case 'Q':
-      val = fetch_arg(buffer, place, 3, info);
+      val = fetch_arg(buffer, place, 3);
       if (!val)		/* 0 means 8. */
 	val = 8;
       (*info->fprintf_func) (info->stream, "#%d", val);
       break;
 
     case 'M':
-      val = fetch_arg (buffer, place, 8, info);
+      val = fetch_arg(buffer, place, 8);
       if (val & 0x80)
 	val = val - 0x100;
       (*info->fprintf_func) (info->stream, "#%d", val);
       break;
 
     case 'T':
-      val = fetch_arg (buffer, place, 4, info);
+      val = fetch_arg(buffer, place, 4);
       (*info->fprintf_func) (info->stream, "#%d", val);
       break;
 
     case 'D':
       (*info->fprintf_func) (info->stream, "%s",
-			     reg_names[fetch_arg (buffer, place, 3, info)]);
+			     reg_names[fetch_arg(buffer, place, 3)]);
       break;
 
     case 'A':
       (*info->fprintf_func)
 	(info->stream, "%s",
-	 reg_names[fetch_arg (buffer, place, 3, info) + 010]);
+	 reg_names[fetch_arg(buffer, place, 3) + 010]);
       break;
 
     case '+':
       (*info->fprintf_func)
 	(info->stream, "%s@+",
-	 reg_names[fetch_arg (buffer, place, 3, info) + 8]);
+	 reg_names[fetch_arg(buffer, place, 3) + 8]);
       break;
 
     case '-':
       (*info->fprintf_func)
 	(info->stream, "%s@-",
-	 reg_names[fetch_arg (buffer, place, 3, info) + 8]);
+	 reg_names[fetch_arg(buffer, place, 3) + 8]);
       break;
 
     case '#':
@@ -1239,7 +1231,7 @@ static int print_insn_arg(const char *d, unsigned char *buffer,
       val = NEXTWORD (p);
       (*info->fprintf_func)
 	(info->stream, "%s@(%d)",
-	 reg_names[fetch_arg (buffer, place, 3, info) + 8], val);
+	 reg_names[fetch_arg(buffer, place, 3) + 8], val);
       break;
 
     case '*':
@@ -1454,7 +1446,7 @@ print_insn_m68k (bfd_vma memaddr, disassemble_info *info)
 		{
 		  if (d[0] == 's' && d[1] == '8')
 		    {
-		      val = fetch_arg (buffer, d[1], 3, info);
+		      val = fetch_arg(buffer, d[1], 3);
 		      if ((val & (val - 1)) != 0)
 			break;
 		    }
@@ -1468,7 +1460,7 @@ print_insn_m68k (bfd_vma memaddr, disassemble_info *info)
                 {
                   if (d[0] == 'I')
                     {
-                      val = fetch_arg (buffer, 'd', 3, info);
+                      val = fetch_arg(buffer, 'd', 3);
                       if (val != 1)
                         break;
                     }
