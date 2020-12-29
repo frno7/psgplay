@@ -1170,27 +1170,17 @@ static int print_insn_arg(const char *d, unsigned char *buffer,
       break;
 
     case 'Q':
-      val = fetch_arg (buffer, place, 3, info);
-      /* 0 means 8, except for the bkpt instruction... */
-      if (val == 0 && d[1] != 's')
+      val = fetch_arg(buffer, place, 3, info);
+      if (!val)		/* 0 means 8. */
 	val = 8;
       (*info->fprintf_func) (info->stream, "#%d", val);
       break;
 
     case 'M':
-      if (place == 'h')
-	{
-	  static const char *const scalefactor_name[] = { "<<", ">>" };
-	  val = fetch_arg (buffer, place, 1, info);
-	  (*info->fprintf_func) (info->stream, "%s", scalefactor_name[val]);
-	}
-      else
-	{
-	  val = fetch_arg (buffer, place, 8, info);
-	  if (val & 0x80)
-	    val = val - 0x100;
-	  (*info->fprintf_func) (info->stream, "#%d", val);
-	}
+      val = fetch_arg (buffer, place, 8, info);
+      if (val & 0x80)
+	val = val - 0x100;
+      (*info->fprintf_func) (info->stream, "#%d", val);
       break;
 
     case 'T':
@@ -1222,16 +1212,8 @@ static int print_insn_arg(const char *d, unsigned char *buffer,
       break;
 
     case '#':
-      p1 = buffer + (*d == '#' ? 2 : 4);
-      if (place == 's')
-	val = fetch_arg (buffer, place, 4, info);
-      else if (place == 'C')
-	val = fetch_arg (buffer, place, 7, info);
-      else if (place == '8')
-	val = fetch_arg (buffer, place, 3, info);
-      else if (place == '3')
-	val = fetch_arg (buffer, place, 8, info);
-      else if (place == 'b')
+      p1 = buffer + 2;
+      if (place == 'b')
 	val = NEXTBYTE (p1);
       else if (place == 'w' || place == 'W')
 	val = NEXTWORD (p1);
@@ -1243,29 +1225,10 @@ static int print_insn_arg(const char *d, unsigned char *buffer,
       break;
 
     case 'B':
-      if (place == 'b')
-	disp = NEXTBYTE (p);
-      else if (place == 'B')
+      if (place == 'B')
 	disp = COERCE_SIGNED_CHAR (buffer[1]);
       else if (place == 'w' || place == 'W')
 	disp = NEXTWORD (p);
-      else if (place == 'l' || place == 'L' || place == 'C')
-	disp = NEXTLONG (p);
-      else if (place == 'g')
-	{
-	  disp = NEXTBYTE (buffer);
-	  if (disp == 0)
-	    disp = NEXTWORD (p);
-	  else if (disp == -1)
-	    disp = NEXTLONG (p);
-	}
-      else if (place == 'c')
-	{
-	  if (buffer[1] & 0x40)		/* If bit six is one, long offset.  */
-	    disp = NEXTLONG (p);
-	  else
-	    disp = NEXTWORD (p);
-	}
       else
 	BUG();
 
