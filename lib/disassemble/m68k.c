@@ -997,6 +997,57 @@ print_indexed (int basereg,
   return p;
 }
 
+static unsigned char *op_range(const char *d, unsigned char *buffer,
+	unsigned char *p, disassemble_info *info)
+{
+	unsigned char *p1 = buffer + 2;
+	int val = NEXTWORD(p1);
+
+	/*
+	 * Move the pointer ahead if this point is farther ahead
+	 * than the last.
+	 */
+	p = p1 > p ? p1 : p;
+
+	if (val == 0) {
+		(*info->fprintf_func) (info->stream, "#0");
+		return p;
+	}
+
+	if (*d == 'l') {
+		int newval = 0;
+
+		for (int regno = 0; regno < 16; ++regno)
+			if (val & (0x8000 >> regno))
+				newval |= 1 << regno;
+		val = newval;
+	}
+
+	val &= 0xffff;
+	char doneany = 0;
+
+	for (int regno = 0; regno < 16; ++regno)
+		if (val & (1 << regno)) {
+			int first_regno;
+
+			if (doneany)
+				(*info->fprintf_func) (info->stream, "/");
+
+			doneany = 1;
+
+			(*info->fprintf_func) (info->stream, "%s", reg_names[regno]);
+
+			first_regno = regno;
+			while (val & (1 << (regno + 1)))
+				++regno;
+			if (regno > first_regno)
+				(*info->fprintf_func) (info->stream, "-%s",
+						reg_names[regno]);
+		}
+
+	return p;
+}
+
 /*
  * Returns number of bytes "eaten" by the operand, or return -1 if an invalid
  * operand was found. ADDR is the pc for this arg to be relative to.
@@ -1269,49 +1320,8 @@ static int print_insn_arg(const char *d, unsigned char *buffer,
 
     case 'L':
     case 'l':
-	if (place == 'w')
-	  {
-	    char doneany;
-	    p1 = buffer + 2;
-	    val = NEXTWORD (p1);
-	    /* Move the pointer ahead if this point is farther ahead
-	       than the last.  */
-	    p = p1 > p ? p1 : p;
-	    if (val == 0)
-	      {
-		(*info->fprintf_func) (info->stream, "#0");
-		break;
-	      }
-	    if (*d == 'l')
-	      {
-		int newval = 0;
-
-		for (regno = 0; regno < 16; ++regno)
-		  if (val & (0x8000 >> regno))
-		    newval |= 1 << regno;
-		val = newval;
-	      }
-	    val &= 0xffff;
-	    doneany = 0;
-	    for (regno = 0; regno < 16; ++regno)
-	      if (val & (1 << regno))
-		{
-		  int first_regno;
-
-		  if (doneany)
-		    (*info->fprintf_func) (info->stream, "/");
-		  doneany = 1;
-		  (*info->fprintf_func) (info->stream, "%s", reg_names[regno]);
-		  first_regno = regno;
-		  while (val & (1 << (regno + 1)))
-		    ++regno;
-		  if (regno > first_regno)
-		    (*info->fprintf_func) (info->stream, "-%s",
-					   reg_names[regno]);
-		}
-	  }
-	else
-	  BUG();
+      BUG_ON(place != 'w');
+      p = op_range(d, buffer, p, info);
       break;
 
     default:
