@@ -786,182 +786,50 @@ dummy_print_address (bfd_vma vma, struct disassemble_info *info)
 {
 }
 
-/* Fetch BITS bits from a position in the instruction specified by CODE.
-   CODE is a "place to put an argument", or 'x' for a destination
-   that is a general address (mode and register).
-   BUFFER contains the instruction.  */
-
-static int
-fetch_arg (unsigned char *buffer,
-	   int code,
-	   int bits,
-	   disassemble_info *info)
+/*
+ * Fetch BITS bits from a position in the instruction specified by CODE.
+ * CODE is a "place to put an argument", or 'x' for a destination that is
+ * a general address (mode and register). BUFFER contains the instruction.
+ */
+static int fetch_arg(unsigned char *buffer,
+   int code, int bits, disassemble_info *info)
 {
-  int val = 0;
+	int val = 0;
 
-  switch (code)
-    {
-    case '/': /* MAC/EMAC mask bit.  */
-      val = buffer[3] >> 5;
-      break;
+	switch (code)
+	{
+		case 's':
+			val = buffer[1];
+			break;
 
-    case 'G': /* EMAC ACC load.  */
-      val = ((buffer[3] >> 3) & 0x2) | ((~buffer[1] >> 7) & 0x1);
-      break;
+		case 'd':	/* Destination, for register or quick. */
+			val = (buffer[0] << 8) + buffer[1];
+			val >>= 9;
+			break;
 
-    case 'H': /* EMAC ACC !load.  */
-      val = ((buffer[3] >> 3) & 0x2) | ((buffer[1] >> 7) & 0x1);
-      break;
+		case 'x':	/* Destination, for general arg. */
+			val = (buffer[0] << 8) + buffer[1];
+			val >>= 6;
+			break;
 
-    case ']': /* EMAC ACCEXT bit.  */
-      val = buffer[0] >> 2;
-      break;
+		default:
+			BUG();
+	}
 
-    case 'I': /* MAC/EMAC scale factor.  */
-      val = buffer[2] >> 1;
-      break;
-
-    case 'F': /* EMAC ACCx.  */
-      val = buffer[0] >> 1;
-      break;
-
-    case 'f':
-      val = buffer[1];
-      break;
-
-    case 's':
-      val = buffer[1];
-      break;
-
-    case 'd':			/* Destination, for register or quick.  */
-      val = (buffer[0] << 8) + buffer[1];
-      val >>= 9;
-      break;
-
-    case 'x':			/* Destination, for general arg.  */
-      val = (buffer[0] << 8) + buffer[1];
-      val >>= 6;
-      break;
-
-    case 'k':
-      fetch_data(info, buffer + 3);
-      val = (buffer[3] >> 4);
-      break;
-
-    case 'C':
-      fetch_data(info, buffer + 3);
-      val = buffer[3];
-      break;
-
-    case '1':
-      fetch_data(info, buffer + 3);
-      val = (buffer[2] << 8) + buffer[3];
-      val >>= 12;
-      break;
-
-    case '2':
-      fetch_data(info, buffer + 3);
-      val = (buffer[2] << 8) + buffer[3];
-      val >>= 6;
-      break;
-
-    case '3':
-      fetch_data(info, buffer + 3);
-      val = (buffer[2] << 8) + buffer[3];
-      break;
-
-    case '4':
-      fetch_data(info, buffer + 5);
-      val = (buffer[4] << 8) + buffer[5];
-      val >>= 12;
-      break;
-
-    case '5':
-      fetch_data(info, buffer + 5);
-      val = (buffer[4] << 8) + buffer[5];
-      val >>= 6;
-      break;
-
-    case '6':
-      fetch_data(info, buffer + 5);
-      val = (buffer[4] << 8) + buffer[5];
-      break;
-
-    case '7':
-      fetch_data(info, buffer + 3);
-      val = (buffer[2] << 8) + buffer[3];
-      val >>= 7;
-      break;
-
-    case '8':
-      fetch_data(info, buffer + 3);
-      val = (buffer[2] << 8) + buffer[3];
-      val >>= 10;
-      break;
-
-    case '9':
-      fetch_data(info, buffer + 3);
-      val = (buffer[2] << 8) + buffer[3];
-      val >>= 5;
-      break;
-
-    case 'e':
-      val = (buffer[1] >> 6);
-      break;
-
-    case 'm':
-      val = (buffer[1] & 0x40 ? 0x8 : 0)
-	| ((buffer[0] >> 1) & 0x7)
-	| (buffer[3] & 0x80 ? 0x10 : 0);
-      break;
-
-    case 'n':
-      val = (buffer[1] & 0x40 ? 0x8 : 0) | ((buffer[0] >> 1) & 0x7);
-      break;
-
-    case 'o':
-      val = (buffer[2] >> 4) | (buffer[3] & 0x80 ? 0x10 : 0);
-      break;
-
-    case 'M':
-      val = (buffer[1] & 0xf) | (buffer[3] & 0x40 ? 0x10 : 0);
-      break;
-
-    case 'N':
-      val = (buffer[3] & 0xf) | (buffer[3] & 0x40 ? 0x10 : 0);
-      break;
-
-    case 'h':
-      val = buffer[2] >> 2;
-      break;
-
-    default:
-      BUG();
-    }
-
-  switch (bits)
-    {
-    case 1:
-      return val & 1;
-    case 2:
-      return val & 3;
-    case 3:
-      return val & 7;
-    case 4:
-      return val & 017;
-    case 5:
-      return val & 037;
-    case 6:
-      return val & 077;
-    case 7:
-      return val & 0177;
-    case 8:
-      return val & 0377;
-    case 12:
-      return val & 07777;
-    default:
-      BUG();
-    }
+	switch (bits)
+	{
+		case  1: return val & 1;
+		case  2: return val & 3;
+		case  3: return val & 7;
+		case  4: return val & 017;
+		case  5: return val & 037;
+		case  6: return val & 077;
+		case  7: return val & 0177;
+		case  8: return val & 0377;
+		case 12: return val & 07777;
+		default:
+			BUG();
+	}
 }
 
 /* Check if an EA is valid for a particular code.  This is required
