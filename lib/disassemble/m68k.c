@@ -1061,8 +1061,6 @@ static int print_insn_arg(const char *d, unsigned char *buffer,
   int regno;
   const char *regname;
   unsigned char *p1;
-  double flval;
-  int flt_p;
   bfd_signed_vma disp;
   unsigned int uval;
 
@@ -1271,35 +1269,15 @@ static int print_insn_arg(const char *d, unsigned char *buffer,
 	      break;
 
 	    case 4:
-	      flt_p = 1;	/* Assume it's a float... */
 	      switch (place)
 	      {
-		case 'b':
-		  val = NEXTBYTE (p);
-		  flt_p = 0;
-		  break;
-
-		case 'w':
-		  val = NEXTWORD (p);
-		  flt_p = 0;
-		  break;
-
-		case 'l':
-		  val = NEXTLONG (p);
-		  flt_p = 0;
-		  break;
-
-		case 'p':
-		  flval = NEXTPACKED (p);
-		  break;
-
-		default:
-		  return -1;
+		      case 'b': val = NEXTBYTE(p); break;
+		      case 'w': val = NEXTWORD(p); break;
+		      case 'l': val = NEXTLONG(p); break;
+		      default:
+				BUG();
 	      }
-	      if (flt_p)	/* Print a float? */
-		(*info->fprintf_func) (info->stream, "#%g", flval);
-	      else
-		(*info->fprintf_func) (info->stream, "#%d", val);
+	      (*info->fprintf_func) (info->stream, "#%d", val);
 	      break;
 
 	    default:
