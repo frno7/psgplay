@@ -1048,6 +1048,102 @@ static unsigned char *op_range(const char *d, unsigned char *buffer,
 	return p;
 }
 
+static unsigned char *op_ea(const char *d, int place, unsigned char *buffer,
+	unsigned char *p, bfd_vma addr, disassemble_info *info)
+{
+	int val;
+
+	if (place == 'd') {
+		val = fetch_arg (buffer, 'x', 6, info);
+		val = ((val & 7) << 3) + ((val >> 3) & 7);
+	} else
+		val = fetch_arg (buffer, 's', 6, info);
+
+	/* If the <ea> is invalid for *d, then reject this match.  */
+	if (!m68k_valid_ea(*d, val))
+		return NULL;
+
+	/* Get register number assuming address register.  */
+	const int regno = (val & 7) + 8;
+	const char *regname = reg_names[regno];
+
+	switch (val >> 3)
+	{
+	case 0:
+		(*info->fprintf_func) (info->stream, "%s", reg_names[val]);
+		break;
+
+	case 1:
+		(*info->fprintf_func) (info->stream, "%s", regname);
+		break;
+
+	case 2:
+		(*info->fprintf_func) (info->stream, "%s@", regname);
+		break;
+
+	case 3:
+		(*info->fprintf_func) (info->stream, "%s@+", regname);
+		break;
+
+	case 4:
+		(*info->fprintf_func) (info->stream, "%s@-", regname);
+		break;
+
+	case 5:
+		val = NEXTWORD (p);
+		(*info->fprintf_func) (info->stream, "%s@(%d)", regname, val);
+		break;
+
+	case 6:
+		p = print_indexed (regno, p, addr, info);
+		break;
+
+	case 7:
+		switch (val & 7)
+		{
+		case 0:
+			val = NEXTWORD (p);
+			(*info->print_address_func) (val, info);
+			break;
+
+		case 1: {
+			const unsigned int uval = NEXTULONG (p);
+			(*info->print_address_func) (uval, info);
+			break;
+		}
+
+		case 2:
+			val = NEXTWORD (p);
+			(*info->fprintf_func) (info->stream, "%%pc@(");
+			(*info->print_address_func) (addr + val, info);
+			(*info->fprintf_func) (info->stream, ")");
+			break;
+
+		case 3:
+			p = print_indexed (-1, p, addr, info);
+			break;
+
+		case 4:
+			switch (place)
+			{
+			case 'b': val = NEXTBYTE(p); break;
+			case 'w': val = NEXTWORD(p); break;
+			case 'l': val = NEXTLONG(p); break;
+			default:
+				  BUG();
+			}
+
+			(*info->fprintf_func) (info->stream, "#%d", val);
+			break;
+
+		default:
+			return NULL;
+		}
+	}
+
+	return p;
+}
+
 /*
  * Returns number of bytes "eaten" by the operand, or return -1 if an invalid
  * operand was found. ADDR is the pc for this arg to be relative to.
@@ -1058,11 +1154,8 @@ static int print_insn_arg(const char *d, unsigned char *buffer,
   int val = 0;
   int place = d[1];
   unsigned char *p = p0;
-  int regno;
-  const char *regname;
   unsigned char *p1;
   bfd_signed_vma disp;
-  unsigned int uval;
 
   switch (*d)
     {
@@ -1198,102 +1291,7 @@ static int print_insn_arg(const char *d, unsigned char *buffer,
     case '$':
     case '&':
     case '<':
-      if (place == 'd')
-	{
-	  val = fetch_arg (buffer, 'x', 6, info);
-	  val = ((val & 7) << 3) + ((val >> 3) & 7);
-	}
-      else
-	val = fetch_arg (buffer, 's', 6, info);
-
-      /* If the <ea> is invalid for *d, then reject this match.  */
-      if (!m68k_valid_ea (*d, val))
-	return -1;
-
-      /* Get register number assuming address register.  */
-      regno = (val & 7) + 8;
-      regname = reg_names[regno];
-      switch (val >> 3)
-	{
-	case 0:
-	  (*info->fprintf_func) (info->stream, "%s", reg_names[val]);
-	  break;
-
-	case 1:
-	  (*info->fprintf_func) (info->stream, "%s", regname);
-	  break;
-
-	case 2:
-	  (*info->fprintf_func) (info->stream, "%s@", regname);
-	  break;
-
-	case 3:
-	  (*info->fprintf_func) (info->stream, "%s@+", regname);
-	  break;
-
-	case 4:
-	  (*info->fprintf_func) (info->stream, "%s@-", regname);
-	  break;
-
-	case 5:
-	  val = NEXTWORD (p);
-	  (*info->fprintf_func) (info->stream, "%s@(%d)", regname, val);
-	  break;
-
-	case 6:
-	  p = print_indexed (regno, p, addr, info);
-	  break;
-
-	case 7:
-	  switch (val & 7)
-	    {
-	    case 0:
-	      val = NEXTWORD (p);
-	      (*info->print_address_func) (val, info);
-	      break;
-
-	    case 1:
-	      uval = NEXTULONG (p);
-	      (*info->print_address_func) (uval, info);
-	      break;
-
-	    case 2:
-	      val = NEXTWORD (p);
-	      (*info->fprintf_func) (info->stream, "%%pc@(");
-	      (*info->print_address_func) (addr + val, info);
-	      (*info->fprintf_func) (info->stream, ")");
-	      break;
-
-	    case 3:
-	      p = print_indexed (-1, p, addr, info);
-	      break;
-
-	    case 4:
-	      switch (place)
-	      {
-		      case 'b': val = NEXTBYTE(p); break;
-		      case 'w': val = NEXTWORD(p); break;
-		      case 'l': val = NEXTLONG(p); break;
-		      default:
-				BUG();
-	      }
-	      (*info->fprintf_func) (info->stream, "#%d", val);
-	      break;
-
-	    default:
-	      return -1;
-	    }
-	}
-
-      /* If place is '/', then this is the case of the mask bit for
-	 mac/emac loads. Now that the arg has been printed, grab the
-	 mask bit and if set, add a '&' to the arg.  */
-      if (place == '/')
-	{
-	  val = fetch_arg (buffer, place, 1, info);
-	  if (val)
-	    info->fprintf_func (info->stream, "&");
-	}
+      p = op_ea(d, place, buffer, p, addr, info);
       break;
 
     case 'L':
@@ -1306,7 +1304,7 @@ static int print_insn_arg(const char *d, unsigned char *buffer,
       BUG();
     }
 
-  return p - p0;
+  return p ? p - p0 : -1;
 }
 
 /* Try to match the current instruction to best and if so, return the
