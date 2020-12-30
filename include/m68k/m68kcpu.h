@@ -70,10 +70,6 @@ typedef uint32 uint64;
 #define S64(val) val
 #endif
 
-#include "m68k/milieu.h"
-#include "m68k/softfloat.h"
-
-
 /* Allow for architectures that don't have 8-bit sizes */
 #if UCHAR_MAX == 0xff
 	#define MAKE_INT_8(A) (sint8)(A)
@@ -912,7 +908,6 @@ typedef struct
 	uint cacr;         /* Cache Control Register (m68020, unemulated) */
 	uint caar;         /* Cache Address Register (m68020, unemulated) */
 	uint ir;           /* Instruction Register */
-	floatx80 fpr[8];     /* FPU Data Register (m68030/040) */
 	uint fpiar;        /* FPU Instruction Address Register (m68040) */
 	uint fpsr;         /* FPU Status Register (m68040) */
 	uint fpcr;         /* FPU Control Register (m68040) */
