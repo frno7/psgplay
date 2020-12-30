@@ -16,4 +16,4 @@ lib/m68k/%ops.c include/m68k/%ops.h: lib/m68k/%_in.c $(M68KMAKE)
 
 lib/m68k/m68kcpu.c: $(M68K_GEN_H)
 
-M68K_SRC := $(M68K_GEN_C) lib/m68k/m68kcpu.c lib/m68k/m68kdasm.c
+M68K_SRC := $(M68K_GEN_C) lib/m68k/m68kcpu.c
