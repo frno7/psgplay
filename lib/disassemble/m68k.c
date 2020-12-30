@@ -32,15 +32,98 @@ struct insn_memory {
 	uint32_t address;
 };
 
-/* This struct is passed into the instruction decoding routine,
-   and is passed back out into each callback.  The various fields are used
-   for conveying information from your main routine into your callbacks,
-   for passing information into the instruction decoders (such as the
-   addresses of the callback functions), or for passing information
-   back from the instruction decoders to their callers.
-
-   It must be initialized before it is first passed; this can be done
-   by hand, or using one of the initialization macros below.  */
+/**
+ * Effective addressing modes, registers, operands, validness and syntax:
+ *
+ * mod |      |   |            |
+ * reg | op   | v | syntax     | addressing mode
+ * ----+------+---+------------+---------------------------------------------
+ * 0.d | d    | r | Dn         | data register
+ * 1.a | a    | R | An         | address register
+ * 2.a | ai   | A | (An)       | address register indirect
+ * 3.a | pi   | + | (An)+      | address register indirect with postincrement
+ * 4.a | pd   | - | -(An)      | address register indirect with predecrement
+ * 5.a | di   | D | (d16,An)   | address register indirect with displacement
+ * 6.a | ix   | X | (d8,An,Xn) | address register indirect with index
+ * 7.0 | aw   | W | (xxx).w    | absolute word address
+ * 7.1 | al   | L | (xxx).l    | absolute long address
+ * 7.2 | pcdi | d | (d16,PC)   | program counter relative with displacement
+ * 7.3 | pcix | x | (d8,PC,Xn) | program counter relative with index
+ * 7.4 | imm  | I | #imm       | immediate data
+ *
+ * Operand categories and valid effective addressing modes:
+ *
+ * operand |   valid ea   | operand
+ * ckey    | rRA+-DXWLdxI | category
+ * --------+--------------+------------------------
+ *       * | rRA+-DXWLdxI | all
+ *       ~ | ..A+-DXWL... | alterable memory
+ *       % | rRA+-DXWL... | alterable
+ *       ; | r.A+-DXWLdxI | data
+ *       $ | r.A+-DXWL... | alterable data
+ *       @ | r.A+-DXWLdx. | data, but not immediate
+ *       ! | ..A..DXWLdx. | control
+ *       & | ..A..DXWL... | alterable control
+ *       < | ..A+.DXWLdx. | restore operands
+ *       D | ............ | data register only
+ *       A | ............ | address register only
+ *       + | ............ | postincrement only
+ *       - | ............ | predecrement only
+ *       d | ............ | address register indirect with displacement
+ *       B | ............ | program counter relative with displacement
+ *       # | ............ | immediate data as byte, word or long
+ *       M | ............ | 8-bit immediate data in -128..127 range
+ *       Q | ............ | 3-bit immediate data in 1..8 range
+ *       S | ............ | stack pointer register
+ *       U | ............ | user stack pointer register
+ *       C | ............ | condition code register
+ *       l | ............ | register list, reversed bits
+ *       L | ............ | register list
+ *       T | ............ | 4-bit trap vector
+ *
+ * Operand placements:
+ *
+ * operand | operand
+ * pkey    | placement
+ * --------+-----------------------------------------------------------------
+ *       b | second word, low byte
+ *       B | first word, low byte, for branch displacements
+ *       w | second word (entire), variable word/long branch offset for dbra
+ *       W | second word (entire), for branch displacements
+ *       l | second and third word (entire)
+ *       s | source, low bits of first word
+ *       d | destination, shifted 9 in first word
+ *
+ * All ckey and pkey operand combinations:
+ *
+ *      |         pkey
+ * ckey |  b  B  w  W  l  s  d
+ * -----+---------------------
+ *    * | .. .. *w .. *l .. ..
+ *    ~ | ~b .. ~w .. ~l ~s ..
+ *    % | .. .. %w .. %l %s %d
+ *    ; | ;b .. ;w .. ;l .. ..
+ *    $ | $b .. $w .. $l $s $d
+ *    @ | .. .. .. .. .. @s ..
+ *    ! | .. .. .. .. .. !s ..
+ *    & | .. .. .. .. .. &s ..
+ *    < | .. .. .. .. .. <s ..
+ *    D | .. .. .. .. .. Ds Dd
+ *    A | .. .. .. .. .. As Ad
+ *    + | .. .. .. .. .. +s +d
+ *    - | .. .. .. .. .. -s -d
+ *    d | .. .. .. .. .. ds ..
+ *    B | .. BB Bw BW .. .. ..
+ *    # | #b .. #w #W #l .. ..
+ *    M | .. .. .. .. .. Ms ..
+ *    Q | .. .. .. .. .. .. Qd
+ *    S | .. .. .. .. .. Ss Sd
+ *    U | .. .. .. .. .. .. Ud
+ *    C | .. .. .. .. .. Cs Cd
+ *    l | .. .. lw .. .. .. ..
+ *    L | .. .. Lw .. .. .. ..
+ *    T | .. .. .. .. .. Ts ..
+ */
 
 typedef struct disassemble_info {
   const struct insn_memory *insn_memory;
@@ -129,190 +212,6 @@ struct m68k_opcode
    operand of the instruction.  The first specifies the kind of
    operand; the second, the place it is stored.  */
 
-/* Kinds of operands:
-   Characters used: AaBbCcDdEeFfGgHIiJkLlMmnOopQqRrSsTtU VvWwXxYyZz01234|*~%;@!&$?/<>#+-
-
-   D  data register only.  Stored as 3 bits.
-   A  address register only.  Stored as 3 bits.
-   a  address register indirect only.  Stored as 3 bits.
-   R  either kind of register.  Stored as 4 bits.
-   r  either kind of register indirect only.  Stored as 4 bits.
-      At the moment, used only for cas2 instruction.
-   F  floating point coprocessor register only.   Stored as 3 bits.
-   O  an offset (or width): immediate data 0-31 or data register.
-      Stored as 6 bits in special format for BF... insns.
-   +  autoincrement only.  Stored as 3 bits (number of the address register).
-   -  autodecrement only.  Stored as 3 bits (number of the address register).
-   Q  quick immediate data.  Stored as 3 bits.
-      This matches an immediate operand only when value is in range 1 .. 8.
-   M  moveq immediate data.  Stored as 8 bits.
-      This matches an immediate operand only when value is in range -128..127
-   T  trap vector immediate data.  Stored as 4 bits.
-
-   k  K-factor for fmove.p instruction.   Stored as a 7-bit constant or
-      a three bit register offset, depending on the field type.
-
-   #  immediate data.  Stored in special places (b, w or l)
-      which say how many bits to store.
-   B  pc-relative address, converted to an offset
-      that is treated as immediate data.
-   d  displacement and register.  Stores the register as 3 bits
-      and stores the displacement in the entire second word.
-
-   C  the CCR.  No need to store it; this is just for filtering validity.
-   S  the SR.  No need to store, just as with CCR.
-   U  the USP.  No need to store, just as with CCR.
-   E  the MAC ACC.  No need to store, just as with CCR.
-   e  the EMAC ACC[0123].
-   G  the MAC/EMAC MACSR.  No need to store, just as with CCR.
-   g  the EMAC ACCEXT{01,23}.
-   H  the MASK.  No need to store, just as with CCR.
-   i  the MAC/EMAC scale factor.
-
-   I  Coprocessor ID.   Not printed if 1.   The Coprocessor ID is always
-      extracted from the 'd' field of word one, which means that an extended
-      coprocessor opcode can be skipped using the 'i' place, if needed.
-
-   s  System Control register for the floating point coprocessor.
-
-    L  Register list of the type d0-d7/a0-a7 etc.
-       (New!  Improved!  Can also hold fp0-fp7, as well!)
-       The assembler tries to see if the registers match the insn by
-       looking at where the insn wants them stored.
-
-    l  Register list like L, but with all the bits reversed.
-       Used for going the other way. . .
-
-    c  cache identifier which may be "nc" for no cache, "ic"
-       for instruction cache, "dc" for data cache, or "bc"
-       for both caches.  Used in cinv and cpush.  Always
-       stored in position "d".
-
-    u  Any register, with ``upper'' or ``lower'' specification.  Used
-       in the mac instructions with size word.
-
- The remainder are all stored as 6 bits using an address mode and a
- register number; they differ in which addressing modes they match.
-
-   *  all					(modes 0-6,7.0-4)
-   ~  alterable memory				(modes 2-6,7.0,7.1)
-						(not 0,1,7.2-4)
-   %  alterable					(modes 0-6,7.0,7.1)
-						(not 7.2-4)
-   ;  data					(modes 0,2-6,7.0-4)
-						(not 1)
-   @  data, but not immediate			(modes 0,2-6,7.0-3)
-						(not 1,7.4)
-   !  control					(modes 2,5,6,7.0-3)
-						(not 0,1,3,4,7.4)
-   &  alterable control				(modes 2,5,6,7.0,7.1)
-						(not 0,1,3,4,7.2-4)
-   $  alterable data				(modes 0,2-6,7.0,7.1)
-						(not 1,7.2-4)
-   ?  alterable control, or data register	(modes 0,2,5,6,7.0,7.1)
-						(not 1,3,4,7.2-4)
-   /  control, or data register			(modes 0,2,5,6,7.0-3)
-						(not 1,3,4,7.4)
-   >  *save operands				(modes 2,4,5,6,7.0,7.1)
-						(not 0,1,3,7.2-4)
-   <  *restore operands				(modes 2,3,5,6,7.0-3)
-						(not 0,1,4,7.4)
-
-   coldfire move operands:
-   m  						(modes 0-4)
-   n						(modes 5,7.2)
-   o						(modes 6,7.0,7.1,7.3,7.4)
-   p						(modes 0-5)
-
-   coldfire bset/bclr/btst/mulsl/mulul operands:
-   q						(modes 0,2-5)
-   v						(modes 0,2-5,7.0,7.1)
-   b                                            (modes 0,2-5,7.2)
-   w                                            (modes 2-5,7.2)
-   y						(modes 2,5)
-   z						(modes 2,5,7.2)
-   x  mov3q immediate operand.
-   4						(modes 2,3,4,5)
-  */
-
-/* Places to put an operand, for non-general operands:
-   Characters used: BbCcDdFfGgHhIijkLlMmNnostWw123456789/
-
-   s  source, low bits of first word.
-   d  dest, shifted 9 in first word
-   1  second word, shifted 12
-   2  second word, shifted 6
-   3  second word, shifted 0
-   4  third word, shifted 12
-   5  third word, shifted 6
-   6  third word, shifted 0
-   7  second word, shifted 7
-   8  second word, shifted 10
-   9  second word, shifted 5
-   D  store in both place 1 and place 3; for divul and divsl.
-   B  first word, low byte, for branch displacements
-   W  second word (entire), for branch displacements
-   L  second and third words (entire), for branch displacements
-      (also overloaded for move16)
-   b  second word, low byte
-   w  second word (entire) [variable word/long branch offset for dbra]
-   W  second word (entire) (must be signed 16 bit value)
-   l  second and third word (entire)
-   g  variable branch offset for bra and similar instructions.
-      The place to store depends on the magnitude of offset.
-   t  store in both place 7 and place 8; for floating point operations
-   c  branch offset for cpBcc operations.
-      The place to store is word two if bit six of word one is zero,
-      and words two and three if bit six of word one is one.
-   i  Increment by two, to skip over coprocessor extended operands.   Only
-      works with the 'I' format.
-   k  Dynamic K-factor field.   Bits 6-4 of word 2, used as a register number.
-      Also used for dynamic fmovem instruction.
-   C  floating point coprocessor constant - 7 bits.  Also used for static
-      K-factors...
-   m  For M[S]ACx; 4 bits split with MSB shifted 6 bits in first word
-      and remaining 3 bits of register shifted 9 bits in first word.
-      Indicate upper/lower in 1 bit shifted 7 bits in second word.
-      Use with `R' or `u' format.
-   n  `m' withouth upper/lower indication. (For M[S]ACx; 4 bits split
-      with MSB shifted 6 bits in first word and remaining 3 bits of
-      register shifted 9 bits in first word.  No upper/lower
-      indication is done.)  Use with `R' or `u' format.
-   o  For M[S]ACw; 4 bits shifted 12 in second word (like `1').
-      Indicate upper/lower in 1 bit shifted 7 bits in second word.
-      Use with `R' or `u' format.
-   M  For M[S]ACw; 4 bits in low bits of first word.  Indicate
-      upper/lower in 1 bit shifted 6 bits in second word.  Use with
-      `R' or `u' format.
-   N  For M[S]ACw; 4 bits in low bits of second word.  Indicate
-      upper/lower in 1 bit shifted 6 bits in second word.  Use with
-      `R' or `u' format.
-   h  shift indicator (scale factor), 1 bit shifted 10 in second word
-
- Places to put operand, for general operands:
-   d  destination, shifted 6 bits in first word
-   b  source, at low bit of first word, and immediate uses one byte
-   w  source, at low bit of first word, and immediate uses two bytes
-   l  source, at low bit of first word, and immediate uses four bytes
-   s  source, at low bit of first word.
-      Used sometimes in contexts where immediate is not allowed anyway.
-   f  single precision float, low bit of 1st word, immediate uses 4 bytes
-   F  double precision float, low bit of 1st word, immediate uses 8 bytes
-   x  extended precision float, low bit of 1st word, immediate uses 12 bytes
-   p  packed float, low bit of 1st word, immediate uses 12 bytes
-   G  EMAC accumulator, load  (bit 4 2nd word, !bit8 first word)
-   H  EMAC accumulator, non load  (bit 4 2nd word, bit 8 first word)
-   F  EMAC ACCx
-   f  EMAC ACCy
-   I  MAC/EMAC scale factor
-   /  Like 's', but set 2nd word, bit 5 if trailing_ampersand set
-   ]  first word, bit 10
-*/
-
-/*
- * The assembler requires that all instances of the same mnemonic must
- * be consecutive. If they aren't, the assembler will bomb at runtime.
- */
 static const struct m68k_opcode m68k_opcodes[] =
 {
 	{ "abcd",	2, 0140400, 0170770, "DsDd" },
@@ -828,10 +727,10 @@ static bool m68k_valid_ea(char code, int val)
 		case '~': mask = M (0,0,1,1,1,1,1,1,1,0,0,0); break;
 		case '%': mask = M (1,1,1,1,1,1,1,1,1,0,0,0); break;
 		case ';': mask = M (1,0,1,1,1,1,1,1,1,1,1,1); break;
+		case '$': mask = M (1,0,1,1,1,1,1,1,1,0,0,0); break;
 		case '@': mask = M (1,0,1,1,1,1,1,1,1,1,1,0); break;
 		case '!': mask = M (0,0,1,0,0,1,1,1,1,1,1,0); break;
 		case '&': mask = M (0,0,1,0,0,1,1,1,1,0,0,0); break;
-		case '$': mask = M (1,0,1,1,1,1,1,1,1,0,0,0); break;
 		case '<': mask = M (0,0,1,1,0,1,1,1,1,1,1,0); break;
 		default:
 			  BUG();
