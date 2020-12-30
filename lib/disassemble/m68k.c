@@ -832,22 +832,7 @@ static bool m68k_valid_ea(char code, int val)
 		case '!': mask = M (0,0,1,0,0,1,1,1,1,1,1,0); break;
 		case '&': mask = M (0,0,1,0,0,1,1,1,1,0,0,0); break;
 		case '$': mask = M (1,0,1,1,1,1,1,1,1,0,0,0); break;
-		case '?': mask = M (1,0,1,0,0,1,1,1,1,0,0,0); break;
-		case '/': mask = M (1,0,1,0,0,1,1,1,1,1,1,0); break;
-		case '|': mask = M (0,0,1,0,0,1,1,1,1,1,1,0); break;
-		case '>': mask = M (0,0,1,0,1,1,1,1,1,0,0,0); break;
 		case '<': mask = M (0,0,1,1,0,1,1,1,1,1,1,0); break;
-		case 'm': mask = M (1,1,1,1,1,0,0,0,0,0,0,0); break;
-		case 'n': mask = M (0,0,0,0,0,1,0,0,0,1,0,0); break;
-		case 'o': mask = M (0,0,0,0,0,0,1,1,1,0,1,1); break;
-		case 'p': mask = M (1,1,1,1,1,1,0,0,0,0,0,0); break;
-		case 'q': mask = M (1,0,1,1,1,1,0,0,0,0,0,0); break;
-		case 'v': mask = M (1,0,1,1,1,1,0,1,1,0,0,0); break;
-		case 'b': mask = M (1,0,1,1,1,1,0,0,0,1,0,0); break;
-		case 'w': mask = M (0,0,1,1,1,1,0,0,0,1,0,0); break;
-		case 'y': mask = M (0,0,1,0,0,1,0,0,0,0,0,0); break;
-		case 'z': mask = M (0,0,1,0,0,1,0,0,0,1,0,0); break;
-		case '4': mask = M (0,0,1,1,1,1,0,0,0,0,0,0); break;
 		default:
 			  BUG();
 	}
