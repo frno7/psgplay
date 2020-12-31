@@ -1357,9 +1357,7 @@ print_insn_m68k (bfd_vma memaddr, disassemble_info *info)
 	}
     }
 
-  /* Handle undefined instructions.  */
-  info->fprintf_func (info->stream, "0%o", (buffer[0] << 8) + buffer[1]);
-  return 2;
+  return 0;	/* Zero out on undefined instructions. */
 }
 
 static int read_buffer(bfd_vma memaddr, uint8_t *myaddr,
