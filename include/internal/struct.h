@@ -7,6 +7,9 @@
 
 #define sizeof_member(type, member) sizeof(((type *)0)->member)
 
+#define BE_STORAGE __attribute__(( __scalar_storage_order__("big-endian") ))
+#define LE_STORAGE __attribute__(( __scalar_storage_order__("little-endian") ))
+
 /* Macro definitions from the Linux kernel. */
 
 /**
