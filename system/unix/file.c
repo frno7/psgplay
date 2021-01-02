@@ -96,6 +96,21 @@ struct file file_read_fd(int fd, const char *path)
 	return file_read_fd__(fd, xstrdup(path));
 }
 
+bool file_write(const char *path, int oflag, void *buf, size_t nbyte)
+{
+	const int fd = xopen(path, oflag, 0644);
+
+	if (fd < 0)
+		return false;
+
+	const bool valid = (xwrite(fd, buf, nbyte) == nbyte);
+
+	if (xclose(fd) < 0)
+		return false;
+
+	return valid;
+}
+
 void file_free(struct file f)
 {
 	free(f.path);
