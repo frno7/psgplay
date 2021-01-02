@@ -12,7 +12,7 @@
 #include "internal/assert.h"
 #include "internal/print.h"
 
-#include "disassemble/m68k.h"
+#include "m68k/m68kda.h"
 
 #include "psgplay/psgplay.h"
 #include "psgplay/sndh.h"
@@ -63,6 +63,8 @@ enum m68k_insn_type {
 
 static enum m68k_insn_type insn_type(const char *mnemonic)
 {
+	BUG_ON(!mnemonic);
+
 	static const struct {
 		const char *mnemonic;
 		enum m68k_insn_type type;
@@ -157,17 +159,15 @@ static int dasm_print_nl(struct disassembly *dasm, int i, int col)
 
 	if (12 <= i - col && i - col < dasm->header_size) {
 		for (int c = col; c < 8; c++)
-			printf("     ");
+			printf("    ");
 
-		printf(" /* ");
+		printf(" ; ");
 
 		for (size_t k = 0; k < col; k++) {
 			const char c = dasm->data[i - col + k];
 
 			printf("%c", isprint(c) ? c : '.');
 		}
-
-		printf(" */");
 	}
 
 	printf("\n");
@@ -200,9 +200,9 @@ static void dasm_print_data(struct disassembly *dasm, size_t i, size_t size)
 			if (i == 12)
 				remake_header(dasm->data, dasm->size);
 		} else if (!col)
-			printf("\t.dc.b\t0x%02x", dasm->data[i]);
+			printf("\tdc.b\t$%02x", dasm->data[i]);
 		else
-			printf(",0x%02x", dasm->data[i]);
+			printf(",$%02x", dasm->data[i]);
 
 		if (++col == 8)
 			col = dasm_print_nl(dasm, i + 1, col);
@@ -237,14 +237,14 @@ static int dasm_print_insn_fmt(void *arg, const char *fmt, ...)
 	return r;
 }
 
-static struct m68k_symbol dasm_address_label(void *arg, uint32_t address)
+static struct m68kda_symbol dasm_address_label(void *arg, uint32_t address)
 {
 	struct insn_disassembly *insn = arg;
 
 	if (!dasm_is_label(insn->dasm, address))
-		return (struct m68k_symbol) { };
+		return (struct m68kda_symbol) { };
 
-	struct m68k_symbol sym;
+	struct m68kda_symbol sym;
 
 	if (insn->dasm->m[address].label) {
 		strncpy(sym.s, insn->dasm->m[address].label, sizeof(sym.s) - 1);
@@ -264,7 +264,7 @@ static void dasm_print_insn(struct disassembly *dasm, size_t i, size_t size)
 		insn.s[0] = '\0';
 		insn.dasm = dasm;
 
-		const int s = m68k_disassemble_instruction(
+		const int s = m68kda_disassemble_instruction(
 			&dasm->data[i], size - i, i,
 			dasm_address_label, dasm_print_insn_fmt, &insn);
 
@@ -348,11 +348,13 @@ static void dasm_mark_text_trace(struct disassembly *dasm, size_t i)
 
 		uint32_t target;
 		const char *mnemonic;
-		const size_t insn_size = m68k_disassemble_type_target(
+		const size_t insn_size = m68kda_disassemble_type_target(
 			&dasm->data[i], s, i, &mnemonic, &target);
 
 		if (!insn_size)
 			return;
+
+		BUG_ON(!mnemonic);
 
 		const enum m68k_insn_type type = insn_type(mnemonic);
 

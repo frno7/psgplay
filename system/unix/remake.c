@@ -72,18 +72,18 @@ static void print_substrings_tag(const char *tag,
 {
 	int subtune_count;
 
-	printf("\t.even\n%s:\n\t.ascii\t\"%s\"\n", label, tag);
+	printf("\teven\n%s:\n\tdc.b\t'%s'\n", label, tag);
 
 	if (!sndh_tag_subtune_count(&subtune_count, data, size))
 		subtune_count = 1;
 
 	for (int i = 0; i < subtune_count; i++)
-		printf("\t.dc.w\t%s%d-%s\n", prefix, 1 + i, label);
+		printf("\tdc.w\t%s%d-%s\n", prefix, 1 + i, label);
 }
 
 void remake_header(const void *data, size_t size)
 {
-	printf("\t.ascii\t\"SNDH\"\n");
+	printf("\tdc.b\t'SNDH'\n");
 
 	int time_count = 0;
 	int subtitle_count = 0;
@@ -96,26 +96,26 @@ void remake_header(const void *data, size_t size)
 
 		if (strcmp(name, "TIME") == 0) {
 			if (!time_count++)
-				printf("\t.even\n\t.ascii\t\"TIME\"\n");
-			printf("\t.dc.w\t\%d\n", sndh_tag_integer);
+				printf("\teven\n\tdc.b\t'TIME'\n");
+			printf("\tdc.w\t\%d\n", sndh_tag_integer);
 		} else if (strcmp(name, "!#SN") == 0) {
 			if (!subtitle_count++)
 				print_substrings_tag(name,
 					".subtitles", ".st", data, size);
-			printf(".st%d:\t.asciz\t\"%s\"\n", subtitle_count, v);
+			printf(".st%d:\tdc.b\t'%s',0\n", subtitle_count, v);
 		} else if (strcmp(name, "FLAG") == 0) {
 			if (!subflag_count++)
 				print_substrings_tag(name,
 					".subflags", ".sf", data, size);
-			printf(".sf%d:\t.asciz\t\"%s\"\n", subflag_count, v);
+			printf(".sf%d:\tdc.b\t'%s',0\n", subflag_count, v);
 		} else if (strcmp(name, "##") == 0) {
-			printf("\t.asciz\t\"%s%02d\"\n", name, sndh_tag_integer);
+			printf("\tdc.b\t'%s%02d',0\n", name, sndh_tag_integer);
 		} else
-			printf("\t.asciz\t\"%s%s\"\n", name, v);
+			printf("\tdc.b\t'%s%s',0\n", name, v);
 
 		free(value);
 	}
 
-	printf("\t.even\n");
-	printf("\t.ascii\t\"HDNS\"\n");
+	printf("\teven\n");
+	printf("\tdc.b\t'HDNS'\n");
 }

@@ -148,51 +148,53 @@ Excerpt of disassembly with the `--disassemble` option:
 
 ```
 init:
-	braw	_init
+	bra.w	_init				; init
 exit:
-	braw	_exit
+	bra.w	_exit				; exit
 play:
-	braw	_play
+	bra.w	_play				; play
 sndh:
-	.dc.b	0x53,0x4e,0x44,0x48,0x43,0x4f,0x4d,0x4d /* SNDHCOMM */
-	.dc.b	0x4d,0x61,0x64,0x20,0x4d,0x61,0x78,0x00 /* Mad Max. */
-	.dc.b	0x52,0x49,0x50,0x50,0x47,0x72,0x61,0x7a /* RIPPGraz */
-	.dc.b	0x65,0x79,0x20,0x2f,0x20,0x50,0x48,0x46 /* ey / PHF */
-	.dc.b	0x00,0x43,0x4f,0x4e,0x56,0x47,0x72,0x61 /* .CONVGra */
-	.dc.b	0x7a,0x65,0x79,0x20,0x2f,0x20,0x50,0x48 /* zey / PH */
-	.dc.b	0x46,0x00,0x54,0x49,0x54,0x4c,0x57,0x61 /* F.TITLWa */
-	.dc.b	0x72,0x70,0x00,0x23,0x23,0x30,0x38,0x00 /* rp.##08. */
-	.dc.b	0x54,0x43,0x35,0x30,0x00,0x00           /* TC50.. */
+	dc.b	$53,$4e,$44,$48,$43,$4f,$4d,$4d	; SNDHCOMM
+	dc.b	$4d,$61,$64,$20,$4d,$61,$78,$00	; Mad Max.
+	dc.b	$52,$49,$50,$50,$47,$72,$61,$7a	; RIPPGraz
+	dc.b	$65,$79,$20,$2f,$20,$50,$48,$46	; ey / PHF
+	dc.b	$00,$43,$4f,$4e,$56,$47,$72,$61	; .CONVGra
+	dc.b	$7a,$65,$79,$20,$2f,$20,$50,$48	; zey / PH
+	dc.b	$46,$00,$54,$49,$54,$4c,$57,$61	; F.TITLWa
+	dc.b	$72,$70,$00,$23,$23,$30,$38,$00	; rp.##08.
+	dc.b	$54,$43,$35,$30,$00,$00        	; TC50..
 _init:
-	lea	%pc@(0x9a),%a0
-	lea	%pc@(0x9e),%a1
-	movel	%a0,%a1@
-	subiw	#1,%d0
-	lea	%pc@(0xb4a),%a0
-	lea	%pc@(0xac),%a1
-	movel	%d0,%d1
-	aslw	#3,%d1
-	moveal	%a1@(0,%d1:w),%a2
-	addqw	#6,%d1
-	movew	%a1@(0,%d1:w),%d0
-	lea	%pc@(0xb4a),%a0
-	addal	%a2,%a0
-	lea	%pc@(_ec),%a1
-	movel	%a0,%a1@(56)
-	movel	%a0,%a1@(108)
-	clrw	%a1@(2104)
-	bsrw	_ec
-	lea	%pc@(0xf4),%a0
-	lea	%pc@(0x9e),%a1
-	movel	%a0,%a1@
-	rts
+	lea	_9a(pc),a0			; init
+	lea	_9e(pc),a1			; init
+	move.l	a0,(a1)				; init
+	subi.w	#1,d0				; init
+	lea	_b4a(pc),a0			; init
+	lea	_ac(pc),a1			; init
+	move.l	d0,d1				; init
+	asl.w	#3,d1				; init
+	movea.l	(a1,d1.w),a2			; init
+	addq.w	#6,d1				; init
+	move.w	(a1,d1.w),d0			; init
+	lea	_b4a(pc),a0			; init
+	adda.l	a2,a0				; init
+	lea	_ec(pc),a1			; init
+	move.l	a0,56(a1)			; init
+	move.l	a0,108(a1)			; init
+	clr.w	2104(a1)			; init
+	bsr.w	_ec				; init
+	lea	_f4(pc),a0			; init
+	lea	_9e(pc),a1			; init
+	move.l	a0,(a1)				; init
+_9a:
+	rts					; init
 _exit:
-	rts
-	.dc.b	0x00,0x00,0x00,0x00
+	rts					; exit
+_9e:
+	dc.b	$00,$00,$00,$00
 _play:
-	moveal	%pc@(0x9e),%a0
-	jsr	%a0@
-	rts
+	movea.l	_9e(pc),a0			; play
+	jsr	(a0)				; play
+	rts					; play
 	...
 ```
 
@@ -200,36 +202,36 @@ Excerpt of disassembly with the `--disassemble-header` option:
 
 ```
 init:
-	braw	_init
+	bra.w	_init
 exit:
-	braw	_exit
+	bra.w	_exit
 play:
-	braw	_play
+	bra.w	_play
 sndh:
-	.dc.b	0x53,0x4e,0x44,0x48,0x43,0x4f,0x4d,0x4d /* SNDHCOMM */
-	.dc.b	0x4d,0x61,0x64,0x20,0x4d,0x61,0x78,0x00 /* Mad Max. */
-	.dc.b	0x52,0x49,0x50,0x50,0x47,0x72,0x61,0x7a /* RIPPGraz */
-	.dc.b	0x65,0x79,0x20,0x2f,0x20,0x50,0x48,0x46 /* ey / PHF */
-	.dc.b	0x00,0x43,0x4f,0x4e,0x56,0x47,0x72,0x61 /* .CONVGra */
-	.dc.b	0x7a,0x65,0x79,0x20,0x2f,0x20,0x50,0x48 /* zey / PH */
-	.dc.b	0x46,0x00,0x54,0x49,0x54,0x4c,0x57,0x61 /* F.TITLWa */
-	.dc.b	0x72,0x70,0x00,0x23,0x23,0x30,0x38,0x00 /* rp.##08. */
-	.dc.b	0x54,0x43,0x35,0x30,0x00,0x00           /* TC50.. */
+	dc.b	$53,$4e,$44,$48,$43,$4f,$4d,$4d	; SNDHCOMM
+	dc.b	$4d,$61,$64,$20,$4d,$61,$78,$00	; Mad Max.
+	dc.b	$52,$49,$50,$50,$47,$72,$61,$7a	; RIPPGraz
+	dc.b	$65,$79,$20,$2f,$20,$50,$48,$46	; ey / PHF
+	dc.b	$00,$43,$4f,$4e,$56,$47,$72,$61	; .CONVGra
+	dc.b	$7a,$65,$79,$20,$2f,$20,$50,$48	; zey / PH
+	dc.b	$46,$00,$54,$49,$54,$4c,$57,$61	; F.TITLWa
+	dc.b	$72,$70,$00,$23,$23,$30,$38,$00	; rp.##08.
+	dc.b	$54,$43,$35,$30,$00,$00        	; TC50..
 _init:
-	.dc.b	0x41,0xfa,0x00,0x46,0x43,0xfa,0x00,0x46
-	.dc.b	0x22,0x88,0x04,0x40,0x00,0x01,0x41,0xfa
-	.dc.b	0x0a,0xe8,0x43,0xfa,0x00,0x46,0x22,0x00
-	.dc.b	0xe7,0x41,0x24,0x71,0x10,0x00,0x5c,0x41
-	.dc.b	0x30,0x31,0x10,0x00,0x41,0xfa,0x0a,0xd2
-	.dc.b	0xd1,0xca,0x43,0xfa,0x00,0x6e,0x23,0x48
-	.dc.b	0x00,0x38,0x23,0x48,0x00,0x6c,0x42,0x69
-	.dc.b	0x08,0x38,0x61,0x00,0x00,0x5e,0x41,0xfa
-	.dc.b	0x00,0x62,0x43,0xfa,0x00,0x08,0x22,0x88
-	.dc.b	0x4e,0x75
+	dc.b	$41,$fa,$00,$46,$43,$fa,$00,$46
+	dc.b	$22,$88,$04,$40,$00,$01,$41,$fa
+	dc.b	$0a,$e8,$43,$fa,$00,$46,$22,$00
+	dc.b	$e7,$41,$24,$71,$10,$00,$5c,$41
+	dc.b	$30,$31,$10,$00,$41,$fa,$0a,$d2
+	dc.b	$d1,$ca,$43,$fa,$00,$6e,$23,$48
+	dc.b	$00,$38,$23,$48,$00,$6c,$42,$69
+	dc.b	$08,$38,$61,$00,$00,$5e,$41,$fa
+	dc.b	$00,$62,$43,$fa,$00,$08,$22,$88
+	dc.b	$4e,$75
 _exit:
-	.dc.b	0x4e,0x75,0x00,0x00,0x00,0x00
+	dc.b	$4e,$75,$00,$00,$00,$00
 _play:
-	.dc.b	0x20,0x7a,0xff,0xfa,0x4e,0x90,0x4e,0x75
+	dc.b	$20,$7a,$ff,$fa,$4e,$90,$4e,$75
 	...
 ```
 
@@ -239,36 +241,36 @@ repaired from the previous excerpt):
 
 ```
 init:
-	braw	_init
+	bra.w	_init
 exit:
-	braw	_exit
+	bra.w	_exit
 play:
-	braw	_play
+	bra.w	_play
 sndh:
-	.ascii	"SNDH"
-	.asciz	"COMMMad Max"
-	.asciz	"RIPPGrazey / PHF"
-	.asciz	"CONVGrazey / PHF"
-	.asciz	"TITLWarp"
-	.asciz	"##08"
-	.asciz	"TC50"
-	.even
-	.ascii	"HDNS"
+	dc.b	'SNDH'
+	dc.b	'COMMMad Max',0
+	dc.b	'RIPPGrazey / PHF',0
+	dc.b	'CONVGrazey / PHF',0
+	dc.b	'TITLWarp',0
+	dc.b	'##08',0
+	dc.b	'TC50',0
+	even
+	dc.b	'HDNS'
 _init:
-	.dc.b	0x41,0xfa,0x00,0x46,0x43,0xfa,0x00,0x46
-	.dc.b	0x22,0x88,0x04,0x40,0x00,0x01,0x41,0xfa
-	.dc.b	0x0a,0xe8,0x43,0xfa,0x00,0x46,0x22,0x00
-	.dc.b	0xe7,0x41,0x24,0x71,0x10,0x00,0x5c,0x41
-	.dc.b	0x30,0x31,0x10,0x00,0x41,0xfa,0x0a,0xd2
-	.dc.b	0xd1,0xca,0x43,0xfa,0x00,0x6e,0x23,0x48
-	.dc.b	0x00,0x38,0x23,0x48,0x00,0x6c,0x42,0x69
-	.dc.b	0x08,0x38,0x61,0x00,0x00,0x5e,0x41,0xfa
-	.dc.b	0x00,0x62,0x43,0xfa,0x00,0x08,0x22,0x88
-	.dc.b	0x4e,0x75
+	dc.b	$41,$fa,$00,$46,$43,$fa,$00,$46
+	dc.b	$22,$88,$04,$40,$00,$01,$41,$fa
+	dc.b	$0a,$e8,$43,$fa,$00,$46,$22,$00
+	dc.b	$e7,$41,$24,$71,$10,$00,$5c,$41
+	dc.b	$30,$31,$10,$00,$41,$fa,$0a,$d2
+	dc.b	$d1,$ca,$43,$fa,$00,$6e,$23,$48
+	dc.b	$00,$38,$23,$48,$00,$6c,$42,$69
+	dc.b	$08,$38,$61,$00,$00,$5e,$41,$fa
+	dc.b	$00,$62,$43,$fa,$00,$08,$22,$88
+	dc.b	$4e,$75
 _exit:
-	.dc.b	0x4e,0x75,0x00,0x00,0x00,0x00
+	dc.b	$4e,$75,$00,$00,$00,$00
 _play:
-	.dc.b	0x20,0x7a,0xff,0xfa,0x4e,0x90,0x4e,0x75
+	dc.b	$20,$7a,$ff,$fa,$4e,$90,$4e,$75
 	...
 ```
 
@@ -280,39 +282,39 @@ for quick and easy review, application and SNDH file reassembly:
 --- sndh/Mad_Max/Games/Lethal_Xcess_(ST).S.orig	2020-05-22 14:56:20.495508523 +0200
 +++ sndh/Mad_Max/Games/Lethal_Xcess_(ST).S.new	2020-05-22 15:23:55.260509689 +0200
 @@ -6,13 +6,31 @@
- 	braw	_play
+ 	bra.w	_play
  sndh:
- 	.ascii	"SNDH"
--	.asciz	"TITLLethal Xcess (ST/Falc)"
--	.asciz	"COMMMad Max"
-+	.asciz	"TITLLethal Xcess (ST)"
-+	.asciz	"COMMJochen Hippel"
- 	.asciz	"RIPPGrazey / PHF"
- 	.asciz	"CONVGrazey / PHF"
-+	.asciz	"YEAR1991"
- 	.asciz	"TC50"
- 	.asciz	"##07"
- 	.even
+ 	dc.b	'SNDH'
+-	dc.b	'TITLLethal Xcess (ST/Falc)',0
+-	dc.b	'COMMMad Max',0
++	dc.b	'TITLLethal Xcess (ST)',0
++	dc.b	'COMMJochen Hippel',0
+ 	dc.b	'RIPPGrazey / PHF',0
+ 	dc.b	'CONVGrazey / PHF',0
++	dc.b	'YEAR1991',0
+ 	dc.b	'TC50',0
+ 	dc.b	'##07',0
+ 	even
 +.subtitles:
-+	.ascii	"!#SN"
-+	.dc.w	.st1-.subtitles
-+	.dc.w	.st2-.subtitles
-+	.dc.w	.st3-.subtitles
-+	.dc.w	.st4-.subtitles
-+	.dc.w	.st5-.subtitles
-+	.dc.w	.st6-.subtitles
-+	.dc.w	.st7-.subtitles
-+.st1:	.asciz	"Main Menu"
-+.st2:	.asciz	"Level 1: Ruins of Methallycha 1"
-+.st3:	.asciz	"Level 1: Ruins of Methallycha 2"
-+.st4:	.asciz	"Level 2: Desert of No Return"
-+.st5:	.asciz	"Level 3: The Evil Garden"
-+.st6:	.asciz	"Level 4: Volcanic Plateaus"
-+.st7:	.asciz	"Level 5: Fortress of Methallycha"
-+	.even
- 	.ascii	"HDNS"
++	dc.b	'!#SN'
++	dc.w	.st1-.subtitles
++	dc.w	.st2-.subtitles
++	dc.w	.st3-.subtitles
++	dc.w	.st4-.subtitles
++	dc.w	.st5-.subtitles
++	dc.w	.st6-.subtitles
++	dc.w	.st7-.subtitles
++.st1:	dc.b	'Main Menu',0
++.st2:	dc.b	'Level 1: Ruins of Methallycha 1',0
++.st3:	dc.b	'Level 1: Ruins of Methallycha 2',0
++.st4:	dc.b	'Level 2: Desert of No Return',0
++.st5:	dc.b	'Level 3: The Evil Garden',0
++.st6:	dc.b	'Level 4: Volcanic Plateaus',0
++.st7:	dc.b	'Level 5: Fortress of Methallycha',0
++	even
+ 	dc.b	'HDNS'
  _init:
- 	.dc.b	0x2f,0x00,0x41,0xfa,0x00,0x6e,0x4a,0x50
+ 	dc.b	$2f,$00,$41,$fa,$00,$6e,$4a,$50
 ```
 
 # How it works
