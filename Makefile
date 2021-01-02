@@ -23,8 +23,8 @@ ALL_CFLAGS += $(DEP_CFLAGS) $(HAVE_CFLAGS) $(S_CFLAGS)
 
 PSGPLAY := psgplay
 
-EXAMPLE_INFO := lib/psgplay/example-info
-EXAMPLE_PLAY := lib/psgplay/example-play
+EXAMPLE_INFO := lib/example/example-info
+EXAMPLE_PLAY := lib/example/example-play
 
 .PHONY: all
 all: $(PSGPLAY) $(EXAMPLE_INFO) $(EXAMPLE_PLAY)

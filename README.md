@@ -118,9 +118,9 @@ analogue filters and mixers. This digital interface is documented in
 
 There are two simple examples on how to use the PSG play library:
 
-- [`lib/psgplay/example-info.c`](https://github.com/frno7/psgplay/blob/master/lib/psgplay/example-info.c)
+- [`lib/example/example-info.c`](https://github.com/frno7/psgplay/blob/master/lib/example/example-info.c)
   is an example on how to display SNDH tags;
-- [`lib/psgplay/example-play.c`](https://github.com/frno7/psgplay/blob/master/lib/psgplay/example-play.c)
+- [`lib/example/example-play.c`](https://github.com/frno7/psgplay/blob/master/lib/example/example-play.c)
   is an example on how to play an SNDH file in 44.1 kHz stereo.
 
 ## Disassembly
