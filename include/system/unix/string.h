@@ -24,4 +24,30 @@ char *xstrndup(const char *s, size_t n);
  */
 char *strrep(const char *s, const char *from, const char *to);	/* FIXME */
 
+/**
+ * struct strbuf - string buffer
+ * @length: length in bytes of @s, excluding any terminating NUL
+ * @capacity: maximum size in bytes of @s
+ * @data: contents of string, NUL terminated only if @size > 0
+ */
+struct strbuf {
+	size_t length;
+	size_t capacity;
+	char *s;
+};
+
+/**
+ * sbprintf - formatted output conversion to a string buffer
+ * @sb: string buffer, can be initialised to zero
+ * @fmt: a printf family format
+ * @...: parameters to @fmt
+ *
+ * Return: %true if successful, otherwise %false
+ */
+bool sbprintf(struct strbuf *sb, const char *fmt, ...);
+
+bool sbmprintf(struct strbuf *sb, size_t margin, const char *fmt, ...);
+
+bool vsbmprintf(struct strbuf *sb, size_t margin, const char *fmt, va_list ap);
+
 #endif /* PSGPLAY_SYSTEM_UNIX_STRING_H */
