@@ -18,7 +18,14 @@ lib/m68k/m68kcpu.c: $(M68K_GEN_H)
 
 M68K_SRC := $(M68K_GEN_C) lib/m68k/m68kcpu.c
 
+M68KDA_SPEC := lib/m68k/m68kda.spec
+
 M68KDG := lib/m68k/m68kdg
+
+M68KDG_GEN_H := include/m68k/m68kdg.h
+
+$(M68KDG_GEN_H): $(M68KDG) $(M68KDA_SPEC)
+	$(QUIET_GEN)$(M68KDG) -o $@ $(M68KDA_SPEC)
 
 M68KDG_LINK_OBJS =							\
 	lib/ice/ice.o							\
