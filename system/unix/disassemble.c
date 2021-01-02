@@ -43,6 +43,92 @@ struct disassembly {
 	struct memory *m;
 };
 
+/**
+ * enum m68k_insn_type - instruction type
+ * @m68k_insn_inv: invalid instruction
+ * @m68k_insn_ins: instruction except jump
+ * @m68k_insn_jmp: unconditional jump
+ * @m68k_insn_jcc: conditional jump
+ * @m68k_insn_jsr: jump to subroutine
+ * @m68k_insn_ret: return instruction
+ */
+enum m68k_insn_type {
+	m68k_insn_inv,
+	m68k_insn_ins,
+	m68k_insn_jmp,
+	m68k_insn_jcc,
+	m68k_insn_jsr,
+	m68k_insn_ret,
+};
+
+static enum m68k_insn_type insn_type(const char *mnemonic)
+{
+	static const struct {
+		const char *mnemonic;
+		enum m68k_insn_type type;
+	} types[] = {
+		{ "bhi.w",	m68k_insn_jcc },
+		{ "bls.w",	m68k_insn_jcc },
+		{ "bcc.w",	m68k_insn_jcc },
+		{ "bcs.w",	m68k_insn_jcc },
+		{ "bne.w",	m68k_insn_jcc },
+		{ "beq.w",	m68k_insn_jcc },
+		{ "bvc.w",	m68k_insn_jcc },
+		{ "bvs.w",	m68k_insn_jcc },
+		{ "bpl.w",	m68k_insn_jcc },
+		{ "bmi.w",	m68k_insn_jcc },
+		{ "bge.w",	m68k_insn_jcc },
+		{ "blt.w",	m68k_insn_jcc },
+		{ "bgt.w",	m68k_insn_jcc },
+		{ "ble.w",	m68k_insn_jcc },
+		{ "bhi.s",	m68k_insn_jcc },
+		{ "bls.s",	m68k_insn_jcc },
+		{ "bcc.s",	m68k_insn_jcc },
+		{ "bcs.s",	m68k_insn_jcc },
+		{ "bne.s",	m68k_insn_jcc },
+		{ "beq.s",	m68k_insn_jcc },
+		{ "bvc.s",	m68k_insn_jcc },
+		{ "bvs.s",	m68k_insn_jcc },
+		{ "bpl.s",	m68k_insn_jcc },
+		{ "bmi.s",	m68k_insn_jcc },
+		{ "bge.s",	m68k_insn_jcc },
+		{ "blt.s",	m68k_insn_jcc },
+		{ "bgt.s",	m68k_insn_jcc },
+		{ "ble.s",	m68k_insn_jcc },
+		{ "bra.w",	m68k_insn_jmp },
+		{ "bra.s",	m68k_insn_jmp },
+		{ "bsr.w",	m68k_insn_jsr },
+		{ "bsr.s",	m68k_insn_jsr },
+		{ "dbcc",	m68k_insn_jcc },
+		{ "dbcs",	m68k_insn_jcc },
+		{ "dbeq",	m68k_insn_jcc },
+		{ "dbf",	m68k_insn_jcc },
+		{ "dbge",	m68k_insn_jcc },
+		{ "dbgt",	m68k_insn_jcc },
+		{ "dbhi",	m68k_insn_jcc },
+		{ "dble",	m68k_insn_jcc },
+		{ "dbls",	m68k_insn_jcc },
+		{ "dblt",	m68k_insn_jcc },
+		{ "dbmi",	m68k_insn_jcc },
+		{ "dbne",	m68k_insn_jcc },
+		{ "dbpl",	m68k_insn_jcc },
+		{ "dbt",	m68k_insn_jcc },
+		{ "dbvc",	m68k_insn_jcc },
+		{ "dbvs",	m68k_insn_jcc },
+		{ "jmp",	m68k_insn_jmp },
+		{ "jsr",	m68k_insn_jsr },
+		{ "rte",	m68k_insn_ret },
+		{ "rtr",	m68k_insn_ret },
+		{ "rts",	m68k_insn_ret },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(types); i++)
+		if (strcmp(types[i].mnemonic, mnemonic) == 0)
+			return types[i].type;
+
+	return m68k_insn_ins;
+}
+
 static void dasm_label(struct disassembly *dasm, const char *s, size_t address)
 {
 	if (dasm->size <= address || dasm->m[address].label)
@@ -261,12 +347,14 @@ static void dasm_mark_text_trace(struct disassembly *dasm, size_t i)
 			return;
 
 		uint32_t target;
-		enum m68k_insn_type type;
+		const char *mnemonic;
 		const size_t insn_size = m68k_disassemble_type_target(
-			&dasm->data[i], s, i, &type, &target);
+			&dasm->data[i], s, i, &mnemonic, &target);
 
 		if (!insn_size)
 			return;
+
+		const enum m68k_insn_type type = insn_type(mnemonic);
 
 		dasm_mark_text(dasm, i, insn_size);
 		i += insn_size;

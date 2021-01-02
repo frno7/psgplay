@@ -172,7 +172,7 @@ typedef struct disassemble_info {
   char branch_delay_insns;	/* How many sequential insn's will run before
 				   a branch takes effect.  (0 = normal) */
   char data_size;		/* Size of data reference in insn, in bytes */
-  enum m68k_insn_type insn_type;	/* Type of instruction */
+  const char *mnemonic;		/* Mnemonic */
   bfd_vma target;		/* Target address of branch or dref, if known;
 				   zero if unknown.  */
   bfd_vma target2;		/* Second target address for dref2 */
@@ -187,7 +187,6 @@ typedef struct disassemble_info {
  * @opcode: the opcode itself
  * @match: the mask used by the disassembler
  * @args: the arguments
- * @insn_type: instruction type
  */
 struct m68k_opcode
 {
@@ -196,7 +195,6 @@ struct m68k_opcode
 	unsigned int opcode;
 	unsigned int match;
 	const char *args;
-	enum m68k_insn_type insn_type;
 };
 
 /* We store four bytes of opcode for all opcodes because that is the
@@ -271,35 +269,35 @@ static const struct m68k_opcode m68k_opcodes[] =
 	{ "asr.l",	2, 0160200, 0170770, "QdDs" },
 	{ "asr.l",	2, 0160240, 0170770, "DdDs" },
 
-	{ "bhi.w",	2, 0061000, 0177777, "BW",	m68k_insn_jcc },
-	{ "bls.w",	2, 0061400, 0177777, "BW",	m68k_insn_jcc },
-	{ "bcc.w",	2, 0062000, 0177777, "BW",	m68k_insn_jcc },
-	{ "bcs.w",	2, 0062400, 0177777, "BW",	m68k_insn_jcc },
-	{ "bne.w",	2, 0063000, 0177777, "BW",	m68k_insn_jcc },
-	{ "beq.w",	2, 0063400, 0177777, "BW",	m68k_insn_jcc },
-	{ "bvc.w",	2, 0064000, 0177777, "BW",	m68k_insn_jcc },
-	{ "bvs.w",	2, 0064400, 0177777, "BW",	m68k_insn_jcc },
-	{ "bpl.w",	2, 0065000, 0177777, "BW",	m68k_insn_jcc },
-	{ "bmi.w",	2, 0065400, 0177777, "BW",	m68k_insn_jcc },
-	{ "bge.w",	2, 0066000, 0177777, "BW",	m68k_insn_jcc },
-	{ "blt.w",	2, 0066400, 0177777, "BW",	m68k_insn_jcc },
-	{ "bgt.w",	2, 0067000, 0177777, "BW",	m68k_insn_jcc },
-	{ "ble.w",	2, 0067400, 0177777, "BW",	m68k_insn_jcc },
+	{ "bhi.w",	2, 0061000, 0177777, "BW" },
+	{ "bls.w",	2, 0061400, 0177777, "BW" },
+	{ "bcc.w",	2, 0062000, 0177777, "BW" },
+	{ "bcs.w",	2, 0062400, 0177777, "BW" },
+	{ "bne.w",	2, 0063000, 0177777, "BW" },
+	{ "beq.w",	2, 0063400, 0177777, "BW" },
+	{ "bvc.w",	2, 0064000, 0177777, "BW" },
+	{ "bvs.w",	2, 0064400, 0177777, "BW" },
+	{ "bpl.w",	2, 0065000, 0177777, "BW" },
+	{ "bmi.w",	2, 0065400, 0177777, "BW" },
+	{ "bge.w",	2, 0066000, 0177777, "BW" },
+	{ "blt.w",	2, 0066400, 0177777, "BW" },
+	{ "bgt.w",	2, 0067000, 0177777, "BW" },
+	{ "ble.w",	2, 0067400, 0177777, "BW" },
 
-	{ "bhi.s",	2, 0061000, 0177400, "BB",	m68k_insn_jcc },
-	{ "bls.s",	2, 0061400, 0177400, "BB",	m68k_insn_jcc },
-	{ "bcc.s",	2, 0062000, 0177400, "BB",	m68k_insn_jcc },
-	{ "bcs.s",	2, 0062400, 0177400, "BB",	m68k_insn_jcc },
-	{ "bne.s",	2, 0063000, 0177400, "BB",	m68k_insn_jcc },
-	{ "beq.s",	2, 0063400, 0177400, "BB",	m68k_insn_jcc },
-	{ "bvc.s",	2, 0064000, 0177400, "BB",	m68k_insn_jcc },
-	{ "bvs.s",	2, 0064400, 0177400, "BB",	m68k_insn_jcc },
-	{ "bpl.s",	2, 0065000, 0177400, "BB",	m68k_insn_jcc },
-	{ "bmi.s",	2, 0065400, 0177400, "BB",	m68k_insn_jcc },
-	{ "bge.s",	2, 0066000, 0177400, "BB",	m68k_insn_jcc },
-	{ "blt.s",	2, 0066400, 0177400, "BB",	m68k_insn_jcc },
-	{ "bgt.s",	2, 0067000, 0177400, "BB",	m68k_insn_jcc },
-	{ "ble.s",	2, 0067400, 0177400, "BB",	m68k_insn_jcc },
+	{ "bhi.s",	2, 0061000, 0177400, "BB" },
+	{ "bls.s",	2, 0061400, 0177400, "BB" },
+	{ "bcc.s",	2, 0062000, 0177400, "BB" },
+	{ "bcs.s",	2, 0062400, 0177400, "BB" },
+	{ "bne.s",	2, 0063000, 0177400, "BB" },
+	{ "beq.s",	2, 0063400, 0177400, "BB" },
+	{ "bvc.s",	2, 0064000, 0177400, "BB" },
+	{ "bvs.s",	2, 0064400, 0177400, "BB" },
+	{ "bpl.s",	2, 0065000, 0177400, "BB" },
+	{ "bmi.s",	2, 0065400, 0177400, "BB" },
+	{ "bge.s",	2, 0066000, 0177400, "BB" },
+	{ "blt.s",	2, 0066400, 0177400, "BB" },
+	{ "bgt.s",	2, 0067000, 0177400, "BB" },
+	{ "ble.s",	2, 0067400, 0177400, "BB" },
 
 	{ "bchg",	2, 0000500, 0170700, "Dd$s" },
 	{ "bchg",	4, 0004100, 0177700, "#b$s" },
@@ -307,14 +305,14 @@ static const struct m68k_opcode m68k_opcodes[] =
 	{ "bclr",	2, 0000600, 0170700, "Dd$s" },
 	{ "bclr",	4, 0004200, 0177700, "#b$s" },
 
-	{ "bra.w",	2, 0060000, 0177777, "BW",	m68k_insn_jmp },
-	{ "bra.s",	2, 0060000, 0177400, "BB",	m68k_insn_jmp },
+	{ "bra.w",	2, 0060000, 0177777, "BW" },
+	{ "bra.s",	2, 0060000, 0177400, "BB" },
 
 	{ "bset",	2, 0000700, 0170700, "Dd$s" },
 	{ "bset",	4, 0004300, 0177700, "#b$s" },
 
-	{ "bsr.w",	2, 0060400, 0177777, "BW",	m68k_insn_jsr },
-	{ "bsr.s",	2, 0060400, 0177400, "BB",	m68k_insn_jsr },
+	{ "bsr.w",	2, 0060400, 0177777, "BW" },
+	{ "bsr.s",	2, 0060400, 0177400, "BB" },
 
 	{ "btst",	2, 0000400, 0170700, "Dd;b" },
 	{ "btst",	4, 0004000, 0177700, "#b@s" },
@@ -340,22 +338,22 @@ static const struct m68k_opcode m68k_opcodes[] =
 	{ "cmp.w",	2, 0130100, 0170700, "*wDd" },
 	{ "cmp.l",	2, 0130200, 0170700, "*lDd" },
 
-	{ "dbcc",	2, 0052310, 0177770, "DsBw",	m68k_insn_jcc },
-	{ "dbcs",	2, 0052710, 0177770, "DsBw",	m68k_insn_jcc },
-	{ "dbeq",	2, 0053710, 0177770, "DsBw",	m68k_insn_jcc },
-	{ "dbf",	2, 0050710, 0177770, "DsBw",	m68k_insn_jcc },
-	{ "dbge",	2, 0056310, 0177770, "DsBw",	m68k_insn_jcc },
-	{ "dbgt",	2, 0057310, 0177770, "DsBw",	m68k_insn_jcc },
-	{ "dbhi",	2, 0051310, 0177770, "DsBw",	m68k_insn_jcc },
-	{ "dble",	2, 0057710, 0177770, "DsBw",	m68k_insn_jcc },
-	{ "dbls",	2, 0051710, 0177770, "DsBw",	m68k_insn_jcc },
-	{ "dblt",	2, 0056710, 0177770, "DsBw",	m68k_insn_jcc },
-	{ "dbmi",	2, 0055710, 0177770, "DsBw",	m68k_insn_jcc },
-	{ "dbne",	2, 0053310, 0177770, "DsBw",	m68k_insn_jcc },
-	{ "dbpl",	2, 0055310, 0177770, "DsBw",	m68k_insn_jcc },
-	{ "dbt",	2, 0050310, 0177770, "DsBw",	m68k_insn_jcc },
-	{ "dbvc",	2, 0054310, 0177770, "DsBw",	m68k_insn_jcc },
-	{ "dbvs",	2, 0054710, 0177770, "DsBw",	m68k_insn_jcc },
+	{ "dbcc",	2, 0052310, 0177770, "DsBw" },
+	{ "dbcs",	2, 0052710, 0177770, "DsBw" },
+	{ "dbeq",	2, 0053710, 0177770, "DsBw" },
+	{ "dbf",	2, 0050710, 0177770, "DsBw" },
+	{ "dbge",	2, 0056310, 0177770, "DsBw" },
+	{ "dbgt",	2, 0057310, 0177770, "DsBw" },
+	{ "dbhi",	2, 0051310, 0177770, "DsBw" },
+	{ "dble",	2, 0057710, 0177770, "DsBw" },
+	{ "dbls",	2, 0051710, 0177770, "DsBw" },
+	{ "dblt",	2, 0056710, 0177770, "DsBw" },
+	{ "dbmi",	2, 0055710, 0177770, "DsBw" },
+	{ "dbne",	2, 0053310, 0177770, "DsBw" },
+	{ "dbpl",	2, 0055310, 0177770, "DsBw" },
+	{ "dbt",	2, 0050310, 0177770, "DsBw" },
+	{ "dbvc",	2, 0054310, 0177770, "DsBw" },
+	{ "dbvs",	2, 0054710, 0177770, "DsBw" },
 
 	{ "divu.w",	2, 0100300, 0170700, ";wDd" },
 
@@ -378,9 +376,9 @@ static const struct m68k_opcode m68k_opcodes[] =
 
 	{ "illegal",	2, 0045374, 0177777, ""     },
 
-	{ "jmp",	2, 0047300, 0177700, "!s",	m68k_insn_jmp },
+	{ "jmp",	2, 0047300, 0177700, "!s" },
 
-	{ "jsr",	2, 0047200, 0177700, "!s",	m68k_insn_jsr },
+	{ "jsr",	2, 0047200, 0177700, "!s" },
 
 	{ "lea",	2, 0040700, 0170700, "!sAd" },
 
@@ -499,11 +497,11 @@ static const struct m68k_opcode m68k_opcodes[] =
 	{ "roxr.l",	2, 0160220, 0170770, "QdDs" },
 	{ "roxr.l",	2, 0160260, 0170770, "DdDs" },
 
-	{ "rte",	2, 0047163, 0177777, "",	m68k_insn_ret },
+	{ "rte",	2, 0047163, 0177777, "" },
 
-	{ "rtr",	2, 0047167, 0177777, "",	m68k_insn_ret },
+	{ "rtr",	2, 0047167, 0177777, "" },
 
-	{ "rts",	2, 0047165, 0177777, "",	m68k_insn_ret },
+	{ "rts",	2, 0047165, 0177777, "" },
 
 	{ "sbcd",	2, 0100400, 0170770, "DsDd" },
 	{ "sbcd",	2, 0100410, 0170770, "-s-d" },
@@ -1189,7 +1187,7 @@ match_insn_m68k (bfd_vma memaddr,
 
   d = best->args;
 
-  info->insn_type = m68k_insn_inv;
+  info->mnemonic = "";
 
   save_p = p;
   info->print_address_func = dummy_print_address;
@@ -1219,7 +1217,7 @@ match_insn_m68k (bfd_vma memaddr,
 
   d = best->args;
 
-  info->insn_type = best->insn_type ? best->insn_type : m68k_insn_ins;
+  info->mnemonic = best->name;
 
   info->fprintf_func (info->stream, "%s", best->name);
 
@@ -1424,7 +1422,7 @@ int m68k_disassemble_instruction(const void *data, size_t size,
 }
 
 int m68k_disassemble_type_target(const void *data, size_t size,
-	uint32_t address, enum m68k_insn_type *type, uint32_t *target)
+	uint32_t address, const char **mnemonic, uint32_t *target)
 {
 	const struct insn_memory insn_memory = {
 		.size = size,
@@ -1443,8 +1441,8 @@ int m68k_disassemble_type_target(const void *data, size_t size,
 
 	int r = print_insn_m68k(address, &info);
 
-	if (type)
-		*type = info.insn_type;
+	if (mnemonic)
+		*mnemonic = info.mnemonic;
 
 	if (target)
 		*target = info.target;
