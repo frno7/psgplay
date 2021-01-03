@@ -51,32 +51,32 @@ static const char *brief_size_symbol(struct m68kda_brief_ext brief)
 
 static void format_d(uint8_t d, struct m68kda *da)
 {
-	da->fprintf_func(da->stream, "%s", data_register_symbol(d));
+	da->fprintf_func(da->arg, "%s", data_register_symbol(d));
 }
 
 static void format_a(uint8_t a, struct m68kda *da)
 {
-	da->fprintf_func(da->stream, "%s", address_register_symbol(a));
+	da->fprintf_func(da->arg, "%s", address_register_symbol(a));
 }
 
 static void format_ai(uint8_t a, struct m68kda *da)
 {
-	da->fprintf_func(da->stream, "(%s)", address_register_symbol(a));
+	da->fprintf_func(da->arg, "(%s)", address_register_symbol(a));
 }
 
 static void format_pi(uint8_t a, struct m68kda *da)
 {
-	da->fprintf_func(da->stream, "(%s)+", address_register_symbol(a));
+	da->fprintf_func(da->arg, "(%s)+", address_register_symbol(a));
 }
 
 static void format_pd(uint8_t a, struct m68kda *da)
 {
-	da->fprintf_func(da->stream, "-(%s)", address_register_symbol(a));
+	da->fprintf_func(da->arg, "-(%s)", address_register_symbol(a));
 }
 
 static void format_di(int16_t displacement, uint8_t a, struct m68kda *da)
 {
-	da->fprintf_func(da->stream, "%d(%s)",
+	da->fprintf_func(da->arg, "%d(%s)",
 		displacement, address_register_symbol(a));
 }
 
@@ -84,12 +84,12 @@ static void format_ix(uint8_t a,
 	struct m68kda_brief_ext brief, struct m68kda *da)
 {
 	if (!brief.d)
-		da->fprintf_func(da->stream, "(%s,%s%s)",
+		da->fprintf_func(da->arg, "(%s,%s%s)",
 			address_register_symbol(a),
 			brief_register_symbol(brief),
 			brief_size_symbol(brief));
 	else
-		da->fprintf_func(da->stream, "%d(%s,%s%s)",
+		da->fprintf_func(da->arg, "%d(%s,%s%s)",
 			brief.d, address_register_symbol(a),
 			brief_register_symbol(brief),
 			brief_size_symbol(brief));
@@ -99,31 +99,31 @@ static void format_aw(int16_t address, struct m68kda *da)
 {
 	/* FIXME: da->print_address_func(address, da); */
 
-	da->fprintf_func(da->stream, "$%x.w", address);
+	da->fprintf_func(da->arg, "$%x.w", address);
 }
 
 static void format_al(int32_t address, struct m68kda *da)
 {
 	/* FIXME: da->print_address_func(address, da); */
 
-	da->fprintf_func(da->stream, "$%x.l", address);
+	da->fprintf_func(da->arg, "$%x.l", address);
 }
 
 static void format_pcdi(int16_t displacement, struct m68kda *da)
 {
 	/* FIXME: da->print_address_func(da->address + displacement, da); */
 
-	da->fprintf_func(da->stream, "%d(pc)", displacement);
+	da->fprintf_func(da->arg, "%d(pc)", displacement);
 }
 
 static void format_pcix(struct m68kda_brief_ext brief, struct m68kda *da)
 {
 	if (!brief.d)
-		da->fprintf_func(da->stream, "(pc,%s%s)",
+		da->fprintf_func(da->arg, "(pc,%s%s)",
 			brief_register_symbol(brief),
 			brief_size_symbol(brief));
 	else
-		da->fprintf_func(da->stream, "%d(pc,%s%s)",
+		da->fprintf_func(da->arg, "%d(pc,%s%s)",
 			brief.d, brief_register_symbol(brief),
 			brief_size_symbol(brief));
 }
@@ -141,7 +141,7 @@ static void format_das(uint8_t ds, uint8_t as, struct m68kda *da)
 	char buf[64];
 
 	if (!rs) {
-		da->fprintf_func(da->stream, "#0");
+		da->fprintf_func(da->arg, "#0");
 		return;
 	}
 
@@ -164,27 +164,27 @@ static void format_das(uint8_t ds, uint8_t as, struct m68kda *da)
 			range = (rs & (m << 1)) != 0;
 		}
 
-	da->fprintf_func(da->stream, "%s", buf);
+	da->fprintf_func(da->arg, "%s", buf);
 }
 
 static void format_imm(int32_t n, struct m68kda *da)
 {
-	da->fprintf_func(da->stream, "#%" PRId32, n);
+	da->fprintf_func(da->arg, "#%" PRId32, n);
 }
 
 static void format_ccr(struct m68kda *da)
 {
-	da->fprintf_func(da->stream, "ccr");
+	da->fprintf_func(da->arg, "ccr");
 }
 
 static void format_sr(struct m68kda *da)
 {
-	da->fprintf_func(da->stream, "sr");
+	da->fprintf_func(da->arg, "sr");
 }
 
 static void format_usp(struct m68kda *da)
 {
-	da->fprintf_func(da->stream, "usp");
+	da->fprintf_func(da->arg, "usp");
 }
 
 struct m68kda_operands m68kds_motorola = {

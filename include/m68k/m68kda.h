@@ -220,21 +220,22 @@ typedef int (*fprintf_function)(void *f, const char *fmt, ...)
 	__attribute__((format(printf, 2, 3)));
 
 struct m68kda {
-  fprintf_function fprintf_func;
-  void *stream;
+	fprintf_function fprintf_func;
 
-  void (*print_address_func)(uint32_t addr, struct m68kda *da);
+	void (*print_address_func)(uint32_t addr, struct m68kda *da);
 
-  struct m68kda_symbol (*symbol)(void *arg, uint32_t address);
+	struct m68kda_symbol (*symbol)(void *arg, uint32_t address);
 
-  uint32_t address;
+	uint32_t address;
 
-  const char *mnemonic;		/* Mnemonic */
-  uint32_t target;		/* Target address of branch or dref, if known;
+	const char *mnemonic;	/* Mnemonic */
+	uint32_t target;	/* Target address of branch or dref, if known;
 				   zero if unknown.  */
-  uint32_t target2;		/* Second target address for dref2 */
+	uint32_t target2;	/* Second target address for dref2 */
 
-  const struct m68kda_operands *operands;
+	const struct m68kda_operands *operands;
+
+	void *arg;
 };
 
 /**

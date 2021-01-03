@@ -245,13 +245,13 @@ static uint8_t print_insn_m68k(
 
 	da->mnemonic = spec->mnemonic;
 
-	da->fprintf_func(da->stream, "%s", spec->mnemonic);
+	da->fprintf_func(da->arg, "%s", spec->mnemonic);
 
 	if (m68kda_opcode_count(spec) > 0) {
 		union m68kda_opdata op0_data = { };
 		memcpy(&op0_data, &b[sizeof(insn)], spec->op0.size);
 
-		da->fprintf_func(da->stream, "\t");
+		da->fprintf_func(da->arg, "\t");
 
 		print_insn_arg(spec->op0.opcp, insn, op0_data, da);
 	}
@@ -260,7 +260,7 @@ static uint8_t print_insn_m68k(
 		memcpy(&op1_data, &b[sizeof(insn) + spec->op0.size],
 			spec->op1.size);
 
-		da->fprintf_func(da->stream, ",");
+		da->fprintf_func(da->arg, ",");
 
 		print_insn_arg(spec->op1.opcp, insn, op1_data, da);
 	}
@@ -275,12 +275,12 @@ static void print_address(uint32_t addr, struct m68kda *da)
 	da->target = addr;
 
 	if (da->symbol)
-		sym = da->symbol(da->stream, addr);
+		sym = da->symbol(da->arg, addr);
 
 	if (sym.s[0])
-		da->fprintf_func(da->stream, "%s", sym.s);
+		da->fprintf_func(da->arg, "%s", sym.s);
 	else
-		da->fprintf_func(da->stream, "0x%" PRIx32,
+		da->fprintf_func(da->arg, "0x%" PRIx32,
 			addr & 0xffffff);
 }
 
@@ -292,7 +292,7 @@ int m68kda_disassemble_instruction(
 {
 	struct m68kda da = {
 		.fprintf_func = print,
-		.stream = arg,
+		.arg = arg,
 
 		.print_address_func = print_address,
 		.symbol = symbol,
@@ -305,7 +305,7 @@ int m68kda_disassemble_instruction(
 	return print_insn_m68k(data, size, &da);
 }
 
-static int ignore_print(void *stream, const char *format, ...)
+static int ignore_print(void *arg, const char *format, ...)
 {
 	return 0;
 }
@@ -316,7 +316,7 @@ int m68kda_disassemble_type_target(
 {
 	struct m68kda da = {
 		.fprintf_func = ignore_print,
-		.stream = NULL,
+		.arg = NULL,
 
 		.print_address_func = print_address,
 
