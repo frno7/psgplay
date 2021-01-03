@@ -173,7 +173,12 @@ static void format_das(uint8_t ds, uint8_t as, struct m68kda *da)
 
 static void format_imm(int32_t n, struct m68kda *da)
 {
-	da->format(da->arg, "#%" PRId32, n);
+	/* Format immediates for the status register in hexadecimal. */
+	if (da->spec->op0.opcp.c == 'S' ||
+	    da->spec->op1.opcp.c == 'S')
+		da->format(da->arg, "#$%" PRIx32, n);
+	else
+		da->format(da->arg, "#%" PRId32, n);
 }
 
 static void format_ccr(struct m68kda *da)
