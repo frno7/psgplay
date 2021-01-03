@@ -302,17 +302,44 @@ static int ignore_format(void *arg, const char *format, ...)
 	return 0;
 }
 
+#define DEFAULT_ELEMENT(name_) .name_ = e->name_ ? e->name_ : d->name_
+
 const struct m68kda_spec *m68kda_disassemble_instruction(
 	const void *data, size_t size,
 	struct m68kda_symbol (*symbol)(void *arg, uint32_t address),
+	const struct m68kda_elements *elements,
 	int (*format)(void *arg, const char *fmt, ...),
 	void *arg)
 {
+	const struct m68kda_elements *d = &m68kds_motorola;
+	const struct m68kda_elements *e = elements ? elements : d;
+	const struct m68kda_elements elems = {
+		DEFAULT_ELEMENT(insn),
+		DEFAULT_ELEMENT(op),
+		DEFAULT_ELEMENT(d),
+		DEFAULT_ELEMENT(a),
+		DEFAULT_ELEMENT(ai),
+		DEFAULT_ELEMENT(pi),
+		DEFAULT_ELEMENT(pd),
+		DEFAULT_ELEMENT(di),
+		DEFAULT_ELEMENT(ix),
+		DEFAULT_ELEMENT(aw),
+		DEFAULT_ELEMENT(al),
+		DEFAULT_ELEMENT(pcdi),
+		DEFAULT_ELEMENT(pcix),
+		DEFAULT_ELEMENT(bra),
+		DEFAULT_ELEMENT(das),
+		DEFAULT_ELEMENT(imm),
+		DEFAULT_ELEMENT(ccr),
+		DEFAULT_ELEMENT(sr),
+		DEFAULT_ELEMENT(usp),
+	};
+
 	struct m68kda da = {
 		.print_address_func = print_address,
 		.symbol = symbol,
 
-		.elements = &m68kds_motorola,
+		.elements = &elems,
 		.format = format ? format : ignore_format,
 		.arg = arg,
 	};

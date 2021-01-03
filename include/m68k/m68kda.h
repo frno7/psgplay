@@ -256,6 +256,7 @@ uint8_t m68kda_insn_size(const struct m68kda_spec *spec);
 const struct m68kda_spec *m68kda_disassemble_instruction(
 	const void *data, size_t size,
 	struct m68kda_symbol (*symbol)(void *arg, uint32_t address),
+	const struct m68kda_elements *elements,
 	int (*format)(void *arg, const char *fmt, ...)
 		__attribute__((format(printf, 2, 3))),
 	void *arg);

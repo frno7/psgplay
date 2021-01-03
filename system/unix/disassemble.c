@@ -266,7 +266,7 @@ static void dasm_print_insn(struct disassembly *dasm, size_t i, size_t size)
 
 		const struct m68kda_spec *spec = m68kda_disassemble_instruction(
 			&dasm->data[i], size - i,
-			dasm_address_label, dasm_print_insn_fmt, &insn);
+			dasm_address_label, NULL, dasm_print_insn_fmt, &insn);
 		if (!spec)
 			return dasm_print_data(dasm, i, size);
 
