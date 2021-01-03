@@ -65,6 +65,7 @@ static void help(FILE *file)
 "\n"
 "    --disassemble          disassemble SNDH file and exit\n"
 "    --disassemble-header   disassemble SNDH file header and exit\n"
+"    --disassemble-address  display address column in disassembly\n"
 "    --remake-header        remake SNDH file header in disassembly\n"
 "\n",
 		progname);
@@ -139,25 +140,26 @@ bool text_mode_option(void)
 struct options *parse_options(int argc, char **argv)
 {
 	static const struct option options[] = {
-		{ "help",               no_argument,       NULL, 0 },
-		{ "version",            no_argument,       NULL, 0 },
-		{ "verbose",            no_argument,       NULL, 0 },
+		{ "help",                no_argument,       NULL, 0 },
+		{ "version",             no_argument,       NULL, 0 },
+		{ "verbose",             no_argument,       NULL, 0 },
 
-		{ "info",               no_argument,       NULL, 0 },
-		{ "output",             required_argument, NULL, 0 },
+		{ "info",                no_argument,       NULL, 0 },
+		{ "output",              required_argument, NULL, 0 },
 
-		{ "start",              required_argument, NULL, 0 },
-		{ "stop",               required_argument, NULL, 0 },
-		{ "length",             required_argument, NULL, 0 },
+		{ "start",               required_argument, NULL, 0 },
+		{ "stop",                required_argument, NULL, 0 },
+		{ "length",              required_argument, NULL, 0 },
 
-		{ "mode",               required_argument, NULL, 0 },
+		{ "mode",                required_argument, NULL, 0 },
 
-		{ "track",              required_argument, NULL, 0 },
-		{ "frequency",          required_argument, NULL, 0 },
+		{ "track",               required_argument, NULL, 0 },
+		{ "frequency",           required_argument, NULL, 0 },
 
-		{ "disassemble",        no_argument,       NULL, 0 },
-		{ "disassemble-header", no_argument,       NULL, 0 },
-		{ "remake-header",      no_argument,       NULL, 0 },
+		{ "disassemble",         no_argument,       NULL, 0 },
+		{ "disassemble-header",  no_argument,       NULL, 0 },
+		{ "disassemble-address", no_argument,       NULL, 0 },
+		{ "remake-header",       no_argument,       NULL, 0 },
 
 		{ NULL, 0, NULL, 0 }
 	};
@@ -211,6 +213,8 @@ struct options *parse_options(int argc, char **argv)
 				option.disassemble = DISASSEMBLE_TYPE_ALL;
 			else if (OPT("disassemble-header"))
 				option.disassemble = DISASSEMBLE_TYPE_HEADER;
+			else if (OPT("disassemble-address"))
+				option.disassemble_address = true;
 			else if (OPT("remake-header"))
 				option.remake_header = true;
 			break;

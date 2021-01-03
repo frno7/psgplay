@@ -37,6 +37,7 @@ struct options {
 	const char *input;
 
 	enum disassemble_type disassemble;
+	bool disassemble_address;
 	bool remake_header;
 };
 

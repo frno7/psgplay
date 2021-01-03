@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include "internal/assert.h"
+#include "internal/compare.h"
 #include "internal/print.h"
 
 #include "m68k/m68kda.h"
@@ -186,6 +187,20 @@ static void dasm_print_label(struct disassembly *dasm, size_t i)
 		printf("_%zx:\n", i);
 }
 
+static void dasm_print_address(uint32_t address, const void *data, size_t size)
+{
+	const uint8_t *b = data;
+	size_t length = 0;
+	char code[32];
+
+	code[0] = '\0';
+	for (size_t i = 0; i + 1 < size; i += 2)
+		length += snprintf(&code[length], sizeof(code) - length,
+			"%s%02x%02x", !i ? "" : " ", b[i], b[i + 1]);
+
+	printf("%8x: %-24s", address, code);
+}
+
 static void dasm_print_data(struct disassembly *dasm, size_t i, size_t size)
 {
 	int col;
@@ -199,9 +214,13 @@ static void dasm_print_data(struct disassembly *dasm, size_t i, size_t size)
 		if (dasm_is_header_remake(dasm, i)) {
 			if (i == 12)
 				remake_header(dasm->data, dasm->size);
-		} else if (!col)
+		} else if (!col) {
+			if (dasm->options->disassemble_address)
+				dasm_print_address(i, &dasm->data[i],
+					min_t(size_t, size -i, 8));
+
 			printf("\tdc.b\t$%02x", dasm->data[i]);
-		else
+		} else
 			printf(",$%02x", dasm->data[i]);
 
 		if (++col == 8)
@@ -354,12 +373,17 @@ static void dasm_print_insn(struct disassembly *dasm, size_t i, size_t size)
 		if (!spec)
 			return dasm_print_data(dasm, i, size);
 
+		const size_t insn_size = m68kda_insn_size(spec);
+
 		if (dasm_is_label(dasm, i))
 			dasm_print_label(dasm, i);
 
+		if (dasm->options->disassemble_address)
+			dasm_print_address(i, &dasm->data[i], insn_size);
+
 		printf("\t%s\n", insn.s);
 
-		i += m68kda_insn_size(spec);
+		i += insn_size;
 	}
 }
 
