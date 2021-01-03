@@ -219,13 +219,45 @@ struct insn_disassembly {
 	struct disassembly *dasm;
 };
 
+struct insn_symbol {
+	char s[16];
+};
+
+static struct insn_symbol dasm_address_label(
+	const int16_t displacement, struct insn_disassembly *insn)
+{
+	const uint32_t address = insn->address + displacement;
+
+	if (!dasm_is_label(insn->dasm, address))
+		return (struct insn_symbol) { };
+
+	struct insn_symbol sym;
+
+	if (insn->dasm->m[address].label) {
+		strncpy(sym.s, insn->dasm->m[address].label,
+			sizeof(sym.s) - 1);
+		sym.s[sizeof(sym.s) - 1] = '\0';
+	} else
+		snprintf(sym.s, sizeof(sym.s), "_%" PRIx32, address);
+
+	return sym;
+}
+
+static void format_pcdi(int16_t displacement, struct m68kda *da)
+{
+	struct insn_disassembly *insn = da->arg;
+	const struct insn_symbol sym = dasm_address_label(displacement, insn);
+
+	if (sym.s[0])
+		da->format(da->arg, "%s(pc)", sym.s);
+	else
+		da->format(da->arg, "%d(pc)", displacement);
+}
+
 static void format_bra(int16_t displacement, struct m68kda *da)
 {
 	struct insn_disassembly *insn = da->arg;
-	struct m68kda_symbol sym = { };
-
-	if (da->symbol)
-		sym = da->symbol(da->arg, insn->address);
+	const struct insn_symbol sym = dasm_address_label(displacement, insn);
 
 	if (sym.s[0])
 		da->format(da->arg, "%s", sym.s);
@@ -252,27 +284,10 @@ static int dasm_print_insn_fmt(void *arg, const char *fmt, ...)
 	return r;
 }
 
-static struct m68kda_symbol dasm_address_label(void *arg, uint32_t address)
-{
-	struct insn_disassembly *insn = arg;
-
-	if (!dasm_is_label(insn->dasm, address))
-		return (struct m68kda_symbol) { };
-
-	struct m68kda_symbol sym;
-
-	if (insn->dasm->m[address].label) {
-		strncpy(sym.s, insn->dasm->m[address].label, sizeof(sym.s) - 1);
-		sym.s[sizeof(sym.s) - 1] = '\0';
-	} else
-		snprintf(sym.s, sizeof(sym.s), "_%" PRIx32, address);
-
-	return sym;
-}
-
 static void dasm_print_insn(struct disassembly *dasm, size_t i, size_t size)
 {
 	const struct m68kda_elements elements = {
+		.pcdi = format_pcdi,
 		.bra = format_bra,
 	};
 
@@ -281,11 +296,11 @@ static void dasm_print_insn(struct disassembly *dasm, size_t i, size_t size)
 
 		insn.size = 0;
 		insn.s[0] = '\0';
-		insn.address = i;
+		insn.address = i + sizeof(union m68kda_insn),
 		insn.dasm = dasm;
 
 		const struct m68kda_spec *spec = m68kda_disassemble_instruction(
-			&dasm->data[i], size - i, dasm_address_label,
+			&dasm->data[i], size - i,
 			&elements, dasm_print_insn_fmt, &insn);
 		if (!spec)
 			return dasm_print_data(dasm, i, size);
@@ -356,11 +371,18 @@ struct target {
 	int32_t branch;
 };
 
+static void target_pcdi(int16_t displacement, struct m68kda *da)
+{
+	struct target *target = da->arg;
+
+	dasm_mark_target(target->dasm, target->address + displacement);
+}
+
 static void target_bra(int16_t displacement, struct m68kda *da)
 {
 	struct target *target = da->arg;
 
-	target->branch = target->address + 2 + displacement;
+	target->branch = target->address + displacement;
 
 	dasm_mark_target(target->dasm, target->branch);
 }
@@ -368,6 +390,7 @@ static void target_bra(int16_t displacement, struct m68kda *da)
 static void dasm_mark_text_trace(struct disassembly *dasm, size_t i)
 {
 	const struct m68kda_elements elements = {
+		.pcdi = target_pcdi,
 		.bra = target_bra,
 	};
 
@@ -385,11 +408,11 @@ static void dasm_mark_text_trace(struct disassembly *dasm, size_t i)
 
 		struct target target = {
 			.dasm = dasm,
-			.address = i,
+			.address = i + sizeof(union m68kda_insn),
 			.branch = -1
 		};
 		const struct m68kda_spec *spec = m68kda_disassemble_instruction(
-			&dasm->data[i], s, NULL, &elements, NULL, &target);
+			&dasm->data[i], s, &elements, NULL, &target);
 		if (!spec)
 			return;
 

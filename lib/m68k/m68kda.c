@@ -290,7 +290,6 @@ static int ignore_format(void *arg, const char *format, ...)
 
 const struct m68kda_spec *m68kda_disassemble_instruction(
 	const void *data, size_t size,
-	struct m68kda_symbol (*symbol)(void *arg, uint32_t address),
 	const struct m68kda_elements *elements,
 	int (*format)(void *arg, const char *fmt, ...),
 	void *arg)
@@ -320,8 +319,6 @@ const struct m68kda_spec *m68kda_disassemble_instruction(
 	};
 
 	struct m68kda da = {
-		.symbol = symbol,
-
 		.elements = &elems,
 		.format = format ? format : ignore_format,
 		.arg = arg,

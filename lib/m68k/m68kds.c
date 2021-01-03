@@ -107,22 +107,16 @@ static void format_ix(uint8_t a,
 
 static void format_aw(int16_t address, struct m68kda *da)
 {
-	/* FIXME: da->print_address_func(address, da); */
-
 	da->format(da->arg, "$%x.w", address);
 }
 
 static void format_al(int32_t address, struct m68kda *da)
 {
-	/* FIXME: da->print_address_func(address, da); */
-
 	da->format(da->arg, "$%x.l", address);
 }
 
 static void format_pcdi(int16_t displacement, struct m68kda *da)
 {
-	/* FIXME: da->print_address_func(da->address + displacement, da); */
-
 	da->format(da->arg, "%d(pc)", displacement);
 }
 
@@ -140,8 +134,6 @@ static void format_pcix(struct m68kda_brief_ext brief, struct m68kda *da)
 
 static void format_bra(int16_t displacement, struct m68kda *da)
 {
-	/* FIXME: da->print_address_func(address, da); */
-
 	da->format(da->arg, "%d(pc)", displacement);
 }
 
