@@ -219,19 +219,9 @@ struct m68kda_spec
 typedef int (*fprintf_function)(void *f, const char *fmt, ...)
 	__attribute__((format(printf, 2, 3)));
 
-struct insn_memory {
-	size_t size;
-	const uint8_t *data;
-	uint32_t address;
-};
-
 struct m68kda {
-  const struct insn_memory *insn_memory;
   fprintf_function fprintf_func;
   void *stream;
-
-  int (*read_memory_func)(uint32_t memaddr, void *myaddr, int length,
-	     struct m68kda *da);
 
   void (*print_address_func)(uint32_t addr, struct m68kda *da);
 

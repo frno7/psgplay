@@ -203,17 +203,6 @@ static int m68kda_opcode_count(const struct m68kda_spec *spec)
 	       spec->op0.opcp.c ? 1 : 0;
 }
 
-static bool m68kda_read(void *buffer, size_t nbytes, uint32_t address,
-	struct m68kda *da)
-{
-	uint8_t *b = buffer;
-
-	if (da->read_memory_func(address, b, nbytes, da) != 0)
-		return false;
-
-	return true;
-}
-
 const struct m68kda_spec *m68kda_find_insn(union m68kda_insn insn)
 {
 	/* FIXME: Lookup table on instruction prefix */
@@ -235,61 +224,48 @@ uint8_t m68kda_insn_size(const struct m68kda_spec *spec)
 	return sizeof(union m68kda_insn) + spec->op0.size + spec->op1.size;
 }
 
-static uint8_t print_insn_m68k(uint32_t memaddr, struct m68kda *da)
+static uint8_t print_insn_m68k(
+	const void *data, const size_t size, struct m68kda *da)
 {
+	const uint8_t *b = data;
+
 	union m68kda_insn insn;
-
-	da->address = memaddr;
-
-	if (!m68kda_read(&insn, sizeof(insn), da->address, da))
+	if (size < sizeof(insn))
 		return 0;
+	/* FIXME: GCC bug 98502: memcpy(&insn, b, sizeof(insn)); */
+	insn.byte[0] = b[0];
+	insn.byte[1] = b[1];
 
 	const struct m68kda_spec *spec = m68kda_find_insn(insn);
 	if (!spec)
 		return 0;	/* Zero out on undefined instructions. */
-
-	union m68kda_opdata op0_data = { };
-	union m68kda_opdata op1_data = { };
-
-	if (spec->op0.size > 0)
-		if (!m68kda_read(&op0_data, spec->op0.size,
-				da->address + sizeof(insn), da))
-			return 0;
-	if (spec->op1.size > 0)
-		if (!m68kda_read(&op1_data, spec->op1.size,
-				da->address + sizeof(insn) +
-				spec->op0.size, da))
-			return 0;
+	const uint8_t insn_size = m68kda_insn_size(spec);
+	if (size < insn_size)
+		return 0;
 
 	da->mnemonic = spec->mnemonic;
 
 	da->fprintf_func(da->stream, "%s", spec->mnemonic);
 
 	if (m68kda_opcode_count(spec) > 0) {
+		union m68kda_opdata op0_data = { };
+		memcpy(&op0_data, &b[sizeof(insn)], spec->op0.size);
+
 		da->fprintf_func(da->stream, "\t");
 
 		print_insn_arg(spec->op0.opcp, insn, op0_data, da);
 	}
 	if (m68kda_opcode_count(spec) > 1) {
+		union m68kda_opdata op1_data = { };
+		memcpy(&op1_data, &b[sizeof(insn) + spec->op0.size],
+			spec->op1.size);
+
 		da->fprintf_func(da->stream, ",");
 
 		print_insn_arg(spec->op1.opcp, insn, op1_data, da);
 	}
 
-	return m68kda_insn_size(spec);
-}
-
-static int read_buffer(uint32_t memaddr, void *myaddr,
-	int length, struct m68kda *da)
-{
-	const size_t offset = memaddr - da->insn_memory->address;
-
-	if (length < 1 || da->insn_memory->size < offset + length)
-		return -EFAULT;
-
-	memcpy(myaddr, &da->insn_memory->data[offset], length);
-
-	return 0;
+	return insn_size;
 }
 
 static void print_address(uint32_t addr, struct m68kda *da)
@@ -314,24 +290,19 @@ int m68kda_disassemble_instruction(
 	int (*print)(void *arg, const char *fmt, ...),
 	void *arg)
 {
-	const struct insn_memory insn_memory = {
-		.size = size,
-		.data = data,
-		.address = address,
-	};
 	struct m68kda da = {
-		.insn_memory = &insn_memory,
 		.fprintf_func = print,
 		.stream = arg,
 
-		.read_memory_func = read_buffer,
 		.print_address_func = print_address,
 		.symbol = symbol,
+
+		.address = address,
 
 		.operands = &m68kds_motorola,
 	};
 
-	return print_insn_m68k(address, &da);
+	return print_insn_m68k(data, size, &da);
 }
 
 static int ignore_print(void *stream, const char *format, ...)
@@ -343,23 +314,18 @@ int m68kda_disassemble_type_target(
 	const void *data, size_t size, uint32_t address,
 	const char **mnemonic, uint32_t *target)
 {
-	const struct insn_memory insn_memory = {
-		.size = size,
-		.data = data,
-		.address = address,
-	};
 	struct m68kda da = {
-		.insn_memory = &insn_memory,
 		.fprintf_func = ignore_print,
 		.stream = NULL,
 
-		.read_memory_func = read_buffer,
 		.print_address_func = print_address,
+
+		.address = address,
 
 		.operands = &m68kds_motorola,
 	};
 
-	int r = print_insn_m68k(address, &da);
+	int r = print_insn_m68k(data, size, &da);
 
 	if (mnemonic)
 		*mnemonic = da.mnemonic;
