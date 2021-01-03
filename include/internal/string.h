@@ -51,4 +51,18 @@ struct string_split next_string_split(
 	     (split).s;							\
 	     (split) = next_string_split((split), (sep), strstr))
 
+struct line_column {
+	int line;
+	int column;
+};
+
+/**
+ * char_line_column - update line and column given a character
+ * @c: character for update
+ * @lc: line and column to update
+ *
+ * Return: line and column after character update
+ */
+struct line_column char_line_column(char c, struct line_column lc);
+
 #endif /* INTERNAL_STRING_H */

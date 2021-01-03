@@ -85,3 +85,15 @@ struct string_split next_string_split(
 	return split.eos ? (struct string_split) { } :
 		first_string_split(&split.s[split.length], sep, find);
 }
+
+struct line_column char_line_column(char c, struct line_column lc)
+{
+	if (c == '\n') {
+		lc.line++;
+		lc.column = 1;
+	} else
+		lc.column = 1 + (c == '\t' ?
+			(((lc.column - 1) >> 3) << 3) + 8 : lc.column);
+
+	return lc;
+}
