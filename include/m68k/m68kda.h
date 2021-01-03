@@ -258,6 +258,14 @@ struct m68kda {
  */
 const struct m68kda_spec *m68kda_find_insn(union m68kda_insn insn);
 
+/**
+ * m68kda_insn_size - instruction size in bytes including operands
+ * @spec: instruction specification
+ *
+ * Return: instruction size in bytes including operands
+ */
+uint8_t m68kda_insn_size(const struct m68kda_spec *spec);
+
 int m68kda_disassemble_instruction(const void *data, size_t size,
 	uint32_t address,
 	struct m68kda_symbol (*symbol)(void *arg, uint32_t address),

@@ -228,13 +228,19 @@ const struct m68kda_spec *m68kda_find_insn(union m68kda_insn insn)
 	return NULL;
 }
 
-static int print_insn_m68k(uint32_t memaddr, struct m68kda *da)
+uint8_t m68kda_insn_size(const struct m68kda_spec *spec)
+{
+	BUILD_BUG_ON(sizeof(union m68kda_insn) != 2);
+
+	return sizeof(union m68kda_insn) + spec->op0.size + spec->op1.size;
+}
+
+static uint8_t print_insn_m68k(uint32_t memaddr, struct m68kda *da)
 {
 	union m68kda_insn insn;
 
 	da->address = memaddr;
 
-	BUILD_BUG_ON(sizeof(insn) != 2);
 	if (!m68kda_read(&insn, sizeof(insn), da->address, da))
 		return 0;
 
@@ -270,7 +276,7 @@ static int print_insn_m68k(uint32_t memaddr, struct m68kda *da)
 		print_insn_arg(spec->op1.opcp, insn, op1_data, da);
 	}
 
-	return sizeof(insn) + spec->op0.size + spec->op1.size;
+	return m68kda_insn_size(spec);
 }
 
 static int read_buffer(uint32_t memaddr, void *myaddr,
