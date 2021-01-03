@@ -8,6 +8,6 @@
 
 #include "m68kda.h"
 
-extern struct m68kda_operands m68kds_motorola;
+extern struct m68kda_elements m68kds_motorola;
 
 #endif /* M68KDS_H */

@@ -59,7 +59,7 @@ static uint16_t rev16(uint16_t w)
 
 static void op_das(uint16_t das, struct m68kda *da)
 {
-	da->operands->das(das & 0xff, (das >> 8) & 0xff, da);
+	da->elements->das(das & 0xff, (das >> 8) & 0xff, da);
 }
 
 static struct m68kda_ea eap(const struct m68kda_opcp opcp,
@@ -95,9 +95,9 @@ static void op_imm(const struct m68kda_opcp opcp,
 	const union m68kda_opdata opdata, struct m68kda *da)
 {
 	switch (opcp.p) {
-	case 'b': return da->operands->imm(op_byte(opdata), da);
-	case 'w': return da->operands->imm(op_word(opdata), da);
-	case 'l': return da->operands->imm(op_long(opdata), da);
+	case 'b': return da->elements->imm(op_byte(opdata), da);
+	case 'w': return da->elements->imm(op_word(opdata), da);
+	case 'l': return da->elements->imm(op_long(opdata), da);
 	default: BUG();
 	}
 }
@@ -107,10 +107,10 @@ static void op_ea7(const struct m68kda_opcp opcp,
 	struct m68kda *da)
 {
 	switch (ea.r) {
-	case 0: return da->operands->aw(op_word(opdata), da);
-	case 1: return da->operands->al(op_long(opdata), da);
-	case 2: return da->operands->pcdi(op_word(opdata), da);
-	case 3: return da->operands->pcix(op_brief(opdata), da);
+	case 0: return da->elements->aw(op_word(opdata), da);
+	case 1: return da->elements->al(op_long(opdata), da);
+	case 2: return da->elements->pcdi(op_word(opdata), da);
+	case 3: return da->elements->pcix(op_brief(opdata), da);
 	case 4:	return op_imm(opcp, opdata, da);
 	default: BUG();
 	}
@@ -123,13 +123,13 @@ static void op_ea(const struct m68kda_opcp opcp,
 	const struct m68kda_ea ea = eap(opcp, insn);
 
 	switch (ea.m) {
-	case 0: return da->operands->d(ea.r, da);
-	case 1: return da->operands->a(ea.r, da);
-	case 2: return da->operands->ai(ea.r, da);
-	case 3: return da->operands->pi(ea.r, da);
-	case 4: return da->operands->pd(ea.r, da);
-	case 5: return da->operands->di(op_word(opdata), ea.r, da);
-	case 6: return da->operands->ix(ea.r, op_brief(opdata), da);
+	case 0: return da->elements->d(ea.r, da);
+	case 1: return da->elements->a(ea.r, da);
+	case 2: return da->elements->ai(ea.r, da);
+	case 3: return da->elements->pi(ea.r, da);
+	case 4: return da->elements->pd(ea.r, da);
+	case 5: return da->elements->di(op_word(opdata), ea.r, da);
+	case 6: return da->elements->ix(ea.r, op_brief(opdata), da);
 	case 7: return op_ea7(opcp, ea, opdata, da);
 	default: BUG();
 	}
@@ -160,8 +160,8 @@ static void op_bra(const struct m68kda_opcp opcp,
 	struct m68kda *da)
 {
 	switch (opcp.p) {
-	case 'B': return da->operands->bra(op_imm8(insn), da);
-	case 'w': return da->operands->bra(op_word(opdata), da);
+	case 'B': return da->elements->bra(op_imm8(insn), da);
+	case 'w': return da->elements->bra(op_word(opdata), da);
 	default: BUG();
 	}
 }
@@ -171,17 +171,17 @@ static void print_insn_arg(const struct m68kda_opcp opcp,
 	struct m68kda *da)
 {
 	switch (opcp.c) {
-	case 'C': return da->operands->ccr(da);
-	case 'S': return da->operands->sr(da);
-	case 'U': return da->operands->usp(da);
-	case 'Q': return da->operands->imm(op_imm3(insn), da);
-	case 'M': return da->operands->imm(op_imm8(insn), da);
-	case 'T': return da->operands->imm(op_imm4(insn), da);
-	case 'D': return da->operands->d(op_reg(opcp, insn), da);
-	case 'A': return da->operands->a(op_reg(opcp, insn), da);
-	case 'd': return da->operands->di(op_word(opdata), op_sreg(insn), da);
-	case '+': return da->operands->pi(op_reg(opcp, insn), da);
-	case '-': return da->operands->pd(op_reg(opcp, insn), da);
+	case 'C': return da->elements->ccr(da);
+	case 'S': return da->elements->sr(da);
+	case 'U': return da->elements->usp(da);
+	case 'Q': return da->elements->imm(op_imm3(insn), da);
+	case 'M': return da->elements->imm(op_imm8(insn), da);
+	case 'T': return da->elements->imm(op_imm4(insn), da);
+	case 'D': return da->elements->d(op_reg(opcp, insn), da);
+	case 'A': return da->elements->a(op_reg(opcp, insn), da);
+	case 'd': return da->elements->di(op_word(opdata), op_sreg(insn), da);
+	case '+': return da->elements->pi(op_reg(opcp, insn), da);
+	case '-': return da->elements->pd(op_reg(opcp, insn), da);
 	case '#': return op_imm(opcp, opdata, da);
 	case 'B': return op_bra(opcp, insn, opdata, da);
 	case '@': return op_ea(opcp, insn, opdata, da);
@@ -299,7 +299,7 @@ int m68kda_disassemble_instruction(
 
 		.address = address,
 
-		.operands = &m68kds_motorola,
+		.elements = &m68kds_motorola,
 	};
 
 	return print_insn_m68k(data, size, &da);
@@ -322,7 +322,7 @@ int m68kda_disassemble_type_target(
 
 		.address = address,
 
-		.operands = &m68kds_motorola,
+		.elements = &m68kds_motorola,
 	};
 
 	int r = print_insn_m68k(data, size, &da);

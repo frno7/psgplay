@@ -187,7 +187,7 @@ static void format_usp(struct m68kda *da)
 	da->fprintf_func(da->arg, "usp");
 }
 
-struct m68kda_operands m68kds_motorola = {
+struct m68kda_elements m68kds_motorola = {
 	.d    = format_d,
 	.a    = format_a,
 	.ai   = format_ai,

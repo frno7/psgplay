@@ -140,7 +140,7 @@ union m68kda_opdata {
 } BE_STORAGE;
 
 /**
- * struct m68kda_operands - operands
+ * struct m68kda_elements - instruction disassembly elements
  * @d:    data register
  * @a:    address register
  * @ai:   address register indirect
@@ -159,7 +159,7 @@ union m68kda_opdata {
  * @sr:   status register
  * @usp:  user stack pointer register
  */
-struct m68kda_operands {
+struct m68kda_elements {
 	void (*d)(uint8_t d, struct m68kda *da);
 	void (*a)(uint8_t a, struct m68kda *da);
 	void (*ai)(uint8_t a, struct m68kda *da);
@@ -233,7 +233,7 @@ struct m68kda {
 				   zero if unknown.  */
 	uint32_t target2;	/* Second target address for dref2 */
 
-	const struct m68kda_operands *operands;
+	const struct m68kda_elements *elements;
 
 	void *arg;
 };
