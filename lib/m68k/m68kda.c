@@ -242,7 +242,8 @@ static const struct m68kda_spec *print_insn_m68k(
 	if (size < m68kda_insn_size(spec))
 		return NULL;
 
-	da->fprintf_func(da->arg, "%s", spec->mnemonic);
+	da->spec = spec;
+	da->elements->insn(da);
 
 	if (m68kda_opcode_count(spec) > 0) {
 		union m68kda_opdata op0_data = { };

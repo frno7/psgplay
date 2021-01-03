@@ -49,6 +49,11 @@ static const char *brief_size_symbol(struct m68kda_brief_ext brief)
 	return brief.l ? ".l" : ".w";
 }
 
+static void format_insn(struct m68kda *da)
+{
+	da->fprintf_func(da->arg, "%s", da->spec->mnemonic);
+}
+
 static void format_d(uint8_t d, struct m68kda *da)
 {
 	da->fprintf_func(da->arg, "%s", data_register_symbol(d));
@@ -188,6 +193,7 @@ static void format_usp(struct m68kda *da)
 }
 
 struct m68kda_elements m68kds_motorola = {
+	.insn = format_insn,
 	.d    = format_d,
 	.a    = format_a,
 	.ai   = format_ai,

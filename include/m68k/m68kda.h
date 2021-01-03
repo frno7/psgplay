@@ -141,6 +141,7 @@ union m68kda_opdata {
 
 /**
  * struct m68kda_elements - instruction disassembly elements
+ * @insn: instruction
  * @d:    data register
  * @a:    address register
  * @ai:   address register indirect
@@ -160,6 +161,7 @@ union m68kda_opdata {
  * @usp:  user stack pointer register
  */
 struct m68kda_elements {
+	void (*insn)(struct m68kda *da);
 	void (*d)(uint8_t d, struct m68kda *da);
 	void (*a)(uint8_t a, struct m68kda *da);
 	void (*ai)(uint8_t a, struct m68kda *da);
@@ -220,6 +222,8 @@ typedef int (*fprintf_function)(void *f, const char *fmt, ...)
 	__attribute__((format(printf, 2, 3)));
 
 struct m68kda {
+	const struct m68kda_spec *spec;
+
 	fprintf_function fprintf_func;
 
 	void (*print_address_func)(uint32_t addr, struct m68kda *da);
