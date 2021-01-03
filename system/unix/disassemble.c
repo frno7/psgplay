@@ -243,6 +243,39 @@ static struct insn_symbol dasm_address_label(
 	return sym;
 }
 
+static const char *data_register_symbol(uint8_t d)
+{
+	static const char *names[8] = {
+		"d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7"
+	};
+
+	BUG_ON(d > 7);
+
+	return names[d];
+}
+
+static const char *address_register_symbol(uint8_t a)
+{
+	static const char *names[8] = {
+		"a0", "a1", "a2", "a3", "a4", "a5", "a6", "sp"
+	};
+
+	BUG_ON(a > 7);
+
+	return names[a];
+}
+
+static const char *brief_register_symbol(struct m68kda_brief_ext brief)
+{
+	return (brief.a ?
+		address_register_symbol : data_register_symbol)(brief.r);
+}
+
+static const char *brief_size_symbol(struct m68kda_brief_ext brief)
+{
+	return brief.l ? ".l" : ".w";
+}
+
 static void format_pcdi(int16_t displacement, struct m68kda *da)
 {
 	struct insn_disassembly *insn = da->arg;
@@ -252,6 +285,21 @@ static void format_pcdi(int16_t displacement, struct m68kda *da)
 		da->format(da->arg, "%s(pc)", sym.s);
 	else
 		da->format(da->arg, "%d(pc)", displacement);
+}
+
+static void format_pcix(struct m68kda_brief_ext brief, struct m68kda *da)
+{
+	struct insn_disassembly *insn = da->arg;
+	const struct insn_symbol sym = dasm_address_label(brief.d, insn);
+
+	if (sym.s[0])
+		da->format(da->arg, "%s(pc,%s%s)",
+			sym.s, brief_register_symbol(brief),
+			brief_size_symbol(brief));
+	else
+		da->format(da->arg, "%d(pc,%s%s)",
+			brief.d, brief_register_symbol(brief),
+			brief_size_symbol(brief));
 }
 
 static void format_bra(int16_t displacement, struct m68kda *da)
@@ -288,6 +336,7 @@ static void dasm_print_insn(struct disassembly *dasm, size_t i, size_t size)
 {
 	const struct m68kda_elements elements = {
 		.pcdi = format_pcdi,
+		.pcix = format_pcix,
 		.bra = format_bra,
 	};
 
@@ -378,6 +427,13 @@ static void target_pcdi(int16_t displacement, struct m68kda *da)
 	dasm_mark_target(target->dasm, target->address + displacement);
 }
 
+static void target_pcix(struct m68kda_brief_ext brief, struct m68kda *da)
+{
+	struct target *target = da->arg;
+
+	dasm_mark_target(target->dasm, target->address + brief.d);
+}
+
 static void target_bra(int16_t displacement, struct m68kda *da)
 {
 	struct target *target = da->arg;
@@ -391,6 +447,7 @@ static void dasm_mark_text_trace(struct disassembly *dasm, size_t i)
 {
 	const struct m68kda_elements elements = {
 		.pcdi = target_pcdi,
+		.pcix = target_pcix,
 		.bra = target_bra,
 	};
 
