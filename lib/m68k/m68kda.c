@@ -224,6 +224,24 @@ uint8_t m68kda_insn_size(const struct m68kda_spec *spec)
 	return sizeof(union m68kda_insn) + spec->op0.size + spec->op1.size;
 }
 
+static void m68kda_opdata_memcpy(
+	union m68kda_opdata *op0_data,
+	union m68kda_opdata *op1_data,
+	const uint8_t *b,
+	const struct m68kda_spec *spec)
+{
+	/* The MOVEM operand 1 register set is placed before operand 0. */
+	if (spec->op1.opcp.c == 'L') {
+		memcpy(op1_data, &b[sizeof(union m68kda_insn)], spec->op1.size);
+		memcpy(op0_data, &b[sizeof(union m68kda_insn) + spec->op1.size],
+			spec->op0.size);
+	} else {
+		memcpy(op0_data, &b[sizeof(union m68kda_insn)], spec->op0.size);
+		memcpy(op1_data, &b[sizeof(union m68kda_insn) + spec->op0.size],
+			spec->op1.size);
+	}
+}
+
 static const struct m68kda_spec *print_insn_m68k(
 	const void *data, const size_t size, struct m68kda *da)
 {
@@ -245,19 +263,16 @@ static const struct m68kda_spec *print_insn_m68k(
 	da->spec = spec;
 	da->elements->insn(da);
 
-	if (m68kda_opcode_count(spec) > 0) {
-		union m68kda_opdata op0_data = { };
-		memcpy(&op0_data, &b[sizeof(insn)], spec->op0.size);
+	union m68kda_opdata op0_data = { };
+	union m68kda_opdata op1_data = { };
+	m68kda_opdata_memcpy(&op0_data, &op1_data, b, spec);
 
+	if (m68kda_opcode_count(spec) > 0) {
 		da->elements->op(0, da);
 
 		print_insn_arg(spec->op0.opcp, insn, op0_data, da);
 	}
 	if (m68kda_opcode_count(spec) > 1) {
-		union m68kda_opdata op1_data = { };
-		memcpy(&op1_data, &b[sizeof(insn) + spec->op0.size],
-			spec->op1.size);
-
 		da->elements->op(1, da);
 
 		print_insn_arg(spec->op1.opcp, insn, op1_data, da);
