@@ -223,8 +223,6 @@ struct m68kda_spec
 struct m68kda {
 	const struct m68kda_spec *spec;
 
-	void (*print_address_func)(uint32_t addr, struct m68kda *da);
-
 	struct m68kda_symbol (*symbol)(void *arg, uint32_t address);
 
 	uint32_t target;	/* Target address of branch or dref, if known;

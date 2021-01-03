@@ -140,7 +140,9 @@ static void format_pcix(struct m68kda_brief_ext brief, struct m68kda *da)
 
 static void format_bra(int16_t displacement, struct m68kda *da)
 {
-	da->print_address_func(/* FIXME: address */ + 2 + displacement, da);
+	/* FIXME: da->print_address_func(address, da); */
+
+	da->format(da->arg, "%d(pc)", displacement);
 }
 
 static void format_das(uint8_t ds, uint8_t as, struct m68kda *da)

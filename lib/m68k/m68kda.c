@@ -281,22 +281,6 @@ static const struct m68kda_spec *print_insn_m68k(
 	return spec;
 }
 
-static void print_address(uint32_t addr, struct m68kda *da)
-{
-	struct m68kda_symbol sym = { };
-
-	da->target = addr;
-
-	if (da->symbol)
-		sym = da->symbol(da->arg, addr);
-
-	if (sym.s[0])
-		da->format(da->arg, "%s", sym.s);
-	else
-		da->format(da->arg, "0x%" PRIx32,
-			addr & 0xffffff);
-}
-
 static int ignore_format(void *arg, const char *format, ...)
 {
 	return 0;
@@ -336,7 +320,6 @@ const struct m68kda_spec *m68kda_disassemble_instruction(
 	};
 
 	struct m68kda da = {
-		.print_address_func = print_address,
 		.symbol = symbol,
 
 		.elements = &elems,
@@ -351,8 +334,6 @@ const struct m68kda_spec *m68kda_disassemble_type_target(
 	const void *data, size_t size, uint32_t *target)
 {
 	struct m68kda da = {
-		.print_address_func = print_address,
-
 		.elements = &m68kds_motorola,
 		.format = ignore_format,
 		.arg = NULL,
