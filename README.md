@@ -58,6 +58,7 @@ Disassembly options:
 
     --disassemble          disassemble SNDH file and exit
     --disassemble-header   disassemble SNDH file header and exit
+    --disassemble-address  display address column in disassembly
     --remake-header        remake SNDH file header in disassembly
 ```
 
@@ -140,9 +141,6 @@ entry points.
 The `--remake-header` option can be used to repair broken SNDH metadata such
 as missing tags, excessive whitespace, etc. It can also be used to update or
 add new metadata, by editing the produced assembly source code in an editor.
-
-See issue [#4](https://github.com/frno7/psgplay/issues/4) about switching
-from MIT to Motorola syntax.
 
 Excerpt of disassembly with the `--disassemble` option:
 

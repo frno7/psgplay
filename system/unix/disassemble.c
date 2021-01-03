@@ -12,6 +12,7 @@
 #include "internal/assert.h"
 #include "internal/compare.h"
 #include "internal/print.h"
+#include "internal/string.h"
 
 #include "m68k/m68kda.h"
 
@@ -31,6 +32,11 @@ struct memory {
 		MEMORY_TEXT,
 		MEMORY_DATA,
 	} type;
+	enum sndh_insn {
+		SNDH_INSN_INIT = 1,
+		SNDH_INSN_EXIT = 2,
+		SNDH_INSN_PLAY = 4,
+	} sndh_insn;
 	const char *label;
 	char *mnemonic;
 	bool target;
@@ -42,6 +48,7 @@ struct disassembly {
 	const uint8_t *data;
 	size_t header_size;
 	struct memory *m;
+	enum sndh_insn sndh_insn_run;
 };
 
 /**
@@ -162,7 +169,7 @@ static int dasm_print_nl(struct disassembly *dasm, int i, int col)
 		for (int c = col; c < 8; c++)
 			printf("    ");
 
-		printf(" ; ");
+		printf("\t; ");
 
 		for (size_t k = 0; k < col; k++) {
 			const char c = dasm->data[i - col + k];
@@ -351,6 +358,41 @@ static int dasm_print_insn_fmt(void *arg, const char *fmt, ...)
 	return r;
 }
 
+static uint32_t dasm_sndh_insn_types(
+	struct disassembly *dasm, const size_t address, const size_t size)
+{
+	uint32_t sndh_insn_types = 0;
+
+	for (size_t i = 0; i < size; i++)
+		sndh_insn_types |= dasm->m[address + i].sndh_insn;
+
+	return sndh_insn_types;
+}
+
+static void dasm_print_sndh_insn_types(struct disassembly *dasm,
+	const char *s, size_t i, size_t insn_size)
+{
+	const uint32_t sndh_insn_types =
+		dasm_sndh_insn_types(dasm, i, insn_size);
+
+	if (!sndh_insn_types)
+		return;
+
+	struct line_column lc = string_line_column(
+		s, (struct line_column) { .column = 1 });
+
+	while (lc.column < 41) {
+		lc = char_line_column('\t', lc);
+		printf("\t");
+	}
+
+	printf("\t;");
+
+	if (sndh_insn_types & SNDH_INSN_INIT) printf(" init");
+	if (sndh_insn_types & SNDH_INSN_EXIT) printf(" exit");
+	if (sndh_insn_types & SNDH_INSN_PLAY) printf(" play");
+}
+
 static void dasm_print_insn(struct disassembly *dasm, size_t i, size_t size)
 {
 	const struct m68kda_elements elements = {
@@ -362,8 +404,9 @@ static void dasm_print_insn(struct disassembly *dasm, size_t i, size_t size)
 	while (i < size) {
 		struct insn_disassembly insn;
 
-		insn.size = 0;
-		insn.s[0] = '\0';
+		insn.size = 1;
+		insn.s[0] = '\t';
+		insn.s[1] = '\0';
 		insn.address = i + sizeof(union m68kda_insn),
 		insn.dasm = dasm;
 
@@ -381,7 +424,11 @@ static void dasm_print_insn(struct disassembly *dasm, size_t i, size_t size)
 		if (dasm->options->disassemble_address)
 			dasm_print_address(i, &dasm->data[i], insn_size);
 
-		printf("\t%s\n", insn.s);
+		printf("%s", insn.s);
+
+		dasm_print_sndh_insn_types(dasm, insn.s, i, insn_size);
+
+		puts("");
 
 		i += insn_size;
 	}
@@ -421,15 +468,19 @@ static void dasm_print(struct disassembly *dasm)
 }
 
 static void dasm_mark(struct disassembly *dasm,
-	size_t i, size_t size, enum memory_type type)
+	size_t i, size_t size, enum memory_type type,
+	enum sndh_insn sndh_insn_type)
 {
-	for (size_t k = 0; i + k < dasm->size && k < size; k++)
+	for (size_t k = 0; i + k < dasm->size && k < size; k++) {
 		dasm->m[i + k].type = type;
+		dasm->m[i + k].sndh_insn |= sndh_insn_type;
+	}
 }
 
-static void dasm_mark_text(struct disassembly *dasm, size_t i, size_t size)
+static void dasm_mark_text(struct disassembly *dasm,
+	size_t i, size_t size, enum sndh_insn sndh_insn_type)
 {
-	dasm_mark(dasm, i, size, MEMORY_TEXT);
+	dasm_mark(dasm, i, size, MEMORY_TEXT, sndh_insn_type);
 }
 
 static void dasm_mark_target(struct disassembly *dasm, size_t target)
@@ -467,7 +518,8 @@ static void target_bra(int16_t displacement, struct m68kda *da)
 	dasm_mark_target(target->dasm, target->branch);
 }
 
-static void dasm_mark_text_trace(struct disassembly *dasm, size_t i)
+static void dasm_mark_text_trace(struct disassembly *dasm,
+	size_t i, enum sndh_insn sndh_insn_type)
 {
 	const struct m68kda_elements elements = {
 		.pcdi = target_pcdi,
@@ -480,7 +532,8 @@ static void dasm_mark_text_trace(struct disassembly *dasm, size_t i)
 		    i > 12)
 			return;
 
-		if (dasm->m[i].type != MEMORY_UNDEFINED)
+		if (dasm->m[i].type != MEMORY_UNDEFINED &&
+		    (~dasm->m[i].sndh_insn & sndh_insn_type) == 0)
 			return;
 
 		const size_t s = dasm_section_size(dasm, i);
@@ -500,7 +553,7 @@ static void dasm_mark_text_trace(struct disassembly *dasm, size_t i)
 		const size_t insn_size = m68kda_insn_size(spec);
 		const enum m68k_insn_type type = insn_type(spec->mnemonic);
 
-		dasm_mark_text(dasm, i, insn_size);
+		dasm_mark_text(dasm, i, insn_size, sndh_insn_type);
 		i += insn_size;
 
 		switch (type) {
@@ -516,7 +569,8 @@ static void dasm_mark_text_trace(struct disassembly *dasm, size_t i)
 		case m68k_insn_jcc:
 		case m68k_insn_jsr:
 			if (target.branch != -1)
-				dasm_mark_text_trace(dasm, target.branch);
+				dasm_mark_text_trace(dasm,
+					target.branch, sndh_insn_type);
 			continue;
 		case m68k_insn_ret:
 			return;
@@ -528,9 +582,9 @@ static void dasm_mark_text_trace(struct disassembly *dasm, size_t i)
 
 static void dasm_mark_text_trace_entries(struct disassembly *dasm)
 {
-	dasm_mark_text_trace(dasm, 0);	/* init */
-	dasm_mark_text_trace(dasm, 4);	/* exit */
-	dasm_mark_text_trace(dasm, 8);	/* play */
+	dasm_mark_text_trace(dasm, 0, SNDH_INSN_INIT);
+	dasm_mark_text_trace(dasm, 4, SNDH_INSN_EXIT);
+	dasm_mark_text_trace(dasm, 8, SNDH_INSN_PLAY);
 }
 
 static void dasm_instruction(uint32_t pc, void *arg)
@@ -540,7 +594,14 @@ static void dasm_instruction(uint32_t pc, void *arg)
 	if (pc < MACHINE_PROGRAM)
 		return;
 
-	dasm_mark_text_trace(dasm, pc - MACHINE_PROGRAM);
+	const uint32_t i = pc - MACHINE_PROGRAM;
+
+	dasm->sndh_insn_run =
+		i == 0 ? SNDH_INSN_INIT :
+		i == 4 ? SNDH_INSN_EXIT :
+		i == 8 ? SNDH_INSN_PLAY : dasm->sndh_insn_run;
+
+	dasm_mark_text_trace(dasm, i, dasm->sndh_insn_run);
 }
 
 static ssize_t parse_time(const char *s, int frequency)
