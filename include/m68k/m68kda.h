@@ -223,9 +223,6 @@ struct m68kda_spec
 struct m68kda {
 	const struct m68kda_spec *spec;
 
-	int (*fprintf_func)(void *f, const char *fmt, ...)
-		__attribute__((format(printf, 2, 3)));
-
 	void (*print_address_func)(uint32_t addr, struct m68kda *da);
 
 	struct m68kda_symbol (*symbol)(void *arg, uint32_t address);
@@ -237,7 +234,8 @@ struct m68kda {
 	uint32_t target2;	/* Second target address for dref2 */
 
 	const struct m68kda_elements *elements;
-
+	int (*format)(void *arg, const char *fmt, ...)
+		__attribute__((format(printf, 2, 3)));
 	void *arg;
 };
 
@@ -260,7 +258,8 @@ uint8_t m68kda_insn_size(const struct m68kda_spec *spec);
 const struct m68kda_spec *m68kda_disassemble_instruction(
 	const void *data, size_t size, uint32_t address,
 	struct m68kda_symbol (*symbol)(void *arg, uint32_t address),
-	int (*print)(void *arg, const char *fmt, ...),
+	int (*format)(void *arg, const char *fmt, ...)
+		__attribute__((format(printf, 2, 3))),
 	void *arg);
 
 const struct m68kda_spec *m68kda_disassemble_type_target(

@@ -291,50 +291,48 @@ static void print_address(uint32_t addr, struct m68kda *da)
 		sym = da->symbol(da->arg, addr);
 
 	if (sym.s[0])
-		da->fprintf_func(da->arg, "%s", sym.s);
+		da->format(da->arg, "%s", sym.s);
 	else
-		da->fprintf_func(da->arg, "0x%" PRIx32,
+		da->format(da->arg, "0x%" PRIx32,
 			addr & 0xffffff);
+}
+
+static int ignore_format(void *arg, const char *format, ...)
+{
+	return 0;
 }
 
 const struct m68kda_spec *m68kda_disassemble_instruction(
 	const void *data, size_t size, uint32_t address,
 	struct m68kda_symbol (*symbol)(void *arg, uint32_t address),
-	int (*print)(void *arg, const char *fmt, ...),
+	int (*format)(void *arg, const char *fmt, ...),
 	void *arg)
 {
 	struct m68kda da = {
-		.fprintf_func = print,
-		.arg = arg,
-
 		.print_address_func = print_address,
 		.symbol = symbol,
 
 		.address = address,
 
 		.elements = &m68kds_motorola,
+		.format = format ? format : ignore_format,
+		.arg = arg,
 	};
 
 	return print_insn_m68k(data, size, &da);
-}
-
-static int ignore_print(void *arg, const char *format, ...)
-{
-	return 0;
 }
 
 const struct m68kda_spec *m68kda_disassemble_type_target(
 	const void *data, size_t size, uint32_t address, uint32_t *target)
 {
 	struct m68kda da = {
-		.fprintf_func = ignore_print,
-		.arg = NULL,
-
 		.print_address_func = print_address,
 
 		.address = address,
 
 		.elements = &m68kds_motorola,
+		.format = ignore_format,
+		.arg = NULL,
 	};
 
 	const struct m68kda_spec *spec = print_insn_m68k(data, size, &da);
