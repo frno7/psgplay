@@ -341,22 +341,17 @@ static void dasm_mark_text_trace(struct disassembly *dasm, size_t i)
 			return;
 
 		const size_t s = dasm_section_size(dasm, i);
-
 		if (!s)
 			return;
 
 		uint32_t target;
-		const char *mnemonic;
 		const struct m68kda_spec *spec = m68kda_disassemble_type_target(
-			&dasm->data[i], s, i, &mnemonic, &target);
+			&dasm->data[i], s, i, &target);
 		if (!spec)
 			return;
 
 		const size_t insn_size = m68kda_insn_size(spec);
-
-		BUG_ON(!mnemonic);
-
-		const enum m68k_insn_type type = insn_type(mnemonic);
+		const enum m68k_insn_type type = insn_type(spec->mnemonic);
 
 		dasm_mark_text(dasm, i, insn_size);
 		i += insn_size;

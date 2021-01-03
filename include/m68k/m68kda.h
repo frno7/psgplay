@@ -228,7 +228,6 @@ struct m68kda {
 
 	uint32_t address;
 
-	const char *mnemonic;	/* Mnemonic */
 	uint32_t target;	/* Target address of branch or dref, if known;
 				   zero if unknown.  */
 	uint32_t target2;	/* Second target address for dref2 */
@@ -261,7 +260,6 @@ const struct m68kda_spec *m68kda_disassemble_instruction(
 	void *arg);
 
 const struct m68kda_spec *m68kda_disassemble_type_target(
-	const void *data, size_t size, uint32_t address,
-	const char **type, uint32_t *target);
+	const void *data, size_t size, uint32_t address, uint32_t *target);
 
 #endif /* M68KDA_H */

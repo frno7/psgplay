@@ -242,8 +242,6 @@ static const struct m68kda_spec *print_insn_m68k(
 	if (size < m68kda_insn_size(spec))
 		return NULL;
 
-	da->mnemonic = spec->mnemonic;
-
 	da->fprintf_func(da->arg, "%s", spec->mnemonic);
 
 	if (m68kda_opcode_count(spec) > 0) {
@@ -310,8 +308,7 @@ static int ignore_print(void *arg, const char *format, ...)
 }
 
 const struct m68kda_spec *m68kda_disassemble_type_target(
-	const void *data, size_t size, uint32_t address,
-	const char **mnemonic, uint32_t *target)
+	const void *data, size_t size, uint32_t address, uint32_t *target)
 {
 	struct m68kda da = {
 		.fprintf_func = ignore_print,
@@ -327,9 +324,6 @@ const struct m68kda_spec *m68kda_disassemble_type_target(
 	const struct m68kda_spec *spec = print_insn_m68k(data, size, &da);
 	if (!spec)
 		return NULL;
-
-	if (mnemonic)
-		*mnemonic = da.mnemonic;
 
 	if (target)
 		*target = da.target;
