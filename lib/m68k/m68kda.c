@@ -303,7 +303,7 @@ static int ignore_format(void *arg, const char *format, ...)
 }
 
 const struct m68kda_spec *m68kda_disassemble_instruction(
-	const void *data, size_t size, uint32_t address,
+	const void *data, size_t size,
 	struct m68kda_symbol (*symbol)(void *arg, uint32_t address),
 	int (*format)(void *arg, const char *fmt, ...),
 	void *arg)
@@ -311,8 +311,6 @@ const struct m68kda_spec *m68kda_disassemble_instruction(
 	struct m68kda da = {
 		.print_address_func = print_address,
 		.symbol = symbol,
-
-		.address = address,
 
 		.elements = &m68kds_motorola,
 		.format = format ? format : ignore_format,
@@ -323,12 +321,10 @@ const struct m68kda_spec *m68kda_disassemble_instruction(
 }
 
 const struct m68kda_spec *m68kda_disassemble_type_target(
-	const void *data, size_t size, uint32_t address, uint32_t *target)
+	const void *data, size_t size, uint32_t *target)
 {
 	struct m68kda da = {
 		.print_address_func = print_address,
-
-		.address = address,
 
 		.elements = &m68kds_motorola,
 		.format = ignore_format,

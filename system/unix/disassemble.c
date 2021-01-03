@@ -265,7 +265,7 @@ static void dasm_print_insn(struct disassembly *dasm, size_t i, size_t size)
 		insn.dasm = dasm;
 
 		const struct m68kda_spec *spec = m68kda_disassemble_instruction(
-			&dasm->data[i], size - i, i,
+			&dasm->data[i], size - i,
 			dasm_address_label, dasm_print_insn_fmt, &insn);
 		if (!spec)
 			return dasm_print_data(dasm, i, size);
@@ -346,7 +346,7 @@ static void dasm_mark_text_trace(struct disassembly *dasm, size_t i)
 
 		uint32_t target;
 		const struct m68kda_spec *spec = m68kda_disassemble_type_target(
-			&dasm->data[i], s, i, &target);
+			&dasm->data[i], s, &target);
 		if (!spec)
 			return;
 
