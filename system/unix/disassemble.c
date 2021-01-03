@@ -350,8 +350,27 @@ static void dasm_mark_target(struct disassembly *dasm, size_t target)
 		dasm->m[target].target = true;
 }
 
+struct target {
+	struct disassembly *dasm;
+	uint32_t address;
+	int32_t branch;
+};
+
+static void target_bra(int16_t displacement, struct m68kda *da)
+{
+	struct target *target = da->arg;
+
+	target->branch = target->address + 2 + displacement;
+
+	dasm_mark_target(target->dasm, target->branch);
+}
+
 static void dasm_mark_text_trace(struct disassembly *dasm, size_t i)
 {
+	const struct m68kda_elements elements = {
+		.bra = target_bra,
+	};
+
 	while (i < dasm->size) {
 		if (dasm->options->disassemble == DISASSEMBLE_TYPE_HEADER &&
 		    i > 12)
@@ -364,9 +383,13 @@ static void dasm_mark_text_trace(struct disassembly *dasm, size_t i)
 		if (!s)
 			return;
 
-		uint32_t target;
-		const struct m68kda_spec *spec = m68kda_disassemble_type_target(
-			&dasm->data[i], s, &target);
+		struct target target = {
+			.dasm = dasm,
+			.address = i,
+			.branch = -1
+		};
+		const struct m68kda_spec *spec = m68kda_disassemble_instruction(
+			&dasm->data[i], s, NULL, &elements, NULL, &target);
 		if (!spec)
 			return;
 
@@ -382,13 +405,14 @@ static void dasm_mark_text_trace(struct disassembly *dasm, size_t i)
 		case m68k_insn_ins:
 			continue;
 		case m68k_insn_jmp:
-			dasm_mark_target(dasm, target);
-			i = target;
+			if (target.branch == -1)
+				return;
+			i = target.branch;
 			continue;
 		case m68k_insn_jcc:
 		case m68k_insn_jsr:
-			dasm_mark_target(dasm, target);
-			dasm_mark_text_trace(dasm, target);
+			if (target.branch != -1)
+				dasm_mark_text_trace(dasm, target.branch);
 			continue;
 		case m68k_insn_ret:
 			return;
