@@ -233,9 +233,6 @@ struct m68kda {
   int (*read_memory_func)(uint32_t memaddr, void *myaddr, int length,
 	     struct m68kda *da);
 
-  void (*memory_error_func)(int status, uint32_t memaddr,
-		struct m68kda *da);
-
   void (*print_address_func)(uint32_t addr, struct m68kda *da);
 
   struct m68kda_symbol (*symbol)(void *arg, uint32_t address);
@@ -266,13 +263,14 @@ const struct m68kda_spec *m68kda_find_insn(union m68kda_insn insn);
  */
 uint8_t m68kda_insn_size(const struct m68kda_spec *spec);
 
-int m68kda_disassemble_instruction(const void *data, size_t size,
-	uint32_t address,
+int m68kda_disassemble_instruction(
+	const void *data, size_t size, uint32_t address,
 	struct m68kda_symbol (*symbol)(void *arg, uint32_t address),
 	int (*print)(void *arg, const char *fmt, ...),
 	void *arg);
 
-int m68kda_disassemble_type_target(const void *data, size_t size,
-	uint32_t address, const char **type, uint32_t *target);
+int m68kda_disassemble_type_target(
+	const void *data, size_t size, uint32_t address,
+	const char **type, uint32_t *target);
 
 #endif /* M68KDA_H */

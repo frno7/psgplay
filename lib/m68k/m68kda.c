@@ -292,15 +292,6 @@ static int read_buffer(uint32_t memaddr, void *myaddr,
 	return 0;
 }
 
-static void memory_error(int status, uint32_t memaddr,
-	struct m68kda *da)
-{
-#if 0
-	fprintf(stderr, "%s: %d %" PRIu64 "\n",		/* FIXME */
-		__func__, status, memaddr);
-#endif
-}
-
 static void print_address(uint32_t addr, struct m68kda *da)
 {
 	struct m68kda_symbol sym = { };
@@ -317,8 +308,8 @@ static void print_address(uint32_t addr, struct m68kda *da)
 			addr & 0xffffff);
 }
 
-int m68kda_disassemble_instruction(const void *data, size_t size,
-	uint32_t address,
+int m68kda_disassemble_instruction(
+	const void *data, size_t size, uint32_t address,
 	struct m68kda_symbol (*symbol)(void *arg, uint32_t address),
 	int (*print)(void *arg, const char *fmt, ...),
 	void *arg)
@@ -334,7 +325,6 @@ int m68kda_disassemble_instruction(const void *data, size_t size,
 		.stream = arg,
 
 		.read_memory_func = read_buffer,
-		.memory_error_func = memory_error,
 		.print_address_func = print_address,
 		.symbol = symbol,
 
@@ -349,8 +339,9 @@ static int ignore_print(void *stream, const char *format, ...)
 	return 0;
 }
 
-int m68kda_disassemble_type_target(const void *data, size_t size,
-	uint32_t address, const char **mnemonic, uint32_t *target)
+int m68kda_disassemble_type_target(
+	const void *data, size_t size, uint32_t address,
+	const char **mnemonic, uint32_t *target)
 {
 	const struct insn_memory insn_memory = {
 		.size = size,
@@ -363,7 +354,6 @@ int m68kda_disassemble_type_target(const void *data, size_t size,
 		.stream = NULL,
 
 		.read_memory_func = read_buffer,
-		.memory_error_func = memory_error,
 		.print_address_func = print_address,
 
 		.operands = &m68kds_motorola,
