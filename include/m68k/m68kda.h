@@ -220,13 +220,11 @@ struct m68kda_spec
 	} op0, op1;
 };
 
-typedef int (*fprintf_function)(void *f, const char *fmt, ...)
-	__attribute__((format(printf, 2, 3)));
-
 struct m68kda {
 	const struct m68kda_spec *spec;
 
-	fprintf_function fprintf_func;
+	int (*fprintf_func)(void *f, const char *fmt, ...)
+		__attribute__((format(printf, 2, 3)));
 
 	void (*print_address_func)(uint32_t addr, struct m68kda *da);
 
