@@ -65,4 +65,13 @@ struct line_column {
  */
 struct line_column char_line_column(char c, struct line_column lc);
 
+/**
+ * string_line_column - update line and column given a string
+ * @s: string for update
+ * @lc: line and column to update
+ *
+ * Return: line and column after string update
+ */
+struct line_column string_line_column(const char *s, struct line_column lc);
+
 #endif /* INTERNAL_STRING_H */

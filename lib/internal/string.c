@@ -97,3 +97,11 @@ struct line_column char_line_column(char c, struct line_column lc)
 
 	return lc;
 }
+
+struct line_column string_line_column(const char *s, struct line_column lc)
+{
+	for (size_t i = 0; s[i] != '\0'; i++)
+		lc = char_line_column(s[i], lc);
+
+	return lc;
+}
