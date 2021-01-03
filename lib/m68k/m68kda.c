@@ -214,6 +214,20 @@ static bool m68kda_read(void *buffer, size_t nbytes, uint32_t address,
 	return true;
 }
 
+const struct m68kda_spec *m68kda_find_insn(union m68kda_insn insn)
+{
+	/* FIXME: Lookup table on instruction prefix */
+
+	for (int i = 0; i < ARRAY_SIZE(m68kda_opcodes); i++) {
+		const struct m68kda_spec *spec = &m68kda_opcodes[i];
+
+		if (m68kda_opcode_match(insn, spec))
+			return spec;
+	}
+
+	return NULL;
+}
+
 static int print_insn_m68k(uint32_t memaddr, struct m68kda *da)
 {
 	union m68kda_insn insn;
@@ -224,44 +238,39 @@ static int print_insn_m68k(uint32_t memaddr, struct m68kda *da)
 	if (!m68kda_read(&insn, sizeof(insn), da->address, da))
 		return 0;
 
-	for (int i = 0; i < ARRAY_SIZE(m68kda_opcodes); i++) {
-		const struct m68kda_spec *spec = &m68kda_opcodes[i];
+	const struct m68kda_spec *spec = m68kda_find_insn(insn);
+	if (!spec)
+		return 0;	/* Zero out on undefined instructions. */
 
-		if (!m68kda_opcode_match(insn, spec))
-			continue;
+	union m68kda_opdata op0_data = { };
+	union m68kda_opdata op1_data = { };
 
-		union m68kda_opdata op0_data = { };
-		union m68kda_opdata op1_data = { };
+	if (spec->op0.size > 0)
+		if (!m68kda_read(&op0_data, spec->op0.size,
+				da->address + sizeof(insn), da))
+			return 0;
+	if (spec->op1.size > 0)
+		if (!m68kda_read(&op1_data, spec->op1.size,
+				da->address + sizeof(insn) +
+				spec->op0.size, da))
+			return 0;
 
-		if (spec->op0.size > 0)
-			if (!m68kda_read(&op0_data, spec->op0.size,
-					da->address + sizeof(insn), da))
-				return 0;
-		if (spec->op1.size > 0)
-			if (!m68kda_read(&op1_data, spec->op1.size,
-					da->address + sizeof(insn) +
-					spec->op0.size, da))
-				return 0;
+	da->mnemonic = spec->mnemonic;
 
-		da->mnemonic = spec->mnemonic;
+	da->fprintf_func(da->stream, "%s", spec->mnemonic);
 
-		da->fprintf_func(da->stream, "%s", spec->mnemonic);
+	if (m68kda_opcode_count(spec) > 0) {
+		da->fprintf_func(da->stream, "\t");
 
-		if (m68kda_opcode_count(spec) > 0) {
-			da->fprintf_func(da->stream, "\t");
+		print_insn_arg(spec->op0.opcp, insn, op0_data, da);
+	}
+	if (m68kda_opcode_count(spec) > 1) {
+		da->fprintf_func(da->stream, ",");
 
-			print_insn_arg(spec->op0.opcp, insn, op0_data, da);
-		}
-		if (m68kda_opcode_count(spec) > 1) {
-			da->fprintf_func(da->stream, ",");
-
-			print_insn_arg(spec->op1.opcp, insn, op1_data, da);
-		}
-
-		return sizeof(insn) + spec->op0.size + spec->op1.size;
+		print_insn_arg(spec->op1.opcp, insn, op1_data, da);
 	}
 
-	return 0;	/* Zero out on undefined instructions. */
+	return sizeof(insn) + spec->op0.size + spec->op1.size;
 }
 
 static int read_buffer(uint32_t memaddr, void *myaddr,

@@ -250,6 +250,14 @@ struct m68kda {
   const struct m68kda_operands *operands;
 };
 
+/**
+ * m68kda_find_insn - find instruction specification
+ * @insn: 16-bit instruction word
+ *
+ * Return: instruction specification, or %NULL if invalid
+ */
+const struct m68kda_spec *m68kda_find_insn(union m68kda_insn insn);
+
 int m68kda_disassemble_instruction(const void *data, size_t size,
 	uint32_t address,
 	struct m68kda_symbol (*symbol)(void *arg, uint32_t address),
