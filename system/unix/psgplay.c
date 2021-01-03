@@ -39,9 +39,14 @@ static void NORETURN info_exit(struct file file)
 
 static void NORETURN disassemble_exit(struct options *options, struct file file)
 {
+#ifdef HAVE_SSO
 	sndh_disassemble(options, file);
 
 	exit(EXIT_SUCCESS);
+#else
+	pr_fatal_error("Disassembler disabled: The C compiler does not support "
+		"__attribute__((__scalar_storage_order__(\"big-endian\")))\n");
+#endif
 }
 
 static int default_subtune(struct file file)

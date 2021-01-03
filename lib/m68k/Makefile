@@ -16,8 +16,11 @@ lib/m68k/%ops.c include/m68k/%ops.h: lib/m68k/%_in.c $(M68KMAKE)
 
 lib/m68k/m68kcpu.c: $(M68K_GEN_H)
 
-M68K_SRC := $(M68K_GEN_C) lib/m68k/m68kcpu.c				\
-	lib/m68k/m68kds.c lib/m68k/m68kda.c
+M68K_SRC = $(M68K_GEN_C) lib/m68k/m68kcpu.c
+
+ifeq "$(HAVE_SSO)" "1"
+M68K_SRC += lib/m68k/m68kds.c lib/m68k/m68kda.c
+endif
 
 M68KDA_SPEC := lib/m68k/m68kda.spec
 
