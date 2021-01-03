@@ -259,7 +259,4 @@ const struct m68kda_spec *m68kda_disassemble_instruction(
 		__attribute__((format(printf, 2, 3))),
 	void *arg);
 
-const struct m68kda_spec *m68kda_disassemble_type_target(
-	const void *data, size_t size, uint32_t *target);
-
 #endif /* M68KDA_H */

@@ -329,22 +329,3 @@ const struct m68kda_spec *m68kda_disassemble_instruction(
 
 	return print_insn_m68k(data, size, &da);
 }
-
-const struct m68kda_spec *m68kda_disassemble_type_target(
-	const void *data, size_t size, uint32_t *target)
-{
-	struct m68kda da = {
-		.elements = &m68kds_motorola,
-		.format = ignore_format,
-		.arg = NULL,
-	};
-
-	const struct m68kda_spec *spec = print_insn_m68k(data, size, &da);
-	if (!spec)
-		return NULL;
-
-	if (target)
-		*target = da.target;
-
-	return spec;
-}
