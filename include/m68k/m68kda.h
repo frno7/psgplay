@@ -142,6 +142,7 @@ union m68kda_opdata {
 /**
  * struct m68kda_elements - instruction disassembly elements
  * @insn: instruction
+ * @op:   operand
  * @d:    data register
  * @a:    address register
  * @ai:   address register indirect
@@ -162,6 +163,7 @@ union m68kda_opdata {
  */
 struct m68kda_elements {
 	void (*insn)(struct m68kda *da);
+	void (*op)(int n, struct m68kda *da);
 	void (*d)(uint8_t d, struct m68kda *da);
 	void (*a)(uint8_t a, struct m68kda *da);
 	void (*ai)(uint8_t a, struct m68kda *da);

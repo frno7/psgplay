@@ -249,7 +249,7 @@ static const struct m68kda_spec *print_insn_m68k(
 		union m68kda_opdata op0_data = { };
 		memcpy(&op0_data, &b[sizeof(insn)], spec->op0.size);
 
-		da->fprintf_func(da->arg, "\t");
+		da->elements->op(0, da);
 
 		print_insn_arg(spec->op0.opcp, insn, op0_data, da);
 	}
@@ -258,7 +258,7 @@ static const struct m68kda_spec *print_insn_m68k(
 		memcpy(&op1_data, &b[sizeof(insn) + spec->op0.size],
 			spec->op1.size);
 
-		da->fprintf_func(da->arg, ",");
+		da->elements->op(1, da);
 
 		print_insn_arg(spec->op1.opcp, insn, op1_data, da);
 	}

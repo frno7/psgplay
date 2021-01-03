@@ -54,6 +54,11 @@ static void format_insn(struct m68kda *da)
 	da->fprintf_func(da->arg, "%s", da->spec->mnemonic);
 }
 
+static void format_op(int n, struct m68kda *da)
+{
+	da->fprintf_func(da->arg, "%s", !n ? "\t" : ",");
+}
+
 static void format_d(uint8_t d, struct m68kda *da)
 {
 	da->fprintf_func(da->arg, "%s", data_register_symbol(d));
@@ -194,6 +199,7 @@ static void format_usp(struct m68kda *da)
 
 struct m68kda_elements m68kds_motorola = {
 	.insn = format_insn,
+	.op   = format_op,
 	.d    = format_d,
 	.a    = format_a,
 	.ai   = format_ai,
