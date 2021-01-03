@@ -254,13 +254,13 @@ const struct m68kda_spec *m68kda_find_insn(union m68kda_insn insn);
  */
 uint8_t m68kda_insn_size(const struct m68kda_spec *spec);
 
-int m68kda_disassemble_instruction(
+const struct m68kda_spec *m68kda_disassemble_instruction(
 	const void *data, size_t size, uint32_t address,
 	struct m68kda_symbol (*symbol)(void *arg, uint32_t address),
 	int (*print)(void *arg, const char *fmt, ...),
 	void *arg);
 
-int m68kda_disassemble_type_target(
+const struct m68kda_spec *m68kda_disassemble_type_target(
 	const void *data, size_t size, uint32_t address,
 	const char **type, uint32_t *target);
 

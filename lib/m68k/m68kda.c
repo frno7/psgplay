@@ -224,24 +224,23 @@ uint8_t m68kda_insn_size(const struct m68kda_spec *spec)
 	return sizeof(union m68kda_insn) + spec->op0.size + spec->op1.size;
 }
 
-static uint8_t print_insn_m68k(
+static const struct m68kda_spec *print_insn_m68k(
 	const void *data, const size_t size, struct m68kda *da)
 {
 	const uint8_t *b = data;
 
 	union m68kda_insn insn;
 	if (size < sizeof(insn))
-		return 0;
+		return NULL;
 	/* FIXME: GCC bug 98502: memcpy(&insn, b, sizeof(insn)); */
 	insn.byte[0] = b[0];
 	insn.byte[1] = b[1];
 
 	const struct m68kda_spec *spec = m68kda_find_insn(insn);
 	if (!spec)
-		return 0;	/* Zero out on undefined instructions. */
-	const uint8_t insn_size = m68kda_insn_size(spec);
-	if (size < insn_size)
-		return 0;
+		return NULL;	/* Zero out on undefined instructions. */
+	if (size < m68kda_insn_size(spec))
+		return NULL;
 
 	da->mnemonic = spec->mnemonic;
 
@@ -265,7 +264,7 @@ static uint8_t print_insn_m68k(
 		print_insn_arg(spec->op1.opcp, insn, op1_data, da);
 	}
 
-	return insn_size;
+	return spec;
 }
 
 static void print_address(uint32_t addr, struct m68kda *da)
@@ -284,7 +283,7 @@ static void print_address(uint32_t addr, struct m68kda *da)
 			addr & 0xffffff);
 }
 
-int m68kda_disassemble_instruction(
+const struct m68kda_spec *m68kda_disassemble_instruction(
 	const void *data, size_t size, uint32_t address,
 	struct m68kda_symbol (*symbol)(void *arg, uint32_t address),
 	int (*print)(void *arg, const char *fmt, ...),
@@ -310,7 +309,7 @@ static int ignore_print(void *arg, const char *format, ...)
 	return 0;
 }
 
-int m68kda_disassemble_type_target(
+const struct m68kda_spec *m68kda_disassemble_type_target(
 	const void *data, size_t size, uint32_t address,
 	const char **mnemonic, uint32_t *target)
 {
@@ -325,7 +324,9 @@ int m68kda_disassemble_type_target(
 		.elements = &m68kds_motorola,
 	};
 
-	int r = print_insn_m68k(data, size, &da);
+	const struct m68kda_spec *spec = print_insn_m68k(data, size, &da);
+	if (!spec)
+		return NULL;
 
 	if (mnemonic)
 		*mnemonic = da.mnemonic;
@@ -333,5 +334,5 @@ int m68kda_disassemble_type_target(
 	if (target)
 		*target = da.target;
 
-	return r;
+	return spec;
 }

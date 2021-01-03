@@ -264,11 +264,10 @@ static void dasm_print_insn(struct disassembly *dasm, size_t i, size_t size)
 		insn.s[0] = '\0';
 		insn.dasm = dasm;
 
-		const int s = m68kda_disassemble_instruction(
+		const struct m68kda_spec *spec = m68kda_disassemble_instruction(
 			&dasm->data[i], size - i, i,
 			dasm_address_label, dasm_print_insn_fmt, &insn);
-
-		if (s <= 0 || size < i + s)
+		if (!spec)
 			return dasm_print_data(dasm, i, size);
 
 		if (dasm_is_label(dasm, i))
@@ -276,7 +275,7 @@ static void dasm_print_insn(struct disassembly *dasm, size_t i, size_t size)
 
 		printf("\t%s\n", insn.s);
 
-		i += s;
+		i += m68kda_insn_size(spec);
 	}
 }
 
@@ -348,11 +347,12 @@ static void dasm_mark_text_trace(struct disassembly *dasm, size_t i)
 
 		uint32_t target;
 		const char *mnemonic;
-		const size_t insn_size = m68kda_disassemble_type_target(
+		const struct m68kda_spec *spec = m68kda_disassemble_type_target(
 			&dasm->data[i], s, i, &mnemonic, &target);
-
-		if (!insn_size)
+		if (!spec)
 			return;
+
+		const size_t insn_size = m68kda_insn_size(spec);
 
 		BUG_ON(!mnemonic);
 
