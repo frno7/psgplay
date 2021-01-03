@@ -12,13 +12,12 @@ Motorola 68000 instruction disassembly specification
    # | immediate data as byte, word or long
    M | 8-bit immediate data in -128..127 range
    Q | 3-bit immediate data in 1..8 range
-   S | stack pointer register
+   S | status register
    U | user stack pointer register
    C | condition code register
    l | register list, reversed bits
    L | register list
    T | 4-bit trap vector
-
 
   effective address categories
   -------------+------------------------
@@ -31,7 +30,6 @@ Motorola 68000 instruction disassembly specification
   ..A..DXWLpx. | control
   ..A..DXWL... | alterable control
   ..A+.DXWLpx. | restore operands
-
 
   effective address modes and registers
   --+---+------+---+------------+---------------------------------------------
@@ -50,7 +48,6 @@ Motorola 68000 instruction disassembly specification
   7 | 3 | pcix | x | (d8,PC,Xk) | program counter relative with index
   7 | 4 | imm  | I | #imm       | immediate data
 
-
   operand placements
   ---+-----------------------------------------------
    b | second word, low byte
@@ -59,7 +56,6 @@ Motorola 68000 instruction disassembly specification
    l | second and third word (entire)
    s | source register, low bits of first word
    d | destination register, shifted 9 in first word
-
 
   valid operands
   ---+------------------
@@ -81,7 +77,6 @@ Motorola 68000 instruction disassembly specification
    l | .. .. lw .. .. ..
    L | .. .. Lw .. .. ..
    T | .. .. .. .. Ts ..
-
 
           operation word      valid ea    operand
 mnemonic  bit pattern       daA+-DXWLpxI   0   1
