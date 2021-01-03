@@ -204,10 +204,10 @@ struct m68kda_symbol {
  * @mask: operation word mask bit pattern
  * @op0: first operand, if any
  * @op0.size: extra words of first operand, in bytes
- * @op0.opcp: first operand category and placement, if any
+ * @op0.opcp: first operand category and placement, or NUL
  * @op1: second operand, if any
  * @op1.size: extra words of second operand, in bytes
- * @op1.opcp: first operand category and placement, if any
+ * @op1.opcp: first operand category and placement, or NUL
  */
 struct m68kda_spec
 {
