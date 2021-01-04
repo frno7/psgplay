@@ -26,3 +26,17 @@ uint16_t bitpop16(uint16_t x)
 
 	return n;
 }
+
+uint16_t bitcompress16(uint16_t x, uint16_t m)
+{
+	uint16_t r = 0;
+
+	for (uint16_t s = 0; m; x >>= 1, m >>= 1) {
+		const uint16_t b = m & 1;
+
+		r |= (x & b) << s;
+		s += b;
+	}
+
+	return r;
+}
