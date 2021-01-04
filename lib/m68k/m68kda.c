@@ -193,7 +193,7 @@ static int m68kda_opcode_count(const struct m68kda_spec *spec)
 	       spec->op0.opcp.c ? 1 : 0;
 }
 
-const struct m68kda_spec *m68kda_find_insn(union m68kda_insn insn)
+const struct m68kda_spec *m68kda_insn_find(union m68kda_insn insn)
 {
 	/* FIXME: Lookup table on instruction prefix */
 
@@ -244,7 +244,7 @@ static const struct m68kda_spec *print_insn_m68k(
 	insn.byte[0] = b[0];
 	insn.byte[1] = b[1];
 
-	const struct m68kda_spec *spec = m68kda_find_insn(insn);
+	const struct m68kda_spec *spec = m68kda_insn_find(insn);
 	if (!spec)
 		return NULL;	/* Zero out on undefined instructions. */
 	if (size < m68kda_insn_size(spec))

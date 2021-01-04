@@ -226,12 +226,12 @@ struct m68kda {
 };
 
 /**
- * m68kda_find_insn - find instruction specification
+ * m68kda_insn_find - find instruction specification
  * @insn: 16-bit instruction word
  *
  * Return: instruction specification, or %NULL if invalid
  */
-const struct m68kda_spec *m68kda_find_insn(union m68kda_insn insn);
+const struct m68kda_spec *m68kda_insn_find(union m68kda_insn insn);
 
 /**
  * m68kda_insn_size - instruction size in bytes including operands
