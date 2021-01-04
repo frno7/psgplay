@@ -40,3 +40,17 @@ uint16_t bitcompress16(uint16_t x, uint16_t m)
 
 	return r;
 }
+
+uint16_t bitexpand16(uint16_t x, uint16_t m)
+{
+	uint16_t r = 0;
+
+	for (uint16_t s = 0; m; s++, m >>= 1) {
+		const uint16_t b = m & 1;
+
+		r |= (x & b) << s;
+		x >>= b;
+	}
+
+	return r;
+}
