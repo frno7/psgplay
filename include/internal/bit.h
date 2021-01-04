@@ -50,4 +50,17 @@ uint16_t bitcompress16(uint16_t x, uint16_t m);
  */
 uint16_t bitexpand16(uint16_t x, uint16_t m);
 
+/**
+ * bitsuccessor16 - successor to a compressed 16-bit word expanded
+ * @x: word to succeed
+ * @m: compression and expansion word
+ *
+ * Example: Let @x = 0000 0000 efgh klmn, and
+ *              @m = 0000 1111 0011 1100, then the result is
+ *                   0000 efgh 00kl mn00.
+ *
+ * Result: bits in @x chosen by bits in @m
+ */
+uint16_t bitsuccessor16(uint16_t x, uint16_t m);
+
 #endif /* INTERNAL_BIT_H */
