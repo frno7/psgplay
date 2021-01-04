@@ -14,3 +14,15 @@ uint16_t bitrev16(uint16_t x)
 
 	return r;
 }
+
+uint16_t bitpop16(uint16_t x)
+{
+	uint16_t n = 0;
+
+	while (x) {
+		x &= x - 1;
+		n++;
+	}
+
+	return n;
+}

@@ -16,4 +16,12 @@
  */
 uint16_t bitrev16(uint16_t x);
 
+/**
+ * bitpop16 - 16-bit word population count
+ * @x: word to count
+ *
+ * Return: number of bits in @x that are 1
+ */
+uint16_t bitpop16(uint16_t x);
+
 #endif /* INTERNAL_BIT_H */
