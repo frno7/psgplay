@@ -33,7 +33,7 @@ uint16_t bitpop16(uint16_t x);
  *              @m = 0000 1111 0011 1100, then the result is
  *                   0000 0000 efgh klmn.
  *
- * Result: bits in @x chosen by bits in @m
+ * Return: bits in @x chosen by bits in @m
  */
 uint16_t bitcompress16(uint16_t x, uint16_t m);
 
@@ -46,7 +46,7 @@ uint16_t bitcompress16(uint16_t x, uint16_t m);
  *              @m = 0000 1111 0011 1100, then the result is
  *                   0000 efgh 00kl mn00.
  *
- * Result: bits in @x chosen by bits in @m
+ * Return: bits in @x chosen by bits in @m
  */
 uint16_t bitexpand16(uint16_t x, uint16_t m);
 
@@ -59,7 +59,7 @@ uint16_t bitexpand16(uint16_t x, uint16_t m);
  *              @m = 0000 1111 0011 1100, then the result is
  *                   0000 efgh 00kl mn00.
  *
- * Result: bits in @x chosen by bits in @m
+ * Return: bits in @x chosen by bits in @m
  */
 uint16_t bitsuccessor16(uint16_t x, uint16_t m);
 
