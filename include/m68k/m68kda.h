@@ -241,7 +241,7 @@ const struct m68kda_spec *m68kda_insn_find(union m68kda_insn insn);
  */
 uint8_t m68kda_insn_size(const struct m68kda_spec *spec);
 
-const struct m68kda_spec *m68kda_disassemble_instruction(
+const struct m68kda_spec *m68kda_insn_disassemble(
 	const void *data, size_t size,
 	const struct m68kda_elements *elements,
 	int (*format)(void *arg, const char *fmt, ...)

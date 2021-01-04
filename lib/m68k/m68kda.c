@@ -278,7 +278,7 @@ static int ignore_format(void *arg, const char *format, ...)
 
 #define DEFAULT_ELEMENT(name_) .name_ = e->name_ ? e->name_ : d->name_
 
-const struct m68kda_spec *m68kda_disassemble_instruction(
+const struct m68kda_spec *m68kda_insn_disassemble(
 	const void *data, size_t size,
 	const struct m68kda_elements *elements,
 	int (*format)(void *arg, const char *fmt, ...),
