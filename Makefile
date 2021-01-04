@@ -118,6 +118,7 @@ help:
 	@echo "  all            - compile PSG play (default)"
 	@echo "  install        - install PSG play"
 	@echo "  PSGPLAY.TOS    - compile PSG play for Atari ST"
+	@echo "  gtags          - make tags for the GNU Global source code tagging system"
 	@echo "  version        - display PSG play version"
 	@echo "  clean          - remove generated files"
 	@echo
