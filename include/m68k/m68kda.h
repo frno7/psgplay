@@ -267,4 +267,28 @@ const struct m68kda_spec *m68kda_insn_disassemble(
 		__attribute__((format(printf, 2, 3))),
 	void *arg);
 
+#define M68KDG_INSTRUCTION_SPEC(					\
+		mnemonic_, code_, mask_,				\
+		size0_, opc0_, opp0_,					\
+		size1_, opc1_, opp1_)					\
+	{								\
+		.mnemonic = mnemonic_,					\
+		.code = code_,						\
+		.mask = mask_,						\
+		.op0 = {						\
+			.size = size0_,					\
+			.opcp = {					\
+				.c = opc0_,				\
+				.p = opp0_,				\
+			},						\
+		},							\
+		.op1 = {						\
+			.size = size1_,					\
+			.opcp = {					\
+				.c = opc1_,				\
+				.p = opp1_,				\
+			},						\
+		},							\
+	},
+
 #endif /* M68KDA_H */

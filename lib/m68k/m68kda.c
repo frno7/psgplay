@@ -21,30 +21,7 @@
 
 static const struct m68kda_spec m68kda_opcodes[] =
 {
-#define M68KDG_INSTRUCTION_ENTRY(					\
-		mnemonic_, code_, mask_,				\
-		size0_, opc0_, opp0_,					\
-		size1_, opc1_, opp1_)					\
-	{								\
-		.mnemonic = mnemonic_,					\
-		.code = code_,						\
-		.mask = mask_,						\
-		.op0 = {						\
-			.size = size0_,					\
-			.opcp = {					\
-				.c = opc0_,				\
-				.p = opp0_,				\
-			},						\
-		},							\
-		.op1 = {						\
-			.size = size1_,					\
-			.opcp = {					\
-				.c = opc1_,				\
-				.p = opp1_,				\
-			},						\
-		},							\
-	},
-M68KDG_INSTRUCTIONS(M68KDG_INSTRUCTION_ENTRY)
+	M68KDG_INSTRUCTIONS(M68KDG_INSTRUCTION_SPEC)
 };
 
 static void op_das(uint16_t das, struct m68kda *da)

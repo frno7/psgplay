@@ -60,7 +60,7 @@
 
 struct fields {
 	char *mnemonic;
-	char *pattern ;
+	char *pattern;
 	char *ea;
 	char *op0;
 	char *op1;
