@@ -10,4 +10,5 @@ EXAMPLE_LINK_OBJ +=							\
 	system/unix/file.o						\
 	system/unix/memory.o						\
 	system/unix/print.o						\
+	system/unix/sndh.o						\
 	system/unix/string.o

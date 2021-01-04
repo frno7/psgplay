@@ -12,6 +12,7 @@ SYSTEM_UNIX_SRC =							\
 	system/unix/print.c						\
 	system/unix/psgplay.c						\
 	system/unix/remake.c						\
+	system/unix/sndh.c						\
 	system/unix/string.c						\
 	system/unix/text-mode.c						\
 	system/unix/tty.c

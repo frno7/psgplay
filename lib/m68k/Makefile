@@ -34,7 +34,6 @@ $(M68KDG_GEN_H): $(M68KDG) $(M68KDA_SPEC)
 	$(QUIET_GEN)$(M68KDG) -o $@ $(M68KDA_SPEC)
 
 M68KDG_LINK_OBJS =							\
-	lib/ice/ice.o							\
 	system/unix/file.o						\
 	system/unix/memory.o						\
 	system/unix/print.o						\

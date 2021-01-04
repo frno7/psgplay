@@ -18,8 +18,6 @@
 #include "internal/print.h"
 #include "internal/types.h"
 
-#include "ice/ice.h"
-
 #include "system/unix/file.h"
 #include "system/unix/memory.h"
 #include "system/unix/string.h"
@@ -210,33 +208,4 @@ const char *file_basename(const char *path)
 			k = i + 1;
 
 	return &path[k];
-}
-
-struct file sndh_read_file(const char *path)
-{
-	struct file file = file_read_or_stdin(path);
-
-	if (!file_valid(file))
-		return file;
-
-	if (ice_identify(file.data, file.size)) {
-		const size_t s = ice_decrunched_size(file.data, file.size);
-		void *b = xmalloc(s);
-
-		if (ice_decrunch(b, file.data, file.size) == -1) {
-			pr_error("%s: ICE decrunch failed\n", file.path);
-
-			free(b);
-			file_free(file);
-			errno = ENOEXEC;
-
-			return (struct file) { };
-		}
-
-		free(file.data);
-		file.size = s;
-		file.data = b;
-	}
-
-	return file;
 }
