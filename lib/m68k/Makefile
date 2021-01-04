@@ -18,10 +18,6 @@ lib/m68k/m68kcpu.c: $(M68K_GEN_H)
 
 M68K_SRC = $(M68K_GEN_C) lib/m68k/m68kcpu.c
 
-ifeq "$(HAVE_SSO)" "1"
-M68K_SRC += lib/m68k/m68kds.c lib/m68k/m68kda.c
-endif
-
 M68KDA_SPEC := lib/m68k/m68kda.spec
 
 M68KDG := lib/m68k/m68kdg
@@ -47,3 +43,31 @@ $(M68KDG).o: $(M68KDG).c
 
 $(M68KDG): $(M68KDG).o $(M68KDG_LINK_OBJS)
 	$(QUIET_LINK)$(CC) $(ALL_CFLAGS) -o $@ $(M68KDG).o $(M68KDG_LINK_OBJS)
+
+ifeq "$(HAVE_SSO)" "1"
+
+lib/m68k/m68kdt.c: $(M68KDG_GEN_H)
+
+M68KDA_SRC = lib/m68k/m68kds.c lib/m68k/m68kdt.c lib/m68k/m68kda.c
+M68KDT_SRC = lib/m68k/m68kds.c lib/m68k/m68kdt.c
+
+M68K_SRC += $(M68KDA_SRC)
+
+M68KDT_OBJ = $(patsubst %.c, %.o, $(M68KDT_SRC))
+
+M68KDT_LINK_OBJ :=							\
+	lib/psgplay/version.o						\
+	system/unix/file.o						\
+	system/unix/memory.o						\
+	system/unix/print.o						\
+	system/unix/string.o						\
+	lib/internal/bit.o						\
+	lib/internal/fifo.o						\
+	lib/internal/print.o						\
+	lib/internal/string.o
+
+M68KDT := lib/m68k/m68kdt
+$(M68KDT): $(M68KDT_OBJ) $(M68KDT_LINK_OBJ) lib/m68k/m68kda.o
+	$(QUIET_LINK)$(CC) $(ALL_CFLAGS) -o $@ $^
+
+endif

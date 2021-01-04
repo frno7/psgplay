@@ -95,6 +95,10 @@ install: all
 	$(INSTALL) -d $(DESTDIR)$(bindir)
 	$(INSTALL) $(PSGPLAY) $(DESTDIR)$(bindir)
 
+.PHONY: test
+test: $(M68KDT)
+	$(QUIET_TEST)$(M68KDT) $(subst @,,$(V:1=-v))
+
 .PHONY: version
 version:
 	@script/version
@@ -117,6 +121,7 @@ help:
 	@echo "Targets:"
 	@echo "  all            - compile PSG play (default)"
 	@echo "  install        - install PSG play"
+	@echo "  test           - test components of PSG play
 	@echo "  PSGPLAY.TOS    - compile PSG play for Atari ST"
 	@echo "  gtags          - make tags for the GNU Global source code tagging system"
 	@echo "  version        - display PSG play version"
