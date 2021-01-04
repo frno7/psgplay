@@ -57,5 +57,5 @@ uint16_t bitexpand16(uint16_t x, uint16_t m)
 
 uint16_t bitsuccessor16(uint16_t x, uint16_t m)
 {
-	return bitexpand16(bitcompress16(x, m) + 1, m);
+	return bitexpand16(bitcompress16(x, m) + 1, m) | (x & ~m);
 }
