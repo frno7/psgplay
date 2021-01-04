@@ -11,6 +11,7 @@
 #include <string.h>
 
 #include "internal/assert.h"
+#include "internal/bit.h"
 #include "internal/macro.h"
 #include "internal/types.h"
 
@@ -45,17 +46,6 @@ static const struct m68kda_spec m68kda_opcodes[] =
 	},
 M68KDG_INSTRUCTIONS(M68KDG_INSTRUCTION_ENTRY)
 };
-
-/* Reverse 16 bits. */
-static uint16_t rev16(uint16_t w)
-{
-	uint16_t m = 0;
-
-	for (int i = 0; i < 16; i++, w >>= 1)
-		m |= (w & 1) << (15 - i);
-
-	return m;
-}
 
 static void op_das(uint16_t das, struct m68kda *da)
 {
@@ -186,7 +176,7 @@ static void print_insn_arg(const struct m68kda_opcp opcp,
 	case 'B': return op_bra(opcp, insn, opdata, da);
 	case '@': return op_ea(opcp, insn, opdata, da);
 	case 'L': return op_das(op_word(opdata), da);
-	case 'l': return op_das(rev16(op_word(opdata)), da);
+	case 'l': return op_das(bitrev16(op_word(opdata)), da);
 	default: BUG();
 	}
 }

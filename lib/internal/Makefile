@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 
 INTERNAL_SRC :=								\
+	lib/internal/bit.c						\
 	lib/internal/fifo.c						\
 	lib/internal/print.c						\
 	lib/internal/string.c
