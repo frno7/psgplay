@@ -216,6 +216,14 @@ struct m68kda_spec
 	} op0, op1;
 };
 
+/**
+ * struct m68kda - disassembly structure
+ * @spec: instruction specification
+ * @elements: callbacks for every constituent part of the instruction,
+ *	can be %NULL for default Motorola syntax
+ * @format: output function when using default syntax elements
+ * @arg: optional argument supplied to @format
+ */
 struct m68kda {
 	const struct m68kda_spec *spec;
 
@@ -241,6 +249,17 @@ const struct m68kda_spec *m68kda_insn_find(union m68kda_insn insn);
  */
 uint8_t m68kda_insn_size(const struct m68kda_spec *spec);
 
+/**
+ * m68kda_insn_disassemble - disassemble a 68000 processor instruction
+ * @data: pointer to memory where the instruction is located
+ * @size: size of @data, must be at least the size the instruction, which
+ *	for the 68000 is 10 bytes
+ * @elements: callbacks for every constituent part of the instruction,
+ *	can be %NULL for default Motorola syntax
+ * @format: output function when using default syntax elements,
+ *	can be %NULL to ignore output
+ * @arg: optional argument supplied to @format
+ */
 const struct m68kda_spec *m68kda_insn_disassemble(
 	const void *data, size_t size,
 	const struct m68kda_elements *elements,
