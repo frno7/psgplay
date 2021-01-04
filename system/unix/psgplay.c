@@ -74,10 +74,13 @@ static void select_subtune(int *track, struct file file)
 
 static const struct output *select_output(const struct options *options)
 {
+	if (alsa_output_handle(options->output)) {
 #ifdef HAVE_ALSA
-	if (alsa_output_handle(options->output))
 		return &alsa_output;
+#else
+		pr_fatal_error("ALSA was disabled during compilation\n");
 #endif /* HAVE_ALSA */
+	}
 
 	if (!options->output)
 		pr_fatal_error("missing output file\n");

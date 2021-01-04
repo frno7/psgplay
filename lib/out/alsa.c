@@ -4,6 +4,7 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "out/alsa.h"
@@ -43,12 +44,6 @@ struct alsa_state {
 	struct alsa_stereo_sample buffer[4096];
 	struct fifo fifo;
 };
-
-const char *alsa_output_handle(const char *output)
-{
-	return !output ? "default" :
-		strncmp(output, "alsa:", 5) == 0 ? &output[5] : NULL;
-}
 
 static void alsa_sample_flush(struct alsa_state *state)
 {
@@ -227,6 +222,12 @@ static void alsa_close(void *arg)
 }
 
 #endif /* HAVE_ALSA */
+
+const char *alsa_output_handle(const char *output)
+{
+	return !output ? "default" :
+		strncmp(output, "alsa:", 5) == 0 ? &output[5] : NULL;
+}
 
 const struct output alsa_output = {
 #ifdef HAVE_ALSA
