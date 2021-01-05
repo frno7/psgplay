@@ -34,7 +34,7 @@ static void mmu_bus_wait(const struct device *dev)
 		USE_CYCLES(wait_cycles);
 }
 
-s8 dma_read_memory_8(u32 bus_address)
+u8 dma_read_memory_8(u32 bus_address)
 {
 	const struct device *dev = &ram_device;
 
