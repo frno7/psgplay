@@ -10,4 +10,6 @@
 
 u8 dma_read_memory_8(u32 bus_address);
 
+u16 probe_read_memory_16(u32 bus_address);
+
 #endif /* ATARI_MMU_H */
