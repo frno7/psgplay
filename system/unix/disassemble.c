@@ -207,7 +207,7 @@ static void print_address(struct strbuf *sb,
 		length += snprintf(&code[length], sizeof(code) - length,
 			"%s%02x%02x", !i ? "" : " ", b[i], b[i + 1]);
 
-	sbprintf(sb, "%8x: %-24s", address, code);
+	sbprintf(sb, "%6x: %-24s\t", address, code);
 }
 
 static void dasm_print_data(struct disassembly *dasm, size_t i, size_t size)
