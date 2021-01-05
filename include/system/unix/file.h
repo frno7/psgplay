@@ -27,7 +27,7 @@ struct file file_read_or_stdin(const char *path);
 
 struct file file_read_fd(int fd, const char *path);
 
-bool file_write(const char *path, int oflag, void *buf, size_t nbyte);
+bool file_write(const char *path, void *buf, size_t nbyte);
 
 void file_free(struct file f);
 

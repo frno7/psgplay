@@ -337,7 +337,6 @@ int main(int argc, char *argv[])
 
 	file_free(spec);
 
-	return sb.length && file_write(out_filepath,
-		O_WRONLY | O_CREAT | O_TRUNC, sb.s, sb.length) ?
+	return sb.length && file_write(out_filepath, sb.s, sb.length) ?
 		EXIT_SUCCESS : EXIT_FAILURE;
 }

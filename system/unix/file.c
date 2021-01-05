@@ -94,9 +94,9 @@ struct file file_read_fd(int fd, const char *path)
 	return file_read_fd__(fd, xstrdup(path));
 }
 
-bool file_write(const char *path, int oflag, void *buf, size_t nbyte)
+bool file_write(const char *path, void *buf, size_t nbyte)
 {
-	const int fd = xopen(path, oflag, 0644);
+	const int fd = xopen(path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 
 	if (fd < 0)
 		return false;
