@@ -49,9 +49,9 @@ call( 22, evnt_mouse,							\
 call( 23, evnt_mesag,							\
 		(),							\
 		(),							\
-		(message),						\
+		(mesag),						\
 		(),,							\
-		int16_t *message)					\
+		struct aes_mesag *mesag)				\
 call( 24, evnt_timer,							\
 		(locount, hicount),					\
 		(),							\

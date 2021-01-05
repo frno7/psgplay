@@ -95,6 +95,60 @@ struct aes {
 	struct aes_addr_out addr_out;
 };
 
+#define AES_MESAG_TYPE(t)						\
+	t(10, MN_SELECTED)						\
+	t(20, WM_REDRAW)						\
+	t(21, WM_TOPPED)						\
+	t(22, WM_CLOSED)						\
+	t(23, WM_FULLED)						\
+	t(24, WM_ARROWED)						\
+	t(25, WM_HSLID)							\
+	t(26, WM_VSLID)							\
+	t(27, WM_SIZED)							\
+	t(28, WM_MOVED)							\
+	t(30, WM_UNTOPPED)						\
+	t(31, WM_ONTOP)							\
+	t(33, WM_BOTTOM)						\
+	t(34, WM_ICONIFY)						\
+	t(35, WM_UNICONIFY)						\
+	t(36, WM_ALLICONIFY)						\
+	t(37, WM_TOOLBAR)						\
+	t(40, AC_OPEN)							\
+	t(41, AC_CLOSE)
+
+enum aes_mesag_type {
+#define AES_MESAG_TYPE_ENUM(id_, label_)				\
+	AES_ ## label_ = id_,
+AES_MESAG_TYPE(AES_MESAG_TYPE_ENUM)
+};
+
+struct aes_wind_rect {
+	int16_t x;
+	int16_t y;
+	int16_t w;
+	int16_t h;
+};
+
+struct aes_mesag {
+	union {
+		struct {
+			int16_t type;
+			int16_t ap_id;
+			int16_t extension;
+			union {
+				struct {
+					int16_t id;
+				} wm_closed;
+				struct {
+					int16_t id;
+					struct aes_wind_rect r;
+				} wm_sized, wm_moved;
+			}
+		};
+		int16_t word[16];
+	};
+};
+
 #define __AES_DECALARE(opcode_, name_,					\
 		int_in_, int_out_, addr_in_, addr_out_, ...)		\
 int16_t aes_##name_(struct aes *aes_ __VA_ARGS__);
