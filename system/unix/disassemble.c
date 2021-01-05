@@ -43,6 +43,7 @@ struct memory {
 };
 
 struct disassembly {
+	struct strbuf sb;
 	struct options *options;
 	size_t size;
 	const uint8_t *data;
@@ -167,18 +168,18 @@ static int dasm_print_nl(struct disassembly *dasm, int i, int col)
 
 	if (12 <= i - col && i - col < dasm->header_size) {
 		for (int c = col; c < 8; c++)
-			printf("    ");
+			sbprintf(&dasm->sb, "    ");
 
-		printf("\t; ");
+		sbprintf(&dasm->sb, "\t; ");
 
 		for (size_t k = 0; k < col; k++) {
 			const char c = dasm->data[i - col + k];
 
-			printf("%c", isprint(c) ? c : '.');
+			sbprintf(&dasm->sb, "%c", isprint(c) ? c : '.');
 		}
 	}
 
-	printf("\n");
+	sbprintf(&dasm->sb, "\n");
 
 	return 0;
 }
@@ -189,12 +190,13 @@ static void dasm_print_label(struct disassembly *dasm, size_t i)
 		return;
 
 	if (dasm->m[i].label)
-		printf("%s:\n", dasm->m[i].label);
+		sbprintf(&dasm->sb, "%s:\n", dasm->m[i].label);
 	else
-		printf("_%zx:\n", i);
+		sbprintf(&dasm->sb, "_%zx:\n", i);
 }
 
-static void dasm_print_address(uint32_t address, const void *data, size_t size)
+static void dasm_print_address(struct disassembly *dasm,
+	uint32_t address, const void *data, size_t size)
 {
 	const uint8_t *b = data;
 	size_t length = 0;
@@ -205,7 +207,7 @@ static void dasm_print_address(uint32_t address, const void *data, size_t size)
 		length += snprintf(&code[length], sizeof(code) - length,
 			"%s%02x%02x", !i ? "" : " ", b[i], b[i + 1]);
 
-	printf("%8x: %-24s", address, code);
+	sbprintf(&dasm->sb, "%8x: %-24s", address, code);
 }
 
 static void dasm_print_data(struct disassembly *dasm, size_t i, size_t size)
@@ -223,12 +225,12 @@ static void dasm_print_data(struct disassembly *dasm, size_t i, size_t size)
 				remake_header(dasm->data, dasm->size);
 		} else if (!col) {
 			if (dasm->options->disassemble_address)
-				dasm_print_address(i, &dasm->data[i],
+				dasm_print_address(dasm, i, &dasm->data[i],
 					min_t(size_t, size -i, 8));
 
-			printf("\tdc.b\t$%02x", dasm->data[i]);
+			sbprintf(&dasm->sb, "\tdc.b\t$%02x", dasm->data[i]);
 		} else
-			printf(",$%02x", dasm->data[i]);
+			sbprintf(&dasm->sb, ",$%02x", dasm->data[i]);
 
 		if (++col == 8)
 			col = dasm_print_nl(dasm, i + 1, col);
@@ -383,14 +385,14 @@ static void dasm_print_sndh_insn_types(struct disassembly *dasm,
 
 	while (lc.column < 41) {
 		lc = char_line_column('\t', lc);
-		printf("\t");
+		sbprintf(&dasm->sb, "\t");
 	}
 
-	printf("\t;");
+	sbprintf(&dasm->sb, "\t;");
 
-	if (sndh_insn_types & SNDH_INSN_INIT) printf(" init");
-	if (sndh_insn_types & SNDH_INSN_EXIT) printf(" exit");
-	if (sndh_insn_types & SNDH_INSN_PLAY) printf(" play");
+	if (sndh_insn_types & SNDH_INSN_INIT) sbprintf(&dasm->sb, " init");
+	if (sndh_insn_types & SNDH_INSN_EXIT) sbprintf(&dasm->sb, " exit");
+	if (sndh_insn_types & SNDH_INSN_PLAY) sbprintf(&dasm->sb, " play");
 }
 
 static void dasm_print_insn(struct disassembly *dasm, size_t i, size_t size)
@@ -422,13 +424,13 @@ static void dasm_print_insn(struct disassembly *dasm, size_t i, size_t size)
 			dasm_print_label(dasm, i);
 
 		if (dasm->options->disassemble_address)
-			dasm_print_address(i, &dasm->data[i], insn_size);
+			dasm_print_address(dasm, i, &dasm->data[i], insn_size);
 
-		printf("%s", insn.s);
+		sbprintf(&dasm->sb, "%s", insn.s);
 
 		dasm_print_sndh_insn_types(dasm, insn.s, i, insn_size);
 
-		puts("");
+		sbprintf(&dasm->sb, "\n");
 
 		i += insn_size;
 	}
@@ -673,5 +675,9 @@ void sndh_disassemble(struct options *options, struct file file)
 
 	dasm_print(&dasm);
 
+	if (dasm.sb.length)
+		printf("%s", dasm.sb.s);
+
+	free(dasm.sb.s);
 	free(dasm.m);
 }
