@@ -618,9 +618,8 @@ static ssize_t parse_time(const char *s, int frequency)
 }
 
 static void dasm_mark_text_trace_run(
-	struct disassembly *dasm,
-	const struct options *options,
-	struct file file)
+	void (*insn_cb)(uint32_t pc, void *arg), void *arg,
+	const struct options *options, struct file file)
 {
 	int subtune_count;
 
@@ -641,7 +640,7 @@ static void dasm_mark_text_trace_run(
 		if (!pp)
 			continue;
 
-		psgplay_instruction_callback(pp, dasm_instruction, dasm);
+		psgplay_instruction_callback(pp, insn_cb, arg);
 
 		psgplay_read_stereo(pp, NULL, sample_count);
 
@@ -671,7 +670,8 @@ void sndh_disassemble(struct options *options, struct file file)
 	dasm_mark_text_trace_entries(&dasm);
 
 	if (options->disassemble != DISASSEMBLE_TYPE_HEADER)
-		dasm_mark_text_trace_run(&dasm, options, file);
+		dasm_mark_text_trace_run(dasm_instruction,
+			&dasm, options, file);
 
 	dasm_print(&dasm);
 
