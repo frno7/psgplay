@@ -95,6 +95,27 @@ struct aes {
 	struct aes_addr_out addr_out;
 };
 
+#define AES_WF_MODE(m)							\
+	m( 4, WF_WORKXYWH)						\
+	m( 5, WF_CURRXYWH)						\
+	m( 6, WF_PREVXYWH)						\
+	m( 7, WF_FULLXYWH)						\
+	m( 8, WF_HSLIDE)						\
+	m( 9, WF_VSLIDE)						\
+	m(10, WF_TOP	)						\
+	m(11, WF_FIRSTXYWH)						\
+	m(12, WF_NEXTXYWH)						\
+	m(14, WF_NEWDESK)						\
+	m(15, WF_HSLSIZE)						\
+	m(16, WF_VSLSIZE)						\
+	m(17, WF_SCREEN)
+
+enum aes_wf_mode {
+#define AES_WF_MODE_ENUM(id_, label_)					\
+	AES_ ## label_ = id_,
+AES_WF_MODE(AES_WF_MODE_ENUM)
+};
+
 #define AES_MESAG_TYPE(t)						\
 	t(10, MN_SELECTED)						\
 	t(20, WM_REDRAW)						\
