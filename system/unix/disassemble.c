@@ -195,7 +195,7 @@ static void dasm_print_label(struct disassembly *dasm, size_t i)
 		sbprintf(&dasm->sb, "_%zx:\n", i);
 }
 
-static void dasm_print_address(struct disassembly *dasm,
+static void print_address(struct strbuf *sb,
 	uint32_t address, const void *data, size_t size)
 {
 	const uint8_t *b = data;
@@ -207,7 +207,7 @@ static void dasm_print_address(struct disassembly *dasm,
 		length += snprintf(&code[length], sizeof(code) - length,
 			"%s%02x%02x", !i ? "" : " ", b[i], b[i + 1]);
 
-	sbprintf(&dasm->sb, "%8x: %-24s", address, code);
+	sbprintf(sb, "%8x: %-24s", address, code);
 }
 
 static void dasm_print_data(struct disassembly *dasm, size_t i, size_t size)
@@ -225,7 +225,7 @@ static void dasm_print_data(struct disassembly *dasm, size_t i, size_t size)
 				remake_header(dasm->data, dasm->size);
 		} else if (!col) {
 			if (dasm->options->disassemble_address)
-				dasm_print_address(dasm, i, &dasm->data[i],
+				print_address(&dasm->sb, i, &dasm->data[i],
 					min_t(size_t, size -i, 8));
 
 			sbprintf(&dasm->sb, "\tdc.b\t$%02x", dasm->data[i]);
@@ -424,7 +424,7 @@ static void dasm_print_insn(struct disassembly *dasm, size_t i, size_t size)
 			dasm_print_label(dasm, i);
 
 		if (dasm->options->disassemble_address)
-			dasm_print_address(dasm, i, &dasm->data[i], insn_size);
+			print_address(&dasm->sb, i, &dasm->data[i], insn_size);
 
 		sbprintf(&dasm->sb, "%s", insn.s);
 
