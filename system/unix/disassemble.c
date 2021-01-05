@@ -675,8 +675,14 @@ void sndh_disassemble(struct options *options, struct file file)
 
 	dasm_print(&dasm);
 
-	if (dasm.sb.length)
-		printf("%s", dasm.sb.s);
+	if (dasm.sb.length) {
+		if (options->output) {
+			if (!file_write(options->output,
+					dasm.sb.s, dasm.sb.length))
+				pr_fatal_errno(options->output);
+		} else
+			printf("%s", dasm.sb.s);
+	}
 
 	free(dasm.sb.s);
 	free(dasm.m);
