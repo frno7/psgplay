@@ -20,6 +20,7 @@ static void mmu_trace(const char *op, u32 dev_address,
 {
 	char description[256];
 
+	/* FIXME: if (!dev->trace.format) with dev->trace.format(fmt, ...) */
 	return;
 
 	if (strcmp(dev->name, "dma") == 0)
@@ -39,16 +40,16 @@ trace:
 		description[0] = '\0';
 
 	if (description[0] != '\0')
-		printf("%9" PRIu64 " mmu %s %s %x %s%.*x %s\n",
-			machine_cycle(), op, dev->name,
+		printf("%s %8" PRIu64 "  %6x: %s %s%.*x %s\n",
+			dev->name, machine_cycle(),
 			dev->bus.address + dev_address,
-			spacing, size, value,
+			op, spacing, size, value,
 			description);
 	else
-		printf("%9" PRIu64 " mmu %s %s %x %s%.*x\n",
-			machine_cycle(), op, dev->name,
+		printf("%s %8" PRIu64 "  %6x: %s %s%.*x\n",
+			dev->name, machine_cycle(),
 			dev->bus.address + dev_address,
-			spacing, size, value);
+			op, spacing, size, value);
 }
 
 void mmu_trace_rd_u8(u32 dev_address, u32 value, const struct device *dev)
