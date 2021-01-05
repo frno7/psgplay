@@ -226,4 +226,6 @@ __AES_CALL(__AES_DECALARE)
 
 int16_t aes_appl_init(struct aes *aes_);
 
+const char *aes_mesag_type_string(const enum aes_mesag_type type);
+
 #endif /* _TOSLIBC_TOS_AES_H */

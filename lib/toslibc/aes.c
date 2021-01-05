@@ -83,3 +83,13 @@ int16_t aes_appl_init(struct aes *aes_)
 
 	return aes_appl_init__(aes_);
 }
+
+const char *aes_mesag_type_string(const enum aes_mesag_type type)
+{
+	switch (type) {
+#define AES_MESAG_TYPE_CASE(id_, label_)				\
+	case AES_ ## label_: return #label_;
+AES_MESAG_TYPE(AES_MESAG_TYPE_CASE)
+	default: return "";
+	}
+}
