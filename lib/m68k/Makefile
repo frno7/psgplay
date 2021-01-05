@@ -34,6 +34,7 @@ M68KDG_LINK_OBJS =							\
 	system/unix/memory.o						\
 	system/unix/print.o						\
 	system/unix/string.o						\
+	lib/internal/bit.o						\
 	lib/internal/fifo.o						\
 	lib/internal/print.o						\
 	lib/internal/string.o

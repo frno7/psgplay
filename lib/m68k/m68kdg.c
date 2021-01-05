@@ -12,6 +12,7 @@
 #include <string.h>
 
 #include "internal/assert.h"
+#include "internal/bit.h"
 #include "internal/print.h"
 #include "internal/string.h"
 #include "internal/types.h"
@@ -20,6 +21,8 @@
 
 #include "system/unix/file.h"
 #include "system/unix/string.h"
+
+#define PREFIX_TABLE_BITS   10	/* Configure 0..16 for size of lookup table */
 
 /**
  * M68KDG_OPERAND_SIZE(op) - operand sizes
@@ -65,6 +68,79 @@ struct fields {
 	char *op0;
 	char *op1;
 };
+
+#define PREFIX_TABLE_SHIFT  (16 - (PREFIX_TABLE_BITS))
+#define PREFIX_TABLE_COUNT  (1 << (PREFIX_TABLE_BITS))
+#define PREFIX_TABLE_MASK   ((PREFIX_TABLE_COUNT - 1) << (PREFIX_TABLE_SHIFT))
+
+static struct {
+	int count[PREFIX_TABLE_COUNT];
+	int offset[PREFIX_TABLE_COUNT];
+	struct {
+		uint16_t k;
+		int i;
+	} index[1 << 16];
+	struct {
+		uint16_t k;
+		int i;
+	} order[1 << 16];
+	int insns;
+	int size;
+} prefixes;
+
+static void prefix_table(struct strbuf *sb, const char *s)
+{
+	sbprintf(sb, "#define M68KDG_PREFIX_BITS\t%d\n", PREFIX_TABLE_BITS);
+	sbprintf(sb, "#define M68KDG_PREFIX_SHIFT\t%d\n", PREFIX_TABLE_SHIFT);
+	sbprintf(sb, "#define M68KDG_PREFIX_COUNT\t%d\n", PREFIX_TABLE_COUNT);
+	sbprintf(sb, "#define M68KDG_PREFIX_SIZE\t%d\n", prefixes.size);
+
+	/* Compute running offset into index table. */
+	for (int i = 1; i < ARRAY_SIZE(prefixes.offset); i++)
+		prefixes.offset[i] += prefixes.offset[i - 1] +
+				      prefixes.count[i - 1];
+
+	/* Output prefix offsets and count. */
+	sbprintf(sb, "#define M68KDG_PREFIX_INDEX(p)\t\t\t\t\t\t\\\n");
+	for (int i = 0; i < ARRAY_SIZE(prefixes.offset); i++)
+		sbprintf(sb, "\tp(0x%04x, %4d, %4d)\t\t\t\t\t\t\\\n",
+			i, prefixes.offset[i], prefixes.count[i]);
+	sbprintf(sb, "\n");
+
+	/* Order prefixes. */
+	for (int i = 0; i < prefixes.size; i++) {
+		const uint16_t k = prefixes.index[i].k;
+		const uint16_t h = prefixes.offset[k]++;
+
+		prefixes.order[h].k = k;
+		prefixes.order[h].i = prefixes.index[i].i;
+	}
+
+	/* Output ordered prefixes. */
+	sbprintf(sb, "#define M68KDG_PREFIX_TABLE(p)\t\t\t\t\t\t\\\n");
+	for (int i = 0; i < prefixes.size; i++)
+		sbprintf(sb, "\tp(0x%04x, %4d)\t\t\t\t\t\t\t\\\n",
+			prefixes.order[i].k,
+			prefixes.order[i].i);
+	sbprintf(sb, "\n");
+}
+
+static void prefix_insn(const uint16_t code, const uint16_t mask)
+{
+	const uint16_t h = ~mask & PREFIX_TABLE_MASK;
+	const uint16_t n = 1 << bitpop16(h);
+
+	for (uint16_t i = 0, c = code; i < n; i++, c = bitsuccessor16(c, h)) {
+		const uint16_t k = c >> PREFIX_TABLE_SHIFT;
+
+		prefixes.count[k]++;
+		prefixes.index[prefixes.size].k = k;
+		prefixes.index[prefixes.size].i = prefixes.insns;
+		prefixes.size++;
+	}
+
+	prefixes.insns++;
+}
 
 static struct m68kda_ea eap(const struct m68kda_opcp opcp,
 	const union m68kda_insn opword)
@@ -154,6 +230,8 @@ static void insn_entry(struct strbuf *sb, const struct fields *f,
 	const int8_t op1_size = op_size(opword, m68kda_opcp(f->op1));
 
 	BUG_ON(op0_size == -1 || op1_size == -1);
+
+	prefix_insn(c, m);
 
 	sbprintf(sb, "\top(\"%s\",\t0x%04x, 0x%04x", f->mnemonic, c, m);
 
@@ -255,6 +333,7 @@ int main(int argc, char *argv[])
 	struct strbuf sb = { };
 
 	insn_table(&sb, spec.data);
+	prefix_table(&sb, spec.data);
 
 	file_free(spec);
 

@@ -19,11 +19,6 @@
 #include "m68k/m68kdg.h"
 #include "m68k/m68kds.h"
 
-static const struct m68kda_spec m68kda_opcodes[] =
-{
-	M68KDG_INSTRUCTIONS(M68KDG_INSTRUCTION_SPEC)
-};
-
 static void op_das(uint16_t das, struct m68kda *da)
 {
 	da->elements->das(das & 0xff, (das >> 8) & 0xff, da);
@@ -172,10 +167,34 @@ static int m68kda_opcode_count(const struct m68kda_spec *spec)
 
 const struct m68kda_spec *m68kda_insn_find(union m68kda_insn insn)
 {
-	/* FIXME: Lookup table on instruction prefix */
+	static const struct m68kda_spec opcodes[] =
+	{
+		M68KDG_INSTRUCTIONS(M68KDG_INSTRUCTION_SPEC)
+	};
 
-	for (int i = 0; i < ARRAY_SIZE(m68kda_opcodes); i++) {
-		const struct m68kda_spec *spec = &m68kda_opcodes[i];
+	static const struct {
+		uint16_t index;
+	} table[M68KDG_PREFIX_SIZE] = {
+		M68KDG_PREFIX_TABLE(M68KDG_PREFIX_TABLE_ENTRY)
+	};
+
+	static const struct {
+		uint16_t n;
+	} offsets[M68KDG_PREFIX_COUNT] = {
+		M68KDG_PREFIX_INDEX(M68KDG_PREFIX_INDEX_OFFSET)
+	};
+
+	static const struct {
+		uint8_t n;
+	} counts[M68KDG_PREFIX_COUNT] = {
+		M68KDG_PREFIX_INDEX(M68KDG_PREFIX_INDEX_COUNT)
+	};
+
+	const uint16_t k = insn.word >> M68KDG_PREFIX_SHIFT;
+
+	for (int i = 0; i < counts[k].n; i++) {
+		const struct m68kda_spec *spec =
+			&opcodes[table[offsets[k].n + i].index];
 
 		if (m68kda_opcode_match(insn, spec))
 			return spec;

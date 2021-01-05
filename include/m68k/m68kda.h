@@ -291,4 +291,8 @@ const struct m68kda_spec *m68kda_insn_disassemble(
 		},							\
 	},
 
+#define M68KDG_PREFIX_INDEX_OFFSET(prefix_, offset_, count_) { .n = offset_ },
+#define M68KDG_PREFIX_INDEX_COUNT(prefix_, offset_, count_) { .n = count_ },
+#define M68KDG_PREFIX_TABLE_ENTRY(prefix_, index_) { .index = index_ },
+
 #endif /* M68KDA_H */
