@@ -87,7 +87,7 @@ bool sbprintf(struct strbuf *sb, const char *fmt, ...)
 	va_list ap;
 
 	va_start(ap, fmt);
-	const int length = vsbmprintf(sb, 4096, fmt, ap);
+	const int length = vsbprintf(sb, fmt, ap);
 	va_end(ap);
 
 	return length;
@@ -102,6 +102,11 @@ bool sbmprintf(struct strbuf *sb, size_t margin, const char *fmt, ...)
 	va_end(ap);
 
 	return length;
+}
+
+bool vsbprintf(struct strbuf *sb, const char *fmt, va_list ap)
+{
+	return vsbmprintf(sb, 4096, fmt, ap);
 }
 
 bool vsbmprintf(struct strbuf *sb, size_t margin, const char *fmt, va_list ap)

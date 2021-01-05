@@ -48,6 +48,8 @@ bool sbprintf(struct strbuf *sb, const char *fmt, ...);
 
 bool sbmprintf(struct strbuf *sb, size_t margin, const char *fmt, ...);
 
+bool vsbprintf(struct strbuf *sb, const char *fmt, va_list ap);
+
 bool vsbmprintf(struct strbuf *sb, size_t margin, const char *fmt, va_list ap);
 
 #endif /* PSGPLAY_SYSTEM_UNIX_STRING_H */
