@@ -95,6 +95,35 @@ struct aes {
 	struct aes_addr_out addr_out;
 };
 
+#define AES_GRAF_MOUSE(m)						\
+	m(  0, ARROW)							\
+	m(  1, TEXT_CRSR)						\
+	m(  2, BUSY_BEE)						\
+	m(  3, POINT_HAND)						\
+	m(  4, FLAT_HAND)						\
+	m(  5, THIN_CROSS)						\
+	m(  6, THICK_CROSS)						\
+	m(  7, OUTLN_CROSS)						\
+	m(255, USER_DEF)						\
+	m(256, OFF)							\
+	m(257, ON)
+
+enum aes_graf_mouse {
+#define AES_GRAF_MOUSE_ENUM(id_, label_)				\
+	AES_GRAF_MOUSE_ ## label_ = id_,
+AES_GRAF_MOUSE(AES_GRAF_MOUSE_ENUM)
+};
+
+struct aes_graf_mouse_user_def {
+	int16_t xhot;
+	int16_t yhot;
+	int16_t nplanes;
+	int16_t fg;
+	int16_t bg;
+	int16_t mask[16];
+	int16_t data[16];
+};
+
 #define AES_WF_MODE(m)							\
 	m( 4, WF_WORKXYWH)						\
 	m( 5, WF_CURRXYWH)						\
