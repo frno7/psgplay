@@ -34,11 +34,18 @@ static void mmu_bus_wait(const struct device *dev)
 		USE_CYCLES(wait_cycles);
 }
 
+#define DMA_DEVICE(bus_address, dev)					\
+	valid_device_bus_address(bus_address, dev) ? dev
+#define DMA_DEVICES(bus_address)					\
+	DMA_DEVICE(bus_address, &ram_device) :				\
+	DMA_DEVICE(bus_address, &rom0_device) :				\
+	DMA_DEVICE(bus_address, &rom1_device) : NULL
+
 u8 dma_read_memory_8(u32 bus_address)
 {
-	const struct device *dev = &ram_device;
+	const struct device *dev = DMA_DEVICES(bus_address);
 
-	if (!valid_device_bus_address(bus_address, dev))
+	if (!dev)
 		return 0;
 
 	const u32 dev_address = bus_address - dev->bus.address;
