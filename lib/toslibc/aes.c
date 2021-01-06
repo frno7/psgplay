@@ -65,18 +65,18 @@ int16_t aes_ ## name_(struct aes *aes_ __VA_ARGS__)			\
 	AES_INT_IN int_in_; 						\
 	AES_ADDR_IN addr_in_; 						\
 									\
-	xgemdos_aes(aes_);						\
+	xgemdos_aes(&aes_->pb);						\
 									\
 	AES_INT_OUT int_out_;	 					\
 	AES_ADDR_OUT addr_out_;						\
 									\
-	return aes_->int_out.n[0];					\
+	return aes_->pb.int_out->n[0];					\
 }
 __AES_CALL(__AES_DEFINE)
 
 int16_t aes_appl_init(struct aes *aes_)
 {
-	aes_->bp = (struct aes_bp) {
+	aes_->pb = (struct aes_pb) {
 		.control  = &aes_->control,
 		.global   = &aes_->global,
 		.int_in   = &aes_->int_in,

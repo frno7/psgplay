@@ -76,7 +76,7 @@ struct aes_addr_out {
 	void *a[1];
 };
 
-struct aes_bp {
+struct aes_pb {
 	struct aes_control *control;
 	struct aes_global *global;
 	const struct aes_int_in *int_in;
@@ -86,7 +86,7 @@ struct aes_bp {
 };
 
 struct aes {
-	struct aes_bp bp;
+	struct aes_pb pb;
 	struct aes_control control;
 	struct aes_global global;
 	struct aes_int_in int_in;
