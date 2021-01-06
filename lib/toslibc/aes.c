@@ -48,29 +48,23 @@
 #define AES_ADDR_OUT(...) AES_ADDR_OUTN(				\
 	__CONCATENATE(AES_ADDR_OUT, COUNT_ARGS(__VA_ARGS__)), __VA_ARGS__)
 
-#define DELIST(X) ESC(ISH X)
-#define ISH(...) ISH __VA_ARGS__
-#define ESC(...) ESC_(__VA_ARGS__)
-#define ESC_(...) VAN ## __VA_ARGS__
-#define VANISH
-
 #define __AES_DEFINE(opcode_, name_,					\
 		int_in_, int_out_, addr_in_, addr_out_, ...)		\
 int16_t aes_ ## name_(struct aes *aes_ __VA_ARGS__)			\
 {									\
 	AES_CONTROL(opcode_,						\
-		COUNT_ARGS(DELIST(int_in_)),				\
-		COUNT_ARGS(DELIST(int_out_)),				\
-		COUNT_ARGS(DELIST(addr_in_)),				\
-		COUNT_ARGS(DELIST(addr_out_)));				\
+		COUNT_ARGS int_in_,					\
+		COUNT_ARGS int_out_,					\
+		COUNT_ARGS addr_in_,					\
+		COUNT_ARGS addr_out_);					\
 									\
-	AES_INT_IN(DELIST(int_in_)); 					\
-	AES_ADDR_IN(DELIST(addr_in_)); 					\
+	AES_INT_IN int_in_; 						\
+	AES_ADDR_IN addr_in_; 						\
 									\
 	xgemdos_aes(aes_);						\
 									\
-	AES_INT_OUT(DELIST(int_out_));	 				\
-	AES_ADDR_OUT(DELIST(addr_out_));				\
+	AES_INT_OUT int_out_;	 					\
+	AES_ADDR_OUT addr_out_;						\
 									\
 	return aes_->int_out.n[0];					\
 }
