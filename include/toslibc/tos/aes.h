@@ -121,14 +121,29 @@ enum aes_graf_mouse {
 AES_GRAF_MOUSE(AES_GRAF_MOUSE_ENUM)
 };
 
-struct aes_rect {
+struct aes_point {
+	int16_t x;
+	int16_t y;
+};
+
+struct aes_rectangle {
 	int16_t w;
 	int16_t h;
 };
 
+struct aes_bar {
+	union {
+		struct {
+			struct aes_point p;
+			struct aes_rectangle r;
+		};
+		int16_t word[4];
+	};
+};
+
 struct aes_graf_cell_box {
-	struct aes_rect cell;
-	struct aes_rect box;
+	struct aes_rectangle cell;
+	struct aes_rectangle box;
 };
 
 struct aes_graf_mouse_user_def {
@@ -209,13 +224,6 @@ enum aes_mesag_type {
 AES_MESAG_TYPE(AES_MESAG_TYPE_ENUM)
 };
 
-struct aes_wind_rect {
-	int16_t x;
-	int16_t y;
-	int16_t w;
-	int16_t h;
-};
-
 struct aes_mesag {
 	union {
 		struct {
@@ -228,8 +236,8 @@ struct aes_mesag {
 				} wm_closed;
 				struct {
 					int16_t id;
-					struct aes_wind_rect r;
-				} wm_sized, wm_moved;
+					struct aes_bar b;
+				} wm_redraw, wm_sized, wm_moved;
 			}
 		};
 		int16_t word[16];
