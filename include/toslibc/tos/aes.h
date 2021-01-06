@@ -95,6 +95,13 @@ struct aes {
 	struct aes_addr_out addr_out;
 };
 
+enum {
+	AES_FORM_ICON_NONE,
+	AES_FORM_ICON_EXCLAMATION,
+	AES_FORM_ICON_QUESTION,
+	AES_FORM_ICON_STOP,
+};
+
 #define AES_GRAF_MOUSE(m)						\
 	m(  0, ARROW)							\
 	m(  1, TEXT_CRSR)						\
