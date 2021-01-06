@@ -79,9 +79,9 @@ struct aes_addr_out {
 struct aes_bp {
 	struct aes_control *control;
 	struct aes_global *global;
-	struct aes_int_in *int_in;
+	const struct aes_int_in *int_in;
 	struct aes_int_out *int_out;
-	struct aes_addr_in *addr_in;
+	const struct aes_addr_in *addr_in;
 	struct aes_addr_out *addr_out;
 };
 
