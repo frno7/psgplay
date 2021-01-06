@@ -8,7 +8,8 @@
 
 #define TRACE_DEVICE(dev)						\
 	dev(all, ALL, 0)						\
-	dev(cpu, CPU, 1)
+	dev(cpu, CPU, 1)						\
+	dev(reg, REG, 2)
 
 enum trace_device {
 #define TRACE_DEVICE_ENUM(symbol_, label_, id_)				\

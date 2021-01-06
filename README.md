@@ -64,7 +64,7 @@ Disassembly options:
 Tracing options:
 
     --trace=<device>,...   trace device operations of SNDH file and exit:
-                           all cpu
+                           all cpu reg
 ```
 
 ## Interactive text mode

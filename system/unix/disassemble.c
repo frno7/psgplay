@@ -14,6 +14,7 @@
 #include "internal/print.h"
 #include "internal/string.h"
 
+#include "m68k/m68k.h"
 #include "m68k/m68kda.h"
 
 #include "psgplay/psgplay.h"
@@ -708,12 +709,33 @@ static int trace_print_insn_fmt(void *arg, const char *fmt, ...)
 	return r;
 }
 
+static void trace_reg(void)
+{
+	printf("reg %8" PRIu64, machine_cycle());
+
+	printf(" pc %6" PRIx32, m68k_get_reg(NULL, M68K_REG_PC));
+
+#define TRACE_REGS(reg)							\
+	reg(sr, SR)							\
+	reg(d0, D0) reg(d1, D1) reg(d2, D2) reg(d3, D3)			\
+	reg(d4, D4) reg(d5, D5) reg(d6, D6) reg(d7, D7)			\
+	reg(a0, A0) reg(a1, A1) reg(a2, A2) reg(a3, A3)			\
+	reg(a4, A4) reg(a5, A5) reg(a6, A6)				\
+	reg(usp, USP)							\
+	reg(isp, ISP)
+#define TRACE_REG(symbol_, label_)					\
+	printf(" " #symbol_ " %x", m68k_get_reg(NULL, M68K_REG_ ## label_));
+TRACE_REGS(TRACE_REG)
+
+	printf("\n");
+}
+
 static void cpu_instruction_trace(uint32_t pc, void *arg)
 {
 	struct trace *trace = arg;
 
 	if (!TRACE_ENABLE(&trace->options->trace, CPU))
-		return;
+		goto trace_reg;
 
 	BUG_ON(pc % 2 != 0);
 
@@ -747,6 +769,10 @@ static void cpu_instruction_trace(uint32_t pc, void *arg)
 	BUG_ON(!trace->sb.length);
 
 	printf("%s\n", trace->sb.s);
+
+trace_reg:
+	if (TRACE_ENABLE(&trace->options->trace, REG))
+		trace_reg();
 }
 
 void sndh_trace(struct options *options, struct file file)
