@@ -141,24 +141,24 @@ struct aes_graf_mouse_user_def {
 	int16_t data[16];
 };
 
-#define AES_WIND_CREATE_MASK(m)						\
-	m( 0, NAME)							\
-	m( 1, CLOSER)							\
-	m( 2, FULLER)							\
-	m( 3, MOVER)							\
-	m( 4, INFO)							\
-	m( 5, SIZER)							\
-	m( 6, UPARROW)							\
-	m( 7, DNARROW)							\
-	m( 8, VSLIDE)							\
-	m( 9, LFARROW)							\
-	m(10, RTARROW)							\
-	m(11, HSLIDE)
+#define AES_WC_MASK(m)							\
+	m( 0, WC_NAME)							\
+	m( 1, WC_CLOSER)						\
+	m( 2, WC_FULLER)						\
+	m( 3, WC_MOVER)							\
+	m( 4, WC_INFO)							\
+	m( 5, WC_SIZER)							\
+	m( 6, WC_UPARROW)						\
+	m( 7, WC_DNARROW)						\
+	m( 8, WC_VSLIDE)						\
+	m( 9, WC_LFARROW)						\
+	m(10, WC_RTARROW)						\
+	m(11, WC_HSLIDE)
 
 enum aes_wind_create_mask {
-#define AES_WIND_CREATE_MASK_ENUM(id_, label_)				\
-	AES_WIND_CREATE_ ## label_ = 1 << id_,
-AES_WIND_CREATE_MASK(AES_WIND_CREATE_MASK_ENUM)
+#define AES_WC_MASK_ENUM(id_, label_)					\
+	AES_ ## label_ = 1 << id_,
+AES_WC_MASK(AES_WC_MASK_ENUM)
 };
 
 #define AES_WF_MODE(m)							\
