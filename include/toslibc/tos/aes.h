@@ -264,6 +264,37 @@ int16_t aes_form_alertf(struct aes *aes_,
 
 int16_t aes_graf_handle(struct aes *aes_, struct aes_graf_cell_box *gcb);
 
+static inline struct aes_bar aes_wind_firstxywh(
+	struct aes *aes_, int16_t win_id)
+{
+	struct aes_bar bar;
+
+	return aes_wind_get(aes_, win_id, AES_WF_FIRSTXYWH,
+		&bar.p.x, &bar.p.y, &bar.r.w, &bar.r.h) != 0 ? bar :
+		(struct aes_bar) { };
+}
+
+static inline struct aes_bar aes_wind_nextxywh(
+	struct aes *aes_, int16_t win_id)
+{
+	struct aes_bar bar;
+
+	return aes_wind_get(aes_, win_id, AES_WF_NEXTXYWH,
+		&bar.p.x, &bar.p.y, &bar.r.w, &bar.r.h) != 0 ? bar :
+		(struct aes_bar) { };
+}
+
+static inline aes_rectangle_degenerate(struct aes_rectangle r)
+{
+	return !r.w || !r.h;
+}
+
+#define aes_wind_for_each_xywh(bar_, aes_, win_id_)			\
+	/* FIXME: typecheck win_id_ */					\
+	for ((bar_) = aes_wind_firstxywh((aes_), (win_id));		\
+	     !aes_rectangle_degenerate(bar_.r);				\
+	     (bar_) = aes_wind_nextxywh((aes_), (win_id)))
+
 const char *aes_mesag_type_string(const enum aes_mesag_type type);
 
 #endif /* _TOSLIBC_TOS_AES_H */
