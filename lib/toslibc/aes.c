@@ -6,6 +6,7 @@
 #include <tos/aes.h>
 #include <tos/xgemdos.h>
 
+#include "internal/build-assert.h"
 #include "internal/macro.h"
 
 #define AES_CONTROL(opcode_, int_in_, int_out_, addr_in_, addr_out_)	\
@@ -82,6 +83,20 @@ int16_t aes_appl_init(struct aes *aes_)
 	};
 
 	return aes_appl_init__(aes_);
+}
+
+int16_t aes_graf_handle(struct aes *aes_, struct aes_graf_cell_box *gcb)
+{
+	struct aes_graf_cell_box gcb_;
+
+	if (!gcb)
+		gcb = &gcb_;
+
+	BUILD_BUG_ON(sizeof(*gcb) != sizeof(int16_t[4]));
+
+	return aes_graf_handle__(aes_,
+		&gcb->cell.w, &gcb->cell.h,
+		&gcb->box.w, &gcb->box.h);
 }
 
 const char *aes_mesag_type_string(const enum aes_mesag_type type)

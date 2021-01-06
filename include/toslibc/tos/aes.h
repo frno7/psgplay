@@ -114,6 +114,16 @@ enum aes_graf_mouse {
 AES_GRAF_MOUSE(AES_GRAF_MOUSE_ENUM)
 };
 
+struct aes_rect {
+	int16_t w;
+	int16_t h;
+};
+
+struct aes_graf_cell_box {
+	struct aes_rect cell;
+	struct aes_rect box;
+};
+
 struct aes_graf_mouse_user_def {
 	int16_t xhot;
 	int16_t yhot;
@@ -225,6 +235,8 @@ int16_t aes_##name_(struct aes *aes_ __VA_ARGS__);
 __AES_CALL(__AES_DECALARE)
 
 int16_t aes_appl_init(struct aes *aes_);
+
+int16_t aes_graf_handle(struct aes *aes_, struct aes_graf_cell_box *gcb);
 
 const char *aes_mesag_type_string(const enum aes_mesag_type type);
 

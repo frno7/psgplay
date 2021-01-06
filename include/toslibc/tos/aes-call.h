@@ -246,7 +246,7 @@ call( 76, graf_slidebox,						\
 		(),,							\
 		struct aes_object *tree, int16_t parent,		\
 		int16_t obj, int16_t orient)				\
-call( 77, graf_handle,							\
+call( 77, graf_handle__,						\
 		(),							\
 		(wcell, hcell, wbox, hbox),				\
 		(),							\
