@@ -37,17 +37,33 @@ static void NORETURN info_exit(struct file file)
 	exit(EXIT_SUCCESS);
 }
 
+#ifdef HAVE_SSO
 static void NORETURN disassemble_exit(struct options *options, struct file file)
 {
-#ifdef HAVE_SSO
 	sndh_disassemble(options, file);
 
 	exit(EXIT_SUCCESS);
+}
+
+static void NORETURN trace_exit(struct options *options, struct file file)
+{
+	sndh_trace(options, file);
+
+	exit(EXIT_SUCCESS);
+}
 #else
+static void NORETURN disassemble_exit(struct options *options, struct file file)
+{
 	pr_fatal_error("Disassembler disabled: The C compiler does not support "
 		"__attribute__((__scalar_storage_order__(\"big-endian\")))\n");
-#endif
 }
+
+static void NORETURN trace_exit(struct options *options, struct file file)
+{
+	pr_fatal_error("Disassembler disabled: The C compiler does not support "
+		"__attribute__((__scalar_storage_order__(\"big-endian\")))\n");
+}
+#endif
 
 static int default_subtune(struct file file)
 {
@@ -108,6 +124,9 @@ int main(int argc, char *argv[])
 
 	if (options->disassemble)
 		disassemble_exit(options, file);
+
+	if (options->trace.m)
+		trace_exit(options, file);
 
 	select_subtune(&options->track, file);
 

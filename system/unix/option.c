@@ -12,7 +12,10 @@
 #include "internal/build-assert.h"
 #include "internal/compare.h"
 #include "internal/print.h"
+#include "internal/string.h"
 #include "internal/types.h"
+
+#include "atari/trace.h"
 
 #include "psgplay/version.h"
 
@@ -67,6 +70,12 @@ static void help(FILE *file)
 "    --disassemble-header   disassemble SNDH file header and exit\n"
 "    --disassemble-address  display address column in disassembly\n"
 "    --remake-header        remake SNDH file header in disassembly\n"
+"\n"
+"Tracing options:\n"
+"\n"
+"    --trace=<device>,...   trace device operations of SNDH file and exit:\n"
+#define TRACE_DEVICE_HELP(symbol_, label_, id_) " " #symbol_
+"                          " TRACE_DEVICE(TRACE_DEVICE_HELP) "\n"
 "\n",
 		progname);
 }
@@ -137,6 +146,27 @@ bool text_mode_option(void)
 	return true;
 }
 
+static struct trace_mode trace_option(const char *s)
+{
+	struct string_split dev;
+	uint32_t m = 0;
+
+#define TRACE_DEVICE_OPT(symbol_, label_, id_)				\
+	else if (strncmp(dev.s, #symbol_, dev.length) == 0 &&		\
+			(#symbol_)[dev.length] == '\0')			\
+		m |= TRACE_DEVICE_##label_;
+
+	for_each_string_split (dev, s, ",")
+		if (dev.sep)
+			continue;
+TRACE_DEVICE(TRACE_DEVICE_OPT)
+		else
+			pr_fatal_error("unknown device: %.*s\n",
+				(int)dev.length, dev.s);
+
+	return (struct trace_mode) { .m = m };
+}
+
 struct options *parse_options(int argc, char **argv)
 {
 	static const struct option options[] = {
@@ -160,6 +190,8 @@ struct options *parse_options(int argc, char **argv)
 		{ "disassemble-header",  no_argument,       NULL, 0 },
 		{ "disassemble-address", no_argument,       NULL, 0 },
 		{ "remake-header",       no_argument,       NULL, 0 },
+
+		{ "trace",               required_argument, NULL, 0 },
 
 		{ NULL, 0, NULL, 0 }
 	};
@@ -209,6 +241,8 @@ struct options *parse_options(int argc, char **argv)
 			else if (OPT("frequency"))
 				goto opt_f;
 
+			else if (OPT("trace"))
+				option.trace = trace_option(optarg);
 			else if (OPT("disassemble"))
 				option.disassemble = DISASSEMBLE_TYPE_ALL;
 			else if (OPT("disassemble-header"))

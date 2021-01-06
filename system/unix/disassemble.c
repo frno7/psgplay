@@ -20,6 +20,8 @@
 #include "psgplay/sndh.h"
 
 #include "atari/machine.h"
+#include "atari/mmu.h"
+#include "atari/trace.h"
 
 #include "system/unix/disassemble.h"
 #include "system/unix/memory.h"
@@ -686,4 +688,74 @@ void sndh_disassemble(struct options *options, struct file file)
 
 	free(dasm.sb.s);
 	free(dasm.m);
+}
+
+struct trace {
+	struct options *options;
+	struct strbuf sb;
+};
+
+static int trace_print_insn_fmt(void *arg, const char *fmt, ...)
+{
+	struct trace *trace = arg;
+
+	va_list ap;
+
+	va_start(ap, fmt);
+	const int r = vsbprintf(&trace->sb, fmt, ap);
+	va_end(ap);
+
+	return r;
+}
+
+static void cpu_instruction_trace(uint32_t pc, void *arg)
+{
+	struct trace *trace = arg;
+
+	if (!TRACE_ENABLE(&trace->options->trace, CPU))
+		return;
+
+	BUG_ON(pc % 2 != 0);
+
+	trace->sb.length = 0;
+
+	sbprintf(&trace->sb, "cpu %8" PRIu64 "  ", machine_cycle());
+
+	const union m68kda_insn insn = { .word = probe_read_memory_16(pc) };
+	const struct m68kda_spec *spec0 = m68kda_insn_find(insn);
+
+	if (!spec0) {
+		print_address(&trace->sb, pc, &insn, sizeof(insn));
+		printf("%s\n", trace->sb.s);
+		return;
+	}
+
+	const uint8_t insn_size = m68kda_insn_size(spec0);
+	uint8_t buffer[32];
+
+	BUG_ON(insn_size % 2 != 0);
+	BUG_ON(insn_size < 2 || sizeof(buffer) < insn_size);
+
+	probe_copy_memory_16(buffer, pc, insn_size / 2);
+
+	print_address(&trace->sb, pc, buffer, insn_size);
+
+	const struct m68kda_spec *spec1 = m68kda_insn_disassemble(
+		buffer, insn_size, NULL, trace_print_insn_fmt, trace);
+
+	BUG_ON(spec0 != spec1);
+	BUG_ON(!trace->sb.length);
+
+	printf("%s\n", trace->sb.s);
+}
+
+void sndh_trace(struct options *options, struct file file)
+{
+	struct trace trace = {
+		.options = options,
+	};
+
+	dasm_mark_text_trace_run(cpu_instruction_trace, &trace, options, file);
+
+	free(trace.sb.s);
 }

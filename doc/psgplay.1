@@ -85,7 +85,7 @@ Disassembly options:
 .BR \-\-disassemble
 Disassemble SNDH file and exit. By default, every track is run silently as if
 it was played for 60 seconds, to separate executable instructions from data.
-The disassembly execution length can be set with  the \fB--length\fR option
+The disassembly execution length can be set with the \fB--length\fR option
 (0 to inactivate). Disassembly is also guided by instruction reachability
 from the \fIinit\fR, \fIplay\fR, and \fIexit\fR entry points.
 
@@ -108,10 +108,24 @@ source code in an editor.
 
 .RE
 
+Tracing options:
+
+.RS
+
+.TP
+.BR \-\-trace "=<" \fIdevice\fR ">,..."
+Trace device operations of SNDH file and exit. The trace execution length
+can be set with the \fB--length\fR option. Default is 60 seconds. Devices:
+\fIall\fR,
+\fIcpu\fR.
+
+.RE
+
 .SH COMMAND MODE
 \fIPSG play\fR runs in command mode if it is not compiled with ALSA for
 Linux, or is compiled for Mac OS, or the options \fB-o\fR, \fB--output\fR,
-\fB--start\fR, \fB--stop\fR or \fB--length\fR are given.
+\fB--start\fR, \fB--stop\fR, \fB--length\fR, \fB--disassemble\fR or
+\fB--trace\fR are given.
 
 .SH INTERACTIVE TEXT MODE
 For Linux, terminal mode and ECMA-48 are used, including support for job

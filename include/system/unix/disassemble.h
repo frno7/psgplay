@@ -11,4 +11,6 @@
 
 void sndh_disassemble(struct options *options, struct file file);
 
+void sndh_trace(struct options *options, struct file file);
+
 #endif /* PSGPLAY_SYSTEM_UNIX_DISASSEMBLE_H */

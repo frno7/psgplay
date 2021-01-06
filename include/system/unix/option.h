@@ -8,6 +8,8 @@
 
 #include <stdbool.h>
 
+#include "atari/trace.h"
+
 #define OPTION_TIME_UNDEFINED -1
 #define OPTION_STOP_NEVER     -2
 
@@ -36,6 +38,7 @@ struct options {
 
 	const char *input;
 
+	struct trace_mode trace;
 	enum disassemble_type disassemble;
 	bool disassemble_address;
 	bool remake_header;

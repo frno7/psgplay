@@ -60,6 +60,11 @@ Disassembly options:
     --disassemble-header   disassemble SNDH file header and exit
     --disassemble-address  display address column in disassembly
     --remake-header        remake SNDH file header in disassembly
+
+Tracing options:
+
+    --trace=<device>,...   trace device operations of SNDH file and exit:
+                           all cpu
 ```
 
 ## Interactive text mode
