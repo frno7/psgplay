@@ -106,7 +106,8 @@ A cursor is shown with `>`. Keyboard controls:
 
 PSG play runs in _command mode_ if it is not compiled with ALSA for Linux,
 or is compiled for Mac OS, or the options `-o`, `--output`, `--start`,
-`--stop` or `--length` are given. Atari ST does not support _command mode_.
+`--stop`, `--length`, `--disassemble` or `--trace` are given. Atari ST
+does not support _command mode_.
 
 ## Library form
 
