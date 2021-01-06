@@ -243,6 +243,10 @@ __AES_CALL(__AES_DECALARE)
 
 int16_t aes_appl_init(struct aes *aes_);
 
+int16_t aes_form_alertf(struct aes *aes_,
+	int16_t exit_button, const char *format, ...)
+	__attribute__((format(printf, 3, 4)));
+
 int16_t aes_graf_handle(struct aes *aes_, struct aes_graf_cell_box *gcb);
 
 const char *aes_mesag_type_string(const enum aes_mesag_type type);

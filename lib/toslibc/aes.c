@@ -3,6 +3,9 @@
  * Copyright (C) 2020 Fredrik Noring
  */
 
+#include <stdarg.h>
+#include <stdio.h>
+
 #include <tos/aes.h>
 #include <tos/xgemdos.h>
 
@@ -83,6 +86,19 @@ int16_t aes_appl_init(struct aes *aes_)
 	};
 
 	return aes_appl_init__(aes_);
+}
+
+int16_t aes_form_alertf(struct aes *aes_,
+	int16_t exit_button, const char *format, ...)
+{
+	char buffer[256];
+	va_list ap;
+
+	va_start(ap, format);
+	vsnprintf(buffer, sizeof(buffer), format, ap);
+	va_end(ap);
+
+	return aes_form_alert(aes_, exit_button, buffer);
 }
 
 int16_t aes_graf_handle(struct aes *aes_, struct aes_graf_cell_box *gcb)
