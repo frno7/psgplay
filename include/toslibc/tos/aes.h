@@ -102,6 +102,13 @@ enum {
 	AES_FORM_ICON_STOP,
 };
 
+enum aes_wind_mode {
+	AES_WIND_END_UPDATE,
+	AES_WIND_BEG_UPDATE,
+	AES_WIND_END_MCTRL,
+	AES_WIND_BEG_MCTRL,
+};
+
 #define AES_GRAF_MOUSE(m)						\
 	m(  0, ARROW)							\
 	m(  1, TEXT_CRSR)						\
