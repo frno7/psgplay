@@ -227,6 +227,18 @@ request_event:
 	request_device_event(device, mfp_from_timer_cycle_align(timer->timeout));
 }
 
+static int assert_mfp_irq(void)
+{
+	const u16 intr = mfp_ipr() & mfp_imr();
+	const u16 isr = mfp_isr();
+
+	for (uint16_t irq = 15, m = 0x8000; m > isr; irq--, m >>= 1)
+		if (intr & m)
+			return irq;
+
+	return -1;
+}
+
 static void mfp_event(const struct device *device,
 	const struct device_cycle mfp_cycle)
 {
@@ -261,7 +273,7 @@ static void mfp_event(const struct device *device,
 	 * be processed according to the channel's assigned priority.
 	 * IMRA and IMRB may be read at any time.
 	 */
-	if ((mfp_ipr() & mfp_imr()) > mfp_isr())
+	if (assert_mfp_irq() != -1)
 		glue_irq_set(IRQ_MFP);
 	else
 		glue_irq_clr(IRQ_MFP);
@@ -269,46 +281,41 @@ static void mfp_event(const struct device *device,
 
 u32 mfp_irq_vector(void)
 {
-	const u16 intr = mfp_ipr() & mfp_imr();
-	const u16 isr = mfp_isr();
+	const int irq = assert_mfp_irq();
 
-	for (int i = 15, m = 0x8000; m > isr; i--, m >>= 1) {
-		if (!(intr & m))
-			continue;
-
-		/*
-		 * In-service registers ISRA and ISRB allow interrupts to
-		 * be nested. A bit is set whenever an interrupt vector
-		 * is passed for an interrupt channel. The bit is cleared
-		 * whenever the processor writes a zero to the bit.
-		 *
-		 * In an M68000 vectored interrupt system, the MFP is
-		 * assigned to one of seven possible interrupt levels.
-		 * When an interrupt is received from the MFP, an
-		 * interrupt acknowledge for that level is initiated.
-		 * Once an interrupt is recognised at a particular level,
-		 * interrupts at the same level or below are masked by
-		 * the processor.
-		 *
-		 * As long as the processor's interrupt mask is unchanged,
-		 * the M68000 interrupt structure prohibits nesting the
-		 * interrupts at the same interrupt level. However,
-		 * additional interrupt requests from the MFP can be
-		 * recognised before a previous channel's interrupt
-		 * service routine is finished by lowering the processor's
-		 * interrupt mask to the next lower interrupt level within
-		 * the interrupt handler.
-		 */
-		mfp_wr_interrupt_pending(i, false);
-		if (mfp.vr.sei)
-			mfp_wr_interrupt_service(i, true);
-
-		return (mfp.vr.base << 4) + i;
+	if (irq == -1) {
+		WARN_ONCE("M68K_INT_ACK_SPURIOUS\n");
+		return M68K_INT_ACK_SPURIOUS;
 	}
 
-	WARN_ONCE("M68K_INT_ACK_SPURIOUS\n");
+	/*
+	 * In-service registers ISRA and ISRB allow interrupts to
+	 * be nested. A bit is set whenever an interrupt vector
+	 * is passed for an interrupt channel. The bit is cleared
+	 * whenever the processor writes a zero to the bit.
+	 *
+	 * In an M68000 vectored interrupt system, the MFP is
+	 * assigned to one of seven possible interrupt levels.
+	 * When an interrupt is received from the MFP, an
+	 * interrupt acknowledge for that level is initiated.
+	 * Once an interrupt is recognised at a particular level,
+	 * interrupts at the same level or below are masked by
+	 * the processor.
+	 *
+	 * As long as the processor's interrupt mask is unchanged,
+	 * the M68000 interrupt structure prohibits nesting the
+	 * interrupts at the same interrupt level. However,
+	 * additional interrupt requests from the MFP can be
+	 * recognised before a previous channel's interrupt
+	 * service routine is finished by lowering the processor's
+	 * interrupt mask to the next lower interrupt level within
+	 * the interrupt handler.
+	 */
+	mfp_wr_interrupt_pending(irq, false);
+	if (mfp.vr.sei)
+		mfp_wr_interrupt_service(irq, true);
 
-	return M68K_INT_ACK_SPURIOUS;
+	return (mfp.vr.base << 4) + irq;
 }
 
 static u8 mfp_rd_u8(const struct device *device, u32 dev_address)
