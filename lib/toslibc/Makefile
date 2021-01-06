@@ -48,6 +48,7 @@ TOSLIBC_C_SRC +=							\
 	lib/toslibc/strtoumax.c						\
 	lib/toslibc/supexecarg.c					\
 	lib/toslibc/system-variable.c					\
+	lib/toslibc/vdi.c						\
 	lib/toslibc/vdprintf.c						\
 	lib/toslibc/vprintf.c						\
 	lib/toslibc/vsnprintf.c						\

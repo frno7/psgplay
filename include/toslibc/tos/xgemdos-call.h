@@ -8,7 +8,7 @@
 
 #define XGEMDOS_CALL(call)						\
 	call(0x00, void __NORETURN, reset,)				\
-	call(0x73, void, vdi, struct vdi *vdi_)				\
+	call(0x73, void, vdi, struct vdi_pb *pb)			\
 	call(0xc8, void, aes, struct aes_pb *pb)			\
 	call(0xfe, int16_t, gdos_version,)
 
