@@ -31,6 +31,12 @@ struct {
 	struct sound_mode mode;
 
 	struct sound_sample sample;
+
+	struct fifo {
+		uint8_t index;
+		uint8_t size;
+		int8_t b[8];
+	} fifo;
 } state;
 
 static struct {
@@ -63,6 +69,8 @@ SOUND_SAMPLE_FREQUENCY(SOUND_SAMPLE_FREQUENCY_CASE)
 
 static void sound_start(void)
 {
+	/* FIXME: mfp_irq_sound(0); */
+
 	state.ctrl = sound.ctrl;
 	state.start = (sound.starthi << 16) |
 		      (sound.startmi <<  8) |
@@ -71,18 +79,19 @@ static void sound_start(void)
 		    (sound.endmi <<  8) |
 		     sound.endlo;
 	state.mode = sound.mode;
+
+	/* FIXME: mfp_irq_sound(1); */
 }
 
 static void sound_stop(void)
 {
 	memset(&state, 0, sizeof(state));
+
+	/* FIXME: mfp_irq_sound(0); */
 }
 
-static bool sound_sample_dma(const struct device_cycle sound_cycle)
+static bool sound_sample_emit(const struct device_cycle sound_cycle)
 {
-	if (!state.ctrl.dma)
-		return false;
-
 	const u32 f = sound_frequency(state.mode);
 	const u64 c = sound_cycle.c;
 
@@ -90,29 +99,62 @@ static bool sound_sample_dma(const struct device_cycle sound_cycle)
 	       cycle_transform(f, SOUND_FREQUENCY, c + SAMPLE_CYCLES);
 }
 
-static s8 sound_sample_dma_s8(void)
+static size_t fifo_free(struct fifo *fifo)
 {
-	return dma_read_memory_8(state.start++);
+	return ARRAY_SIZE(fifo->b) - fifo->size;
+}
+
+static void wr_fifo(struct fifo *fifo, int8_t s)
+{
+	BUG_ON(fifo->size >= ARRAY_SIZE(fifo->b));
+
+	fifo->b[(fifo->index + fifo->size++) % ARRAY_SIZE(fifo->b)] = s;
+}
+
+static int8_t rd_fifo(struct fifo *fifo)
+{
+	BUG_ON(!fifo->size);
+
+	const int8_t s = fifo->b[fifo->index];
+
+	fifo->index = (fifo->index + 1) % ARRAY_SIZE(fifo->b);
+	fifo->size--;
+
+	return s;
+}
+
+static void fill_fifo(struct fifo *fifo)
+{
+	while (fifo_free(fifo) >= 2) {
+		const uint16_t w = dma_read_memory_16(state.start);
+
+		wr_fifo(fifo, w >> 8);
+		wr_fifo(fifo, w);
+
+		state.start += 2;
+
+		if (state.start == state.end)
+			(sound.ctrl.loop ? sound_start : sound_stop)();
+	}
 }
 
 static struct sound_sample sound_sample_cycle(
 	const struct device_cycle sound_cycle)
 {
-	if (sound_sample_dma(sound_cycle)) {
+	if (state.ctrl.dma)
+		fill_fifo(&state.fifo);
+
+	if (state.fifo.size && sound_sample_emit(sound_cycle)) {
 		if (state.mode.mono) {
-			const s8 mono = sound_sample_dma_s8();
+			const s8 mono = rd_fifo(&state.fifo);
 
 			state.sample.left  = 256 * mono;
 			state.sample.right = 256 * mono;
 		} else {
-			state.sample.left  = 256 * sound_sample_dma_s8();
-			state.sample.right = 256 * sound_sample_dma_s8();
+			state.sample.left  = 256 * rd_fifo(&state.fifo);
+			state.sample.right = 256 * (state.fifo.size ?
+				rd_fifo(&state.fifo) : state.sample.left);
 		}
-
-		/* FIXME: FIFO and assert IRQ */
-
-		if (state.start == state.end)
-			(sound.ctrl.loop ? sound_start : sound_stop)();
 	}
 
 	return state.sample;
@@ -151,6 +193,8 @@ static void sound_event(const struct device *device,
 	const struct device_cycle sound_cycle)
 {
 	sound_emit(sound_cycle);
+
+	/* FIXME: DMA completion event */
 
 	request_device_event(device, (struct device_cycle) {
 			.c = sound_cycle.c + SOUND_EVENT_CYCLES
