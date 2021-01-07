@@ -384,6 +384,16 @@ static void mfp_wr_u8(const struct device *device,
 		mfp.reg[MFP_REG_IPRB] &= mfp.reg[MFP_REG_IERB];
 		break;
 
+	case MFP_REG_ISRA:
+	case MFP_REG_ISRB:
+		/*
+		 * S=1: Software end-of-interrupt mode and ISR enabled.
+		 * S=0: Automatic end-of-interrupt mode and ISR forced low.
+		 */
+		if (!mfp.vr.sei)
+			mfp.reg[MFP_REG_ISRA] = mfp.reg[MFP_REG_ISRB] = 0;
+		break;
+
 	case MFP_REG_VR:
 		/*
 		 * The interrupt in-service registers ISRA and ISRB
@@ -394,6 +404,9 @@ static void mfp_wr_u8(const struct device *device,
 			mfp.reg[MFP_REG_ISRA] = mfp.reg[MFP_REG_ISRB] = 0;
 		break;
 	}
+
+	if (!mfp.vr.sei)
+		BUG_ON(mfp.reg[MFP_REG_ISRA] || mfp.reg[MFP_REG_ISRB]);
 
 	mfp_event(device, device_cycle(device));
 }

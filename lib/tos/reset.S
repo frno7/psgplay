@@ -38,7 +38,7 @@ _rom:	bra.s	.reset
 
 .reset:	move	#0x2700,sr	/* Disable interrupts */
 	lea	_stack_top,sp	/* Set a valid stack pointer */
-	move.b	#0x48,0xfffa17	/* Set MFP exception vector base */
+	move.b	#0x40,0xfffa17	/* Set MFP exception vector base, SEI=0 */
 
 	/* Ignore all exceptions by default */
 	move.l	#0x8,a1
