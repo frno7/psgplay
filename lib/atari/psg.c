@@ -222,8 +222,10 @@ static void psg_event(const struct device *device,
 static u8 psg_rd_u8(const struct device *device, u32 dev_address)
 {
 	switch (dev_address) {
-	case 0: return reg_select < 16 ? psg.reg[reg_select] : 0xff;
-	case 2: return 0xff;
+	case 0:
+	case 1: return reg_select < 16 ? psg.reg[reg_select] : 0xff;
+	case 2:
+	case 3: return 0xff;
 	default:
 		BUG();
 	}
@@ -242,9 +244,11 @@ static void psg_wr_u8(const struct device *device, u32 dev_address, u8 data)
 
 	switch (dev_address % 4) {
 	case 0:
+	case 1:
 		reg_select = data;
 		break;
 	case 2:
+	case 3:
 		if (reg_select == 13)
 			env_cycle = psg_cycle;
 		if (reg_select < 16)
@@ -265,9 +269,11 @@ static size_t psg_id_u8(const struct device *device,
 {
 	switch (dev_address % 4) {
 	case 0:
+	case 1:
 		snprintf(buf, size, "rd/select");
 		break;
 	case 2:
+	case 3:
 		snprintf(buf, size, "wr %s", psg_register_name(reg_select));
 		break;
 	default:
