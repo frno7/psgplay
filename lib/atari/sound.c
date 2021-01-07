@@ -20,7 +20,8 @@
 
 #define SOUND_EVENT_FREQUENCY 100		/* 10 ms */
 #define SOUND_EVENT_CYCLES (SOUND_FREQUENCY / SOUND_EVENT_FREQUENCY)
-#define SAMPLE_CYCLES 8				/* 250 kHz */
+#define DEVICE_SAMPLE_FREQUENCY 250000	/* 250 kHz */
+#define DEVICE_SAMPLE_CYCLES (SOUND_FREQUENCY / DEVICE_SAMPLE_FREQUENCY)
 
 static union sound sound;
 struct {
@@ -96,7 +97,7 @@ static bool sound_sample_emit(const struct device_cycle sound_cycle)
 	const u64 c = sound_cycle.c;
 
 	return cycle_transform(f, SOUND_FREQUENCY, c) !=
-	       cycle_transform(f, SOUND_FREQUENCY, c + SAMPLE_CYCLES);
+	       cycle_transform(f, SOUND_FREQUENCY, c + DEVICE_SAMPLE_CYCLES);
 }
 
 static size_t fifo_free(struct fifo *fifo)
@@ -166,9 +167,9 @@ static void sound_emit(const struct device_cycle sound_cycle)
 	struct sound_sample buffer[256];
 	size_t count = 0;
 
-	for (u64 c = ALIGN(sound_emit_latest_cycle, SAMPLE_CYCLES);
+	for (u64 c = ALIGN(sound_emit_latest_cycle, DEVICE_SAMPLE_CYCLES);
 	     c < sound_cycle.c;
-	     c += SAMPLE_CYCLES) {
+	     c += DEVICE_SAMPLE_CYCLES) {
 		buffer[count++] = sound_sample_cycle(
 			(struct device_cycle) { .c = c });
 
