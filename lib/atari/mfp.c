@@ -167,7 +167,8 @@ static u8 timer_counter(struct timer *timer,
 	const u32 period = timer_period(timer);
 	const u32 prescale = timer_prescale(timer);
 
-	BUG_ON(!timer->timeout.c);
+	if (!timer->timeout.c)
+		return *timer->data;
 
 	if (timer_cycle.c < timer->timeout.c) {
 		const u64 remaining = timer->timeout.c - timer_cycle.c;
