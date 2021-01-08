@@ -263,25 +263,24 @@ int16_t aes_form_alertf(struct aes *aes_,
 
 int16_t aes_graf_handle(struct aes *aes_, struct aes_graf_cell_box *gcb);
 
-static inline struct aes_bar aes_wind_firstxywh(
-	struct aes *aes_, int16_t win_id)
-{
-	struct aes_bar bar;
+#define DEFINE_AES_WIND_GET_XYWH(symbol_, type_)			\
+	static inline struct aes_bar aes_wind_get_ ## symbol_ ## xywh(	\
+		struct aes *aes_, int16_t win_id)			\
+	{								\
+		struct aes_bar bar;					\
+									\
+		return aes_wind_get(aes_, win_id,			\
+			AES_WF_ ## type_ ## XYWH,			\
+			&bar.p.x, &bar.p.y, &bar.r.w, &bar.r.h) != 0 ?	\
+				bar : (struct aes_bar) { };		\
+	}
 
-	return aes_wind_get(aes_, win_id, AES_WF_FIRSTXYWH,
-		&bar.p.x, &bar.p.y, &bar.r.w, &bar.r.h) != 0 ? bar :
-		(struct aes_bar) { };
-}
-
-static inline struct aes_bar aes_wind_nextxywh(
-	struct aes *aes_, int16_t win_id)
-{
-	struct aes_bar bar;
-
-	return aes_wind_get(aes_, win_id, AES_WF_NEXTXYWH,
-		&bar.p.x, &bar.p.y, &bar.r.w, &bar.r.h) != 0 ? bar :
-		(struct aes_bar) { };
-}
+DEFINE_AES_WIND_GET_XYWH(work,  WORK)
+DEFINE_AES_WIND_GET_XYWH(curr,  CURR)
+DEFINE_AES_WIND_GET_XYWH(prev,  PREV)
+DEFINE_AES_WIND_GET_XYWH(full,  FULL)
+DEFINE_AES_WIND_GET_XYWH(first, FIRST)
+DEFINE_AES_WIND_GET_XYWH(next,  NEXT)
 
 static inline aes_last_rectangle(struct aes_rectangle r)
 {
@@ -290,9 +289,9 @@ static inline aes_last_rectangle(struct aes_rectangle r)
 
 #define aes_wind_for_each_xywh(bar_, aes_, win_id_)			\
 	/* FIXME: typecheck win_id_ */					\
-	for ((bar_) = aes_wind_firstxywh((aes_), (win_id));		\
-	     !aes_rectangle_degenerate(bar_.r);				\
-	     (bar_) = aes_wind_nextxywh((aes_), (win_id)))
+	for ((bar_) = aes_wind_get_firstxywh((aes_), (win_id));		\
+	     !aes_last_rectangle(bar_.r);				\
+	     (bar_) = aes_wind_get_nextxywh((aes_), (win_id)))
 
 const char *aes_mesag_type_string(const enum aes_mesag_type type);
 
