@@ -49,7 +49,7 @@ struct disassembly {
 	struct strbuf sb;
 	struct options *options;
 	size_t size;
-	const uint8_t *data;
+	uint8_t *data;
 	size_t header_size;
 	struct memory *m;
 	enum sndh_insn sndh_insn_run;
@@ -656,10 +656,12 @@ void sndh_disassemble(struct options *options, struct file file)
 	struct disassembly dasm = {
 		.options = options,
 		.size = file.size,
-		.data = file.data,
+		.data = xmalloc(file.size),
 		.header_size = sndh_header_size(file.data, file.size),
 		.m = zalloc(sizeof(struct memory[file.size]))
 	};
+
+	memcpy(dasm.data, file.data, file.size);
 
 	dasm_label(&dasm, "init", 0);
 	dasm_label(&dasm, "exit", 4);
@@ -688,6 +690,7 @@ void sndh_disassemble(struct options *options, struct file file)
 	}
 
 	free(dasm.sb.s);
+	free(dasm.data);
 	free(dasm.m);
 }
 
