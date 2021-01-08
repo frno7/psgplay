@@ -48,6 +48,7 @@ struct memory {
 struct disassembly {
 	struct strbuf sb;
 	struct options *options;
+	const char *path;
 	size_t size;
 	uint8_t *data;
 	size_t header_size;
@@ -655,6 +656,7 @@ void sndh_disassemble(struct options *options, struct file file)
 {
 	struct disassembly dasm = {
 		.options = options,
+		.path = file.path,
 		.size = file.size,
 		.data = xmalloc(file.size),
 		.header_size = sndh_header_size(file.data, file.size),
