@@ -284,9 +284,9 @@ static inline struct aes_bar aes_wind_nextxywh(
 		(struct aes_bar) { };
 }
 
-static inline aes_rectangle_degenerate(struct aes_rectangle r)
+static inline aes_last_rectangle(struct aes_rectangle r)
 {
-	return !r.w || !r.h;
+	return !r.w && !r.h;
 }
 
 #define aes_wind_for_each_xywh(bar_, aes_, win_id_)			\
