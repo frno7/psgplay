@@ -85,6 +85,14 @@ u16 probe_read_memory_16(u32 bus_address)
 	return dev ? dev->rd_u16(dev, bus_address - dev->bus.address) : 0;
 }
 
+void probe_copy_memory_8(void *buffer, u32 bus_address, size_t byte_count)
+{
+	uint8_t *b = buffer;
+
+	for (size_t i = 0; i < byte_count; i++)
+		b[i] = probe_read_memory_8(bus_address + i);
+}
+
 void probe_copy_memory_16(void *buffer, u32 bus_address, size_t word_count)
 {
 	uint8_t *b = buffer;
