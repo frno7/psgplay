@@ -78,11 +78,11 @@ u16 probe_read_memory_16(u32 bus_address)
 	return dev ? dev->rd_u16(dev, bus_address - dev->bus.address) : 0;
 }
 
-void probe_copy_memory_16(void *buffer, u32 bus_address, uint32_t word_count)
+void probe_copy_memory_16(void *buffer, u32 bus_address, size_t word_count)
 {
 	uint8_t *b = buffer;
 
-	for (uint32_t i = 0; i < word_count; i++) {
+	for (size_t i = 0; i < word_count; i++) {
 		const uint16_t v = probe_read_memory_16(
 			bus_address + sizeof(uint16_t[i]));
 
