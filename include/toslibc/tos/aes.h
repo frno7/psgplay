@@ -293,6 +293,13 @@ static inline aes_last_rectangle(struct aes_rectangle r)
 	     !aes_last_rectangle(bar_.r);				\
 	     (bar_) = aes_wind_get_nextxywh((aes_), (win_id)))
 
+static inline bool aes_wind_set_currxywh(
+	struct aes *aes_, int16_t win_id, struct aes_bar bar)
+{
+	return aes_wind_set(aes_, win_id, AES_WF_CURRXYWH,
+		bar.p.x, bar.p.y, bar.r.w, bar.r.h) != 0;
+}
+
 const char *aes_mesag_type_string(const enum aes_mesag_type type);
 
 struct aes_bar aes_bar_intersect(struct aes_bar a, struct aes_bar b);
