@@ -190,12 +190,38 @@ static void sound_emit(const struct device_cycle sound_cycle)
 	sound_emit_latest_cycle = sound_cycle.c;
 }
 
+static u64 completion_cycles(const u32 sample_count)
+{
+	const u32 f = sound_frequency(state.mode);
+	const u64 ds = cycle_transform_align(
+		DEVICE_SAMPLE_FREQUENCY, f, sample_count);
+	const u64 sc = cycle_transform_align(
+		SOUND_FREQUENCY, DEVICE_SAMPLE_FREQUENCY, ds);
+
+	return sc;
+}
+
 static void sound_event(const struct device *device,
 	const struct device_cycle sound_cycle)
 {
 	sound_emit(sound_cycle);
 
-	/* FIXME: DMA completion event */
+	if (state.ctrl.dma) {
+		const size_t m = state.mode.mono ? 1 : 2;
+		const size_t remaining = (state.end - state.start) / m;
+		const size_t margin = ARRAY_SIZE(state.fifo.b) / m;
+
+		/*
+		 * Issue DMA completion event when the FIFO is expected
+		 * to read the last sample of this transmission.
+		 */
+
+		if (margin < remaining)
+			request_device_event(device, (struct device_cycle) {
+				.c = sound_cycle.c +
+					completion_cycles(remaining - margin)
+			});
+	}
 
 	request_device_event(device, (struct device_cycle) {
 			.c = sound_cycle.c + SOUND_EVENT_CYCLES
