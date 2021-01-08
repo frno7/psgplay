@@ -263,6 +263,14 @@ int16_t aes_form_alertf(struct aes *aes_,
 
 int16_t aes_graf_handle(struct aes *aes_, struct aes_graf_cell_box *gcb);
 
+static inline int16_t aes_wind_create(struct aes *aes_,
+	int16_t kind, struct aes_bar maximum)
+{
+	return aes_wind_create__(aes_, kind,
+		maximum.p.x, maximum.p.y,
+		maximum.r.w, maximum.r.h);
+}
+
 #define DEFINE_AES_WIND_GET_XYWH(symbol_, type_)			\
 	static inline struct aes_bar aes_wind_get_ ## symbol_ ## xywh(	\
 		struct aes *aes_, int16_t win_id)			\

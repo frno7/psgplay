@@ -273,7 +273,7 @@ call( 90, fsel_input,							\
 		(),,							\
 		const char *path, const char *file, int16_t *button)	\
 									\
-call(100, wind_create,							\
+call(100, wind_create__,						\
 		(kind, x, y, w, h),					\
 		(),							\
 		(),							\
