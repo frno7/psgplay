@@ -10,6 +10,7 @@
 #include <tos/xgemdos.h>
 
 #include "internal/build-assert.h"
+#include "internal/compare.h"
 #include "internal/macro.h"
 
 #define AES_CONTROL(opcode_, int_in_, int_out_, addr_in_, addr_out_)	\
@@ -123,4 +124,23 @@ const char *aes_mesag_type_string(const enum aes_mesag_type type)
 AES_MESAG_TYPE(AES_MESAG_TYPE_CASE)
 	default: return "";
 	}
+}
+
+struct aes_bar aes_bar_intersect(struct aes_bar a, struct aes_bar b)
+{
+	const int x = max(a.p.x, b.p.x);
+	const int y = max(a.p.y, b.p.y);
+	const int w = min(a.p.x + a.r.w, b.p.x + b.r.w) - x;
+	const int h = min(a.p.y + a.r.h, b.p.y + b.r.h) - y;
+
+	return (struct aes_bar) {
+		.p = {
+			.x = x,
+			.y = y
+		},
+		.r = {
+			.w = max(0, w),
+			.h = max(0, h)
+		}
+	};
 }

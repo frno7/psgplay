@@ -297,4 +297,6 @@ static inline aes_rectangle_degenerate(struct aes_rectangle r)
 
 const char *aes_mesag_type_string(const enum aes_mesag_type type);
 
+struct aes_bar aes_bar_intersect(struct aes_bar a, struct aes_bar b);
+
 #endif /* _TOSLIBC_TOS_AES_H */
