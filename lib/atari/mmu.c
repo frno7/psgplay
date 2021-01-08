@@ -71,6 +71,13 @@ u16 dma_read_memory_16(u32 bus_address)
 	return value;
 }
 
+u8 probe_read_memory_8(u32 bus_address)
+{
+	const struct device *dev = DMA_DEVICES(bus_address);
+
+	return dev ? dev->rd_u8(dev, bus_address - dev->bus.address) : 0;
+}
+
 u16 probe_read_memory_16(u32 bus_address)
 {
 	const struct device *dev = DMA_DEVICES(bus_address);
