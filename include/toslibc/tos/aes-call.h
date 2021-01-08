@@ -280,7 +280,7 @@ call(100, wind_create__,						\
 		(),,							\
 		int16_t kind, int16_t x, int16_t y,			\
 		int16_t w, int16_t h)					\
-call(101, wind_open,							\
+call(101, wind_open__,							\
 		(handle, x, y, w, h),					\
 		(),							\
 		(),							\

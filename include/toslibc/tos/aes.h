@@ -271,6 +271,14 @@ static inline int16_t aes_wind_create(struct aes *aes_,
 		maximum.r.w, maximum.r.h);
 }
 
+static inline int16_t aes_wind_open(struct aes *aes_,
+	int16_t win_id, struct aes_bar place)
+{
+	return aes_wind_open__(aes_, win_id,
+		place.p.x, place.p.y,
+		place.r.w, place.r.h);
+}
+
 #define DEFINE_AES_WIND_GET_XYWH(symbol_, type_)			\
 	static inline struct aes_bar aes_wind_get_ ## symbol_ ## xywh(	\
 		struct aes *aes_, int16_t win_id)			\
