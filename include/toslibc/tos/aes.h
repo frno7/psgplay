@@ -244,6 +244,9 @@ struct aes_mesag {
 					int16_t id;
 					struct aes_bar b;
 				} wm_redraw, wm_sized, wm_moved;
+				struct {
+					int16_t id;
+				} wm_fulled;
 			}
 		};
 		int16_t word[16];
