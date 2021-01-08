@@ -102,6 +102,10 @@ enum {
 	AES_FORM_ICON_STOP,
 };
 
+enum {
+	AES_WIND_ID_DESKTOP
+};
+
 enum aes_wind_mode {
 	AES_WIND_END_UPDATE,
 	AES_WIND_BEG_UPDATE,
