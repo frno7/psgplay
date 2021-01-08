@@ -154,8 +154,7 @@ struct aes_graf_cell_box {
 };
 
 struct aes_graf_mouse_user_def {
-	int16_t xhot;
-	int16_t yhot;
+	struct aes_point hot;
 	int16_t nplanes;
 	int16_t fg;
 	int16_t bg;
