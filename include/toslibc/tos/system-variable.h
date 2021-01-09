@@ -6,7 +6,7 @@
 #ifndef _TOSLIBC_TOS_SYSTEM_VARIABLE_H
 #define _TOSLIBC_TOS_SYSTEM_VARIABLE_H
 
-#include "internal/types.h"
+#include <stdint.h>
 
 /**
  * struct conterm - Attribute bits for console sys
@@ -16,12 +16,11 @@
  * @key_click: enable key-click
  */
 struct conterm {
-	__BITFIELD_FIELD(uint8_t : 4,
-	__BITFIELD_FIELD(uint8_t kbshift : 1,
-	__BITFIELD_FIELD(uint8_t system_bell : 1,
-	__BITFIELD_FIELD(uint8_t key_repeat : 1,
-	__BITFIELD_FIELD(uint8_t key_click : 1,
-	;)))))
+	uint8_t key_click : 1;
+	uint8_t key_repeat : 1;
+	uint8_t system_bell : 1;
+	uint8_t kbshift : 1;
+	uint8_t : 4;
 };
 
 #define SYSTEM_VARIABLE(v)											\
