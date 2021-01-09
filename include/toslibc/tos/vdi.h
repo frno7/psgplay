@@ -9,8 +9,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "internal/types.h"
-
 #include "aes.h"
 #include "vdi-call.h"
 

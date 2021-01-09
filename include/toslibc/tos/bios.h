@@ -9,8 +9,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "internal/types.h"
-
 #include "bios-call.h"
 
 #define BIOS_SETEXC_INQUIRE ((void (*)(void))-1)

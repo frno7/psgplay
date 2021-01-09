@@ -9,7 +9,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "internal/types.h"
+#include <stddef.h>
+#include <stdint.h>
 
 #include "xbios-call.h"
 

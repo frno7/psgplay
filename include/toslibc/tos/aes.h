@@ -6,10 +6,9 @@
 #ifndef _TOSLIBC_TOS_AES_H
 #define _TOSLIBC_TOS_AES_H
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-
-#include "internal/types.h"
 
 #include "aes-call.h"
 

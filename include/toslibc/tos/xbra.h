@@ -11,8 +11,6 @@
 
 #include <tos/bios.h>
 
-#include "internal/build-assert.h"
-
 #define DEFINE_XBRA(cookie_, label_)					\
 uint32_t __##label_##_vector;						\
 void *__##label_##_arg;							\
@@ -22,7 +20,6 @@ extern void __##label_(void);						\
 									\
 void label_##_init(uint32_t vector, void (*f)(void *arg), void *arg)	\
 {									\
-	BUILD_BUG_ON(sizeof(cookie_) != 5); /* 4 char string + NUL */	\
 	__##label_##_vector = vector;					\
 	__##label_##_arg = arg;						\
 	__##label_##_f = f;						\

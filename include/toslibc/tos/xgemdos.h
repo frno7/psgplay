@@ -9,9 +9,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "internal/macro.h"
-#include "internal/types.h"
-
 #include "xgemdos-call.h"
 
 #define XGEMDOS_DECALARE(opcode_, rtype_, name_, ...)			\

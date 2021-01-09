@@ -8,8 +8,6 @@
 
 #include <stdint.h>
 
-#include "internal/types.h"	/* FIXME */
-
 /**
  * struct _dta - Disk Transfer Address (DTA)
  * @reserved: reserved, do not use
