@@ -13,4 +13,6 @@ typedef __INT32_TYPE__ ssize_t;
 #error "unable to define ssize_t"
 #endif
 
+#define __NORETURN __attribute__((__noreturn__))
+
 #endif /* _TOSLIBC_STDDEF_H */
