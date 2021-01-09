@@ -33,7 +33,7 @@ call(0x2c, struct _time,    tgettime,)							\
 call(0x2d, int32_t,         tsettime, w,    struct _time)				\
 call(0x2f, struct _dta *,   fgetdta,)							\
 call(0x30, int16_t,         sversion,)							\
-call(0x31, void,            ptermres, lw,   int32_t save, int16_t code)			\
+call(0x31, void __NORETURN, ptermres__, lw, int32_t keep, int16_t code)			\
 call(0x36, int32_t,         dfree,    lw,   int32_t *buf, int16_t d)			\
 call(0x39, int16_t,         dcreate,  l,    const char *name)				\
 call(0x3a, int32_t,         ddelete,  l,    const char *path)				\
@@ -54,7 +54,7 @@ call(0x48, void *,          malloc,   l,    int32_t size)				\
 call(0x49, int32_t,         mfree,    l,    void *ptr)					\
 call(0x4a, int32_t,         mshrink,  wll,  int16_t unused, void *block, int32_t size)	\
 call(0x4b, int32_t,         pexec,    wlll, int16_t mode, const void *ptr1, const void *ptr2, const void *ptr3)\
-call(0x4c, void __NORETURN, pterm,  w,    int16_t code)					\
+call(0x4c, void __NORETURN, pterm,    w,    int16_t code)					\
 call(0x4e, int32_t,         fsfirst,  lw,   const char *path, uint16_t attrib)		\
 call(0x4f, int32_t,         fsnext,)							\
 call(0x56, int16_t,         frename,  wll,  int16_t junk, const char *old, const char *new)\

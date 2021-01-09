@@ -28,6 +28,7 @@ TOSLIBC_C_SRC +=							\
 	lib/toslibc/memset.c						\
 	lib/toslibc/open.c						\
 	lib/toslibc/printf.c						\
+	lib/toslibc/ptermres.c						\
 	lib/toslibc/putchar.c						\
 	lib/toslibc/puts.c						\
 	lib/toslibc/read.c						\

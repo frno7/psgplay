@@ -73,4 +73,6 @@ struct _datetime {
 rtype_ gemdos_##name_(__VA_ARGS__);
 GEMDOS_CALL(GEMDOS_DECLARE)
 
+void __NORETURN gemdos_ptermres(int16_t code);
+
 #endif /* _TOSLIBC_TOS_GEMDOS_H */
