@@ -5,7 +5,7 @@
 
 #include <stddef.h>
 
-#include "toslibc/tos/gemdos.h"
+#include <tos/gemdos.h>
 
 #define STDIN_FILENO	0
 #define STDOUT_FILENO	1
