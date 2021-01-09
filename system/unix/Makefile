@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 
-SYSTEM_UNIX_SRC =							\
+SYSTEM_UNIX_SRC :=							\
 	system/unix/clock.c						\
 	system/unix/command-mode.c					\
 	system/unix/diagnostic.c					\

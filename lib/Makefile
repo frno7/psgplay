@@ -11,4 +11,5 @@ include lib/text/Makefile
 include lib/tos/Makefile
 include lib/toslibc/Makefile
 include lib/unicode/Makefile
+include lib/version/Makefile
 include lib/vt/Makefile

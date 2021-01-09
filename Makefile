@@ -32,13 +32,9 @@ all: $(PSGPLAY) $(EXAMPLE_INFO) $(EXAMPLE_PLAY)
 include lib/Makefile
 include system/Makefile
 
-LIBPSGPLAY_HIDDEN_SRC :=						\
-	$(ATARI_SRC)							\
-	$(INTERNAL_SRC)							\
-	$(M68K_SRC)
-
-LIBPSGPLAY_PUBLIC_SRC :=						\
-	$(PSGPLAY_SRC)
+ifneq "x$(CROSS_COMPILE)" "x"
+all: $(PSGPLAY_TOS)
+endif
 
 PSGPLAY_SRC :=								\
 	$(DISASSEMBLE_SRC) 						\
@@ -48,17 +44,18 @@ PSGPLAY_SRC :=								\
 	$(TEXT_SRC)							\
 	$(UNICODE_SRC)							\
 	$(VT_SRC)
+PSGPLAY_OBJ := $(patsubst %.c, %.o, $(PSGPLAY_SRC))
 
-LIBPSGPLAY_HIDDEN_OBJ = $(patsubst %.c, %.o, $(LIBPSGPLAY_HIDDEN_SRC))
-LIBPSGPLAY_PUBLIC_OBJ = $(patsubst %.c, %.o, $(LIBPSGPLAY_PUBLIC_SRC))
-LIBPSGPLAY_OBJ = $(LIBPSGPLAY_HIDDEN_OBJ) $(LIBPSGPLAY_PUBLIC_OBJ)
+LIBPSGPLAY_HIDDEN_SRC :=						\
+	$(ATARI_SRC)							\
+	$(INTERNAL_SRC)							\
+	$(M68K_SRC)
+LIBPSGPLAY_HIDDEN_OBJ := $(patsubst %.c, %.o, $(LIBPSGPLAY_HIDDEN_SRC))
 
-INTERNAL_OBJ = $(patsubst %.c, %.o, $(INTERNAL_SRC))
-PSGPLAY_OBJ = $(patsubst %.c, %.o, $(PSGPLAY_SRC))
+LIBPSGPLAY_PUBLIC_SRC := $(LIBPSGPLAY_SRC) $(VERSION_SRC)
+LIBPSGPLAY_PUBLIC_OBJ := $(patsubst %.c, %.o, $(LIBPSGPLAY_PUBLIC_SRC))
 
-EXAMPLE_INFO_OBJ = $(patsubst %.c, %.o, $(EXAMPLE_INFO_SRC))
-EXAMPLE_PLAY_OBJ = $(patsubst %.c, %.o, $(EXAMPLE_PLAY_SRC))
-EXAMPLE_OBJ = $(EXAMPLE_INFO_OBJ) $(EXAMPLE_PLAY_OBJ)
+LIBPSGPLAY_OBJ := $(LIBPSGPLAY_HIDDEN_OBJ) $(LIBPSGPLAY_PUBLIC_OBJ)
 
 $(LIBPSGPLAY_STATIC): $(LIBPSGPLAY_OBJ)
 	$(QUIET_AR)$(AR) rcs $@ $^
@@ -69,21 +66,18 @@ $(LIBPSGPLAY_SHARED): $(LIBPSGPLAY_OBJ)
 $(PSGPLAY): $(PSGPLAY_OBJ) $(LIBPSGPLAY_STATIC)
 	$(QUIET_LINK)$(CC) $(ALL_CFLAGS) -o $@ $^ $(LIBS)
 
-$(EXAMPLE_INFO): $(EXAMPLE_INFO_OBJ) $(LIBPSGPLAY_SHARED)		\
-	$(INTERNAL_OBJ) $(EXAMPLE_LINK_OBJ)
+$(EXAMPLE_INFO): $(EXAMPLE_INFO_OBJ) $(INTERNAL_OBJ)			\
+	$(EXAMPLE_LINK_OBJ) $(LIBPSGPLAY_SHARED)
 	$(QUIET_LINK)$(CC) $(ALL_CFLAGS) -o $@ $^
 
-$(EXAMPLE_PLAY): $(EXAMPLE_PLAY_OBJ) $(LIBPSGPLAY_SHARED)		\
-	$(INTERNAL_OBJ) $(EXAMPLE_LINK_OBJ)
+$(EXAMPLE_PLAY): $(EXAMPLE_PLAY_OBJ) $(INTERNAL_OBJ)			\
+	$(EXAMPLE_LINK_OBJ) $(LIBPSGPLAY_SHARED)
 	$(QUIET_LINK)$(CC) $(ALL_CFLAGS) -o $@ $^
 
 $(LIBPSGPLAY_HIDDEN_OBJ): %.o : %.c
 	$(QUIET_CC)$(CC) $(ALL_CFLAGS) -fvisibility=hidden -c -o $@ $<
 
-$(LIBPSGPLAY_PUBLIC_OBJ): %.o : %.c
-	$(QUIET_CC)$(CC) $(ALL_CFLAGS) -c -o $@ $<
-
-$(PSGPLAY_OBJ) $(EXAMPLE_OBJ): %.o : %.c
+$(LIBPSGPLAY_PUBLIC_OBJ) $(PSGPLAY_OBJ) $(EXAMPLE_OBJ): %.o : %.c
 	$(QUIET_CC)$(CC) $(ALL_CFLAGS) -c -o $@ $<
 
 INSTALL = install
@@ -109,8 +103,8 @@ clean:
 		$(EXAMPLE_INFO) $(EXAMPLE_PLAY)				\
 		$(PSGPLAY) PSGPLAY.* GPATH GRTAGS GTAGS 		\
 		$(LIBPSGPLAY_STATIC) $(LIBPSGPLAY_SHARED)		\
-		$(M68K_GEN_H) $(M68K_GEN_C) $(VER) $(M68KMAKE)		\
-		$(M68KDG_GEN_H) $(M68KDG)
+		$(M68K_GEN_H) $(M68K_GEN_C) $(VERSION_SRC)		\
+		$(M68KMAKE) $(M68KDG_GEN_H) $(M68KDG)
 
 .PHONY: gtags
 gtags:
@@ -121,7 +115,7 @@ help:
 	@echo "Targets:"
 	@echo "  all            - compile PSG play (default)"
 	@echo "  install        - install PSG play"
-	@echo "  test           - test components of PSG play
+	@echo "  test           - test components of PSG play"
 	@echo "  PSGPLAY.TOS    - compile PSG play for Atari ST"
 	@echo "  gtags          - make tags for the GNU Global source code tagging system"
 	@echo "  version        - display PSG play version"

@@ -16,7 +16,7 @@ lib/m68k/%ops.c include/m68k/%ops.h: lib/m68k/%_in.c $(M68KMAKE)
 
 lib/m68k/m68kcpu.c: $(M68K_GEN_H)
 
-M68K_SRC = $(M68K_GEN_C) lib/m68k/m68kcpu.c
+M68K_SRC := $(M68K_GEN_C) lib/m68k/m68kcpu.c
 
 M68KDA_SPEC := lib/m68k/m68kda.spec
 
@@ -29,7 +29,7 @@ lib/m68k/m68kda.c: $(M68KDG_GEN_H)
 $(M68KDG_GEN_H): $(M68KDG) $(M68KDA_SPEC)
 	$(QUIET_GEN)$(M68KDG) -o $@ $(M68KDA_SPEC)
 
-M68KDG_LINK_OBJS =							\
+M68KDG_LINK_OBJS :=							\
 	system/unix/file.o						\
 	system/unix/memory.o						\
 	system/unix/print.o						\
@@ -49,12 +49,12 @@ ifeq "$(HAVE_SSO)" "1"
 
 lib/m68k/m68kdt.c: $(M68KDG_GEN_H)
 
-M68KDA_SRC = lib/m68k/m68kds.c lib/m68k/m68kdt.c lib/m68k/m68kda.c
-M68KDT_SRC = lib/m68k/m68kds.c lib/m68k/m68kdt.c
+M68KDA_SRC := lib/m68k/m68kds.c lib/m68k/m68kda.c
+M68KDT_SRC := lib/m68k/m68kds.c lib/m68k/m68kdt.c
 
 M68K_SRC += $(M68KDA_SRC)
 
-M68KDT_OBJ = $(patsubst %.c, %.o, $(M68KDT_SRC))
+M68KDT_OBJ := $(patsubst %.c, %.o, $(M68KDT_SRC))
 
 M68KDT_LINK_OBJ :=							\
 	lib/psgplay/version.o						\

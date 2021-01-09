@@ -9,8 +9,11 @@ PRG_LDFLAGS += --relocatable --gc-sections --strip-all --entry _start	\
 
 PRG_VLINKFLAGS += -b ataritos -tos-fastload -e _start
 
+PSGPLAY_TOS := PSGPLAY.TOS
+PSGPLAY_PRG_OBJ := system/atari/PSGPLAY.PRG.o
+
 SYSTEM_ATARI_SRC := $(wildcard system/atari/*.c)
-SYSTEM_ATARI_OBJ += $(patsubst %.c, %.o, $(SYSTEM_ATARI_SRC))
+SYSTEM_ATARI_OBJ := $(patsubst %.c, %.o, $(SYSTEM_ATARI_SRC))
 
 $(SYSTEM_ATARI_OBJ): %.o : %.c
 	$(QUIET_CC)$(CROSS_COMPILE)gcc $(PRG_CFLAGS) -c -o $@ $<
@@ -45,7 +48,7 @@ system/atari/vt52.o: lib/vt/vt52.c
 system/atari/vt.o: lib/vt/vt.c
 	$(QUIET_CC)$(CROSS_COMPILE)gcc $(PRG_CFLAGS) -c -o $@ $<
 
-SYSTEM_ATARI_SNDH_OBJ +=						\
+SYSTEM_ATARI_SNDH_OBJ :=						\
 	system/atari/fifo.o						\
 	system/atari/ice.o						\
 	system/atari/ice_decrunch_inplace_.o				\
@@ -57,11 +60,11 @@ SYSTEM_ATARI_SNDH_OBJ +=						\
 	system/atari/vt.o						\
 	system/atari/vt52.o
 
-system/atari/PSGPLAY.PRG.o: $(TOSLIBC_OBJ) $(SYSTEM_ATARI_OBJ)		\
+$(PSGPLAY_PRG_OBJ): $(TOSLIBC_OBJ) $(SYSTEM_ATARI_OBJ)			\
 		$(SYSTEM_ATARI_SNDH_OBJ)
 	$(QUIET_LINK)$(CROSS_COMPILE)ld $(PRG_LDFLAGS) -o $@		\
 		$(TOSLIBC_OBJ) $(SYSTEM_ATARI_OBJ)			\
 		$(SYSTEM_ATARI_SNDH_OBJ)
 
-PSGPLAY.TOS: system/atari/PSGPLAY.PRG.o
+$(PSGPLAY_TOS): $(PSGPLAY_PRG_OBJ)
 	$(QUIET_LINK)vlink $(PRG_VLINKFLAGS) -o $@ $^
