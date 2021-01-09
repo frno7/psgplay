@@ -83,11 +83,15 @@ Disassembly options:
 
 .TP
 .BR \-\-disassemble
-Disassemble SNDH file and exit. By default, every track is run silently as if
-it was played for 60 seconds, to separate executable instructions from data.
-The disassembly execution length can be set with the \fB--length\fR option
-(0 to inactivate). Disassembly is also guided by instruction reachability
-from the \fIinit\fR, \fIplay\fR, and \fIexit\fR entry points.
+Disassemble SNDH file and exit. The disassembly is guided by instruction
+reachability from the \fIinit\fR, \fIplay\fR, and \fIexit\fR entry points,
+to separate executable instructions from data.
+
+To deal with interrupt code and self-modifying code, use both the
+\fB--disassemble\fR and the \fB--trace=cpu\fR options. The disassembly will
+then print what the processor actually executed in memory, which may have
+been modified by the program itself, rather than the contents of the SNDH
+file. The tracing execution length can be set with the \fB--length\fR option.
 
 .TP
 .BR \-\-disassemble-header
@@ -119,6 +123,11 @@ can be set with the \fB--length\fR option. Default is 60 seconds. Devices:
 \fIall\fR,
 \fIcpu\fR,
 \fIreg\fR.
+
+The \fB--trace\fR option can be combined with the \fB--disassemble\fR
+option. Review the \fB--disassemble\fR option manual section for details.
+
+The SNDH file is loaded in memory at address 4000 (in hexadecimal).
 
 .RE
 

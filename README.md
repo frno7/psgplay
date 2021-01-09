@@ -56,7 +56,9 @@ Play options:
 
 Disassembly options:
 
-    --disassemble          disassemble SNDH file and exit
+    --disassemble          disassemble SNDH file and exit; may be combined
+                           with the --trace=cpu option for self-modifying code,
+                           disassembly of interrupt code, etc.
     --disassemble-header   disassemble SNDH file header and exit
     --disassemble-address  display address column in disassembly
     --remake-header        remake SNDH file header in disassembly
@@ -138,11 +140,15 @@ for code inspection. The `--disassemble-header` option is the safest
 choice when updating SNDH metadata, because most of the code is retained
 with `dc.b` data bytes for exact reassembly.
 
-By default, every track is run silently as if it was played for 60 seconds,
-to separate executable instructions from data. The disassembly execution
-length can be set with  the `--length` option (0 to inactivate). Disassembly
-is also guided by instruction reachability from the `init`, `play`, and `exit`
-entry points.
+The disassembly is guided by instruction reachability from the `init`,
+`play`, and `exit` entry points, to separate executable instructions from
+data. To deal with interrupt code and
+[self-modifying code](https://en.wikipedia.org/wiki/Self-modifying_code),
+use both the `--disassemble` and the `--trace=cpu` options. The disassembly
+will then print what the processor actually executed in memory, which may
+have been modified by the program itself, rather than the contents of the
+SNDH file. The tracing execution length can be set with the `--length`
+option.
 
 The `--remake-header` option can be used to repair broken SNDH metadata such
 as missing tags, excessive whitespace, etc. It can also be used to update or

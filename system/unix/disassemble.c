@@ -427,8 +427,14 @@ static void dasm_print_insn(struct disassembly *dasm, size_t i, size_t size)
 		if (dasm_is_label(dasm, i))
 			dasm_print_label(dasm, i);
 
-		if (dasm->options->disassemble_address)
-			print_address(&dasm->sb, i, &dasm->data[i], insn_size);
+		if (dasm->options->disassemble_address) {
+			const uint32_t offset =
+				TRACE_ENABLE(&dasm->options->trace, CPU) ?
+					MACHINE_PROGRAM : 0;
+
+			print_address(&dasm->sb, i + offset,
+				&dasm->data[i], insn_size);
+		}
 
 		sbprintf(&dasm->sb, "%s", insn.s);
 
@@ -595,6 +601,12 @@ static void dasm_mark_text_trace_entries(struct disassembly *dasm)
 
 static void dasm_instruction(uint32_t pc, void *arg)
 {
+	const struct m68kda_elements elements = {
+		.pcdi = target_pcdi,
+		.pcix = target_pcix,
+		.bra = target_bra,
+	};
+
 	struct disassembly *dasm = arg;
 
 	if (pc < MACHINE_PROGRAM)
@@ -607,7 +619,37 @@ static void dasm_instruction(uint32_t pc, void *arg)
 		i == 4 ? SNDH_INSN_EXIT :
 		i == 8 ? SNDH_INSN_PLAY : dasm->sndh_insn_run;
 
-	dasm_mark_text_trace(dasm, i, dasm->sndh_insn_run);
+	const union m68kda_insn insn = { .word = probe_read_memory_16(pc) };
+	const struct m68kda_spec *spec0 = m68kda_insn_find(insn);
+
+	if (!spec0) {
+		pr_warn("%s: tracing invalid instruction %04x\n",
+			dasm->path, insn.word);
+		return;
+	}
+
+	const uint8_t insn_size = m68kda_insn_size(spec0);
+	uint8_t buffer[32];
+
+	BUG_ON(insn_size % 2 != 0);
+	BUG_ON(insn_size < 2 || sizeof(buffer) < insn_size);
+	probe_copy_memory_16(buffer, pc, insn_size / 2);
+
+	if (dasm->size < i + insn_size)
+		return;
+
+	memcpy(&dasm->data[i], buffer, insn_size);
+	dasm_mark_text(dasm, i, insn_size, dasm->sndh_insn_run);
+
+	struct target target = {
+		.dasm = dasm,
+		.address = i + sizeof(union m68kda_insn),
+		.branch = -1
+	};
+	const struct m68kda_spec *spec1 = m68kda_insn_disassemble(
+		buffer, insn_size, &elements, NULL, &target);
+
+	BUG_ON(spec0 != spec1);
 }
 
 static ssize_t parse_time(const char *s, int frequency)
@@ -674,11 +716,14 @@ void sndh_disassemble(struct options *options, struct file file)
 	dasm_label(&dasm, "_play", sndh_play_address(file.data, file.size));
 	dasm_label(&dasm, "_sndh", dasm.header_size);
 
-	dasm_mark_text_trace_entries(&dasm);
-
-	if (options->disassemble != DISASSEMBLE_TYPE_HEADER)
+	if (TRACE_ENABLE(&options->trace, CPU)) {
 		dasm_mark_text_trace_run(dasm_instruction,
 			&dasm, options, file);
+
+		probe_copy_memory_8(dasm.data, MACHINE_PROGRAM, dasm.size);
+	}
+
+	dasm_mark_text_trace_entries(&dasm);
 
 	dasm_print(&dasm);
 
