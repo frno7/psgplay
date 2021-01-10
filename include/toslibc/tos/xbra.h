@@ -34,19 +34,21 @@ struct xbra_regs {
 
 /**
  * typedef xbra_enter - XBRA enter function
+ * @vector: exception vector
  * @regs: registers before entering the previous exception vector
  * @arg: optional function argument supplied to ___xbra_init___()
  *
  * Return: %true to invoke the previous exception vector, otherwise %false
  */
-typedef bool (*xbra_enter)(struct xbra_regs *regs, void *arg);
+typedef bool (*xbra_enter)(uint32_t vector, struct xbra_regs *regs, void *arg);
 
 /**
  * typedef ___xbra_leave___ - XBRA leave function
+ * @vector: exception vector
  * @regs: registers after leaving the previous exception vector
  * @arg: optional function argument supplied to ___xbra_init___()
  */
-typedef void (*xbra_leave)(struct xbra_regs *regs, void *arg);
+typedef void (*xbra_leave)(uint32_t vector, struct xbra_regs *regs, void *arg);
 
 /**
  * ___xbra_init___ - XBRA initialise and install exception vector
@@ -75,8 +77,8 @@ struct __##label_##_rte { 						\
 	void *pc;							\
 } __attribute__((__packed__)) __##label_##_rte[reenter_];		\
 struct __##label_##_rte *__##label_##_reenter = __##label_##_rte;	\
-bool (*__##label_##_enter)(struct xbra_regs *regs, void *arg);		\
-void (*__##label_##_leave)(struct xbra_regs *regs, void *arg);		\
+xbra_enter __##label_##_enter;						\
+xbra_leave __##label_##_leave;						\
 extern void *__##label_##_org;						\
 extern void __##label_(void);						\
 									\
@@ -125,12 +127,13 @@ __asm__ (								\
 "	move.l	__"#label_"_arg,-(%sp)\n"				\
 "	move.l	%sp,-(%sp)\n"						\
 "	addq.l	#4,(%sp)\n"	/* Skip the arg pointer */		\
+"	move.l	__"#label_"_vector,-(%sp)\n"						\
 	/* JSR to the enter function. */				\
 "	pea	0f(%pc)\n"						\
 "	move.l	__"#label_"_enter,-(%sp)\n"				\
 "	rts\n"								\
 "0:\n"	/* Resume after the enter function. */				\
-"	addq.l	#8,%sp\n"						\
+"	lea	12(%sp),%sp\n"						\
 	/* Check whether the enter function returned false. */		\
 "	tst.l	%d0\n"							\
 "	beq.w	4f\n"							\
@@ -178,12 +181,13 @@ __asm__ (								\
 "	move.l	__"#label_"_arg,-(%sp)\n"				\
 "	move.l	%sp,-(%sp)\n"						\
 "	addq.l	#4,(%sp)\n"	/* Skip the arg pointer */		\
+"	move.l	__"#label_"_vector,-(%sp)\n"						\
 	/* JSR to the leave function. */				\
 "	pea	3f(%pc)\n"						\
 "	move.l	__"#label_"_leave,-(%sp)\n"				\
 "	rts\n"								\
 "3:\n"	/* Resume after the leave function. */				\
-"	addq.l	#8,%sp\n"						\
+"	lea	12(%sp),%sp\n"						\
 "	movem.l	(%sp)+,%d0-%a7\n"					\
 	/* Reinstall the user stack pointer (USP). */			\
 "	move.l	%a0,-4(%sp)\n"						\

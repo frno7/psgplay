@@ -9,9 +9,10 @@
 
 DEFINE_XBRA("PSGP", timer_c);
 
-void timer_init(void (*f)(void *arg), void *arg)
+void timer_init(bool (*f)(uint32_t vector,
+	struct xbra_regs *regs, void *arg), void *arg)
 {
 	atexit(timer_c_exit);
 
-	timer_c_init(69, f, arg);
+	timer_c_init(69, f, NULL, arg);
 }

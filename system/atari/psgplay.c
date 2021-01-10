@@ -30,13 +30,15 @@
 
 char progname[] = "PSGPLAY";
 
-void timer_c(void *arg)
+bool timer_c(uint32_t vector, struct xbra_regs *regs, void *arg)
 {
 	struct text_sndh *sndh = arg;
 
 	model_timer(sndh);
 
 	clock_tick();
+
+	return true;
 }
 
 static unicode_t read_key(void)
