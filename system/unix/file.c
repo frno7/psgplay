@@ -25,7 +25,7 @@
 static struct file file_read_fd__(int fd, char *path)
 {
 	size_t size = 0;
-	u8 *data = NULL;
+	uint8_t *data = NULL;
 
 	if (fd < 0)
 		goto err;
@@ -153,7 +153,7 @@ int xclose(int fd)
 
 ssize_t xread(int fd, void *buf, size_t nbyte)
 {
-	u8 *data = buf;
+	uint8_t *data = buf;
 	size_t size = 0;
 
 	while (size < nbyte) {
@@ -174,7 +174,7 @@ ssize_t xread(int fd, void *buf, size_t nbyte)
 
 ssize_t xwrite(int fd, const void *buf, size_t nbyte)
 {
-	const u8 *data = buf;
+	const uint8_t *data = buf;
 	size_t size = 0;
 
 	while (size < nbyte) {
