@@ -19,7 +19,7 @@ call(0x08, int16_t, floprd,      llwwwww,   void *buf, int32_t x, int16_t d, int
 call(0x09, int16_t, flopwr,      llwwwww,   void *buf, int32_t x, int16_t d, int16_t sect, int16_t trk, int16_t side, int16_t n)\
 call(0x0a, int16_t, flopfmt,     llwwwwwlw, void *buf, int32_t x, int16_t d, int16_t spt, int16_t t, int16_t sd, int16_t i, int32_t m, int16_t v)\
 call(0x0b, void,    dbmsg,       wwl,       int16_t rsrvd, int16_t msg_num, int32_t msg_arg)	\
-call(0x0c, void,    midiws,      wl,        int16_t cnt, const char *buf)			\
+call(0x0c, void,    midiws,      wl,        int16_t cnt, const void *buf)			\
 call(0x0d, void,    mfpint,      wl,        int16_t vnum, void *vptr)				\
 call(0x0e, void *,  iorec,       w,         int16_t dev)					\
 call(0x0f, int32_t, rsconf,      wwwwww,    int16_t baud, int16_t flow, int16_t uc, int16_t rs, int16_t ts, int16_t sc)\
