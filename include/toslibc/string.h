@@ -19,4 +19,10 @@ char *strncpy(char *dst, const char *src, size_t n);
 
 const char *strerror(int errnum);
 
+char *strdup(const char *s);
+
+char *strndup(const char *s, size_t n);
+
+char *strstr(const char *haystack, const char *needle);
+
 #endif /* TOSLIBC_STRING_H */
