@@ -15,4 +15,10 @@
 rtype_ xgemdos_##name_(__VA_ARGS__);
 XGEMDOS_CALL(XGEMDOS_DECALARE)
 
+enum xgemdos_trap {
+#define XGEMDOS_TRAP_ENUM(opcode_, rtype_, name_, ...)			\
+	xgemdos_trap_##name_ = opcode_,
+XGEMDOS_CALL(XGEMDOS_TRAP_ENUM)
+};
+
 #endif /* _TOSLIBC_TOS_XGEMDOS_H */
