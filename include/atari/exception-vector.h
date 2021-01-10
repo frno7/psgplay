@@ -40,7 +40,7 @@
 	e( 31, "Interrupt level 7")					\
 	e( 32, "Trap #0")						\
 	e( 33, "Trap #1 GEMDOS")					\
-	e( 34, "Trap #2 GEM")						\
+	e( 34, "Trap #2 XGEMDOS")					\
 	e( 35, "Trap #3")						\
 	e( 36, "Trap #4")						\
 	e( 37, "Trap #5")						\
