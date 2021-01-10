@@ -45,6 +45,4 @@ void file_nonblocking(int fd);
 
 const char *file_basename(const char *path);
 
-struct file sndh_read_file(const char *path);
-
 #endif /* PSGPLAY_SYSTEM_UNIX_FILE_H */

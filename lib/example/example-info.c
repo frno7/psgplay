@@ -11,6 +11,7 @@
 #include "psgplay/sndh.h"
 
 #include "system/unix/file.h"
+#include "system/unix/sndh.h"
 
 int main(int argc, char *argv[])
 {

@@ -17,12 +17,13 @@
 #include "out/alsa.h"
 #include "out/wave.h"
 
+#include "system/unix/command-mode.h"
 #include "system/unix/diagnostic.h"
 #include "system/unix/disassemble.h"
 #include "system/unix/file.h"
 #include "system/unix/info.h"
 #include "system/unix/option.h"
-#include "system/unix/command-mode.h"
+#include "system/unix/sndh.h"
 #include "system/unix/text-mode.h"
 
 char progname[] = "psgplay";
