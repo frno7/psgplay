@@ -54,7 +54,7 @@ call(0x48, void *,          malloc,   l,    int32_t size)				\
 call(0x49, int32_t,         mfree,    l,    void *ptr)					\
 call(0x4a, int32_t,         mshrink,  wll,  int16_t unused, void *block, int32_t size)	\
 call(0x4b, int32_t,         pexec,    wlll, int16_t mode, const void *ptr1, const void *ptr2, const void *ptr3)\
-call(0x4c, void __NORETURN, pterm,    w,    int16_t code)					\
+call(0x4c, void __NORETURN, pterm,    w,    int16_t code)				\
 call(0x4e, int32_t,         fsfirst,  lw,   const char *path, uint16_t attrib)		\
 call(0x4f, int32_t,         fsnext,)							\
 call(0x56, int16_t,         frename,  wll,  int16_t junk, const char *old, const char *new)\
