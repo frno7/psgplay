@@ -9,7 +9,7 @@
 
 #include "toslibc/tos/gemdos.h"
 
-int open(const char *pathname, int flags)
+int open(const char *pathname, int flags, ...)
 {
 	const int32_t fd = gemdos_fopen(pathname, flags);
 
