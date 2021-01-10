@@ -17,6 +17,8 @@ void *malloc(size_t size);
 
 void free(void *ptr);
 
+void *realloc(void *ptr, size_t size);
+
 long int strtol(const char *nptr, char **endptr, int base);
 
 long long int strtoll(const char *nptr, char **endptr, int base);
