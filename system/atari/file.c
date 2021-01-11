@@ -155,7 +155,7 @@ bool sndh_read_next(struct file_cursor *file_cursor)
 		return false;
 
 	if (file_cursor->file_offset < file_cursor->file_size) {
-		const size_t size = min(SNDH_CHUNK_SIZE,
+		const size_t size = min_t(size_t, SNDH_CHUNK_SIZE,
 			file_cursor->file_size - file_cursor->file_offset);
 		u8 *b = file_cursor->file->data;
 		u8 *d = &b[file_cursor->file_offset];
