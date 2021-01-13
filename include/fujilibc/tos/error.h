@@ -3,7 +3,7 @@
 #ifndef _FUJILIBC_TOS_ERROR_H
 #define _FUJILIBC_TOS_ERROR_H
 
-#if defined(_TOSLIBC_SOURCE)
+#if defined(_FUJILIBC_SOURCE)
 
 #define _TOS_ERRORS(E)							\
 	/* BIOS */							\
@@ -63,6 +63,6 @@ int errno_for_tos_error(int toserr);
  */
 const char *tos_error_message(int toserr);
 
-#endif /* defined(_TOSLIBC_SOURCE) */
+#endif /* defined(_FUJILIBC_SOURCE) */
 
 #endif /* _FUJILIBC_TOS_ERROR_H */

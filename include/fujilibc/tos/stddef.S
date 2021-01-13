@@ -6,10 +6,10 @@
 #ifndef _FUJILIBC_TOS_STDDEF_S
 #define _FUJILIBC_TOS_STDDEF_S
 
-#if defined(_TOSLIBC_SOURCE)
+#if defined(_FUJILIBC_SOURCE)
 
 #include "stdreg.S"
 
-#endif /* defined(_TOSLIBC_SOURCE) */
+#endif /* defined(_FUJILIBC_SOURCE) */
 
 #endif /* _FUJILIBC_TOS_STDDEF_S */

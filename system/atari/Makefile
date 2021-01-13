@@ -2,7 +2,7 @@
 
 PRG_CFLAGS += $(DEP_CFLAGS) -march=68000 -fno-PIC -nostdlib		\
 	-ffunction-sections -fdata-sections -isystem include/fujilibc	\
-	-D_TOSLIBC_SOURCE
+	-D_FUJILIBC_SOURCE
 
 PRG_LDFLAGS += --relocatable --gc-sections --strip-all --entry _start	\
 	--script=script/prg.ld
@@ -61,10 +61,10 @@ SYSTEM_ATARI_SNDH_OBJ :=						\
 	system/atari/vt52.o
 
 $(PSGPLAY_PRG_OBJ): check/68000
-$(PSGPLAY_PRG_OBJ): $(TOSLIBC_OBJ) $(SYSTEM_ATARI_OBJ)			\
+$(PSGPLAY_PRG_OBJ): $(FUJILIBC_OBJ) $(SYSTEM_ATARI_OBJ)			\
 		$(SYSTEM_ATARI_SNDH_OBJ)
 	$(QUIET_LINK)$(CROSS_COMPILE)ld $(PRG_LDFLAGS) -o $@		\
-		$(TOSLIBC_OBJ) $(SYSTEM_ATARI_OBJ)			\
+		$(FUJILIBC_OBJ) $(SYSTEM_ATARI_OBJ)			\
 		$(SYSTEM_ATARI_SNDH_OBJ)
 
 $(PSGPLAY_TOS): $(PSGPLAY_PRG_OBJ)

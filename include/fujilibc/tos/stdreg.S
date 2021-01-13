@@ -6,7 +6,7 @@
 #ifndef _FUJILIBC_TOS_STDREG_S
 #define _FUJILIBC_TOS_STDREG_S
 
-#if defined(_TOSLIBC_SOURCE)
+#if defined(_FUJILIBC_SOURCE)
 
 #define REG_(r) % ## r
 
@@ -29,6 +29,6 @@
 #define sr REG_(sr)
 #define pc REG_(pc)
 
-#endif /* defined(_TOSLIBC_SOURCE) */
+#endif /* defined(_FUJILIBC_SOURCE) */
 
 #endif /* _FUJILIBC_TOS_STDREG_S */
