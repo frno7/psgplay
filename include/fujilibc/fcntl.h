@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1
 
-#ifndef _TOSLIBC_FCNTL_H
-#define _TOSLIBC_FCNTL_H
+#ifndef _FUJILIBC_FCNTL_H
+#define _FUJILIBC_FCNTL_H
 
 #include <tos/gemdos.h>
 
@@ -14,4 +14,4 @@
 
 int open(const char *pathname, int flags, ...);
 
-#endif /* _TOSLIBC_FCNTL_H */
+#endif /* _FUJILIBC_FCNTL_H */

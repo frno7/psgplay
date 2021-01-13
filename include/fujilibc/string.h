@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1
 
-#ifndef TOSLIBC_STRING_H
-#define TOSLIBC_STRING_H
+#ifndef _FUJILIBC_STRING_H
+#define _FUJILIBC_STRING_H
 
 #include <stddef.h>
 
@@ -25,4 +25,4 @@ char *strndup(const char *s, size_t n);
 
 char *strstr(const char *haystack, const char *needle);
 
-#endif /* TOSLIBC_STRING_H */
+#endif /* _FUJILIBC_STRING_H */

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1
 
-#ifndef _TOSLIBC_TOS_REGION_H
-#define _TOSLIBC_TOS_REGION_H
+#ifndef _FUJILIBC_TOS_REGION_H
+#define _FUJILIBC_TOS_REGION_H
 
 #if defined(_TOSLIBC_SOURCE)
 
@@ -30,4 +30,4 @@
 
 #endif /* defined(_TOSLIBC_SOURCE) */
 
-#endif /* _TOSLIBC_TOS_REGION_H */
+#endif /* _FUJILIBC_TOS_REGION_H */

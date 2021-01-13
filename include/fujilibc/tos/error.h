@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1
 
-#ifndef _TOSLIBC_TOS_ERROR_H
-#define _TOSLIBC_TOS_ERROR_H
+#ifndef _FUJILIBC_TOS_ERROR_H
+#define _FUJILIBC_TOS_ERROR_H
 
 #if defined(_TOSLIBC_SOURCE)
 
@@ -65,4 +65,4 @@ const char *tos_error_message(int toserr);
 
 #endif /* defined(_TOSLIBC_SOURCE) */
 
-#endif /* _TOSLIBC_TOS_ERROR_H */
+#endif /* _FUJILIBC_TOS_ERROR_H */

@@ -3,8 +3,8 @@
  * Copyright (C) 2020 Fredrik Noring
  */
 
-#ifndef _TOSLIBC_TOS_AES_CALL_H
-#define _TOSLIBC_TOS_AES_CALL_H
+#ifndef _FUJILIBC_TOS_AES_CALL_H
+#define _FUJILIBC_TOS_AES_CALL_H
 
 #define __AES_CALL(call)						\
 call( 10, appl_init__, (), (), (), ())					\
@@ -382,4 +382,4 @@ call(125, shel_envrn,							\
 		(),,							\
 		char **value, const char *name)
 
-#endif /* _TOSLIBC_TOS_AES_CALL_H */
+#endif /* _FUJILIBC_TOS_AES_CALL_H */

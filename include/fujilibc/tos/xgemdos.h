@@ -3,8 +3,8 @@
  * Copyright (C) 2020 Fredrik Noring
  */
 
-#ifndef _TOSLIBC_TOS_XGEMDOS_H
-#define _TOSLIBC_TOS_XGEMDOS_H
+#ifndef _FUJILIBC_TOS_XGEMDOS_H
+#define _FUJILIBC_TOS_XGEMDOS_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -21,4 +21,4 @@ enum xgemdos_trap {
 XGEMDOS_CALL(XGEMDOS_TRAP_ENUM)
 };
 
-#endif /* _TOSLIBC_TOS_XGEMDOS_H */
+#endif /* _FUJILIBC_TOS_XGEMDOS_H */

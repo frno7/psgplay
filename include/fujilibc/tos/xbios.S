@@ -3,8 +3,8 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#ifndef _TOSLIBC_TOS_XBIOS_S
-#define _TOSLIBC_TOS_XBIOS_S
+#ifndef _FUJILIBC_TOS_XBIOS_S
+#define _FUJILIBC_TOS_XBIOS_S
 
 #include <tos/stddef.S>
 
@@ -26,4 +26,4 @@ XBIOS_CALL(XBIOS_OPCODE_EQU)
 	.endm;
 XBIOS_CALL(XBIOS_MACRO)
 
-#endif /* _TOSLIBC_TOS_XBIOS_S */
+#endif /* _FUJILIBC_TOS_XBIOS_S */

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1
 
-#ifndef _TOSLIBC_STDDEF_H
-#define _TOSLIBC_STDDEF_H
+#ifndef _FUJILIBC_STDDEF_H
+#define _FUJILIBC_STDDEF_H
 
 #include <stdint.h>
 
@@ -15,4 +15,4 @@ typedef __INT32_TYPE__ ssize_t;
 
 #define __NORETURN __attribute__((__noreturn__))
 
-#endif /* _TOSLIBC_STDDEF_H */
+#endif /* _FUJILIBC_STDDEF_H */

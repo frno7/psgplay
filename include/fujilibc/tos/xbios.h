@@ -3,8 +3,8 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#ifndef _TOSLIBC_TOS_XBIOS_H
-#define _TOSLIBC_TOS_XBIOS_H
+#ifndef _FUJILIBC_TOS_XBIOS_H
+#define _FUJILIBC_TOS_XBIOS_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -27,4 +27,4 @@ XBIOS_CALL(XBIOS_DECALARE)
  */
 void xbios_supexecarg(void (*func)(void *arg), void *arg);
 
-#endif /* _TOSLIBC_TOS_XBIOS_H */
+#endif /* _FUJILIBC_TOS_XBIOS_H */

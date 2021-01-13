@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1
 
-#ifndef _TOSLIBC_STDIO_H
-#define _TOSLIBC_STDIO_H
+#ifndef _FUJILIBC_STDIO_H
+#define _FUJILIBC_STDIO_H
 
 #include <stdarg.h>
 #include <stddef.h>
@@ -27,4 +27,4 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap);
 int snprintf(char *str, size_t size, const char *format, ...)
 	__attribute__((format(printf, 3, 4)));
 
-#endif /* _TOSLIBC_STDIO_H */
+#endif /* _FUJILIBC_STDIO_H */

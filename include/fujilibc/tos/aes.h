@@ -3,8 +3,8 @@
  * Copyright (C) 2020 Fredrik Noring
  */
 
-#ifndef _TOSLIBC_TOS_AES_H
-#define _TOSLIBC_TOS_AES_H
+#ifndef _FUJILIBC_TOS_AES_H
+#define _FUJILIBC_TOS_AES_H
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -326,4 +326,4 @@ const char *aes_mesag_type_string(const enum aes_mesag_type type);
 
 struct aes_bar aes_bar_intersect(struct aes_bar a, struct aes_bar b);
 
-#endif /* _TOSLIBC_TOS_AES_H */
+#endif /* _FUJILIBC_TOS_AES_H */

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1
 
-#ifndef _TOSLIBC_ERRNO_H
-#define _TOSLIBC_ERRNO_H
+#ifndef _FUJILIBC_ERRNO_H
+#define _FUJILIBC_ERRNO_H
 
 extern int errno;
 
@@ -49,4 +49,4 @@ enum {
 __ERRNO_LIST(__ERRNO_ENUM)
 };
 
-#endif /* _TOSLIBC_ERRNO_H */
+#endif /* _FUJILIBC_ERRNO_H */

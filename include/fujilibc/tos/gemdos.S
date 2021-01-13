@@ -3,8 +3,8 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#ifndef _TOSLIBC_TOS_GEMDOS_S
-#define _TOSLIBC_TOS_GEMDOS_S
+#ifndef _FUJILIBC_TOS_GEMDOS_S
+#define _FUJILIBC_TOS_GEMDOS_S
 
 #include <tos/stddef.S>
 
@@ -34,4 +34,4 @@ GEMDOS_CALL(GEMDOS_OPCODE_EQU)
 	.endm;
 GEMDOS_CALL(GEMDOS_MACRO)
 
-#endif /* _TOSLIBC_TOS_GEMDOS_S */
+#endif /* _FUJILIBC_TOS_GEMDOS_S */

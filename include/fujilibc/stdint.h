@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1
 
-#ifndef _TOSLIBC_STDINT_H
-#define _TOSLIBC_STDINT_H
+#ifndef _FUJILIBC_STDINT_H
+#define _FUJILIBC_STDINT_H
 
 typedef __INT8_TYPE__ int8_t;
 typedef __INT16_TYPE__ int16_t;
@@ -17,4 +17,4 @@ typedef __INTMAX_TYPE__ intmax_t;
 typedef __UINTMAX_TYPE__ uintmax_t;
 typedef __UINTPTR_TYPE__ uintptr_t;
 
-#endif /* _TOSLIBC_STDINT_H */
+#endif /* _FUJILIBC_STDINT_H */

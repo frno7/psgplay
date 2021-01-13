@@ -3,8 +3,8 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#ifndef _TOSLIBC_TOS_GEMDOS_H
-#define _TOSLIBC_TOS_GEMDOS_H
+#ifndef _FUJILIBC_TOS_GEMDOS_H
+#define _FUJILIBC_TOS_GEMDOS_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -71,4 +71,4 @@ GEMDOS_CALL(GEMDOS_DECLARE)
 
 void __NORETURN gemdos_ptermres(int16_t code);
 
-#endif /* _TOSLIBC_TOS_GEMDOS_H */
+#endif /* _FUJILIBC_TOS_GEMDOS_H */

@@ -3,8 +3,8 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#ifndef _TOSLIBC_TOS_BIOS_S
-#define _TOSLIBC_TOS_BIOS_S
+#ifndef _FUJILIBC_TOS_BIOS_S
+#define _FUJILIBC_TOS_BIOS_S
 
 #include <tos/stddef.S>
 
@@ -26,4 +26,4 @@ BIOS_CALL(BIOS_OPCODE_EQU)
 	.endm;
 BIOS_CALL(BIOS_MACRO)
 
-#endif /* _TOSLIBC_TOS_BIOS_S */
+#endif /* _FUJILIBC_TOS_BIOS_S */
