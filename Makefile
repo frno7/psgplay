@@ -29,6 +29,7 @@ EXAMPLE_PLAY := lib/example/example-play
 .PHONY: all
 all: $(PSGPLAY) $(EXAMPLE_INFO) $(EXAMPLE_PLAY)
 
+include check/Makefile
 include lib/Makefile
 include system/Makefile
 
@@ -104,7 +105,8 @@ clean:
 		$(PSGPLAY) PSGPLAY.* GPATH GRTAGS GTAGS 		\
 		$(LIBPSGPLAY_STATIC) $(LIBPSGPLAY_SHARED)		\
 		$(M68K_GEN_H) $(M68K_GEN_C) $(VERSION_SRC)		\
-		$(M68KMAKE) $(M68KDG_GEN_H) $(M68KDG)
+		$(M68KMAKE) $(M68KDG_GEN_H) $(M68KDG)			\
+		check/68000.actual
 
 .PHONY: gtags
 gtags:
@@ -127,8 +129,10 @@ help:
 	@echo "  ALSA           - set to 1 to support ALSA for Linux"
 	@echo "  CROSS_COMPILE  - set m68k cross compiler to use for Atari ST code"
 	@echo
+	@echo "Note that m68k-linux-* cross-compilers emit 68020 and will not work."
+	@echo
 	@echo "Example:"
-	@echo "  make ALSA=1 CROSS_COMPILE=m68k-unknown-linux-gnu-"
+	@echo "  make ALSA=1 CROSS_COMPILE=m68k-elf-"
 
 V             = @
 Q             = $(V:1=)
@@ -138,6 +142,7 @@ QUIET_CC      = $(Q:@=@echo    '  CC      '$@;)
 QUIET_GEN     = $(Q:@=@echo    '  GEN     '$@;)
 QUIET_LINK    = $(Q:@=@echo    '  LD      '$@;)
 QUIET_RM      = $(Q:@=@echo    '  RM      '$@;)
+QUIET_CHECK   = $(Q:@=@echo    '  CHECK   '$@;)
 QUIET_TEST    = $(Q:@=@echo    '  TEST    '$@;)
 
 BASIC_CFLAGS += -Wp,-MD,$(@D)/$(@F).d -MT $(@D)/$(@F)
