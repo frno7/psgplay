@@ -6,7 +6,7 @@
 #include <errno.h>
 #include <stdlib.h>
 
-#include "toslibc/tos/gemdos.h"
+#include <tos/gemdos.h>
 
 void *malloc(size_t size)
 {

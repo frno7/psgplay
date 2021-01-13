@@ -7,7 +7,7 @@
 #include <tos/error.h>
 #include <unistd.h>
 
-#include "toslibc/tos/gemdos.h"
+#include <tos/gemdos.h>
 
 ssize_t write(int fd, const void *buf, size_t count)
 {

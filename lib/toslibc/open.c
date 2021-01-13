@@ -7,7 +7,7 @@
 #include <fcntl.h>
 #include <tos/error.h>
 
-#include "toslibc/tos/gemdos.h"
+#include <tos/gemdos.h>
 
 int open(const char *pathname, int flags, ...)
 {

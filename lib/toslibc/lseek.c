@@ -7,7 +7,7 @@
 #include <tos/error.h>
 #include <unistd.h>
 
-#include "toslibc/tos/gemdos.h"
+#include <tos/gemdos.h>
 
 off_t lseek(int fd, off_t offset, int whence)
 {

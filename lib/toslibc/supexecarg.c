@@ -7,7 +7,7 @@
 #include <tos/error.h>
 #include <unistd.h>
 
-#include "toslibc/tos/xbios.h"
+#include <tos/xbios.h>
 
 static void (*__xbios_supexecarg_func)(void *arg);
 static void *__xbios_supexecarg_arg;

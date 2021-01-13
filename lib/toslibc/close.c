@@ -7,7 +7,7 @@
 #include <fcntl.h>
 #include <tos/error.h>
 
-#include "toslibc/tos/gemdos.h"
+#include <tos/gemdos.h>
 
 int close(int fd)
 {

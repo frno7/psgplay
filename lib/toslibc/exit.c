@@ -7,7 +7,7 @@
 
 #include "internal/macro.h"
 
-#include "toslibc/tos/gemdos.h"
+#include <tos/gemdos.h>
 
 static void (*__atexit_list[8])(void);
 static size_t __atexit_list_count;
