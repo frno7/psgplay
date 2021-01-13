@@ -2,11 +2,11 @@
 
 ifneq "x$(CROSS_COMPILE)" "x"
 
-TOSLIBC_CFLAGS +=  $(DEP_CFLAGS) -march=68000 -fno-PIC -nostdlib	\
+FUJILIBC_CFLAGS +=  $(DEP_CFLAGS) -march=68000 -fno-PIC -nostdlib	\
 	-ffunction-sections -fdata-sections -ffreestanding		\
 	-isystem include/fujilibc -D_FUJILIBC_SOURCE
 
-TOSLIBC_S_SRC +=							\
+FUJILIBC_S_SRC +=							\
 	lib/toslibc/crt0.S						\
 	lib/toslibc/bios.S						\
 	lib/toslibc/gemdos.S						\
@@ -14,7 +14,7 @@ TOSLIBC_S_SRC +=							\
 	lib/toslibc/xgemdos.S						\
 	lib/toslibc/__mulsi3.S
 
-TOSLIBC_C_SRC +=							\
+FUJILIBC_C_SRC +=							\
 	lib/toslibc/aes.c						\
 	lib/toslibc/close.c						\
 	lib/toslibc/ctype.c						\
@@ -65,15 +65,15 @@ TOSLIBC_C_SRC +=							\
 	lib/toslibc/__udivsi3.c						\
 	lib/toslibc/__umoddi3.c
 
-TOSLIBC_S_OBJ += $(patsubst %.S, %.o, $(TOSLIBC_S_SRC))
-TOSLIBC_C_OBJ += $(patsubst %.c, %.o, $(TOSLIBC_C_SRC))
+FUJILIBC_S_OBJ += $(patsubst %.S, %.o, $(FUJILIBC_S_SRC))
+FUJILIBC_C_OBJ += $(patsubst %.c, %.o, $(FUJILIBC_C_SRC))
 
-TOSLIBC_OBJ += $(TOSLIBC_S_OBJ) $(TOSLIBC_C_OBJ)
+FUJILIBC_OBJ += $(FUJILIBC_S_OBJ) $(FUJILIBC_C_OBJ)
 
-$(TOSLIBC_S_OBJ): %.o : %.S
-	$(QUIET_CC)$(CROSS_COMPILE)gcc $(TOSLIBC_CFLAGS) -c -o $@ $<
+$(FUJILIBC_S_OBJ): %.o : %.S
+	$(QUIET_CC)$(CROSS_COMPILE)gcc $(FUJILIBC_CFLAGS) -c -o $@ $<
 
-$(TOSLIBC_C_OBJ): %.o : %.c
-	$(QUIET_CC)$(CROSS_COMPILE)gcc $(TOSLIBC_CFLAGS) -c -o $@ $<
+$(FUJILIBC_C_OBJ): %.o : %.c
+	$(QUIET_CC)$(CROSS_COMPILE)gcc $(FUJILIBC_CFLAGS) -c -o $@ $<
 
 endif
