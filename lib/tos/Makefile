@@ -15,9 +15,9 @@ lib/tos/sndh.o: lib/tos/sndh.c
 	$(QUIET_CC)$(CROSS_COMPILE)gcc $(TOS_CFLAGS) -c -o $@ $<
 
 TOS_FUJILIBC_OBJ +=							\
-	lib/fujilibc/__mulsi3.o						\
-	lib/fujilibc/__udivmodsi4.o					\
-	lib/fujilibc/__udivsi3.o
+	lib/toslibc/__mulsi3.o						\
+	lib/toslibc/__udivmodsi4.o					\
+	lib/toslibc/__udivsi3.o
 
 lib/tos/tos: $(TOS_FUJILIBC_OBJ)
 lib/tos/tos: script/tos.ld script/tos
