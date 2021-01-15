@@ -8,7 +8,7 @@
 
 #include "internal/types.h"
 
-#include "fujilibc/tos/system-variable.h"
+#include "toslibc/tos/system-variable.h"
 
 const char *system_variable_label(u32 address);
 

@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 
 PRG_CFLAGS += $(DEP_CFLAGS) -march=68000 -fno-PIC -nostdlib		\
-	-ffunction-sections -fdata-sections -isystem include/fujilibc	\
+	-ffunction-sections -fdata-sections -isystem include/toslibc	\
 	-D_TOSLIBC_SOURCE
 
 PRG_LDFLAGS += --relocatable --gc-sections --strip-all --entry _start	\
