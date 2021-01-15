@@ -14,16 +14,16 @@ lib/tos/reset.o: lib/tos/reset.S
 lib/tos/sndh.o: lib/tos/sndh.c
 	$(QUIET_CC)$(CROSS_COMPILE)gcc $(TOS_CFLAGS) -c -o $@ $<
 
-TOS_FUJILIBC_OBJ +=							\
+TOS_TOSLIBC_OBJ +=							\
 	lib/toslibc/__mulsi3.o						\
 	lib/toslibc/__udivmodsi4.o					\
 	lib/toslibc/__udivsi3.o
 
-lib/tos/tos: $(TOS_FUJILIBC_OBJ)
+lib/tos/tos: $(TOS_TOSLIBC_OBJ)
 lib/tos/tos: script/tos.ld script/tos
 lib/tos/tos: lib/tos/reset.o lib/tos/sndh.o
 	$(QUIET_LINK)$(CROSS_COMPILE)ld $(TOS_LDFLAGS)			\
-		-o $@ lib/tos/reset.o lib/tos/sndh.o $(TOS_FUJILIBC_OBJ)
+		-o $@ lib/tos/reset.o lib/tos/sndh.o $(TOS_TOSLIBC_OBJ)
 	@chmod a-x $@
 
 else
