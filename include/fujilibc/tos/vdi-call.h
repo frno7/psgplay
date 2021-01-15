@@ -3,8 +3,8 @@
  * Copyright (C) 2021 Fredrik Noring
  */
 
-#ifndef _FUJILIBC_TOS_VDI_CALL_H
-#define _FUJILIBC_TOS_VDI_CALL_H
+#ifndef _TOSLIBC_TOS_VDI_CALL_H
+#define _TOSLIBC_TOS_VDI_CALL_H
 
 #define __VDI_CALL(call)						\
 	call( 11, 1, V_BAR)						\
@@ -13,4 +13,4 @@
 	call(101, 0, V_CLSVWK)						\
 	call(129, 0, VS_CLIP)
 
-#endif /* _FUJILIBC_TOS_VDI_CALL_H */
+#endif /* _TOSLIBC_TOS_VDI_CALL_H */

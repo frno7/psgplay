@@ -3,8 +3,8 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#ifndef _FUJILIBC_TOS_XBRA_H
-#define _FUJILIBC_TOS_XBRA_H
+#ifndef _TOSLIBC_TOS_XBRA_H
+#define _TOSLIBC_TOS_XBRA_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -211,4 +211,4 @@ __asm__ (								\
 
 void __xbra_exit(uint32_t vector, const char cookie[5]);
 
-#endif /* _FUJILIBC_TOS_XBRA_H */
+#endif /* _TOSLIBC_TOS_XBRA_H */

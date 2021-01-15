@@ -3,8 +3,8 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#ifndef _FUJILIBC_TOS_BIOS_H
-#define _FUJILIBC_TOS_BIOS_H
+#ifndef _TOSLIBC_TOS_BIOS_H
+#define _TOSLIBC_TOS_BIOS_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -17,4 +17,4 @@
 rtype_ bios_##name_(__VA_ARGS__);
 BIOS_CALL(BIOS_DECALARE)
 
-#endif /* _FUJILIBC_TOS_BIOS_H */
+#endif /* _TOSLIBC_TOS_BIOS_H */

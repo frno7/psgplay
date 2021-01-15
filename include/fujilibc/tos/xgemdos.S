@@ -3,8 +3,8 @@
  * Copyright (C) 2020 Fredrik Noring
  */
 
-#ifndef _FUJILIBC_TOS_XGEMDOS_S
-#define _FUJILIBC_TOS_XGEMDOS_S
+#ifndef _TOSLIBC_TOS_XGEMDOS_S
+#define _TOSLIBC_TOS_XGEMDOS_S
 
 #include <tos/stddef.S>
 
@@ -27,4 +27,4 @@ XGEMDOS_CALL(XGEMDOS_OPCODE_EQU)
 	.endm;
 XGEMDOS_CALL(XGEMDOS_MACRO)
 
-#endif /* _FUJILIBC_TOS_XGEMDOS_S */
+#endif /* _TOSLIBC_TOS_XGEMDOS_S */

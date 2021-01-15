@@ -3,8 +3,8 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#ifndef _FUJILIBC_TOS_GEMDOS_CALL_H
-#define _FUJILIBC_TOS_GEMDOS_CALL_H
+#ifndef _TOSLIBC_TOS_GEMDOS_CALL_H
+#define _TOSLIBC_TOS_GEMDOS_CALL_H
 
 #define GEMDOS_CALL(call)								\
 call(0x00, void __NORETURN, pterm0,)							\
@@ -60,4 +60,4 @@ call(0x4f, int32_t,         fsnext,)							\
 call(0x56, int16_t,         frename,  wll,  int16_t junk, const char *old, const char *new)\
 call(0x57, int32_t,         fdatime,  lww,  int16_t *timeptr, int16_t fh, int16_t wflag)
 
-#endif /* _FUJILIBC_TOS_GEMDOS_CALL_H */
+#endif /* _TOSLIBC_TOS_GEMDOS_CALL_H */

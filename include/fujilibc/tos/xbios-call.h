@@ -3,8 +3,8 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#ifndef _FUJILIBC_TOS_XBIOS_CALL_H
-#define _FUJILIBC_TOS_XBIOS_CALL_H
+#ifndef _TOSLIBC_TOS_XBIOS_CALL_H
+#define _TOSLIBC_TOS_XBIOS_CALL_H
 
 #define XBIOS_CALL(call)									\
 call(0x00, void,    initmouse,   wll,       int16_t type, void *param, void *mousevec)		\
@@ -48,4 +48,4 @@ call(0x25, void,    vsync,)									\
 call(0x26, void,    supexec,     l,         void (*func)(void))					\
 call(0x27, void,    puntaes,)
 
-#endif /* _FUJILIBC_TOS_XBIOS_CALL_H */
+#endif /* _TOSLIBC_TOS_XBIOS_CALL_H */

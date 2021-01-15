@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1
 
-#ifndef _FUJILIBC_UNISTD_H
-#define _FUJILIBC_UNISTD_H
+#ifndef _TOSLIBC_UNISTD_H
+#define _TOSLIBC_UNISTD_H
 
 #include <stddef.h>
 
@@ -19,4 +19,4 @@ ssize_t write(int fd, const void *buf, size_t count);
 
 int close(int fd);
 
-#endif /* _FUJILIBC_UNISTD_H */
+#endif /* _TOSLIBC_UNISTD_H */

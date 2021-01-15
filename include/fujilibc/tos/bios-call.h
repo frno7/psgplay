@@ -3,8 +3,8 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#ifndef _FUJILIBC_TOS_BIOS_CALL_H
-#define _FUJILIBC_TOS_BIOS_CALL_H
+#ifndef _TOSLIBC_TOS_BIOS_CALL_H
+#define _TOSLIBC_TOS_BIOS_CALL_H
 
 #define BIOS_CALL(call)							\
 call(0x0, void,    getmpb,   l,     struct _mpb *ptr)			\
@@ -20,4 +20,4 @@ call(0x9, int16_t, mediach,  w,     int16_t dev)			\
 call(0xa, int32_t, drvmap,)						\
 call(0xb, int32_t, kbshift,  w,     int16_t mode)
 
-#endif /* _FUJILIBC_TOS_BIOS_CALL_H */
+#endif /* _TOSLIBC_TOS_BIOS_CALL_H */

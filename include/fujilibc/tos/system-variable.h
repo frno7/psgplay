@@ -3,8 +3,8 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#ifndef _FUJILIBC_TOS_SYSTEM_VARIABLE_H
-#define _FUJILIBC_TOS_SYSTEM_VARIABLE_H
+#ifndef _TOSLIBC_TOS_SYSTEM_VARIABLE_H
+#define _TOSLIBC_TOS_SYSTEM_VARIABLE_H
 
 #include <stdint.h>
 
@@ -104,4 +104,4 @@ extern struct system_variables *__system_variables;
 
 #endif /* defined(__m68k__) */
 
-#endif /* _FUJILIBC_TOS_SYSTEM_VARIABLE_H */
+#endif /* _TOSLIBC_TOS_SYSTEM_VARIABLE_H */

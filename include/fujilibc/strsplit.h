@@ -3,8 +3,8 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#ifndef _FUJILIBC_STRSPLIT_H
-#define _FUJILIBC_STRSPLIT_H
+#ifndef TOSLIBC_STRSPLIT_H
+#define TOSLIBC_STRSPLIT_H
 
 #if defined(_TOSLIBC_SOURCE)
 
@@ -52,4 +52,4 @@ struct string_split _next_string_split(struct string_split split, const char *e,
 
 #endif /* defined(_TOSLIBC_SOURCE) */
 
-#endif /* _FUJILIBC_STRSPLIT_H */
+#endif /* TOSLIBC_STRSPLIT_H */

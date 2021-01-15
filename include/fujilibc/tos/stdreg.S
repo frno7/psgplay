@@ -3,8 +3,8 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#ifndef _FUJILIBC_TOS_STDREG_S
-#define _FUJILIBC_TOS_STDREG_S
+#ifndef _TOSLIBC_TOS_STDREG_S
+#define _TOSLIBC_TOS_STDREG_S
 
 #if defined(_TOSLIBC_SOURCE)
 
@@ -31,4 +31,4 @@
 
 #endif /* defined(_TOSLIBC_SOURCE) */
 
-#endif /* _FUJILIBC_TOS_STDREG_S */
+#endif /* _TOSLIBC_TOS_STDREG_S */

@@ -3,8 +3,8 @@
  * Copyright (C) 2021 Fredrik Noring
  */
 
-#ifndef _FUJILIBC_TOS_VDI_H
-#define _FUJILIBC_TOS_VDI_H
+#ifndef _TOSLIBC_TOS_VDI_H
+#define _TOSLIBC_TOS_VDI_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -212,4 +212,4 @@ void vdi_vs_clip_off(int16_t vdi_id);
 
 int16_t vdi_vsf_color(int16_t vdi_id, int16_t color);
 
-#endif /* _FUJILIBC_TOS_VDI_H */
+#endif /* _TOSLIBC_TOS_VDI_H */
