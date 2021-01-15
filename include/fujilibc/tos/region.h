@@ -3,7 +3,7 @@
 #ifndef _FUJILIBC_TOS_REGION_H
 #define _FUJILIBC_TOS_REGION_H
 
-#if defined(_FUJILIBC_SOURCE)
+#if defined(_TOSLIBC_SOURCE)
 
 #define TOS_COUNTRY_US  0	/* USA */
 #define TOS_COUNTRY_DE  1	/* Germany */
@@ -28,6 +28,6 @@
 #define TOS_NTSC 0
 #define TOS_PAL  1
 
-#endif /* defined(_FUJILIBC_SOURCE) */
+#endif /* defined(_TOSLIBC_SOURCE) */
 
 #endif /* _FUJILIBC_TOS_REGION_H */

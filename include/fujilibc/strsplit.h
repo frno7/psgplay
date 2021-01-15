@@ -6,7 +6,7 @@
 #ifndef _FUJILIBC_STRSPLIT_H
 #define _FUJILIBC_STRSPLIT_H
 
-#if defined(_FUJILIBC_SOURCE)
+#if defined(_TOSLIBC_SOURCE)
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -50,6 +50,6 @@ struct string_split _first_string_split(const char *s, const char *e,
 struct string_split _next_string_split(struct string_split split, const char *e,
 	size_t (*sep)(const char *s, const char *e, void *arg), void *arg);
 
-#endif /* defined(_FUJILIBC_SOURCE) */
+#endif /* defined(_TOSLIBC_SOURCE) */
 
 #endif /* _FUJILIBC_STRSPLIT_H */

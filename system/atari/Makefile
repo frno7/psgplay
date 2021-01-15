@@ -2,7 +2,7 @@
 
 PRG_CFLAGS += $(DEP_CFLAGS) -march=68000 -fno-PIC -nostdlib		\
 	-ffunction-sections -fdata-sections -isystem include/fujilibc	\
-	-D_FUJILIBC_SOURCE
+	-D_TOSLIBC_SOURCE
 
 PRG_LDFLAGS += --relocatable --gc-sections --strip-all --entry _start	\
 	--script=script/prg.ld

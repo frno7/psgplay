@@ -62,9 +62,9 @@
 
 #define __mode(x) __attribute__((__mode__(x)))
 
-#ifdef _FUJILIBC_SOURCE
+#ifdef _TOSLIBC_SOURCE
 #define __ARRAY_SIZE	ARRAY_SIZE
 #define __CONCATENATE	CONCATENATE
-#endif /* _FUJILIBC_SOURCE */
+#endif /* _TOSLIBC_SOURCE */
 
 #endif /* INTERNAL_MACRO_H */
