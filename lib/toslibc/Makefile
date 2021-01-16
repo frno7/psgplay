@@ -32,6 +32,7 @@ TOSLIBC_C_SRC +=							\
 	lib/toslibc/putchar.c						\
 	lib/toslibc/puts.c						\
 	lib/toslibc/read.c						\
+	lib/toslibc/realloc.c						\
 	lib/toslibc/snprintf.c						\
 	lib/toslibc/start.c						\
 	lib/toslibc/strcmp.c						\
