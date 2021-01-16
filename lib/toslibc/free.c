@@ -8,8 +8,14 @@
 
 #include <tos/gemdos.h>
 
+#include "internal/malloc.h"
+
 void free(void *ptr)
 {
-	if (ptr)
-		gemdos_mfree(ptr);
+	if (!ptr)
+		return;
+
+	struct __malloc *m = ptr;
+
+	gemdos_mfree(&m[-1]);
 }

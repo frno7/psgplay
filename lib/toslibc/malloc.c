@@ -8,15 +8,19 @@
 
 #include <tos/gemdos.h>
 
+#include "internal/malloc.h"
+
 void *malloc(size_t size)
 {
 	if (!size)
 		return NULL;
 
-	void *ptr = gemdos_malloc(size);
+	struct __malloc *m = gemdos_malloc(sizeof(struct __malloc) + size);
 
-	if (!ptr)
+	if (!m)
 		errno = -ENOMEM;
 
-	return ptr;
+	m->size = size;
+
+	return &m[1];
 }
