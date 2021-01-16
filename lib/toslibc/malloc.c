@@ -10,9 +10,12 @@
 
 void *malloc(size_t size)
 {
+	if (!size)
+		return NULL;
+
 	void *ptr = gemdos_malloc(size);
 
-	if (!ptr && size)
+	if (!ptr)
 		errno = -ENOMEM;
 
 	return ptr;
