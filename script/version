@@ -3,13 +3,16 @@
 set -e
 set -o pipefail
 
-if [ -d .git ]
+if [ -f version ]
+then
+	ver="$(cat version)"
+elif [ -d .git ]
 then
 	mod=$([ -z "$(git status -suno)" ] || echo "+")
 	tag="$(git describe --always --tags)"
 	ver="$(echo "$tag" | sed 's/^v//')$mod"
 else
-	ver="$(cat version)"
+	ver=""
 fi
 
 if [ $# = 0 ]
