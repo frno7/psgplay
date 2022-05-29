@@ -4,7 +4,7 @@ TOS_CFLAGS += $(DEP_CFLAGS) -march=68000 -fno-PIC -nostdlib		\
 	-isystem include/toslibc -D_TOSLIBC_SOURCE
 
 TOS_LDFLAGS += --orphan-handling=error --discard-all -nostdlib		\
-	--no-relax -no-PIE --script=script/tos.ld
+	--no-relax -no-pie --script=script/tos.ld
 
 ifneq "x$(CROSS_COMPILE)" "x"
 
