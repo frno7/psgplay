@@ -21,6 +21,8 @@ struct timer_prescale {
 	u8 count;
 };
 
+struct system_variables *__system_variables = (struct system_variables *)0x400;
+
 struct sndh_file file;
 
 static struct {
@@ -145,6 +147,8 @@ void start(size_t size, void *sndh, u32 track, u32 timer)
 	BUILD_BUG_ON(sizeof(struct system_variables) != 0x102);
 
 	file = (struct sndh_file) { .size = size, .sndh = sndh };
+
+	__system_variables->_membot = (u32)sndh + size + 1024;
 
 	if (install_sndh_timer(u32_to_sndh_timer(timer)))
 		sndh_init(track, &file);
