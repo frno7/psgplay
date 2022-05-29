@@ -46,6 +46,10 @@ _rom:	bra.s	.reset
 	cmp.l	#0x13c,a1
 	bne.s	.loop
 
+	/* Install GEMDOS and XBIOS vectors */
+	move.l	#.gemdos,0x84
+	move.l	#.xbios,0xb8
+
 	/* Install VBL and timer A, B, C and D vectors */
 	move.l	#.vbl,0x70
 	move.l	#.timer_a,0x134
@@ -65,6 +69,18 @@ _rom:	bra.s	.reset
 
 .ignore:
 	rte
+
+.macro	trap	name
+.\name:
+	move.l	sp,-(sp)
+	addq.l	#6,(sp)		/* skip SR and PC saved by the trap */
+	jsr	\name\()_trap
+	addq.l	#4,sp
+	rte
+.endm
+
+	trap gemdos
+	trap xbios
 
 .macro	exception	name
 .\name:	movem.l	d0-a6,-(sp)

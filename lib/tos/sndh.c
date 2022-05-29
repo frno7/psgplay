@@ -30,6 +30,30 @@ static struct {
 	struct timer_prescale prescale;
 } timer_state;
 
+static u32 gemdos_malloc(const u32 amount)
+{
+	const u32 address = (__system_variables->_membot & ~(u32)0xf) + 0x10;
+
+	__system_variables->_membot = address + amount;
+
+	return address;
+}
+
+u32 gemdos_trap(u8 *sp)
+{
+	switch (*(u16*)sp) {
+		case 72:
+			return gemdos_malloc(*(u32*)&sp[2]);
+	}
+
+	return 0;
+}
+
+u32 xbios_trap()
+{
+	return 0;
+}
+
 static bool timer_prescale(struct timer_prescale *prescale, int frequency)
 {
 	static const u8 prescale_div[] = {
