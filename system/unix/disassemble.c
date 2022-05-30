@@ -574,13 +574,13 @@ static void dasm_mark_text_trace(struct disassembly *dasm,
 		case m68k_insn_ins:
 			continue;
 		case m68k_insn_jmp:
-			if (target.branch == -1)
+			if (target.branch == -1 || target.branch % 2 != 0)
 				return;
 			i = target.branch;
 			continue;
 		case m68k_insn_jcc:
 		case m68k_insn_jsr:
-			if (target.branch != -1)
+			if (target.branch != -1 && target.branch % 2 == 0)
 				dasm_mark_text_trace(dasm,
 					target.branch, sndh_insn_type);
 			continue;
