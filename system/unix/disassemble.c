@@ -808,7 +808,8 @@ static void cpu_instruction_trace(uint32_t pc, void *arg)
 	const struct m68kda_spec *spec0 = m68kda_insn_find(insn);
 
 	if (!spec0) {
-		print_address(&trace->sb, pc, &insn, sizeof(insn));
+		print_address(&trace->sb, pc,
+			(const void *)&insn, sizeof(insn));
 		printf("%s\n", trace->sb.s);
 		return;
 	}
