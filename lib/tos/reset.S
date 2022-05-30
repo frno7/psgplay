@@ -37,7 +37,9 @@ _rom:	bra.s	.reset
 	.dc.l	0		/* FIXME */
 
 .reset:	move	#0x2700,sr	/* Disable interrupts */
-	lea	_stack_top,sp	/* Set a valid stack pointer */
+	lea	_usp_top,sp
+	move	sp,%usp		/* Set a valid user stack pointer */
+	lea	_ssp_top,sp	/* Set a valid supervisor stack pointer */
 	move.b	#0x40,0xfffa17	/* Set MFP exception vector base, SEI=0 */
 
 	/* Ignore all exceptions by default */

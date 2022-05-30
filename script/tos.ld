@@ -6,7 +6,7 @@ ENTRY(_rom)
 
 MEMORY
 {
-	sys(rwx) : ORIGIN = 0, LENGTH = 0x4000	/* 16 KiB */
+	sys(rwx) : ORIGIN = 0, LENGTH = 0x40000	/* 256 KiB */
 	rom(rx)	 : ORIGIN = 0xe00000, LENGTH = 1M
 }
 
@@ -21,9 +21,13 @@ SECTIONS
 	} >sys
 
 	.stack : ALIGN(4) {
-		_stack_bottom = .;
-		. += 2K;
-		_stack_top = .;
+		_usp_bottom = .;
+		. += 96K;
+		_usp_top = .;
+		_ssp_bottom = .;
+		. += 96K;
+		_ssp_top = .;
+		. += 4K;
 	} >sys
 
 	.bss : ALIGN(4) {
