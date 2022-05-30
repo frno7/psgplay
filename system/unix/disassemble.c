@@ -780,6 +780,17 @@ TRACE_REGS(TRACE_REG)
 	printf("\n");
 }
 
+static void check_stack_bounds(struct trace *trace)
+{
+	const u32 usp = m68k_get_reg(NULL, M68K_REG_USP);
+	const u32 isp = m68k_get_reg(NULL, M68K_REG_ISP);
+
+	if ((0 < usp && usp < 2048) ||
+	    (0 < isp && isp < 2048) || isp < usp)
+		fprintf(stderr, "%s: stack bounds error usp %" PRIu32 " isp %" PRIu32 "\n",
+			trace->options->input, usp, isp);
+}
+
 static void cpu_instruction_trace(uint32_t pc, void *arg)
 {
 	struct trace *trace = arg;
@@ -821,6 +832,8 @@ static void cpu_instruction_trace(uint32_t pc, void *arg)
 	printf("%s\n", trace->sb.s);
 
 trace_reg:
+	check_stack_bounds(trace);
+
 	if (TRACE_ENABLE(&trace->options->trace, REG))
 		trace_reg();
 }
