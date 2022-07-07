@@ -337,6 +337,10 @@ int main(int argc, char *argv[])
 
 	file_free(spec);
 
-	return sb.length && file_write(out_filepath, sb.s, sb.length) ?
-		EXIT_SUCCESS : EXIT_FAILURE;
+	const bool valid =
+		sb.length && file_write(out_filepath, sb.s, sb.length);
+
+	sbfree(&sb);
+
+	return valid ?  EXIT_SUCCESS : EXIT_FAILURE;
 }
