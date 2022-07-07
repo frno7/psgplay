@@ -361,6 +361,28 @@ static void mfp_wr_u8(const struct device *device,
 	if ((dev_address & 1) == 0 || ARRAY_SIZE(mfp.reg) <= reg)
 		return;
 
+	switch (reg) {
+		/*
+		 * IPRA and IPRB are readable; thus by polling IPRA and
+		 * IPRB, it can be determined whether a channel has a
+		 * pending interrupt. IPRA and IPRB are also writable
+		 * and a pending interrupt can be cleared without
+		 * going through the acknowledge sequence by writing a
+		 * zero to the appropriate bit. This allows any one bit
+		 * to be cleared without altering any other bits, simply
+		 * by writing all ones except for the bit position to be
+		 * cleared to IPRA and IPRB. Thus a fully polled
+		 * interrupt scheme is possible.
+		 *
+		 * Note: writing a one to IPRA, IPRB has no effect on
+		 * the interrupt pending register.
+		 */
+	case MFP_REG_IPRA:
+	case MFP_REG_IPRB:
+		data &= mfp.reg[reg];
+		break;
+	}
+
 	mfp.reg[reg] = data;
 	mfp_hardwire();
 
