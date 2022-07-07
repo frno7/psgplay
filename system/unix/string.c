@@ -82,6 +82,13 @@ char *strrep(const char *s, const char *from, const char *to)
 	return t;
 }
 
+void sbfree(struct strbuf *sb)
+{
+	free(sb->s);
+
+	*sb = (struct strbuf) { };
+}
+
 bool sbprintf(struct strbuf *sb, const char *fmt, ...)
 {
 	va_list ap;

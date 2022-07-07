@@ -36,6 +36,8 @@ struct strbuf {
 	char *s;
 };
 
+void sbfree(struct strbuf *sb);
+
 /**
  * sbprintf - formatted output conversion to a string buffer
  * @sb: string buffer, can be initialised to zero
