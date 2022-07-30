@@ -72,3 +72,5 @@ $(M68KDT): $(M68KDT_OBJ) $(M68KDT_LINK_OBJ) lib/m68k/m68kda.o
 	$(QUIET_LINK)$(CC) $(ALL_CFLAGS) -o $@ $^
 
 endif
+
+emscripten: $(M68KDT) $(M68KMAKE)

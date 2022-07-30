@@ -5,8 +5,8 @@ TOS_CFLAGS += $(DEP_CFLAGS) -march=68000 -fno-PIC -nostdlib		\
 
 TOS_LDFLAGS += --orphan-handling=error --discard-all -nostdlib		\
 	--no-relax -no-pie --script=script/tos.ld
-
 ifneq "x$(CROSS_COMPILE)" "x"
+ifeq "x$(EMSCRIPTEN)" "x"
 
 lib/tos/reset.o: lib/tos/reset.S
 	$(QUIET_AS)$(CROSS_COMPILE)gcc $(TOS_CFLAGS) -c -o $@ $<
@@ -25,7 +25,7 @@ lib/tos/tos: lib/tos/reset.o lib/tos/sndh.o
 	$(QUIET_LINK)$(CROSS_COMPILE)ld $(TOS_LDFLAGS)			\
 		-o $@ lib/tos/reset.o lib/tos/sndh.o $(TOS_TOSLIBC_OBJ)
 	@chmod a-x $@
-
+endif
 else
 
 # Use precompiled TOS when CROSS_COMPILE is undefined.
