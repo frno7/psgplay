@@ -29,21 +29,29 @@ lib/m68k/m68kda.c: $(M68KDG_GEN_H)
 $(M68KDG_GEN_H): $(M68KDG) $(M68KDA_SPEC)
 	$(QUIET_GEN)$(M68KDG) -o $@ $(M68KDA_SPEC)
 
-M68KDG_LINK_OBJS :=							\
-	system/unix/file.o						\
-	system/unix/memory.o						\
-	system/unix/print.o						\
-	system/unix/string.o						\
-	lib/internal/bit.o						\
-	lib/internal/fifo.o						\
-	lib/internal/print.o						\
-	lib/internal/string.o
+M68KDG_LINK_SRC :=							\
+	system/unix/file.c						\
+	system/unix/memory.c						\
+	system/unix/print.c						\
+	system/unix/string.c						\
+	lib/internal/bit.c						\
+	lib/internal/fifo.c						\
+	lib/internal/print.c						\
+	lib/internal/string.c
+
+define M68KDG_LINK_target
+M68KDG_LINK_OBJ += lib/m68k/$(basename $(subst /,-,$(1))).o
+lib/m68k/$(basename $(subst /,-,$(1))).o: $(1)
+	$$(QUIET_CC)$$(BUILD_CC) $$(ALL_CFLAGS) -c -o $$@ $$<
+endef
+
+$(foreach f,$(M68KDG_LINK_SRC),$(eval $(call M68KDG_LINK_target,$(f))))
 
 $(M68KDG).o: $(M68KDG).c
-	$(QUIET_CC)$(HOST_CC) $(ALL_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(BUILD_CC) $(ALL_CFLAGS) -c -o $@ $<
 
-$(M68KDG): $(M68KDG).o $(M68KDG_LINK_OBJS)
-	$(QUIET_LINK)$(HOST_CC) $(ALL_CFLAGS) -o $@ $(M68KDG).o $(M68KDG_LINK_OBJS)
+$(M68KDG): $(M68KDG).o $(M68KDG_LINK_OBJ)
+	$(QUIET_LINK)$(BUILD_CC) $(ALL_CFLAGS) -o $@ $(M68KDG).o $(M68KDG_LINK_OBJ)
 
 ifeq "$(HAVE_SSO)" "1"
 
