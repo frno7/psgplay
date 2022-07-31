@@ -15,6 +15,11 @@ For Linux and Mac OS, do `make psgplay` to compile `psgplay`. To use
 
 For Atari ST, do `make TARGET_CC=m68k-elf-gcc TARGET_LD=m68k-elf-ld PSGPLAY.TOS`.
 
+The `BUILD_CC`, `HOST_AR`, `HOST_CC`, and `TARGET_CC` with `TARGET_LD`
+Makefile variables can be configured for various cross-compilation settings.
+The `BUILD_CFLAGS`, `HOST_CFLAGS`, `TARGET_CFLAGS`, and `TARGET_LDFLAGS` are
+available as well.
+
 Do `make help` to list further targets and options.
 
 The package

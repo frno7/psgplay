@@ -75,9 +75,9 @@ lib/toslibc/memcpy.o							\
 lib/toslibc/memset.o: TOSLIBC_CFLAGS += -fno-tree-loop-distribute-patterns
 
 $(TOSLIBC_S_OBJ): %.o : %.S
-	$(QUIET_CC)$(TARGET_CC) $(TOSLIBC_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(TARGET_CC) $(TOSLIBC_CFLAGS) $(TARGET_CFLAGS) -c -o $@ $<
 
 $(TOSLIBC_C_OBJ): %.o : %.c
-	$(QUIET_CC)$(TARGET_CC) $(TOSLIBC_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(TARGET_CC) $(TOSLIBC_CFLAGS) $(TARGET_CFLAGS) -c -o $@ $<
 
 endif

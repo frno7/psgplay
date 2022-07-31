@@ -3,9 +3,9 @@
 M68KMAKE := lib/m68k/m68kmake
 
 $(M68KMAKE).o: $(M68KMAKE).c
-	$(QUIET_CC)$(BUILD_CC) $(ALL_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(BUILD_CC) $(MOST_CFLAGS) $(BUILD_CFLAGS) -c -o $@ $<
 $(M68KMAKE): $(M68KMAKE).o
-	$(QUIET_LINK)$(BUILD_CC) $(ALL_CFLAGS) -o $@ $^
+	$(QUIET_LINK)$(BUILD_CC) $(MOST_CFLAGS) $(BUILD_CFLAGS) -o $@ $^
 
 M68K_GEN_H := include/m68k/m68kops.h
 M68K_GEN_C := lib/m68k/m68kops.c
@@ -42,16 +42,16 @@ M68KDG_LINK_SRC :=							\
 define M68KDG_LINK_target
 M68KDG_LINK_OBJ += lib/m68k/$(basename $(subst /,-,$(1))).o
 lib/m68k/$(basename $(subst /,-,$(1))).o: $(1)
-	$$(QUIET_CC)$$(BUILD_CC) $$(ALL_CFLAGS) -c -o $$@ $$<
+	$$(QUIET_CC)$$(BUILD_CC) $$(MOST_CFLAGS) $(BUILD_CFLAGS) -c -o $$@ $$<
 endef
 
 $(foreach f,$(M68KDG_LINK_SRC),$(eval $(call M68KDG_LINK_target,$(f))))
 
 $(M68KDG).o: $(M68KDG).c
-	$(QUIET_CC)$(BUILD_CC) $(ALL_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(BUILD_CC) $(MOST_CFLAGS) $(BUILD_CFLAGS) -c -o $@ $<
 
 $(M68KDG): $(M68KDG).o $(M68KDG_LINK_OBJ)
-	$(QUIET_LINK)$(BUILD_CC) $(ALL_CFLAGS) -o $@ $(M68KDG).o $(M68KDG_LINK_OBJ)
+	$(QUIET_LINK)$(BUILD_CC) $(MOST_CFLAGS) $(BUILD_CFLAGS) -o $@ $(M68KDG).o $(M68KDG_LINK_OBJ)
 
 ifeq "$(HAVE_SSO)" "1"
 
@@ -77,6 +77,6 @@ M68KDT_LINK_OBJ :=							\
 
 M68KDT := lib/m68k/m68kdt
 $(M68KDT): $(M68KDT_OBJ) $(M68KDT_LINK_OBJ) lib/m68k/m68kda.o
-	$(QUIET_LINK)$(HOST_CC) $(ALL_CFLAGS) -o $@ $^
+	$(QUIET_LINK)$(HOST_CC) $(MOST_CFLAGS) $(HOST_CFLAGS) -o $@ $^
 
 endif

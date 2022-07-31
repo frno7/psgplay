@@ -20,14 +20,17 @@ HOST_CC = $(CC)
 # TARGET_CC = m68k-elf-gcc
 # TARGET_LD = m68k-elf-ld
 
+CFLAGS = -g -O2
+BUILD_CFLAGS = $(CFLAGS)
+HOST_CFLAGS = $(CFLAGS)
+TARGET_CFLAGS = $(CFLAGS)
+
 INSTALL = install
 
 VERSION_MINOR = $(shell script/version | sed 's/-.*$$//')
 VERSION_MAJOR = $(shell script/version | sed 's/\..*$$//')
 
 export VERSION_MINOR VERSION_MAJOR
-
-CFLAGS += -g -O2 -Wall -fPIC -Iinclude -D_GNU_SOURCE
 
 LIBS += -lm
 
@@ -43,8 +46,9 @@ HAVE_CFLAGS += -DHAVE_ALSA
 LIBS += -lasound
 endif
 
-DEP_CFLAGS += $(CFLAGS) $(BASIC_CFLAGS)
-ALL_CFLAGS += $(DEP_CFLAGS) $(HAVE_CFLAGS) $(S_CFLAGS)
+COMMON_CFLAGS = -Wall -fPIC -Iinclude -D_GNU_SOURCE
+DEP_CFLAGS = $(COMMON_CFLAGS) $(BASIC_CFLAGS)
+MOST_CFLAGS = $(HAVE_CFLAGS) $(S_CFLAGS) $(DEP_CFLAGS)
 
 PSGPLAY := psgplay
 
@@ -88,24 +92,24 @@ $(LIBPSGPLAY_STATIC): $(LIBPSGPLAY_OBJ)
 	$(QUIET_AR)$(HOST_AR) rcs $@ $^
 
 $(LIBPSGPLAY_SHARED): $(LIBPSGPLAY_OBJ)
-	$(QUIET_CC)$(HOST_CC) $(SOFLAGS) -o $@ $^
+	$(QUIET_CC)$(HOST_CC) $(SOFLAGS) $(HOST_CFLAGS) -o $@ $^
 
 $(PSGPLAY): $(PSGPLAY_OBJ) $(LIBPSGPLAY_STATIC)
-	$(QUIET_LINK)$(HOST_CC) $(ALL_CFLAGS) -o $@ $^ $(LIBS)
+	$(QUIET_LINK)$(HOST_CC) $(MOST_CFLAGS) $(HOST_CFLAGS) -o $@ $^ $(LIBS)
 
 $(EXAMPLE_INFO): $(EXAMPLE_INFO_OBJ) $(INTERNAL_OBJ)			\
 	$(EXAMPLE_LINK_OBJ) $(LIBPSGPLAY_SHARED)
-	$(QUIET_LINK)$(HOST_CC) $(ALL_CFLAGS) -o $@ $^
+	$(QUIET_LINK)$(HOST_CC) $(MOST_CFLAGS) $(HOST_CFLAGS) -o $@ $^
 
 $(EXAMPLE_PLAY): $(EXAMPLE_PLAY_OBJ) $(INTERNAL_OBJ)			\
 	$(EXAMPLE_LINK_OBJ) $(LIBPSGPLAY_SHARED)
-	$(QUIET_LINK)$(HOST_CC) $(ALL_CFLAGS) -o $@ $^
+	$(QUIET_LINK)$(HOST_CC) $(MOST_CFLAGS) $(HOST_CFLAGS) -o $@ $^
 
 $(LIBPSGPLAY_HIDDEN_OBJ): %.o : %.c
-	$(QUIET_CC)$(HOST_CC) $(ALL_CFLAGS) -fvisibility=hidden -c -o $@ $<
+	$(QUIET_CC)$(HOST_CC) $(MOST_CFLAGS) -fvisibility=hidden $(HOST_CFLAGS) -c -o $@ $<
 
 $(LIBPSGPLAY_PUBLIC_OBJ) $(PSGPLAY_OBJ) $(EXAMPLE_OBJ): %.o : %.c
-	$(QUIET_CC)$(HOST_CC) $(ALL_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(HOST_CC) $(MOST_CFLAGS) $(HOST_CFLAGS) -c -o $@ $<
 
 $(LIBPSGPLAY_PC):
 	$(QUIET_GEN)script/pkg $@
@@ -185,14 +189,28 @@ help:
 	@echo "  V              - set to 1 to compile verbosely"
 	@echo "  S              - set to 1 for sanitation checks"
 	@echo "  ALSA           - set to 1 to support ALSA for Linux"
+	@echo
 	@echo "  BUILD_CC       - set a C compiler to use for the build system"
 	@echo "  HOST_AR        - set an archiver to use for the host system"
 	@echo "  HOST_CC        - set a C compiler to use for the host system"
 	@echo "  TARGET_CC      - set a m68k C compiler to use for Atari ST code"
 	@echo "  TARGET_LD      - set a m68k linker to use for Atari ST code"
 	@echo
-	@echo "Example:"
-	@echo "  make ALSA=1 TARGET_CC=m68k-elf-gcc TARGET_LD=m68k-elf-ld"
+	@echo "  BUILD_CFLAGS   - set C flags for the build system"
+	@echo "  HOST_CFLAGS    - set C flags for the host system"
+	@echo "  TARGET_CFLAGS  - set C flags for Atari ST code"
+	@echo "  TARGET_LDFLAGS - set linker flags for Atari ST code"
+	@echo
+	@echo "Examples:"
+	@echo
+	@echo "Build an Atari ST program:"
+	@echo "  make TARGET_CC=m68k-elf-gcc TARGET_LD=m68k-elf-ld PSGPLAY.TOS"
+	@echo
+	@echo "Build a statically linked program:"
+	@echo '  make HOST_CFLAGS="-O2 -static" psgplay'
+	@echo
+	@echo "Build a cross-compiled program:"
+	@echo "  make HOST_CC=mipsr5900el-unknown-linux-gnu-gcc psgplay"
 	@echo
 	@echo "Note that m68k-linux-* compilers emit 68020 and will not work."
 
