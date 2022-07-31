@@ -20,7 +20,7 @@ CFLAGS += -g -O2 -Wall -fPIC -Iinclude -D_GNU_SOURCE
 
 LIBS += -lm
 
-SOFLAGS += -shared
+SOFLAGS = -shared -Wl,-soname,libpsgplay.so.$(VERSION_MAJOR)
 
 ifeq "$(S)" "1"
 S_CFLAGS += -fsanitize=address -fsanitize=leak -fsanitize=undefined	\
