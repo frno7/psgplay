@@ -114,7 +114,7 @@ static void test_insn_find(void)
 		M68KDG_INSTRUCTIONS(M68KDG_INSTRUCTION_SPEC)
 	};
 
-	ASSERT(ARRAY_SIZE(opcodes) == 1522);
+	ASSERT(ARRAY_SIZE(opcodes) == 1533);
 
 	for (uint32_t m = 0x0000; m < 0x10000; m++) {
 		const struct m68kda_spec *spec0 = NULL;
