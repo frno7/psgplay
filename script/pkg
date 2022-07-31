@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -e
+set -o pipefail
+
+gen_pkg()
+{
+	echo "prefix=$prefix
+libdir=$libdir
+includedir=$includedir
+
+Name: psgplay
+Description: PSG play is a music player for Atari ST YM2149 SNDH files
+Version: ${VERSION_MINOR}"'
+
+Libs: -L${libdir} -lpsgplay
+Cflags: -I${includedir}'
+}
+
+if [ $# = 1 ]
+then
+	gen_pkg >"$1"
+else
+	gen_pkg
+fi
