@@ -9,9 +9,9 @@ and files in the [SNDH archive](http://sndh.atari.org/).
 
 # How to build
 
-For Linux and Mac OS, do `make` to compile `psgplay`. To use
+For Linux and Mac OS, do `make psgplay` to compile `psgplay`. To use
 [Advanced Linux Sound Architecture](https://en.wikipedia.org/wiki/Advanced_Linux_Sound_Architecture)
-(ALSA) and _interactive text mode_, do `make ALSA=1`.
+(ALSA) and _interactive text mode_, do `make ALSA=1 psgplay`.
 
 For Atari ST, do `make CROSS_COMPILE=m68k-elf- PSGPLAY.TOS`.
 
