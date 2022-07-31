@@ -188,6 +188,7 @@ help:
 	@echo "  install        - install PSG play"
 	@echo "  test           - test components of PSG play"
 	@echo "  PSGPLAY.TOS    - compile PSG play for the Atari ST"
+	@echo "  web            - compile for Javascript and Webassembly"
 	@echo "  gtags          - make tags for the GNU Global source code tagging system"
 	@echo "  version        - display PSG play version"
 	@echo "  clean          - remove generated files"
@@ -216,7 +217,10 @@ help:
 	@echo "Build a statically linked program:"
 	@echo '  make HOST_CFLAGS="-O2 -static" psgplay'
 	@echo
-	@echo "Build a cross-compiled program:"
+	@echo "Build Javascript and Webassembly libraries using the Emscripten compiler:"
+	@echo '  make HOST_CC=emcc web'
+	@echo
+	@echo "Build a cross-compiled program for the MIPS/R5900 architecture:"
 	@echo "  make HOST_CC=mipsr5900el-unknown-linux-gnu-gcc psgplay"
 	@echo
 	@echo "Note that m68k-linux-* compilers emit 68020 and will not work."

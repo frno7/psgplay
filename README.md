@@ -15,6 +15,11 @@ For Linux and Mac OS, do `make psgplay` to compile `psgplay`. To use
 
 For Atari ST, do `make TARGET_CC=m68k-elf-gcc TARGET_LD=m68k-elf-ld PSGPLAY.TOS`.
 
+For [Javascript](https://en.wikipedia.org/wiki/JavaScript),
+[Webassembly](https://en.wikipedia.org/wiki/WebAssembly), and the
+[Emscripten](https://en.wikipedia.org/wiki/Emscripten) compiler, do
+`make HOST_CC=emcc web`.
+
 The `BUILD_CC`, `HOST_AR`, `HOST_CC`, and `TARGET_CC` with `TARGET_LD`
 Makefile variables can be configured for various cross-compilation settings.
 The `BUILD_CFLAGS`, `HOST_CFLAGS`, `TARGET_CFLAGS`, and `TARGET_LDFLAGS` are
