@@ -12,59 +12,38 @@ PRG_VLINKFLAGS += -b ataritos -tos-fastload -e _start
 PSGPLAY_TOS := PSGPLAY.TOS
 PSGPLAY_PRG_OBJ := system/atari/PSGPLAY.PRG.o
 
-SYSTEM_ATARI_SRC := $(wildcard system/atari/*.c)
-SYSTEM_ATARI_OBJ := $(patsubst %.c, %.o, $(SYSTEM_ATARI_SRC))
+SYSTEM_ATARI_SRC :=							\
+	lib/internal/fifo.c						\
+	lib/internal/string.c						\
+	lib/ice/ice.c							\
+	lib/psgplay/sndh.c						\
+	lib/text/load.c							\
+	lib/text/main.c							\
+	lib/text/mode.c							\
+	lib/vt/vt52.c							\
+	lib/vt/vt.c							\
+	system/atari/clock.c						\
+	system/atari/file.c						\
+	system/atari/ice_decrunch_inplace.c				\
+	system/atari/ice_decrunch_inplace_.S				\
+	system/atari/model.c						\
+	system/atari/option.c						\
+	system/atari/print.c						\
+	system/atari/psg.c						\
+	system/atari/psgplay.c						\
+	system/atari/timer.c
 
-$(SYSTEM_ATARI_OBJ): %.o : %.c
-	$(QUIET_CC)$(TARGET_CC) $(PRG_CFLAGS) $(TARGET_CFLAGS) -c -o $@ $<
+define SYSTEM_ATARI_target
+SYSTEM_ATARI_OBJ += system/atari/$(notdir $(basename $(1))).o
+system/atari/$(notdir $(basename $(1))).o: $(1)
+	$$(QUIET_CC)$$(TARGET_CC) $$(PRG_CFLAGS) $$(TARGET_CFLAGS) -c -o $$@ $$<
+endef
 
-system/atari/ice_decrunch_inplace_.o: system/atari/ice_decrunch_inplace_.S
-	$(QUIET_CC)$(TARGET_CC) $(PRG_CFLAGS) $(TARGET_CFLAGS) -c -o $@ $<
+$(foreach f,$(SYSTEM_ATARI_SRC),$(eval $(call SYSTEM_ATARI_target,$(f))))
 
-system/atari/fifo.o: lib/internal/fifo.c
-	$(QUIET_CC)$(TARGET_CC) $(PRG_CFLAGS) $(TARGET_CFLAGS) -c -o $@ $<
-
-system/atari/string.o: lib/internal/string.c
-	$(QUIET_CC)$(TARGET_CC) $(PRG_CFLAGS) $(TARGET_CFLAGS) -c -o $@ $<
-
-system/atari/ice.o: lib/ice/ice.c
-	$(QUIET_CC)$(TARGET_CC) $(PRG_CFLAGS) $(TARGET_CFLAGS) -c -o $@ $<
-
-system/atari/sndh.o: lib/psgplay/sndh.c
-	$(QUIET_CC)$(TARGET_CC) $(PRG_CFLAGS) $(TARGET_CFLAGS) -c -o $@ $<
-
-system/atari/load.o: lib/text/load.c
-	$(QUIET_CC)$(TARGET_CC) $(PRG_CFLAGS) $(TARGET_CFLAGS) -c -o $@ $<
-
-system/atari/main.o: lib/text/main.c
-	$(QUIET_CC)$(TARGET_CC) $(PRG_CFLAGS) $(TARGET_CFLAGS) -c -o $@ $<
-
-system/atari/mode.o: lib/text/mode.c
-	$(QUIET_CC)$(TARGET_CC) $(PRG_CFLAGS) $(TARGET_CFLAGS) -c -o $@ $<
-
-system/atari/vt52.o: lib/vt/vt52.c
-	$(QUIET_CC)$(TARGET_CC) $(PRG_CFLAGS) $(TARGET_CFLAGS) -c -o $@ $<
-
-system/atari/vt.o: lib/vt/vt.c
-	$(QUIET_CC)$(TARGET_CC) $(PRG_CFLAGS) $(TARGET_CFLAGS) -c -o $@ $<
-
-SYSTEM_ATARI_SNDH_OBJ :=						\
-	system/atari/fifo.o						\
-	system/atari/ice.o						\
-	system/atari/ice_decrunch_inplace_.o				\
-	system/atari/load.o						\
-	system/atari/main.o						\
-	system/atari/mode.o						\
-	system/atari/sndh.o						\
-	system/atari/string.o						\
-	system/atari/vt.o						\
-	system/atari/vt52.o
-
-$(PSGPLAY_PRG_OBJ): $(TOSLIBC_OBJ) $(SYSTEM_ATARI_OBJ)			\
-		$(SYSTEM_ATARI_SNDH_OBJ)
+$(PSGPLAY_PRG_OBJ): $(TOSLIBC_OBJ) $(SYSTEM_ATARI_OBJ)
 	$(QUIET_LINK)$(TARGET_LD) $(PRG_LDFLAGS) $(TARGET_LDFLAGS) -o $@ \
-		$(TOSLIBC_OBJ) $(SYSTEM_ATARI_OBJ)			\
-		$(SYSTEM_ATARI_SNDH_OBJ)
+		$(TOSLIBC_OBJ) $(SYSTEM_ATARI_OBJ)
 
 $(PSGPLAY_TOS): $(PSGPLAY_PRG_OBJ)
 	$(QUIET_LINK)vlink $(PRG_VLINKFLAGS) -o $@ $^
