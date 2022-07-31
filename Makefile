@@ -8,6 +8,7 @@ exec_prefix = $(prefix)
 bindir = $(exec_prefix)/bin
 mandir = $(datarootdir)/man
 man1dir = $(mandir)/man1
+includedir = $(prefix)/include
 
 INSTALL = install
 
@@ -90,7 +91,7 @@ $(LIBPSGPLAY_PUBLIC_OBJ) $(PSGPLAY_OBJ) $(EXAMPLE_OBJ): %.o : %.c
 	$(QUIET_CC)$(CC) $(ALL_CFLAGS) -c -o $@ $<
 
 .PHONY: install
-install: install-bin install-man
+install: install-bin install-man install-include
 
 .PHONY: install-bin
 install-bin: $(PSGPLAY)
@@ -101,6 +102,11 @@ install-bin: $(PSGPLAY)
 install-man:
 	$(INSTALL) -d -m 755 $(DESTDIR)$(man1dir)
 	$(INSTALL) -m 644 doc/psgplay.1 $(DESTDIR)$(man1dir)
+
+.PHONY: install-include
+install-include:
+	$(INSTALL) -d -m 755 $(DESTDIR)$(includedir)/psgplay
+	$(INSTALL) -m 644 include/psgplay/*.h $(DESTDIR)$(includedir)/psgplay
 
 .PHONY: test
 test: $(M68KDT)
