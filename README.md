@@ -21,9 +21,10 @@ For [Javascript](https://en.wikipedia.org/wiki/JavaScript),
 `make HOST_CC=emcc web`.
 
 The `BUILD_CC`, `HOST_AR`, `HOST_CC`, and `TARGET_CC` with `TARGET_LD`
-Makefile variables can be configured for various cross-compilation settings.
-The `BUILD_CFLAGS`, `HOST_CFLAGS`, `TARGET_CFLAGS`, and `TARGET_LDFLAGS` are
-available as well.
+[`Makefile`](https://github.com/frno7/psgplay/blob/master/Makefile)
+variables can be configured for various compilation settings.
+The `BUILD_CFLAGS`, `HOST_CFLAGS`, `TARGET_CFLAGS`, and `TARGET_LDFLAGS`
+are available as well.
 
 Do `make help` to list further targets and options.
 
