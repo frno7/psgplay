@@ -10,7 +10,7 @@ INTERNAL_OBJ = $(patsubst %.c, %.o, $(INTERNAL_SRC))
 ifneq "$(MAKECMDGOALS)" "clean"
 
 # Test whether the compiler supports scalar storage order.
-HAVE_SSO := $(shell $(CC) -c -o lib/internal/sso.o lib/internal/sso.c 2>&1 && echo 1)
+HAVE_SSO := $(shell $(HOST_CC) -c -o lib/internal/sso.o lib/internal/sso.c 2>&1 && echo 1)
 
 ifeq "$(HAVE_SSO)" "1"
 HAVE_CFLAGS += -DHAVE_SSO

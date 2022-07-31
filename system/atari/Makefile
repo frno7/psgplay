@@ -16,37 +16,37 @@ SYSTEM_ATARI_SRC := $(wildcard system/atari/*.c)
 SYSTEM_ATARI_OBJ := $(patsubst %.c, %.o, $(SYSTEM_ATARI_SRC))
 
 $(SYSTEM_ATARI_OBJ): %.o : %.c
-	$(QUIET_CC)$(CROSS_COMPILE)gcc $(PRG_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(TARGET_CC) $(PRG_CFLAGS) -c -o $@ $<
 
 system/atari/ice_decrunch_inplace_.o: system/atari/ice_decrunch_inplace_.S
-	$(QUIET_CC)$(CROSS_COMPILE)gcc $(PRG_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(TARGET_CC) $(PRG_CFLAGS) -c -o $@ $<
 
 system/atari/fifo.o: lib/internal/fifo.c
-	$(QUIET_CC)$(CROSS_COMPILE)gcc $(PRG_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(TARGET_CC) $(PRG_CFLAGS) -c -o $@ $<
 
 system/atari/string.o: lib/internal/string.c
-	$(QUIET_CC)$(CROSS_COMPILE)gcc $(PRG_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(TARGET_CC) $(PRG_CFLAGS) -c -o $@ $<
 
 system/atari/ice.o: lib/ice/ice.c
-	$(QUIET_CC)$(CROSS_COMPILE)gcc $(PRG_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(TARGET_CC) $(PRG_CFLAGS) -c -o $@ $<
 
 system/atari/sndh.o: lib/psgplay/sndh.c
-	$(QUIET_CC)$(CROSS_COMPILE)gcc $(PRG_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(TARGET_CC) $(PRG_CFLAGS) -c -o $@ $<
 
 system/atari/load.o: lib/text/load.c
-	$(QUIET_CC)$(CROSS_COMPILE)gcc $(PRG_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(TARGET_CC) $(PRG_CFLAGS) -c -o $@ $<
 
 system/atari/main.o: lib/text/main.c
-	$(QUIET_CC)$(CROSS_COMPILE)gcc $(PRG_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(TARGET_CC) $(PRG_CFLAGS) -c -o $@ $<
 
 system/atari/mode.o: lib/text/mode.c
-	$(QUIET_CC)$(CROSS_COMPILE)gcc $(PRG_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(TARGET_CC) $(PRG_CFLAGS) -c -o $@ $<
 
 system/atari/vt52.o: lib/vt/vt52.c
-	$(QUIET_CC)$(CROSS_COMPILE)gcc $(PRG_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(TARGET_CC) $(PRG_CFLAGS) -c -o $@ $<
 
 system/atari/vt.o: lib/vt/vt.c
-	$(QUIET_CC)$(CROSS_COMPILE)gcc $(PRG_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(TARGET_CC) $(PRG_CFLAGS) -c -o $@ $<
 
 SYSTEM_ATARI_SNDH_OBJ :=						\
 	system/atari/fifo.o						\
@@ -62,7 +62,7 @@ SYSTEM_ATARI_SNDH_OBJ :=						\
 
 $(PSGPLAY_PRG_OBJ): $(TOSLIBC_OBJ) $(SYSTEM_ATARI_OBJ)			\
 		$(SYSTEM_ATARI_SNDH_OBJ)
-	$(QUIET_LINK)$(CROSS_COMPILE)ld $(PRG_LDFLAGS) -o $@		\
+	$(QUIET_LINK)$(TARGET_LD) $(PRG_LDFLAGS) -o $@			\
 		$(TOSLIBC_OBJ) $(SYSTEM_ATARI_OBJ)			\
 		$(SYSTEM_ATARI_SNDH_OBJ)
 

@@ -6,13 +6,13 @@ TOS_CFLAGS += $(DEP_CFLAGS) -march=68000 -fno-PIC -nostdlib		\
 TOS_LDFLAGS += --orphan-handling=error --discard-all -nostdlib		\
 	--no-relax -no-pie --script=script/tos.ld
 
-ifneq "x$(CROSS_COMPILE)" "x"
+ifneq "x$(TARGET_CC)" "x"
 
 lib/tos/reset.o: lib/tos/reset.S
-	$(QUIET_AS)$(CROSS_COMPILE)gcc $(TOS_CFLAGS) -c -o $@ $<
+	$(QUIET_AS)$(TARGET_CC) $(TOS_CFLAGS) -c -o $@ $<
 
 lib/tos/sndh.o: lib/tos/sndh.c
-	$(QUIET_CC)$(CROSS_COMPILE)gcc $(TOS_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(TARGET_CC) $(TOS_CFLAGS) -c -o $@ $<
 
 TOS_TOSLIBC_OBJ +=							\
 	lib/toslibc/__mulsi3.o						\
@@ -22,13 +22,13 @@ TOS_TOSLIBC_OBJ +=							\
 lib/tos/tos: $(TOS_TOSLIBC_OBJ)
 lib/tos/tos: script/tos.ld script/tos
 lib/tos/tos: lib/tos/reset.o lib/tos/sndh.o
-	$(QUIET_LINK)$(CROSS_COMPILE)ld $(TOS_LDFLAGS)			\
+	$(QUIET_LINK)$(TARGET_LD) $(TOS_LDFLAGS)			\
 		-o $@ lib/tos/reset.o lib/tos/sndh.o $(TOS_TOSLIBC_OBJ)
 	@chmod a-x $@
 
 else
 
-# Use precompiled TOS when CROSS_COMPILE is undefined.
+# Use precompiled TOS when TARGET_CC is undefined.
 lib/tos/tos:
 	@touch $@
 

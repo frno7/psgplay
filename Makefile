@@ -14,6 +14,12 @@ pkgdir = $(libdir)/pkgconfig
 
 export prefix includedir libdir
 
+BUILD_CC = $(CC)
+HOST_AR = $(AR)
+HOST_CC = $(CC)
+# TARGET_CC = m68k-elf-gcc
+# TARGET_LD = m68k-elf-ld
+
 INSTALL = install
 
 VERSION_MINOR = $(shell script/version | sed 's/-.*$$//')
@@ -53,7 +59,7 @@ all: $(PSGPLAY) $(EXAMPLE_INFO) $(EXAMPLE_PLAY) $(LIBPSGPLAY_PC)
 include lib/Makefile
 include system/Makefile
 
-ifneq "x$(CROSS_COMPILE)" "x"
+ifneq "x$(TARGET_CC)" "x"
 all: $(PSGPLAY_TOS)
 endif
 
@@ -79,27 +85,27 @@ LIBPSGPLAY_PUBLIC_OBJ := $(patsubst %.c, %.o, $(LIBPSGPLAY_PUBLIC_SRC))
 LIBPSGPLAY_OBJ := $(LIBPSGPLAY_HIDDEN_OBJ) $(LIBPSGPLAY_PUBLIC_OBJ)
 
 $(LIBPSGPLAY_STATIC): $(LIBPSGPLAY_OBJ)
-	$(QUIET_AR)$(AR) rcs $@ $^
+	$(QUIET_AR)$(HOST_AR) rcs $@ $^
 
 $(LIBPSGPLAY_SHARED): $(LIBPSGPLAY_OBJ)
-	$(QUIET_CC)$(CC) $(SOFLAGS) -o $@ $^
+	$(QUIET_CC)$(HOST_CC) $(SOFLAGS) -o $@ $^
 
 $(PSGPLAY): $(PSGPLAY_OBJ) $(LIBPSGPLAY_STATIC)
-	$(QUIET_LINK)$(CC) $(ALL_CFLAGS) -o $@ $^ $(LIBS)
+	$(QUIET_LINK)$(HOST_CC) $(ALL_CFLAGS) -o $@ $^ $(LIBS)
 
 $(EXAMPLE_INFO): $(EXAMPLE_INFO_OBJ) $(INTERNAL_OBJ)			\
 	$(EXAMPLE_LINK_OBJ) $(LIBPSGPLAY_SHARED)
-	$(QUIET_LINK)$(CC) $(ALL_CFLAGS) -o $@ $^
+	$(QUIET_LINK)$(HOST_CC) $(ALL_CFLAGS) -o $@ $^
 
 $(EXAMPLE_PLAY): $(EXAMPLE_PLAY_OBJ) $(INTERNAL_OBJ)			\
 	$(EXAMPLE_LINK_OBJ) $(LIBPSGPLAY_SHARED)
-	$(QUIET_LINK)$(CC) $(ALL_CFLAGS) -o $@ $^
+	$(QUIET_LINK)$(HOST_CC) $(ALL_CFLAGS) -o $@ $^
 
 $(LIBPSGPLAY_HIDDEN_OBJ): %.o : %.c
-	$(QUIET_CC)$(CC) $(ALL_CFLAGS) -fvisibility=hidden -c -o $@ $<
+	$(QUIET_CC)$(HOST_CC) $(ALL_CFLAGS) -fvisibility=hidden -c -o $@ $<
 
 $(LIBPSGPLAY_PUBLIC_OBJ) $(PSGPLAY_OBJ) $(EXAMPLE_OBJ): %.o : %.c
-	$(QUIET_CC)$(CC) $(ALL_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(HOST_CC) $(ALL_CFLAGS) -c -o $@ $<
 
 $(LIBPSGPLAY_PC):
 	$(QUIET_GEN)script/pkg $@
@@ -170,7 +176,7 @@ help:
 	@echo "  all            - compile PSG play (default)"
 	@echo "  install        - install PSG play"
 	@echo "  test           - test components of PSG play"
-	@echo "  PSGPLAY.TOS    - compile PSG play for Atari ST"
+	@echo "  PSGPLAY.TOS    - compile PSG play for the Atari ST"
 	@echo "  gtags          - make tags for the GNU Global source code tagging system"
 	@echo "  version        - display PSG play version"
 	@echo "  clean          - remove generated files"
@@ -179,12 +185,16 @@ help:
 	@echo "  V              - set to 1 to compile verbosely"
 	@echo "  S              - set to 1 for sanitation checks"
 	@echo "  ALSA           - set to 1 to support ALSA for Linux"
-	@echo "  CROSS_COMPILE  - set m68k cross compiler to use for Atari ST code"
-	@echo
-	@echo "Note that m68k-linux-* cross-compilers emit 68020 and will not work."
+	@echo "  BUILD_CC       - set a C compiler to use for the build system"
+	@echo "  HOST_AR        - set an archiver to use for the host system"
+	@echo "  HOST_CC        - set a C compiler to use for the host system"
+	@echo "  TARGET_CC      - set a m68k C compiler to use for Atari ST code"
+	@echo "  TARGET_LD      - set a m68k linker to use for Atari ST code"
 	@echo
 	@echo "Example:"
-	@echo "  make ALSA=1 CROSS_COMPILE=m68k-elf-"
+	@echo "  make ALSA=1 TARGET_CC=m68k-elf-gcc TARGET_LD=m68k-elf-ld"
+	@echo
+	@echo "Note that m68k-linux-* compilers emit 68020 and will not work."
 
 V             = @
 Q             = $(V:1=)

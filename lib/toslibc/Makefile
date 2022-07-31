@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 
-ifneq "x$(CROSS_COMPILE)" "x"
+ifneq "x$(TARGET_CC)" "x"
 
 TOSLIBC_CFLAGS +=  $(DEP_CFLAGS) -march=68000 -fno-PIC -nostdlib	\
 	-ffunction-sections -fdata-sections 				\
@@ -75,9 +75,9 @@ lib/toslibc/memcpy.o							\
 lib/toslibc/memset.o: TOSLIBC_CFLAGS += -fno-tree-loop-distribute-patterns
 
 $(TOSLIBC_S_OBJ): %.o : %.S
-	$(QUIET_CC)$(CROSS_COMPILE)gcc $(TOSLIBC_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(TARGET_CC) $(TOSLIBC_CFLAGS) -c -o $@ $<
 
 $(TOSLIBC_C_OBJ): %.o : %.c
-	$(QUIET_CC)$(CROSS_COMPILE)gcc $(TOSLIBC_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(TARGET_CC) $(TOSLIBC_CFLAGS) -c -o $@ $<
 
 endif
