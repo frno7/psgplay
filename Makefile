@@ -2,6 +2,12 @@
 #
 # Do "make help" for targets and options.
 
+prefix = $(HOME)/.local/usr
+exec_prefix = $(prefix)
+bindir = $(exec_prefix)/bin
+
+INSTALL = install
+
 CFLAGS += -g -O2 -Wall -fPIC -Iinclude -D_GNU_SOURCE
 
 LIBS += -lm
@@ -80,12 +86,11 @@ $(LIBPSGPLAY_HIDDEN_OBJ): %.o : %.c
 $(LIBPSGPLAY_PUBLIC_OBJ) $(PSGPLAY_OBJ) $(EXAMPLE_OBJ): %.o : %.c
 	$(QUIET_CC)$(CC) $(ALL_CFLAGS) -c -o $@ $<
 
-INSTALL = install
+.PHONY: install
+install: install-bin
 
-bindir  := $(prefix)/bin
-
-install: all
-	$(if $(prefix),,$(error "prefix" parameter must be set))
+.PHONY: install-bin
+install-bin: $(PSGPLAY)
 	$(INSTALL) -d $(DESTDIR)$(bindir)
 	$(INSTALL) $(PSGPLAY) $(DESTDIR)$(bindir)
 
