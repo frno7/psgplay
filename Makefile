@@ -29,7 +29,6 @@ EXAMPLE_PLAY := lib/example/example-play
 .PHONY: all
 all: $(PSGPLAY) $(EXAMPLE_INFO) $(EXAMPLE_PLAY)
 
-include check/Makefile
 include lib/Makefile
 include system/Makefile
 
@@ -105,8 +104,7 @@ clean:
 		$(PSGPLAY) PSGPLAY.* GPATH GRTAGS GTAGS 		\
 		$(LIBPSGPLAY_STATIC) $(LIBPSGPLAY_SHARED)		\
 		$(M68K_GEN_H) $(M68K_GEN_C) $(VERSION_SRC)		\
-		$(M68KMAKE) $(M68KDG_GEN_H) $(M68KDG)			\
-		check/68000.actual
+		$(M68KMAKE) $(M68KDG_GEN_H) $(M68KDG)
 
 .PHONY: gtags
 gtags:

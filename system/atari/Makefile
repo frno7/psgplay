@@ -60,7 +60,6 @@ SYSTEM_ATARI_SNDH_OBJ :=						\
 	system/atari/vt.o						\
 	system/atari/vt52.o
 
-$(PSGPLAY_PRG_OBJ): check/68000
 $(PSGPLAY_PRG_OBJ): $(TOSLIBC_OBJ) $(SYSTEM_ATARI_OBJ)			\
 		$(SYSTEM_ATARI_SNDH_OBJ)
 	$(QUIET_LINK)$(CROSS_COMPILE)ld $(PRG_LDFLAGS) -o $@		\

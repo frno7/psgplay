@@ -13,6 +13,7 @@
 #include <tos/gemdos.h>
 #include <tos/xbios.h>
 
+#include "internal/check-compiler.h"
 #include "internal/compare.h"
 
 #include "psgplay/sndh.h"
