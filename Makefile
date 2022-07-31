@@ -69,7 +69,6 @@ endif
 
 PSGPLAY_SRC :=								\
 	$(DISASSEMBLE_SRC) 						\
-	$(ICE_SRC)							\
 	$(OUT_SRC)							\
 	$(SYSTEM_UNIX_SRC)						\
 	$(TEXT_SRC)							\
@@ -83,7 +82,7 @@ LIBPSGPLAY_HIDDEN_SRC :=						\
 	$(M68K_SRC)
 LIBPSGPLAY_HIDDEN_OBJ := $(patsubst %.c, %.o, $(LIBPSGPLAY_HIDDEN_SRC))
 
-LIBPSGPLAY_PUBLIC_SRC := $(LIBPSGPLAY_SRC) $(VERSION_SRC)
+LIBPSGPLAY_PUBLIC_SRC := $(LIBPSGPLAY_SRC) $(ICE_SRC) $(VERSION_SRC)
 LIBPSGPLAY_PUBLIC_OBJ := $(patsubst %.c, %.o, $(LIBPSGPLAY_PUBLIC_SRC))
 
 LIBPSGPLAY_OBJ := $(LIBPSGPLAY_HIDDEN_OBJ) $(LIBPSGPLAY_PUBLIC_OBJ)
@@ -130,6 +129,7 @@ install-man:
 .PHONY: install-include
 install-include:
 	$(INSTALL) -d -m 755 $(DESTDIR)$(includedir)/psgplay
+	$(INSTALL) -m 644 include/ice/*.h $(DESTDIR)$(includedir)/psgplay
 	$(INSTALL) -m 644 include/psgplay/*.h $(DESTDIR)$(includedir)/psgplay
 
 .PHONY: install-lib
