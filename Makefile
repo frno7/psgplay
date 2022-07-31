@@ -9,8 +9,12 @@ bindir = $(exec_prefix)/bin
 mandir = $(datarootdir)/man
 man1dir = $(mandir)/man1
 includedir = $(prefix)/include
+libdir = $(exec_prefix)/lib
 
 INSTALL = install
+
+VERSION_MINOR = $(shell script/version | sed 's/-.*$$//')
+VERSION_MAJOR = $(shell script/version | sed 's/\..*$$//')
 
 CFLAGS += -g -O2 -Wall -fPIC -Iinclude -D_GNU_SOURCE
 
@@ -91,7 +95,7 @@ $(LIBPSGPLAY_PUBLIC_OBJ) $(PSGPLAY_OBJ) $(EXAMPLE_OBJ): %.o : %.c
 	$(QUIET_CC)$(CC) $(ALL_CFLAGS) -c -o $@ $<
 
 .PHONY: install
-install: install-bin install-man install-include
+install: install-bin install-man install-include install-lib
 
 .PHONY: install-bin
 install-bin: $(PSGPLAY)
@@ -107,6 +111,21 @@ install-man:
 install-include:
 	$(INSTALL) -d -m 755 $(DESTDIR)$(includedir)/psgplay
 	$(INSTALL) -m 644 include/psgplay/*.h $(DESTDIR)$(includedir)/psgplay
+
+.PHONY: install-lib
+install-lib: install-lib-static install-lib-shared
+
+.PHONY: install-lib-static
+install-lib-static: $(LIBPSGPLAY_STATIC)
+	$(INSTALL) -d -m 755 $(DESTDIR)$(libdir)
+	$(INSTALL) $(LIBPSGPLAY_STATIC) $(DESTDIR)$(libdir)
+
+.PHONY: install-lib-shared
+install-lib-shared: $(LIBPSGPLAY_SHARED)
+	$(INSTALL) -d -m 755 $(DESTDIR)$(libdir)
+	$(INSTALL) $(LIBPSGPLAY_SHARED) $(DESTDIR)$(libdir)/libpsgplay.so.$(VERSION_MINOR)
+	ln -s libpsgplay.so.$(VERSION_MINOR) $(DESTDIR)$(libdir)/libpsgplay.so.$(VERSION_MAJOR)
+	ln -s libpsgplay.so.$(VERSION_MAJOR) $(DESTDIR)$(libdir)/libpsgplay.so
 
 .PHONY: test
 test: $(M68KDT)
