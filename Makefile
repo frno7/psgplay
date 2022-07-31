@@ -3,8 +3,11 @@
 # Do "make help" for targets and options.
 
 prefix = $(HOME)/.local/usr
+datarootdir = $(prefix)/share
 exec_prefix = $(prefix)
 bindir = $(exec_prefix)/bin
+mandir = $(datarootdir)/man
+man1dir = $(mandir)/man1
 
 INSTALL = install
 
@@ -87,12 +90,17 @@ $(LIBPSGPLAY_PUBLIC_OBJ) $(PSGPLAY_OBJ) $(EXAMPLE_OBJ): %.o : %.c
 	$(QUIET_CC)$(CC) $(ALL_CFLAGS) -c -o $@ $<
 
 .PHONY: install
-install: install-bin
+install: install-bin install-man
 
 .PHONY: install-bin
 install-bin: $(PSGPLAY)
 	$(INSTALL) -d $(DESTDIR)$(bindir)
 	$(INSTALL) $(PSGPLAY) $(DESTDIR)$(bindir)
+
+.PHONY: install-man
+install-man:
+	$(INSTALL) -d -m 755 $(DESTDIR)$(man1dir)
+	$(INSTALL) -m 644 doc/psgplay.1 $(DESTDIR)$(man1dir)
 
 .PHONY: test
 test: $(M68KDT)
