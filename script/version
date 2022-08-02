@@ -21,6 +21,12 @@ then
 	exit
 fi
 
+if [ x"$1" = x--check ]
+then
+	check=1
+	shift
+fi
+
 [ $# = 1 ]
 f="$1"
 
@@ -30,9 +36,13 @@ const char *psgplay_version(void) { return "'"'"$ver"'"'"; }")
 
 if [ ! -f "$f" ] || ! echo "$src" | cmp --quiet - "$f"
 then
-	echo "$src" >"$f".tmp
-	mv "$f".tmp "$f"
-	echo "$f"
+	if [ x"$check" = x1 ]
+	then
+		echo "$f"
+	else
+		echo "$src" >"$f".tmp
+		mv "$f".tmp "$f"
+	fi
 else
 	:
 fi
