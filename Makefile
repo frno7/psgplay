@@ -68,9 +68,6 @@ MOST_CFLAGS = $(HAVE_CFLAGS) $(S_CFLAGS) $(DEP_CFLAGS)
 
 PSGPLAY := psgplay
 
-EXAMPLE_INFO := lib/example/example-info
-EXAMPLE_PLAY := lib/example/example-play
-
 LIBPSGPLAY_PC := libpsgplay.pc
 
 .PHONY: all

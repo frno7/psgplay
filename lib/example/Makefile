@@ -1,5 +1,8 @@
 # SPDX-License-Identifier: GPL-2.0
 
+EXAMPLE_INFO := lib/example/example-info
+EXAMPLE_PLAY := lib/example/example-play
+
 EXAMPLE_INFO_SRC := $(EXAMPLE_INFO).c
 EXAMPLE_PLAY_SRC := $(EXAMPLE_PLAY).c
 
