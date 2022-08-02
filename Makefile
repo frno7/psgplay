@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# See INSTALL for targets and options.
+# See the file INSTALL for installation instructions.
 
 prefix = $(HOME)/.local/usr
 datarootdir = $(prefix)/share
