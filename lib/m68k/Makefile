@@ -37,7 +37,8 @@ M68KDG_LINK_SRC :=							\
 	lib/internal/bit.c						\
 	lib/internal/fifo.c						\
 	lib/internal/print.c						\
-	lib/internal/string.c
+	lib/internal/string.c						\
+	lib/version/version.c
 
 define M68KDG_LINK_target
 M68KDG_LINK_OBJ += lib/m68k/$(basename $(subst /,-,$(1))).o
@@ -63,26 +64,16 @@ M68KDA_SRC := lib/m68k/m68kds.c lib/m68k/m68kda.c
 M68KDT_SRC := lib/m68k/m68kdt.c
 
 M68K_SRC += $(M68KDA_SRC)
+M68K_OBJ := $(M68K_SRC:%.c=%.o)
 
-M68KDA_OBJ := $(patsubst %.c, %.o, $(M68KDA_SRC))
-M68KDT_OBJ := $(patsubst %.c, %.o, $(M68KDT_SRC))
+M68KDA_OBJ := $(M68KDA_SRC:%.c=%.o)
+M68KDT_OBJ := $(M68KDT_SRC:%.c=%.o)
 
-$(M68KDT_OBJ): %.o : %.c
+$(M68K_OBJ) $(M68KDT_OBJ): %.o : %.c
 	$(QUIET_CC)$(HOST_CC) $(MOST_CFLAGS) $(HOST_CFLAGS) -c -o $@ $<
 
-M68KDT_LINK_OBJ :=							\
-	lib/version/version.o						\
-	system/unix/file.o						\
-	system/unix/memory.o						\
-	system/unix/print.o						\
-	system/unix/string.o						\
-	lib/internal/bit.o						\
-	lib/internal/fifo.o						\
-	lib/internal/print.o						\
-	lib/internal/string.o
-
-$(M68KDT): $(M68KDT_OBJ) $(M68KDT_LINK_OBJ) $(M68KDA_OBJ)
+$(M68KDT): $(M68KDT_OBJ) $(M68KDG_LINK_OBJ) $(M68KDA_OBJ)
 	$(QUIET_LINK)$(HOST_CC) $(MOST_CFLAGS) $(HOST_CFLAGS) -o $@	\
-		$(M68KDT_OBJ) $(M68KDT_LINK_OBJ) $(M68KDA_OBJ)
+		$(M68KDT_OBJ) $(M68KDG_LINK_OBJ) $(M68KDA_OBJ)
 
 endif
