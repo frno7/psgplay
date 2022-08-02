@@ -18,6 +18,7 @@ fi
 src="$1"
 dst="$2"
 
-echo 'static u8 tos[] = {' >"$dst"
-"$XXD" -i <"$src" >>"$dst"
-echo '};' >>"$dst"
+echo 'static u8 tos[] = {' >"$dst".tmp
+"$XXD" -i <"$src" >>"$dst".tmp
+echo '};' >>"$dst".tmp
+mv "$dst".tmp "$dst"
