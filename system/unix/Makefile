@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 
+PSGPLAY := psgplay
+
 SYSTEM_UNIX_SRC :=							\
 	system/unix/clock.c						\
 	system/unix/command-mode.c					\
@@ -20,3 +22,19 @@ SYSTEM_UNIX_SRC :=							\
 ifeq "$(HAVE_SSO)" "1"
 SYSTEM_UNIX_SRC += system/unix/disassemble.c
 endif
+
+PSGPLAY_SRC :=								\
+	$(DISASSEMBLE_SRC) 						\
+	$(OUT_SRC)							\
+	$(SYSTEM_UNIX_SRC)						\
+	$(TEXT_SRC)							\
+	$(UNICODE_SRC)							\
+	$(VT_SRC)
+
+PSGPLAY_OBJ := $(patsubst %.c, %.o, $(PSGPLAY_SRC))
+
+$(PSGPLAY_OBJ): %.o : %.c
+	$(QUIET_CC)$(HOST_CC) $(MOST_CFLAGS) $(HOST_CFLAGS) -c -o $@ $<
+
+$(PSGPLAY): $(PSGPLAY_OBJ) $(LIBPSGPLAY_STATIC)
+	$(QUIET_LINK)$(HOST_CC) $(MOST_CFLAGS) $(HOST_CFLAGS) -o $@ $^ $(LIBS)

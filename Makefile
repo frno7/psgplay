@@ -66,8 +66,6 @@ COMMON_CFLAGS = -Wall -fPIC -Iinclude -D_GNU_SOURCE
 DEP_CFLAGS = $(COMMON_CFLAGS) $(BASIC_CFLAGS)
 MOST_CFLAGS = $(HAVE_CFLAGS) $(S_CFLAGS) $(DEP_CFLAGS)
 
-PSGPLAY := psgplay
-
 .PHONY: all
 all:
 
@@ -82,23 +80,8 @@ ifdef TARGET_CC
 all: $(PSGPLAY_TOS)
 endif
 
-PSGPLAY_SRC :=								\
-	$(DISASSEMBLE_SRC) 						\
-	$(OUT_SRC)							\
-	$(SYSTEM_UNIX_SRC)						\
-	$(TEXT_SRC)							\
-	$(UNICODE_SRC)							\
-	$(VT_SRC)
-PSGPLAY_OBJ := $(patsubst %.c, %.o, $(PSGPLAY_SRC))
-
 .PHONY: web
 web: $(LIBPSGPLAY_JAVASCRIPT)
-
-$(PSGPLAY_OBJ): %.o : %.c
-	$(QUIET_CC)$(HOST_CC) $(MOST_CFLAGS) $(HOST_CFLAGS) -c -o $@ $<
-
-$(PSGPLAY): $(PSGPLAY_OBJ) $(LIBPSGPLAY_STATIC)
-	$(QUIET_LINK)$(HOST_CC) $(MOST_CFLAGS) $(HOST_CFLAGS) -o $@ $^ $(LIBS)
 
 .PHONY: install
 install: install-bin install-man install-include install-lib install-pkg
