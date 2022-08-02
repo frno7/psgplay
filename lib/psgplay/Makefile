@@ -39,12 +39,21 @@ LIBPSGPLAY_WEBASSEMBLY := lib/psgplay/libpsgplay.wasm
 LIBPSGPLAY_WEB_FUNCTIONS =						\
 	_psgplay_init							\
 	_psgplay_read_stereo						\
+	_psgplay_read_digital						\
 	_psgplay_free							\
 	_ice_identify							\
+	_ice_crunched_size						\
 	_ice_decrunched_size						\
 	_ice_decrunch							\
+	_sndh_identify							\
+	_sndh_tag_subtune_count						\
 	_sndh_tag_default_subtune					\
 	_sndh_tag_subtune_time						\
+	_sndh_tag_timer							\
+	_sndh_tag_title							\
+	_sndh_init_address						\
+	_sndh_exit_address						\
+	_sndh_play_address						\
 	_malloc								\
 	_free
 
