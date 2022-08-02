@@ -74,12 +74,16 @@ EXAMPLE_PLAY := lib/example/example-play
 LIBPSGPLAY_PC := libpsgplay.pc
 
 .PHONY: all
-all: $(PSGPLAY) $(EXAMPLE_INFO) $(EXAMPLE_PLAY) $(LIBPSGPLAY_PC)
+all:
 
 include lib/Makefile
 include system/Makefile
 
-ifneq "x$(TARGET_CC)" "x"
+all: $(PSGPLAY)
+all: $(LIBPSGPLAY_STATIC) $(LIBPSGPLAY_SHARED) $(LIBPSGPLAY_PC)
+all: $(EXAMPLE_INFO) $(EXAMPLE_PLAY)
+
+ifdef TARGET_CC
 all: $(PSGPLAY_TOS)
 endif
 
