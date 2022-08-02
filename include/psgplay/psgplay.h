@@ -24,11 +24,11 @@ struct psgplay_stereo {
 /**
  * psgplay_init - initialise PSG play
  * @data: SNDH data, must not be in compressed form
- * @size: SNDH size
+ * @size: SNDH size in octets
  * @track: subtune to play
- * @stereo_frequency: stereo sample frequency in Hz, or zero for digital reading
+ * @frequency: stereo sample frequency in Hz, or zero for digital reading
  *
- * Use psgplay_read_stereo() if @stereo_frequency is nonzero, otherwise
+ * Use psgplay_read_stereo() if @frequency is nonzero, otherwise use
  * psgplay_read_digital().
  *
  * Return: PSG play object, which must be freed with psgplay_free(),
