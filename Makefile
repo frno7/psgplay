@@ -17,8 +17,12 @@ export prefix includedir libdir
 BUILD_CC = $(CC)
 HOST_AR = $(AR)
 HOST_CC = $(CC)
-# TARGET_CC = m68k-elf-gcc
-# TARGET_LD = m68k-elf-ld
+
+ifdef TARGET_COMPILE
+TARGET_CC = $(TARGET_COMPILE)gcc
+TARGET_LD = $(TARGET_COMPILE)ld
+TARGET_AR = $(TARGET_COMPILE)ar
+endif
 
 CFLAGS = -g -O2
 BUILD_CFLAGS = $(CFLAGS)
