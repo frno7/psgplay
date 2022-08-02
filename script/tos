@@ -5,7 +5,13 @@ set -o pipefail
 
 if [ $# != 2 ]
 then
-	echo "tos <input> <output>" >&2
+	echo "usage: $0 <input> <output>" >&2
+	exit 1
+fi
+
+if [ x"$XXD" = x ]
+then
+	echo "$0"': error: the XXD environment variable for the "xxd" command is undefined' >&2
 	exit 1
 fi
 
@@ -13,5 +19,5 @@ src="$1"
 dst="$2"
 
 echo 'static u8 tos[] = {' >"$dst"
-xxd -i <"$src" >>"$dst"
+"$XXD" -i <"$src" >>"$dst"
 echo '};' >>"$dst"

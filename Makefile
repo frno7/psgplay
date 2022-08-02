@@ -26,6 +26,9 @@ HOST_CFLAGS = $(CFLAGS)
 TARGET_CFLAGS = $(CFLAGS)
 
 INSTALL = install
+XXD = xxd
+
+export XXD
 
 VERSION_MINOR = $(shell script/version | sed 's/-.*$$//')
 VERSION_MAJOR = $(shell script/version | sed 's/\..*$$//')
