@@ -68,8 +68,6 @@ MOST_CFLAGS = $(HAVE_CFLAGS) $(S_CFLAGS) $(DEP_CFLAGS)
 
 PSGPLAY := psgplay
 
-LIBPSGPLAY_PC := libpsgplay.pc
-
 .PHONY: all
 all:
 
@@ -101,9 +99,6 @@ $(PSGPLAY_OBJ): %.o : %.c
 
 $(PSGPLAY): $(PSGPLAY_OBJ) $(LIBPSGPLAY_STATIC)
 	$(QUIET_LINK)$(HOST_CC) $(MOST_CFLAGS) $(HOST_CFLAGS) -o $@ $^ $(LIBS)
-
-$(LIBPSGPLAY_PC):
-	$(QUIET_GEN)script/pkg $@
 
 .PHONY: install
 install: install-bin install-man install-include install-lib install-pkg

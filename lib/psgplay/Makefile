@@ -40,6 +40,11 @@ $(LIBPSGPLAY_STATIC): $(LIBPSGPLAY_OBJ)
 $(LIBPSGPLAY_SHARED): $(LIBPSGPLAY_OBJ)
 	$(QUIET_CC)$(HOST_CC) $(SOFLAGS) $(HOST_CFLAGS) -o $@ $^
 
+LIBPSGPLAY_PC := lib/psgplay/libpsgplay.pc
+
+$(LIBPSGPLAY_PC):
+	$(QUIET_GEN)script/pkg $@
+
 LIBPSGPLAY_JAVASCRIPT := lib/psgplay/libpsgplay.js
 LIBPSGPLAY_WEBASSEMBLY := lib/psgplay/libpsgplay.wasm
 

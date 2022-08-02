@@ -1,7 +1,6 @@
 /version
 /psgplay
 /PSGPLAY.*
-/libpsgplay.pc
 *.sndh
 *.o
 *.o.d
