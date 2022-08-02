@@ -26,7 +26,8 @@ variables can be configured for various compilation settings.
 The `BUILD_CFLAGS`, `HOST_CFLAGS`, `TARGET_CFLAGS`, and `TARGET_LDFLAGS`
 are available as well.
 
-Do `make help` to list further targets and options.
+Review the file [INSTALL](https://github.com/frno7/psgplay/blob/master/INSTALL)
+for installation instructions.
 
 The package
 [media-sound/psgplay](https://github.com/frno7/gentoo.overlay/tree/master/media-sound/psgplay)

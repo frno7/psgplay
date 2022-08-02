@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Do "make help" for targets and options.
+# See INSTALL for targets and options.
 
 prefix = $(HOME)/.local/usr
 datarootdir = $(prefix)/share
@@ -180,50 +180,6 @@ clean:
 .PHONY: gtags
 gtags:
 	$(QUIET_GEN)gtags
-
-.PHONY: help
-help:
-	@echo "Targets:"
-	@echo "  all            - compile PSG play (default)"
-	@echo "  install        - install PSG play"
-	@echo "  test           - test components of PSG play"
-	@echo "  PSGPLAY.TOS    - compile PSG play for the Atari ST"
-	@echo "  web            - compile for Javascript and Webassembly"
-	@echo "  gtags          - make tags for the GNU Global source code tagging system"
-	@echo "  version        - display PSG play version"
-	@echo "  clean          - remove generated files"
-	@echo
-	@echo "Options:"
-	@echo "  V              - set to 1 to compile verbosely"
-	@echo "  S              - set to 1 for sanitation checks"
-	@echo "  ALSA           - set to 1 to support ALSA for Linux"
-	@echo
-	@echo "  BUILD_CC       - set a C compiler to use for the build system"
-	@echo "  HOST_AR        - set an archiver to use for the host system"
-	@echo "  HOST_CC        - set a C compiler to use for the host system"
-	@echo "  TARGET_CC      - set a m68k C compiler to use for Atari ST code"
-	@echo "  TARGET_LD      - set a m68k linker to use for Atari ST code"
-	@echo
-	@echo "  BUILD_CFLAGS   - set C flags for the build system"
-	@echo "  HOST_CFLAGS    - set C flags for the host system"
-	@echo "  TARGET_CFLAGS  - set C flags for Atari ST code"
-	@echo "  TARGET_LDFLAGS - set linker flags for Atari ST code"
-	@echo
-	@echo "Examples:"
-	@echo
-	@echo "Build an Atari ST program:"
-	@echo "  make TARGET_CC=m68k-elf-gcc TARGET_LD=m68k-elf-ld PSGPLAY.TOS"
-	@echo
-	@echo "Build a statically linked program:"
-	@echo '  make HOST_CFLAGS="-O2 -static" psgplay'
-	@echo
-	@echo "Build Javascript and Webassembly libraries using the Emscripten compiler:"
-	@echo '  make HOST_CC=emcc web'
-	@echo
-	@echo "Build a cross-compiled program for the MIPS/R5900 architecture:"
-	@echo "  make HOST_CC=mipsr5900el-unknown-linux-gnu-gcc psgplay"
-	@echo
-	@echo "Note that m68k-linux-* compilers emit 68020 and will not work."
 
 V             = @
 Q             = $(V:1=)

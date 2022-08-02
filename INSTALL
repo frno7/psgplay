@@ -1,0 +1,55 @@
+Makefile targets:
+
+  all            - compile PSG play, libraries and examples (default)
+  install        - install PSG play
+  test           - test components of PSG play
+  PSGPLAY.TOS    - compile PSG play for the Atari ST
+  web            - compile for Javascript and Webassembly
+  gtags          - make tags for the GNU Global source code tagging system
+  version        - display PSG play version
+  clean          - remove generated files
+
+Makefile options:
+
+  V              - set to 1 to compile verbosely
+  S              - set to 1 for sanitation checks
+  ALSA           - set to 1 to support ALSA for Linux
+
+  BUILD_CC       - set a C compiler to use for the build system
+  HOST_AR        - set an archiver to use for the host system
+  HOST_CC        - set a C compiler to use for the host system
+  TARGET_CC      - set a m68k C compiler to use for Atari ST code
+  TARGET_LD      - set a m68k linker to use for Atari ST code
+
+  BUILD_CFLAGS   - set C flags for the build system
+  HOST_CFLAGS    - set C flags for the host system
+  TARGET_CFLAGS  - set C flags for Atari ST code
+  TARGET_LDFLAGS - set linker flags for Atari ST code
+
+Examples:
+
+Build for Linux or Mac OS:
+
+	$ make psgplay
+
+Build for Linux with ALSA:
+
+	$ make ALSA=1 psgplay
+
+Build for the Atari ST:
+
+	$ make TARGET_CC=m68k-elf-gcc TARGET_LD=m68k-elf-ld PSGPLAY.TOS
+
+Note that m68k-linux-* compilers emit 68020 alignments and will not work.
+
+Build a statically linked program:
+
+	$ make HOST_CFLAGS="-O2 -static" psgplay
+
+Build Javascript and Webassembly libraries using the Emscripten compiler:
+
+	$ make HOST_CC=emcc web
+
+Build a cross-compiled program for the MIPS/R5900 architecture:
+
+	$ make HOST_CC=mipsr5900el-unknown-linux-gnu-gcc psgplay
