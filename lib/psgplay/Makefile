@@ -84,14 +84,20 @@ $(LIBPSGPLAY_JAVASCRIPT) $(LIBPSGPLAY_WEBASSEMBLY): $(LIBPSGPLAY_OBJ)
 .PHONY: web
 web: $(LIBPSGPLAY_JAVASCRIPT)
 
+LIBPSGPLAY_HEADERS =							\
+	include/ice/ice.h						\
+	include/psgplay/digital.h					\
+	include/psgplay/psgplay.h					\
+	include/psgplay/sndh.h						\
+	include/psgplay/version.h
+
 .PHONY: install-lib
 install-lib: install-include install-lib-static install-lib-shared install-pkg
 
 .PHONY: install-include
 install-include:
 	$(INSTALL) -d -m 755 $(DESTDIR)$(includedir)/psgplay
-	$(INSTALL) -m 644 include/ice/*.h $(DESTDIR)$(includedir)/psgplay
-	$(INSTALL) -m 644 include/psgplay/*.h $(DESTDIR)$(includedir)/psgplay
+	$(INSTALL) -m 644 $(LIBPSGPLAY_HEADERS) $(DESTDIR)$(includedir)/psgplay
 
 .PHONY: install-lib-static
 install-lib-static: $(LIBPSGPLAY_STATIC)
