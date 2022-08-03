@@ -6,7 +6,7 @@ set -o pipefail
 if [ -f version ]
 then
 	ver="$(cat version)"
-elif [ -d .git ]
+elif [ -e .git ]
 then
 	mod=$([ -z "$(git status -suno)" ] || echo "+")
 	tag="$(git describe --always --tags)"
