@@ -1,11 +1,14 @@
 # SPDX-License-Identifier: GPL-2.0
 
+M68K_BUILD_CFLAGS = $(MOST_CFLAGS) $(BUILD_CFLAGS)
+M68K_HOST_CFLAGS = $(MOST_CFLAGS) $(HOST_CFLAGS)
+
 M68KMAKE := lib/m68k/m68kmake
 
 $(M68KMAKE).o: $(M68KMAKE).c
-	$(QUIET_CC)$(BUILD_CC) $(MOST_CFLAGS) $(BUILD_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(BUILD_CC) $(M68K_BUILD_CFLAGS) -c -o $@ $<
 $(M68KMAKE): $(M68KMAKE).o
-	$(QUIET_LINK)$(BUILD_CC) $(MOST_CFLAGS) $(BUILD_CFLAGS) -o $@ $^
+	$(QUIET_LINK)$(BUILD_CC) $(M68K_BUILD_CFLAGS) -o $@ $^
 
 M68K_GEN_H := include/m68k/m68kops.h
 M68K_GEN_C := lib/m68k/m68kops.c
@@ -43,16 +46,16 @@ M68KDG_LINK_SRC :=							\
 define M68KDG_LINK_target
 M68KDG_LINK_OBJ += lib/m68k/$(basename $(subst /,-,$(1))).o
 lib/m68k/$(basename $(subst /,-,$(1))).o: $(1)
-	$$(QUIET_CC)$$(BUILD_CC) $$(MOST_CFLAGS) $(BUILD_CFLAGS) -c -o $$@ $$<
+	$$(QUIET_CC)$$(BUILD_CC) $$(M68K_BUILD_CFLAGS) -c -o $$@ $$<
 endef
 
 $(foreach f,$(M68KDG_LINK_SRC),$(eval $(call M68KDG_LINK_target,$(f))))
 
 $(M68KDG).o: $(M68KDG).c
-	$(QUIET_CC)$(BUILD_CC) $(MOST_CFLAGS) $(BUILD_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(BUILD_CC) $(M68K_BUILD_CFLAGS) -c -o $@ $<
 
 $(M68KDG): $(M68KDG).o $(M68KDG_LINK_OBJ)
-	$(QUIET_LINK)$(BUILD_CC) $(MOST_CFLAGS) $(BUILD_CFLAGS) -o $@ $(M68KDG).o $(M68KDG_LINK_OBJ)
+	$(QUIET_LINK)$(BUILD_CC) $(M68K_BUILD_CFLAGS) -o $@ $(M68KDG).o $(M68KDG_LINK_OBJ)
 
 M68KDT := lib/m68k/m68kdt
 
@@ -73,10 +76,10 @@ M68K_OBJ := $(M68K_SRC:%.c=%.o)
 lib/m68k/m68kdt.c: $(M68KDG_GEN_H)
 
 $(M68K_OBJ) $(M68KDT_OBJ): %.o : %.c
-	$(QUIET_CC)$(HOST_CC) $(MOST_CFLAGS) $(HOST_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(HOST_CC) $(M68K_HOST_CFLAGS) -c -o $@ $<
 
 $(M68KDT): $(M68KDT_OBJ) $(M68KDG_LINK_OBJ) $(M68KDA_OBJ)
-	$(QUIET_LINK)$(HOST_CC) $(MOST_CFLAGS) $(HOST_CFLAGS) -o $@	\
+	$(QUIET_LINK)$(HOST_CC) $(M68K_HOST_CFLAGS) -o $@	\
 		$(M68KDT_OBJ) $(M68KDG_LINK_OBJ) $(M68KDA_OBJ)
 
 .PHONY: test-m68kdt
