@@ -71,6 +71,7 @@ MOST_CFLAGS = $(HAVE_CFLAGS) $(S_CFLAGS) $(SOME_CFLAGS)
 .PHONY: all
 all:
 
+include doc/Makefile
 include lib/Makefile
 include system/Makefile
 
@@ -94,11 +95,6 @@ install: install-bin install-man install-include install-lib install-pkg
 install-bin: $(PSGPLAY)
 	$(INSTALL) -d $(DESTDIR)$(bindir)
 	$(INSTALL) $(PSGPLAY) $(DESTDIR)$(bindir)
-
-.PHONY: install-man
-install-man:
-	$(INSTALL) -d -m 755 $(DESTDIR)$(man1dir)
-	$(INSTALL) -m 644 doc/psgplay.1 $(DESTDIR)$(man1dir)
 
 .PHONY: install-include
 install-include:
