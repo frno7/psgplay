@@ -50,7 +50,7 @@ S_CFLAGS = -fsanitize=address -fsanitize=leak -fsanitize=undefined	\
 endif
 
 DEP_CFLAGS = -Wp,-MD,$(@D)/$(@F).d -MT $(@D)/$(@F)
-COMMON_CFLAGS = -O2 -Wall -fPIC -Iinclude -D_GNU_SOURCE
+COMMON_CFLAGS = -O2 -Wall -Iinclude -D_GNU_SOURCE
 SOME_CFLAGS = $(COMMON_CFLAGS) $(DEP_CFLAGS)
 MOST_CFLAGS = $(HAVE_CFLAGS) $(S_CFLAGS) $(SOME_CFLAGS)
 

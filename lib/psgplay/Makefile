@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 
-LIBPSGPLAY_CFLAGS = $(MOST_CFLAGS)
+LIBPSGPLAY_CFLAGS = $(MOST_CFLAGS) -fPIC
 
 LIBPSGPLAY_SRC :=							\
 	lib/psgplay/psgplay.c						\
