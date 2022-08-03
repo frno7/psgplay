@@ -47,8 +47,9 @@ ALL_OBJ += $(PSGPLAY_OBJ) system/unix/system-unix-disassemble.o
 
 PSGPLAY_LIBS = -lm
 
-ifeq "$(ALSA)" "1"
-PSGPLAY_LIBS += -lasound
+ifeq ($(ALSA),1)
+PSGPLAY_ALSA_LIB := $(shell pkg-config --silence-errors --libs alsa || echo -lasound)
+PSGPLAY_LIBS += $(PSGPLAY_ALSA_LIB)
 endif
 
 $(PSGPLAY): $(PSGPLAY_OBJ) $(LIBPSGPLAY_STATIC)

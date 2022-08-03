@@ -49,10 +49,6 @@ S_CFLAGS += -fsanitize=address -fsanitize=leak -fsanitize=undefined	\
 	  -fsanitize-address-use-after-scope -fstack-check
 endif
 
-ifeq "$(ALSA)" "1"
-HAVE_CFLAGS += -DHAVE_ALSA
-endif
-
 DEP_CFLAGS = -Wp,-MD,$(@D)/$(@F).d -MT $(@D)/$(@F)
 COMMON_CFLAGS = -O2 -Wall -fPIC -Iinclude -D_GNU_SOURCE
 SOME_CFLAGS = $(COMMON_CFLAGS) $(DEP_CFLAGS)
