@@ -89,7 +89,7 @@ endif
 web: $(LIBPSGPLAY_JAVASCRIPT)
 
 .PHONY: install
-install: install-bin install-man install-include install-lib install-pkg
+install: install-bin install-man install-lib
 
 .PHONY: install-bin
 install-bin: $(PSGPLAY)
@@ -103,7 +103,7 @@ install-include:
 	$(INSTALL) -m 644 include/psgplay/*.h $(DESTDIR)$(includedir)/psgplay
 
 .PHONY: install-lib
-install-lib: install-lib-static install-lib-shared
+install-lib: install-include install-lib-static install-lib-shared install-pkg
 
 .PHONY: install-lib-static
 install-lib-static: $(LIBPSGPLAY_STATIC)
