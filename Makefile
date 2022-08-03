@@ -160,7 +160,4 @@ QUIET_RM      = $(Q:@=@echo    '  RM      '$@;)
 QUIET_CHECK   = $(Q:@=@echo    '  CHECK   '$@;)
 QUIET_TEST    = $(Q:@=@echo    '  TEST    '$@;)
 
-ifneq "$(MAKECMDGOALS)" "clean"
-    DEP_FILES := $(shell find . -name '*'.d -printf '%P\n' | sort)
-    $(if $(DEP_FILES),$(eval include $(DEP_FILES)))
-endif
+$(eval -include $(ALL_DEP))
