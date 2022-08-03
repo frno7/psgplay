@@ -79,4 +79,8 @@ $(M68KDT): $(M68KDT_OBJ) $(M68KDG_LINK_OBJ) $(M68KDA_OBJ)
 	$(QUIET_LINK)$(HOST_CC) $(MOST_CFLAGS) $(HOST_CFLAGS) -o $@	\
 		$(M68KDT_OBJ) $(M68KDG_LINK_OBJ) $(M68KDA_OBJ)
 
+.PHONY: test-m68kdt
+test-m68kdt: $(M68KDT)
+	$(QUIET_TEST)$(M68KDT) $(subst @,,$(V:1=-v))
+
 endif

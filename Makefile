@@ -89,8 +89,7 @@ endif
 install: install-psgplay install-man install-lib
 
 .PHONY: test
-test: $(M68KDT)
-	$(QUIET_TEST)$(M68KDT) $(subst @,,$(V:1=-v))
+test: test-m68kdt
 
 .PHONY: version
 version:
