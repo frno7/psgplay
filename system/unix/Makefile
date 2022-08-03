@@ -43,5 +43,7 @@ endef
 
 $(foreach f,$(PSGPLAY_SRC),$(eval $(call PSGPLAY_target,$(f))))
 
+ALL_OBJ += $(PSGPLAY_OBJ) system/unix/system-unix-disassemble.o
+
 $(PSGPLAY): $(PSGPLAY_OBJ) $(LIBPSGPLAY_STATIC)
 	$(QUIET_LINK)$(HOST_CC) $(PSGPLAY_CFLAGS) -o $@ $^ $(LIBS)

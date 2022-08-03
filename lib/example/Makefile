@@ -32,6 +32,8 @@ endef
 
 $(foreach f,$(EXAMPLE_LINK_SRC),$(eval $(call EXAMPLE_link_target,$(f))))
 
+ALL_OBJ += $(EXAMPLE_OBJ) $(EXAMPLE_LINK_OBJ)
+
 $(EXAMPLE_OBJ): %.o: %.c
 	$(QUIET_CC)$(HOST_CC) $(MOST_CFLAGS) $(HOST_CFLAGS) -c -o $@ $<
 

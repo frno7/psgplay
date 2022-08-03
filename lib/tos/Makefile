@@ -6,6 +6,8 @@ TOS_CFLAGS += $(SOME_CFLAGS) -march=68000 -fno-PIC -nostdlib		\
 TOS_LDFLAGS += --orphan-handling=error --discard-all -nostdlib		\
 	--no-relax -no-pie --script=script/tos.ld
 
+ALL_OBJ += lib/tos/reset.o lib/tos/sndh.o
+
 ifneq "x$(TARGET_CC)" "x"
 
 lib/tos/reset.o: lib/tos/reset.S

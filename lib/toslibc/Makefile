@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0
 
-ifneq "x$(TARGET_CC)" "x"
-
 TOSLIBC_CFLAGS +=  $(SOME_CFLAGS) -march=68000 -fno-PIC -nostdlib	\
 	-ffunction-sections -fdata-sections 				\
 	-isystem include/toslibc -D_TOSLIBC_SOURCE
@@ -70,6 +68,10 @@ TOSLIBC_S_OBJ += $(patsubst %.S, %.o, $(TOSLIBC_S_SRC))
 TOSLIBC_C_OBJ += $(patsubst %.c, %.o, $(TOSLIBC_C_SRC))
 
 TOSLIBC_OBJ += $(TOSLIBC_S_OBJ) $(TOSLIBC_C_OBJ)
+
+ALL_OBJ += $(TOSLIBC_OBJ)
+
+ifneq "x$(TARGET_CC)" "x"
 
 lib/toslibc/memcpy.o							\
 lib/toslibc/memset.o: TOSLIBC_CFLAGS += -fno-tree-loop-distribute-patterns

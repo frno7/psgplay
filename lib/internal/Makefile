@@ -5,7 +5,8 @@ INTERNAL_SRC :=								\
 	lib/internal/fifo.c						\
 	lib/internal/print.c						\
 	lib/internal/string.c
-INTERNAL_OBJ = $(patsubst %.c, %.o, $(INTERNAL_SRC))
+
+ALL_OBJ += lib/internal/sso.o
 
 ifneq "$(MAKECMDGOALS)" "clean"
 

@@ -74,6 +74,8 @@ all:
 include lib/Makefile
 include system/Makefile
 
+ALL_DEP = $(sort $(ALL_OBJ:%=%.d))
+
 all: $(PSGPLAY)
 all: $(LIBPSGPLAY_STATIC) $(LIBPSGPLAY_SHARED) $(LIBPSGPLAY_PC)
 all: $(EXAMPLE_INFO) $(EXAMPLE_PLAY)
@@ -134,7 +136,7 @@ version:
 
 .PHONY: clean
 clean:
-	$(QUIET_RM)$(RM) -f */*.o* */*/*.o* include/tos/tos.h		\
+	$(QUIET_RM)$(RM) -f $(ALL_OBJ) $(ALL_DEP) include/tos/tos.h	\
 		$(EXAMPLE_INFO) $(EXAMPLE_PLAY)				\
 		$(PSGPLAY) $(PSGPLAY_TOS) GPATH GRTAGS GTAGS 		\
 		$(LIBPSGPLAY_STATIC) $(LIBPSGPLAY_SHARED)		\
