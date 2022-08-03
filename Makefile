@@ -86,12 +86,7 @@ all: $(PSGPLAY_TOS)
 endif
 
 .PHONY: install
-install: install-bin install-man install-lib
-
-.PHONY: install-bin
-install-bin: $(PSGPLAY)
-	$(INSTALL) -d $(DESTDIR)$(bindir)
-	$(INSTALL) $(PSGPLAY) $(DESTDIR)$(bindir)
+install: install-psgplay install-man install-lib
 
 .PHONY: test
 test: $(M68KDT)

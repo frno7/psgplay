@@ -47,3 +47,8 @@ ALL_OBJ += $(PSGPLAY_OBJ) system/unix/system-unix-disassemble.o
 
 $(PSGPLAY): $(PSGPLAY_OBJ) $(LIBPSGPLAY_STATIC)
 	$(QUIET_LINK)$(HOST_CC) $(PSGPLAY_CFLAGS) -o $@ $^ $(LIBS)
+
+.PHONY: install-psgplay
+install-psgplay: $(PSGPLAY)
+	$(INSTALL) -d $(DESTDIR)$(bindir)
+	$(INSTALL) $(PSGPLAY) $(DESTDIR)$(bindir)
