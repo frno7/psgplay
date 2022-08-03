@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: GPL-2.0
 
 PRG_CFLAGS += $(BASIC_TARGET_CFLAGS) -march=68000 -fno-PIC -nostdlib	\
-	-ffunction-sections -fdata-sections -isystem include/toslibc	\
-	-D_TOSLIBC_SOURCE
+	-ffunction-sections -fdata-sections				\
+	-isystem lib/toslibc/include/toslibc -D_TOSLIBC_SOURCE
 
 PRG_LDFLAGS += --relocatable --gc-sections --strip-all --entry _start	\
 	--script=script/prg.ld
@@ -43,9 +43,9 @@ $(foreach f,$(SYSTEM_ATARI_SRC),$(eval $(call SYSTEM_ATARI_target,$(f))))
 
 ALL_OBJ += $(SYSTEM_ATARI_OBJ) $(PSGPLAY_PRG_OBJ)
 
-$(PSGPLAY_PRG_OBJ): $(TOSLIBC_OBJ) $(SYSTEM_ATARI_OBJ)
+$(PSGPLAY_PRG_OBJ): $(TOSLIBC_LIB_OBJ) $(SYSTEM_ATARI_OBJ)
 	$(QUIET_LINK)$(TARGET_LD) $(PRG_LDFLAGS) $(TARGET_LDFLAGS) -o $@ \
-		$(TOSLIBC_OBJ) $(SYSTEM_ATARI_OBJ)
+		$(TOSLIBC_LIB_OBJ) $(SYSTEM_ATARI_OBJ)
 
 $(PSGPLAY_TOS): $(PSGPLAY_PRG_OBJ)
 	$(QUIET_LINK)vlink $(PRG_VLINKFLAGS) -o $@ $^

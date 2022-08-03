@@ -11,7 +11,10 @@ include lib/psgplay/Makefile
 
 include lib/example/Makefile
 
-include lib/toslibc/Makefile
+ifdef TARGET_CC
+TOSLIBC_CFLAGS = $(BASIC_CFLAGS)
+include lib/toslibc/lib/Makefile
+endif
 
 include lib/out/Makefile
 include lib/vt/Makefile

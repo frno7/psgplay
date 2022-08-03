@@ -1,0 +1,3 @@
+[submodule "toslibc"]
+	path = lib/toslibc
+	url = https://github.com/frno7/toslibc.git
