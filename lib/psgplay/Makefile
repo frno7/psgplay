@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 
+LIBPSGPLAY_CFLAGS = $(MOST_CFLAGS)
+
 LIBPSGPLAY_SRC :=							\
 	lib/psgplay/psgplay.c						\
 	lib/psgplay/sndh.c
@@ -24,11 +26,11 @@ LIBPSGPLAY_OBJ := $(LIBPSGPLAY_PUBLIC_OBJ) $(LIBPSGPLAY_HIDDEN_OBJ)
 
 ALL_OBJ += $(LIBPSGPLAY_OBJ) lib/psgplay/m68kda.o lib/psgplay/m68kds.o
 
-$(LIBPSGPLAY_HIDDEN_OBJ): MOST_CFLAGS += -fvisibility=hidden
+$(LIBPSGPLAY_HIDDEN_OBJ): LIBPSGPLAY_CFLAGS += -fvisibility=hidden
 
 define LIBPSGPLAY_target
 $(call LIBPSGPLAY_object,$(1)): $(1)
-	$$(QUIET_CC)$$(HOST_CC) $$(MOST_CFLAGS) $$(HOST_CFLAGS) -c -o $$@ $$<
+	$$(QUIET_CC)$$(HOST_CC) $$(LIBPSGPLAY_CFLAGS) $$(HOST_CFLAGS) -c -o $$@ $$<
 endef
 
 $(foreach f,$(LIBPSGPLAY_SRC),$(eval $(call LIBPSGPLAY_target,$(f))))
