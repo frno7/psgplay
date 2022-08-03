@@ -52,3 +52,5 @@ $(PSGPLAY): $(PSGPLAY_OBJ) $(LIBPSGPLAY_STATIC)
 install-psgplay: $(PSGPLAY)
 	$(INSTALL) -d $(DESTDIR)$(bindir)
 	$(INSTALL) $(PSGPLAY) $(DESTDIR)$(bindir)
+
+OTHER_CLEAN += $(PSGPLAY)

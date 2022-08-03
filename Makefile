@@ -95,20 +95,14 @@ test: test-m68kdt
 version:
 	@script/version
 
-.PHONY: clean
-clean:
-	$(QUIET_RM)$(RM) -f $(ALL_OBJ) $(ALL_DEP) $(LIBPSGPLAY_TOS_HEADER) \
-		$(EXAMPLE_INFO) $(EXAMPLE_PLAY)				\
-		$(PSGPLAY) $(PSGPLAY_TOS) GPATH GRTAGS GTAGS 		\
-		$(LIBPSGPLAY_STATIC) $(LIBPSGPLAY_SHARED)		\
-		$(LIBPSGPLAY_JAVASCRIPT) $(LIBPSGPLAY_WEBASSEMBLY)	\
-		$(M68K_GEN_H) $(M68K_GEN_C) $(VERSION_SRC)		\
-		$(M68KMAKE) $(M68KDG_GEN_H) $(M68KDG) $(M68KDT)		\
-		$(LIBPSGPLAY_PC)
-
 .PHONY: gtags
 gtags:
 	$(QUIET_GEN)gtags
+OTHER_CLEAN += GPATH GRTAGS GTAGS
+
+.PHONY: clean
+clean:
+	$(QUIET_RM)$(RM) -f $(ALL_OBJ) $(ALL_DEP) $(OTHER_CLEAN)
 
 V             = @
 Q             = $(V:1=)

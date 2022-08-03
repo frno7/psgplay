@@ -84,3 +84,6 @@ test-m68kdt: $(M68KDT)
 	$(QUIET_TEST)$(M68KDT) $(subst @,,$(V:1=-v))
 
 endif
+
+OTHER_CLEAN += $(M68K_GEN_H) $(M68K_GEN_C)				\
+	$(M68KMAKE) $(M68KDG_GEN_H) $(M68KDG) $(M68KDT)

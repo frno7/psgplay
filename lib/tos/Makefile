@@ -40,3 +40,5 @@ LIBPSGPLAY_TOS_HEADER = include/tos/tos.h
 
 $(LIBPSGPLAY_TOS_HEADER): lib/tos/tos
 	$(QUIET_GEN)script/tos $< $@
+
+OTHER_CLEAN += $(LIBPSGPLAY_TOS_HEADER)
