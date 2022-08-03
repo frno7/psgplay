@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 
+EXAMPLE_CFLAGS = $(MOST_CFLAGS) $(HOST_CFLAGS)
+
 EXAMPLE_INFO := lib/example/example-info
 EXAMPLE_PLAY := lib/example/example-play
 
@@ -27,7 +29,7 @@ EXAMPLE_object = $(addprefix lib/example/,$(subst /,-,$(1:%.c=%.o)))
 define EXAMPLE_link_target
 EXAMPLE_LINK_OBJ += $(call EXAMPLE_object,$(1))
 $(call EXAMPLE_object,$(1)): $(1)
-	$$(QUIET_CC)$$(HOST_CC) $$(MOST_CFLAGS) $$(HOST_CFLAGS) -c -o $$@ $$<
+	$$(QUIET_CC)$$(HOST_CC) $$(EXAMPLE_CFLAGS) -c -o $$@ $$<
 endef
 
 $(foreach f,$(EXAMPLE_LINK_SRC),$(eval $(call EXAMPLE_link_target,$(f))))
@@ -35,12 +37,12 @@ $(foreach f,$(EXAMPLE_LINK_SRC),$(eval $(call EXAMPLE_link_target,$(f))))
 ALL_OBJ += $(EXAMPLE_OBJ) $(EXAMPLE_LINK_OBJ)
 
 $(EXAMPLE_OBJ): %.o: %.c
-	$(QUIET_CC)$(HOST_CC) $(MOST_CFLAGS) $(HOST_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(HOST_CC) $(EXAMPLE_CFLAGS) -c -o $@ $<
 
 $(EXAMPLE_INFO): $(EXAMPLE_INFO_OBJ)
 $(EXAMPLE_PLAY): $(EXAMPLE_PLAY_OBJ)
 
 $(EXAMPLE_INFO) $(EXAMPLE_PLAY): $(EXAMPLE_LINK_OBJ) $(LIBPSGPLAY_SHARED)
-	$(QUIET_LINK)$(HOST_CC) $(MOST_CFLAGS) $(HOST_CFLAGS) -o $@ $^
+	$(QUIET_LINK)$(HOST_CC) $(EXAMPLE_CFLAGS) -o $@ $^
 
 OTHER_CLEAN += $(EXAMPLE_INFO) $(EXAMPLE_PLAY)
