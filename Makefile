@@ -63,8 +63,9 @@ HAVE_CFLAGS += -DHAVE_ALSA
 LIBS += -lasound
 endif
 
+DEP_CFLAGS = -Wp,-MD,$(@D)/$(@F).d -MT $(@D)/$(@F)
 COMMON_CFLAGS = -Wall -fPIC -Iinclude -D_GNU_SOURCE
-SOME_CFLAGS = $(COMMON_CFLAGS) $(BASIC_CFLAGS)
+SOME_CFLAGS = $(COMMON_CFLAGS) $(DEP_CFLAGS)
 MOST_CFLAGS = $(HAVE_CFLAGS) $(S_CFLAGS) $(SOME_CFLAGS)
 
 .PHONY: all
@@ -156,8 +157,6 @@ QUIET_LINK    = $(Q:@=@echo    '  LD      '$@;)
 QUIET_RM      = $(Q:@=@echo    '  RM      '$@;)
 QUIET_CHECK   = $(Q:@=@echo    '  CHECK   '$@;)
 QUIET_TEST    = $(Q:@=@echo    '  TEST    '$@;)
-
-BASIC_CFLAGS += -Wp,-MD,$(@D)/$(@F).d -MT $(@D)/$(@F)
 
 ifneq "$(MAKECMDGOALS)" "clean"
     DEP_FILES := $(shell find . -name '*'.d -printf '%P\n' | sort)
