@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 
-EXAMPLE_CFLAGS = $(MOST_CFLAGS) $(HOST_CFLAGS)
+EXAMPLE_CFLAGS = $(BASIC_HOST_CFLAGS) $(HOST_CFLAGS)
 
 EXAMPLE_INFO := lib/example/example-info
 EXAMPLE_PLAY := lib/example/example-play
