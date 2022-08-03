@@ -45,8 +45,14 @@ $(foreach f,$(PSGPLAY_SRC),$(eval $(call PSGPLAY_target,$(f))))
 
 ALL_OBJ += $(PSGPLAY_OBJ) system/unix/system-unix-disassemble.o
 
+PSGPLAY_LIBS = -lm
+
+ifeq "$(ALSA)" "1"
+PSGPLAY_LIBS += -lasound
+endif
+
 $(PSGPLAY): $(PSGPLAY_OBJ) $(LIBPSGPLAY_STATIC)
-	$(QUIET_LINK)$(HOST_CC) $(PSGPLAY_CFLAGS) -o $@ $^ $(LIBS)
+	$(QUIET_LINK)$(HOST_CC) $(PSGPLAY_CFLAGS) -o $@ $^ $(PSGPLAY_LIBS)
 
 .PHONY: install-psgplay
 install-psgplay: $(PSGPLAY)

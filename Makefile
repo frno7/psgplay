@@ -50,8 +50,6 @@ PSGPLAY_VERSION_MAJOR := $(shell echo '$(PSGPLAY_VERSION)' | sed 's/\..*$$//')
 
 export PSGPLAY_VERSION_MINOR PSGPLAY_VERSION_MAJOR
 
-LIBS += -lm
-
 ifeq "$(S)" "1"
 S_CFLAGS += -fsanitize=address -fsanitize=leak -fsanitize=undefined	\
 	  -fsanitize-address-use-after-scope -fstack-check
@@ -59,7 +57,6 @@ endif
 
 ifeq "$(ALSA)" "1"
 HAVE_CFLAGS += -DHAVE_ALSA
-LIBS += -lasound
 endif
 
 DEP_CFLAGS = -Wp,-MD,$(@D)/$(@F).d -MT $(@D)/$(@F)
