@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 
-TOS_CFLAGS += $(SOME_CFLAGS) -march=68000 -fno-PIC -nostdlib		\
+TOS_CFLAGS += $(BASIC_TARGET_CFLAGS) -march=68000 -fno-PIC -nostdlib	\
 	-isystem include/toslibc -D_TOSLIBC_SOURCE
 
 TOS_LDFLAGS += --orphan-handling=error --discard-all -nostdlib		\

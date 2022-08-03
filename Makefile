@@ -51,7 +51,7 @@ endif
 
 DEP_CFLAGS = -Wp,-MD,$(@D)/$(@F).d -MT $(@D)/$(@F)
 BASIC_CFLAGS = -O2 -Wall -D_GNU_SOURCE $(HAVE_CFLAGS) $(DEP_CFLAGS)
-SOME_CFLAGS = -Iinclude $(BASIC_CFLAGS)
+BASIC_TARGET_CFLAGS = -Iinclude $(BASIC_CFLAGS)
 MOST_CFLAGS = -Iinclude $(S_CFLAGS) $(BASIC_CFLAGS)
 
 .PHONY: all
