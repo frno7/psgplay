@@ -5,9 +5,7 @@ PRG_CFLAGS += $(BASIC_TARGET_CFLAGS) -march=68000 -fno-PIC -nostdlib	\
 	-isystem lib/toslibc/include/toslibc -D_TOSLIBC_SOURCE
 
 PRG_LDFLAGS += --relocatable --gc-sections --strip-all --entry _start	\
-	--script=script/prg.ld
-
-PRG_VLINKFLAGS += -b ataritos -tos-fastload -e _start
+	--script=lib/toslibc/script/prg.ld
 
 PSGPLAY_TOS := PSGPLAY.TOS
 PSGPLAY_PRG_OBJ := system/atari/PSGPLAY.PRG.o
@@ -43,11 +41,13 @@ $(foreach f,$(SYSTEM_ATARI_SRC),$(eval $(call SYSTEM_ATARI_target,$(f))))
 
 ALL_OBJ += $(SYSTEM_ATARI_OBJ) $(PSGPLAY_PRG_OBJ)
 
-$(PSGPLAY_PRG_OBJ): $(TOSLIBC_LIB_OBJ) $(SYSTEM_ATARI_OBJ)
+$(PSGPLAY_PRG_OBJ): $(TOSLIBC) $(SYSTEM_ATARI_OBJ)
 	$(QUIET_LINK)$(TARGET_LD) $(PRG_LDFLAGS) $(TARGET_LDFLAGS) -o $@ \
-		$(TOSLIBC_LIB_OBJ) $(SYSTEM_ATARI_OBJ)
+		$(SYSTEM_ATARI_OBJ) $(TOSLIBC)
+
+$(PSGPLAY_TOS): $(TOSLINK)
 
 $(PSGPLAY_TOS): $(PSGPLAY_PRG_OBJ)
-	$(QUIET_LINK)vlink $(PRG_VLINKFLAGS) -o $@ $^
+	$(QUIET_LINK)$(TOSLINK) -o $@ $<
 
 OTHER_CLEAN += $(PSGPLAY_TOS)

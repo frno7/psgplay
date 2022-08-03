@@ -14,6 +14,7 @@ include lib/example/Makefile
 ifdef TARGET_CC
 TOSLIBC_CFLAGS = $(BASIC_CFLAGS)
 include lib/toslibc/lib/Makefile
+include lib/toslibc/tool/Makefile
 endif
 
 include lib/out/Makefile
