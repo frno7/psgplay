@@ -31,10 +31,15 @@ PSGPLAY_SRC :=								\
 	$(UNICODE_SRC)							\
 	$(VT_SRC)
 
-PSGPLAY_OBJ := $(patsubst %.c, %.o, $(PSGPLAY_SRC))
+PSGPLAY_object = $(addprefix system/unix/,$(subst /,-,$(1:%.c=%.o)))
 
-$(PSGPLAY_OBJ): %.o : %.c
-	$(QUIET_CC)$(HOST_CC) $(MOST_CFLAGS) $(HOST_CFLAGS) -c -o $@ $<
+define PSGPLAY_target
+PSGPLAY_OBJ += $(call PSGPLAY_object,$(1))
+$(call PSGPLAY_object,$(1)): $(1)
+	$$(QUIET_CC)$$(HOST_CC) $$(MOST_CFLAGS) $$(HOST_CFLAGS) -c -o $$@ $$<
+endef
+
+$(foreach f,$(PSGPLAY_SRC),$(eval $(call PSGPLAY_target,$(f))))
 
 $(PSGPLAY): $(PSGPLAY_OBJ) $(LIBPSGPLAY_STATIC)
 	$(QUIET_LINK)$(HOST_CC) $(MOST_CFLAGS) $(HOST_CFLAGS) -o $@ $^ $(LIBS)
