@@ -44,12 +44,6 @@ XXD = xxd
 
 export XXD
 
-PSGPLAY_VERSION := $(shell script/version)
-PSGPLAY_VERSION_MINOR := $(shell echo '$(PSGPLAY_VERSION)' | sed 's/-.*$$//')
-PSGPLAY_VERSION_MAJOR := $(shell echo '$(PSGPLAY_VERSION)' | sed 's/\..*$$//')
-
-export PSGPLAY_VERSION_MINOR PSGPLAY_VERSION_MAJOR
-
 ifeq "$(S)" "1"
 S_CFLAGS += -fsanitize=address -fsanitize=leak -fsanitize=undefined	\
 	  -fsanitize-address-use-after-scope -fstack-check
