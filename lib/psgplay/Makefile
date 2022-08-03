@@ -107,9 +107,9 @@ install-lib-static: $(LIBPSGPLAY_STATIC)
 .PHONY: install-lib-shared
 install-lib-shared: $(LIBPSGPLAY_SHARED)
 	$(INSTALL) -d -m 755 $(DESTDIR)$(libdir)
-	$(INSTALL) $(LIBPSGPLAY_SHARED) $(DESTDIR)$(libdir)/libpsgplay.so.$(VERSION_MINOR)
-	ln -s libpsgplay.so.$(VERSION_MINOR) $(DESTDIR)$(libdir)/libpsgplay.so.$(VERSION_MAJOR)
-	ln -s libpsgplay.so.$(VERSION_MAJOR) $(DESTDIR)$(libdir)/libpsgplay.so
+	$(INSTALL) $(LIBPSGPLAY_SHARED) $(DESTDIR)$(libdir)/libpsgplay.so.$(PSGPLAY_VERSION_MINOR)
+	ln -s libpsgplay.so.$(PSGPLAY_VERSION_MINOR) $(DESTDIR)$(libdir)/libpsgplay.so.$(PSGPLAY_VERSION_MAJOR)
+	ln -s libpsgplay.so.$(PSGPLAY_VERSION_MAJOR) $(DESTDIR)$(libdir)/libpsgplay.so
 
 .PHONY: install-pkg
 install-pkg: $(LIBPSGPLAY_PC)

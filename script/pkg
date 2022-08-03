@@ -11,7 +11,7 @@ includedir=$includedir
 
 Name: psgplay
 Description: PSG play is a music player for Atari ST YM2149 SNDH files
-Version: ${VERSION_MINOR}"'
+Version: ${PSGPLAY_VERSION_MINOR}"'
 
 Libs: -L${libdir} -lpsgplay
 Cflags: -I${includedir}'

@@ -44,14 +44,14 @@ XXD = xxd
 
 export XXD
 
-VERSION_MINOR = $(shell script/version | sed 's/-.*$$//')
-VERSION_MAJOR = $(shell script/version | sed 's/\..*$$//')
+PSGPLAY_VERSION_MINOR = $(shell script/version | sed 's/-.*$$//')
+PSGPLAY_VERSION_MAJOR = $(shell script/version | sed 's/\..*$$//')
 
-export VERSION_MINOR VERSION_MAJOR
+export PSGPLAY_VERSION_MINOR PSGPLAY_VERSION_MAJOR
 
 LIBS += -lm
 
-SOFLAGS = -shared -Wl,-soname,libpsgplay.so.$(VERSION_MAJOR)
+SOFLAGS = -shared -Wl,-soname,libpsgplay.so.$(PSGPLAY_VERSION_MAJOR)
 
 ifeq "$(S)" "1"
 S_CFLAGS += -fsanitize=address -fsanitize=leak -fsanitize=undefined	\
