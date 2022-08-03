@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 
-lib/atari/rom.c: include/tos/tos.h
+lib/atari/rom.c: $(LIBPSGPLAY_TOS_HEADER)
 
 ATARI_SRC := $(addprefix lib/atari/,					\
 	bus.c								\

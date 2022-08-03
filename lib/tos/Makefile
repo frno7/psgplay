@@ -36,5 +36,7 @@ lib/tos/tos:
 
 endif
 
-include/tos/tos.h: lib/tos/tos
+LIBPSGPLAY_TOS_HEADER = include/tos/tos.h
+
+$(LIBPSGPLAY_TOS_HEADER): lib/tos/tos
 	$(QUIET_GEN)script/tos $< $@

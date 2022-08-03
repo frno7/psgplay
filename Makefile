@@ -97,7 +97,7 @@ version:
 
 .PHONY: clean
 clean:
-	$(QUIET_RM)$(RM) -f $(ALL_OBJ) $(ALL_DEP) include/tos/tos.h	\
+	$(QUIET_RM)$(RM) -f $(ALL_OBJ) $(ALL_DEP) $(LIBPSGPLAY_TOS_HEADER) \
 		$(EXAMPLE_INFO) $(EXAMPLE_PLAY)				\
 		$(PSGPLAY) $(PSGPLAY_TOS) GPATH GRTAGS GTAGS 		\
 		$(LIBPSGPLAY_STATIC) $(LIBPSGPLAY_SHARED)		\
