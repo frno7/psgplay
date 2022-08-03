@@ -14,17 +14,18 @@ pkgdir = $(libdir)/pkgconfig
 
 export prefix includedir libdir
 
-BUILD_CC = $(CC)
-HOST_AR = $(AR)
-HOST_CC = $(CC)
-
 ifdef BUILD_COMPILE
-HOST_CC = $(BUILD_COMPILE)gcc
+BUILD_CC = $(BUILD_COMPILE)gcc
+else
+BUILD_CC = $(CC)
 endif
 
 ifdef HOST_COMPILE
 HOST_CC = $(HOST_COMPILE)gcc
 HOST_AR = $(HOST_COMPILE)ar
+else
+HOST_CC = $(CC)
+HOST_AR = $(AR)
 endif
 
 ifdef TARGET_COMPILE
