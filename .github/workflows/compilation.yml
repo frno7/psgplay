@@ -1,0 +1,31 @@
+name: Compile and publish PSG play programs
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: ghcr.io/frno7/gentoo-m68k:main
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Archive tag
+        run: |
+          echo "ARCHIVE_TAG=${GITHUB_REF_NAME}-${GITHUB_SHA:0:8}" >> $GITHUB_ENV
+
+      - name: Compile PSGPLAY.TOS archive
+        env:
+          TARGET_COMPILE: m68k-elf-
+        run: |
+          JOBS="$(getconf _NPROCESSORS_ONLN)"
+          git submodule update --init --recursive
+          make -j"$JOBS" V=1 PSGPLAY.TOS
+
+      - name: Publish PSGPLAY.TOS archive
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: "psgplay-atari-${{ env.ARCHIVE_TAG }}"
+          path: PSGPLAY.TOS
