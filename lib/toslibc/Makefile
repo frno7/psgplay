@@ -2,7 +2,7 @@
 
 ifneq "x$(TARGET_CC)" "x"
 
-TOSLIBC_CFLAGS +=  $(DEP_CFLAGS) -march=68000 -fno-PIC -nostdlib	\
+TOSLIBC_CFLAGS +=  $(SOME_CFLAGS) -march=68000 -fno-PIC -nostdlib	\
 	-ffunction-sections -fdata-sections 				\
 	-isystem include/toslibc -D_TOSLIBC_SOURCE
 
