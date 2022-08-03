@@ -52,8 +52,6 @@ export PSGPLAY_VERSION_MINOR PSGPLAY_VERSION_MAJOR
 
 LIBS += -lm
 
-SOFLAGS = -shared -Wl,-soname,libpsgplay.so.$(PSGPLAY_VERSION_MAJOR)
-
 ifeq "$(S)" "1"
 S_CFLAGS += -fsanitize=address -fsanitize=leak -fsanitize=undefined	\
 	  -fsanitize-address-use-after-scope -fstack-check
