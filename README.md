@@ -1,3 +1,5 @@
+![compilation workflow](https://github.com/frno7/psgplay/actions/workflows/compilation.yml/badge.svg)
+
 ![Atari ST loading screen](https://raw.githubusercontent.com/frno7/psgplay/master/doc/atari-load.png)
 ![Atari ST main menu](https://raw.githubusercontent.com/frno7/psgplay/master/doc/atari-main.png)
 
