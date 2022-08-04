@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  build:
+  build-atari-st:
     runs-on: ubuntu-latest
     container: ghcr.io/frno7/gentoo-m68k:main
     steps:
@@ -15,7 +15,7 @@ jobs:
         run: |
           echo "ARCHIVE_TAG=${GITHUB_REF_NAME}-${GITHUB_SHA:0:8}" >> $GITHUB_ENV
 
-      - name: Compile PSGPLAY.TOS archive
+      - name: Compile PSGPLAY.TOS archive for the Atari ST
         env:
           TARGET_COMPILE: m68k-elf-
         run: |
@@ -23,9 +23,55 @@ jobs:
           git submodule update --init --recursive
           make -j"$JOBS" V=1 S=1 PSGPLAY.TOS
 
-      - name: Publish PSGPLAY.TOS archive
+      - name: Publish PSGPLAY.TOS archive for the Atari ST
         if: ${{ success() }}
         uses: actions/upload-artifact@v3
         with:
-          name: "psgplay-atari-${{ env.ARCHIVE_TAG }}"
+          name: "psgplay-atari-st-${{ env.ARCHIVE_TAG }}"
           path: PSGPLAY.TOS
+
+  build-linux:
+    strategy:
+      matrix:
+        arch: [ppc64le, aarch64, x86_64]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Arcive tag
+        run: |
+          echo "ARCHIVE_TAG=${{ matrix.arch }}-${GITHUB_REF_NAME}-${GITHUB_SHA:0:8}" >> $GITHUB_ENV
+
+      - uses: uraimo/run-on-arch-action@v2.2.0
+        name: Compile PSG play archive for Linux/${{ matrix.arch }}
+        if: ${{ matrix.arch != 'x86_64' }}
+        with:
+          arch: ${{ matrix.arch }}
+          # Not required, but speeds up builds
+          githubToken: ${{ github.token }}
+          install: |
+            apt-get update -q -y
+            apt-get install -q -y git make gcc libc-dev xxd libasound2 libasound2-dev
+          run: |
+            JOBS="$(getconf _NPROCESSORS_ONLN)"
+            # Avoid fatal: unsafe repository (directory is owned by someone else)
+            git config --global --add safe.directory "$PWD"
+            git config --global --add safe.directory "$PWD"/lib/toslibc
+            git submodule update --init --recursive
+            make -j"$JOBS" V=1 ALSA=1 psgplay
+
+      - name: Compile PSG play archive for Linux/x86_64
+        if: ${{ matrix.arch == 'x86_64' }}
+        run: |
+          sudo apt-get update -q -y
+          sudo apt-get install -q -y git make gcc libc-dev xxd libasound2 libasound2-dev
+          JOBS="$(getconf _NPROCESSORS_ONLN)"
+          git submodule update --init --recursive
+          make -j"$JOBS" V=1 ALSA=1 psgplay
+
+      - name: Publish PSG play archive for Linux
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: "psgplay-linux-${{ env.ARCHIVE_TAG }}"
+          path: psgplay
