@@ -9,6 +9,10 @@ and files in the [SNDH archive](http://sndh.atari.org/).
 
 # How to build
 
+This repository has Git [submodules](https://git-scm.com/docs/git-submodule)
+so clone it with the `--recurse-submodules` option, or do
+`git submodule update --init --recursive`.
+
 For Linux and Mac OS, do `make psgplay` to compile `psgplay`. To use
 [Advanced Linux Sound Architecture](https://en.wikipedia.org/wiki/Advanced_Linux_Sound_Architecture)
 (ALSA) and _interactive text mode_, do `make ALSA=1 psgplay`.
