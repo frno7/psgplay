@@ -1,7 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 
 ifdef TARGET_CC
-TOSLIBC_CFLAGS = $(BASIC_CFLAGS)
 include lib/toslibc/lib/Makefile
 include lib/toslibc/tool/Makefile
 endif
