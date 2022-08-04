@@ -30,12 +30,21 @@ variables can be configured for various compilation settings.
 The `BUILD_CFLAGS`, `HOST_CFLAGS`, `TARGET_CFLAGS`, and `TARGET_LDFLAGS`
 are available as well.
 
-Review the file [INSTALL](https://github.com/frno7/psgplay/blob/master/INSTALL)
+Review the file
+[`INSTALL`](https://github.com/frno7/psgplay/blob/master/INSTALL)
 for installation instructions.
 
 The package
-[media-sound/psgplay](https://github.com/frno7/gentoo.overlay/tree/master/media-sound/psgplay)
+[`media-sound/psgplay`](https://github.com/frno7/gentoo.overlay/tree/master/media-sound/psgplay)
 is available for [Gentoo Linux](https://www.gentoo.org/).
+
+Github [actions](https://github.com/frno7/psgplay/actions)
+automatically compile and publish archives with PSG play for
+the [Atari ST](https://en.wikipedia.org/wiki/Atari_ST),
+as well as Linux and the architectures
+[`ppc64le`](https://en.wikipedia.org/wiki/ppc64le),
+[`aarch64`](https://en.wikipedia.org/wiki/AArch64) and
+[`x86-64`](https://en.wikipedia.org/wiki/X86-64).
 
 # How to use
 
