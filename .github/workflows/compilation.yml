@@ -1,4 +1,4 @@
-name: Compile and publish PSG play programs
+name: Compile PSG play
 
 on:
   push:
@@ -58,7 +58,7 @@ jobs:
             git config --global --add safe.directory "$PWD"
             git config --global --add safe.directory "$PWD"/lib/toslibc
             git submodule update --init --recursive
-            make -j"$JOBS" V=1 ALSA=1 psgplay
+            make -j"$JOBS" V=1 ALSA=1 all test
 
       - name: Compile PSG play archive for Linux/x86_64
         if: ${{ matrix.arch == 'x86_64' }}
@@ -67,6 +67,8 @@ jobs:
           sudo apt-get install -q -y git make gcc libc-dev xxd libasound2 libasound2-dev
           JOBS="$(getconf _NPROCESSORS_ONLN)"
           git submodule update --init --recursive
+          make -j"$JOBS" V=1 S=1 ALSA=1 all test
+          make V=1 S=1 ALSA=1 clean
           make -j"$JOBS" V=1 ALSA=1 psgplay
 
       - name: Publish PSG play archive for Linux
