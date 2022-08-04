@@ -13,7 +13,7 @@ For Linux and Mac OS, do `make psgplay` to compile `psgplay`. To use
 [Advanced Linux Sound Architecture](https://en.wikipedia.org/wiki/Advanced_Linux_Sound_Architecture)
 (ALSA) and _interactive text mode_, do `make ALSA=1 psgplay`.
 
-For Atari ST, do `make TARGET_CC=m68k-elf-gcc TARGET_LD=m68k-elf-ld PSGPLAY.TOS`.
+For Atari ST, do `make TARGET_COMPILE=m68k-elf- PSGPLAY.TOS`.
 
 For [Javascript](https://en.wikipedia.org/wiki/JavaScript),
 [Webassembly](https://en.wikipedia.org/wiki/WebAssembly), and the
