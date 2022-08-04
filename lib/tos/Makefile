@@ -8,7 +8,7 @@ TOS_LDFLAGS += --orphan-handling=error --discard-all -nostdlib		\
 
 ALL_OBJ += lib/tos/reset.o lib/tos/sndh.o
 
-ifneq "x$(TARGET_CC)" "x"
+ifdef TARGET_CC
 
 lib/tos/reset.o: lib/tos/reset.S
 	$(QUIET_AS)$(TARGET_CC) $(TOS_CFLAGS) $(TARGET_CFLAGS) -c -o $@ $<
@@ -16,10 +16,10 @@ lib/tos/reset.o: lib/tos/reset.S
 lib/tos/sndh.o: lib/tos/sndh.c
 	$(QUIET_CC)$(TARGET_CC) $(TOS_CFLAGS) $(TARGET_CFLAGS) -c -o $@ $<
 
-TOS_TOSLIBC_OBJ +=							\
-	lib/toslibc/__mulsi3.o						\
-	lib/toslibc/__udivmodsi4.o					\
-	lib/toslibc/__udivsi3.o
+TOS_TOSLIBC_OBJ += $(addprefix $(TOSLIBC_LIB_SUBDIR),			\
+	__mulsi3.o							\
+	__udivmodsi4.o							\
+	__udivsi3.o)
 
 lib/tos/tos: $(TOS_TOSLIBC_OBJ)
 lib/tos/tos: script/tos.ld script/tos
