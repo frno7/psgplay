@@ -21,7 +21,7 @@ jobs:
         run: |
           JOBS="$(getconf _NPROCESSORS_ONLN)"
           git submodule update --init --recursive
-          make -j"$JOBS" V=1 PSGPLAY.TOS
+          make -j"$JOBS" V=1 S=1 PSGPLAY.TOS
 
       - name: Publish PSGPLAY.TOS archive
         if: ${{ success() }}
