@@ -44,7 +44,7 @@ XXD = xxd
 
 export XXD
 
-ifeq ($(S),1)
+ifeq (1,$(S))
 S_CFLAGS = -fsanitize=address -fsanitize=leak -fsanitize=undefined	\
 	  -fsanitize-address-use-after-scope -fstack-check
 endif

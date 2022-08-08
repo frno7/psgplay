@@ -68,7 +68,7 @@ M68KDT_OBJ := $(M68KDT_SRC:%.c=%.o)
 ALL_OBJ += $(M68KDG).o $(M68KMAKE).o					\
 	$(M68KDA_OBJ) $(M68KDT_OBJ) $(M68KDG_LINK_OBJ)
 
-ifeq "$(HAVE_SSO)" "1"
+ifeq (1,$(HAVE_SSO))
 
 M68K_SRC += $(M68KDA_SRC)
 M68K_OBJ := $(M68K_SRC:%.c=%.o)

@@ -21,7 +21,7 @@ SYSTEM_UNIX_SRC :=							\
 	system/unix/text-mode.c						\
 	system/unix/tty.c
 
-ifeq "$(HAVE_SSO)" "1"
+ifeq (1,$(HAVE_SSO))
 SYSTEM_UNIX_SRC += system/unix/disassemble.c
 endif
 
@@ -47,7 +47,7 @@ ALL_OBJ += $(PSGPLAY_OBJ) system/unix/system-unix-disassemble.o
 
 PSGPLAY_LIBS = -lm
 
-ifeq ($(ALSA),1)
+ifeq (1,$(ALSA))
 PSGPLAY_ALSA_LIB := $(shell pkg-config --silence-errors --libs alsa || echo -lasound)
 PSGPLAY_LIBS += $(PSGPLAY_ALSA_LIB)
 endif

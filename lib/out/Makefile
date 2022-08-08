@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 
-ifeq ($(ALSA),1)
+ifeq (1,$(ALSA))
 HAVE_CFLAGS += -DHAVE_ALSA
 endif
 
