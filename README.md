@@ -24,7 +24,9 @@ For Atari ST, do `make TARGET_COMPILE=m68k-elf- PSGPLAY.TOS`.
 For [Javascript](https://en.wikipedia.org/wiki/JavaScript),
 [Webassembly](https://en.wikipedia.org/wiki/WebAssembly), and the
 [Emscripten](https://en.wikipedia.org/wiki/Emscripten) compiler, do
-`make HOST_CC=emcc web`.
+`make HOST_CC=emcc web`. The PSG play library is available with
+[Cowbell](https://github.com/demozoo/cowbell), having a particular
+focus on [demoscene](https://en.wikipedia.org/wiki/Demoscene) music.
 
 The `BUILD_CC`, `HOST_AR`, `HOST_CC`, and `TARGET_CC` with `TARGET_LD`
 [`Makefile`](https://github.com/frno7/psgplay/blob/master/Makefile)
