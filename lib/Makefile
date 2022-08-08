@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: GPL-2.0
 
-ifdef TARGET_CC
-include lib/toslibc/lib/Makefile
-include lib/toslibc/tool/Makefile
+-include lib/toslibc/lib/Makefile
+-include lib/toslibc/tool/Makefile
+ifndef TOSLINK
+$(warning WARNING: Missing toslibc Git submodule; clone with the "--recurse-submodules" option, or do "git submodule update --init --recursive")
 endif
 
 include lib/version/Makefile
