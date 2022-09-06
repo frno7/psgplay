@@ -277,24 +277,26 @@ static size_t branch_address(size_t offset, const void *data, size_t size)
 {
 	const uint8_t *b = data;
 
-	if (offset + size < 2)
-		return 0;
+	if (size < 2)
+		return 0; //no branch can be found if we expect 1 or 0 bytes of opcode here
 
 	const uint16_t w = (b[offset + 0] << 8) | b[offset + 1];
 	if (w == 0x4e71)	/* nop */
+		return branch_address(offset + 2, data, size);
+	if (w == 0x4e75)	/* rts */
 		return branch_address(offset + 2, data, size);
 
 	if ((w & 0xff00) == 0x6000 && (w & 0xff) != 0)		/* bra.s */
 		return offset + (w & 0xff);
 
-	if (offset + size < 4)
-		return 0;
+	if (size < 4)
+		return 0; //no branch found if we expect 2 or 3 bytes opcode size  
 
 	if (w == 0x6000 ||	/* bra.w */
 	    w == 0x4efa)	/* jmp(pc) */
 		return offset + 2 + ((b[offset + 2] << 8) | b[offset + 3]);
 
-	return 0;
+	return 0; //no branch opcode found
 }
 
 static void branch_bound(size_t *bound,
@@ -302,7 +304,7 @@ static void branch_bound(size_t *bound,
 {
 	const size_t a = branch_address(offset, data, size);
 
-	if (a < *bound)
+	if (a < *bound && a!=0) //ignore branches not found, see http://sndh.atari.org/sndh/sndh_lf/Whittaker_David/Verminator.sndh and others - this would return "has no tags" due to rts at +4 otherwise, which would be wrong 
 		*bound = a;
 }
 
@@ -311,8 +313,8 @@ static size_t tag_bound(const void *data, const size_t size)
 	size_t bound = size;
 
 	branch_bound(&bound, 0, data,  4);
-	branch_bound(&bound, 4, data,  8);
-	branch_bound(&bound, 8, data, 12);
+	branch_bound(&bound, 4, data,  4);
+	branch_bound(&bound, 8, data,  4);
 
 	return bound;
 }
