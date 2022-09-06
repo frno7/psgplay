@@ -294,7 +294,8 @@ static size_t branch_address(size_t offset, const void *data, size_t size)
 	    w == 0x4efa)	/* jmp(pc) */
 		return offset + 2 + ((b[offset + 2] << 8) | b[offset + 3]);
 
-	return 0;
+	return 0;		/* 0x4e75 rts, etc. */
+
 }
 
 static void branch_bound(size_t *bound,
@@ -302,7 +303,7 @@ static void branch_bound(size_t *bound,
 {
 	const size_t a = branch_address(offset, data, size);
 
-	if (a < *bound)
+	if (a > 0 && a < *bound)
 		*bound = a;
 }
 
