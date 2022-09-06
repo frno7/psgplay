@@ -1,4 +1,4 @@
-name: Compile PSG play
+name: build
 
 on:
   push:
@@ -38,7 +38,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Arcive tag
+      - name: Archive tag
         run: |
           echo "ARCHIVE_TAG=${{ matrix.arch }}-${GITHUB_REF_NAME}-${GITHUB_SHA:0:8}" >> $GITHUB_ENV
 
