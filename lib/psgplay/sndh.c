@@ -277,7 +277,7 @@ static size_t branch_address(size_t offset, const void *data, size_t size)
 {
 	const uint8_t *b = data;
 
-	if (offset + size < 2)
+	if (offset + 2 > size)
 		return 0;
 
 	const uint16_t w = (b[offset + 0] << 8) | b[offset + 1];
@@ -287,7 +287,7 @@ static size_t branch_address(size_t offset, const void *data, size_t size)
 	if ((w & 0xff00) == 0x6000 && (w & 0xff) != 0)		/* bra.s */
 		return offset + (w & 0xff);
 
-	if (offset + size < 4)
+	if (offset + 4 > size)
 		return 0;
 
 	if (w == 0x6000 ||	/* bra.w */
