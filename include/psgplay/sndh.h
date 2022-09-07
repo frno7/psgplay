@@ -201,7 +201,7 @@ size_t sndh_play_address(const void *data, const size_t size);
 /**
  * struct sndh_diagnostic - SNDH tag diagnostic message callbacks
  * @warn: diagnostic warning message
- * @error: diagnostic erro message
+ * @error: diagnostic error message
  * @arg: optional callback argument, can be %NULL
  */
 struct sndh_diagnostic {
