@@ -249,8 +249,6 @@ static void psg_wr_u8(const struct device *device, u32 dev_address, u8 data)
 		break;
 	case 2:
 	case 3:
-		if (reg_select == 13)
-			env_cycle = psg_cycle;
 		if (reg_select < 16)
 			psg.reg[reg_select] = data;
 		break;
