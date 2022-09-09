@@ -14,6 +14,9 @@
 #include "atari/machine.h"
 #include "atari/psg.h"
 
+static uint16_t ym2149dac[16][16][16] =
+#include "atari/ym2149dac.h"
+
 #include "psgplay/psgplay.h"
 #include "psgplay/sndh.h"
 
@@ -220,12 +223,11 @@ static void digital_to_stereo(const struct psgplay_digital *sample,
 	size_t count, struct psgplay *pp)
 {
 	for (size_t i = 0; i < count; i++) {
-		const s16 sa = psg_dac(sample[i].psg.lva);
-		const s16 sb = psg_dac(sample[i].psg.lvb);
-		const s16 sc = psg_dac(sample[i].psg.lvc);
-
-		/* Simplistic linear channel mix. */
-		const s16 s = sample->mixer.mix ? (sa + sb + sc) / 3 : 0;
+		const s16 s = sample->mixer.mix ?
+			ym2149dac[clamp_t(int, sample[i].psg.lvc, 0, 15)]
+				 [clamp_t(int, sample[i].psg.lvb, 0, 15)]
+				 [clamp_t(int, sample[i].psg.lva, 0, 15)] -
+			0x8000 : 0;
 
 		/* Simplistic half volume each to PSG and sound. */
 		const s16 left  = (sample[i].sound.left  + s) / 2;
