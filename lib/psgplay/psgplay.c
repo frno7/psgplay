@@ -60,6 +60,11 @@ struct psgplay {
 		void *arg;
 	} digital_to_stereo_callback;
 
+	struct {
+		psgplay_stereo_downsample_cb cb;
+		void *arg;
+	} stereo_downsample_callback;
+
 	const struct machine *machine;
 
 	struct {
@@ -260,6 +265,13 @@ static size_t stereo_downsample(struct psgplay_stereo *resample,
 	return r;
 }
 
+void psgplay_stereo_downsample_callback(struct psgplay *pp,
+	const psgplay_stereo_downsample_cb cb, void *arg)
+{
+	pp->stereo_downsample_callback.cb = cb;
+	pp->stereo_downsample_callback.arg = arg;
+}
+
 static void digital_to_stereo_downsample(struct psgplay *pp,
 	const struct psgplay_digital *digital, const size_t count)
 {
@@ -273,8 +285,8 @@ static void digital_to_stereo_downsample(struct psgplay *pp,
 		pp->digital_to_stereo_callback.cb(stereo, &digital[i], n,
 			pp->digital_to_stereo_callback.arg);
 
-		const size_t r = stereo_downsample(
-			resample, stereo, n, &pp->downsample);
+		const size_t r = pp->stereo_downsample_callback.cb(resample,
+			stereo, n, pp->stereo_downsample_callback.arg);
 
 		pp->errno_ = buffer_stereo_sample(&pp->stereo_buffer, resample, r);
 
@@ -355,6 +367,9 @@ struct psgplay *psgplay_init(const void *data, size_t size,
 
 	psgplay_digital_to_stereo_callback(pp,
 		psgplay_digital_to_stereo_linear, NULL);
+
+	psgplay_stereo_downsample_callback(pp,
+		stereo_downsample, &pp->downsample);
 
 	return pp;
 }
