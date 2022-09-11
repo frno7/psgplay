@@ -207,11 +207,8 @@ static s16 psg_dac(const u8 level)
 	return (level < 16 ? dac[level] : 0xffff) - 0x8000;
 }
 
-static void digital_to_stereo(
-	struct psgplay *pp,
-	struct psgplay_stereo *stereo,
-	const struct psgplay_digital *digital,
-	size_t count)
+static void digital_to_stereo(struct psgplay_stereo *stereo,
+	const struct psgplay_digital *digital, size_t count, void *arg)
 {
 	for (size_t i = 0; i < count; i++) {
 		const s16 sa = psg_dac(digital[i].psg.lva);
@@ -229,13 +226,10 @@ static void digital_to_stereo(
 	}
 }
 
-static size_t stereo_downsample(
-	struct psgplay *pp,
-	struct psgplay_stereo *resample,
-	const struct psgplay_stereo *stereo,
-	size_t count)
+static size_t stereo_downsample(struct psgplay_stereo *resample,
+	const struct psgplay_stereo *stereo, size_t count, void *arg)
 {
-	struct psgplay_downsample *ds = &pp->downsample;
+	struct psgplay_downsample *ds = arg;
 	size_t r = 0;
 
 	for (size_t i = 0; i < count; i++) {
@@ -264,9 +258,10 @@ static void digital_to_stereo_downsample(struct psgplay *pp,
 	while (i < count && !pp->errno_) {
 		const size_t n = min(count - i, ARRAY_SIZE(stereo));
 
-		digital_to_stereo(pp, stereo, &digital[i], n);
+		digital_to_stereo(stereo, &digital[i], n, NULL);
 
-		const size_t r = stereo_downsample(pp, resample, stereo, n);
+		const size_t r = stereo_downsample(
+			resample, stereo, n, &pp->downsample);
 
 		pp->errno_ = buffer_stereo_sample(&pp->stereo_buffer, resample, r);
 
