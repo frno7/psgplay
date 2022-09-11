@@ -55,6 +55,11 @@ struct psgplay {
 		} lowpass;
 	} downsample;
 
+	struct {
+		psgplay_digital_to_stereo_cb cb;
+		void *arg;
+	} digital_to_stereo_callback;
+
 	const struct machine *machine;
 
 	struct {
@@ -207,7 +212,7 @@ static s16 psg_dac(const u8 level)
 	return (level < 16 ? dac[level] : 0xffff) - 0x8000;
 }
 
-static void digital_to_stereo(struct psgplay_stereo *stereo,
+void psgplay_digital_to_stereo_linear(struct psgplay_stereo *stereo,
 	const struct psgplay_digital *digital, size_t count, void *arg)
 {
 	for (size_t i = 0; i < count; i++) {
@@ -224,6 +229,13 @@ static void digital_to_stereo(struct psgplay_stereo *stereo,
 			.right = (digital[i].sound.right + s) / 2
 		};
 	}
+}
+
+void psgplay_digital_to_stereo_callback(struct psgplay *pp,
+	const psgplay_digital_to_stereo_cb cb, void *arg)
+{
+	pp->digital_to_stereo_callback.cb = cb;
+	pp->digital_to_stereo_callback.arg = arg;
 }
 
 static size_t stereo_downsample(struct psgplay_stereo *resample,
@@ -258,7 +270,8 @@ static void digital_to_stereo_downsample(struct psgplay *pp,
 	while (i < count && !pp->errno_) {
 		const size_t n = min(count - i, ARRAY_SIZE(stereo));
 
-		digital_to_stereo(stereo, &digital[i], n, NULL);
+		pp->digital_to_stereo_callback.cb(stereo, &digital[i], n,
+			pp->digital_to_stereo_callback.arg);
 
 		const size_t r = stereo_downsample(
 			resample, stereo, n, &pp->downsample);
@@ -339,6 +352,9 @@ struct psgplay *psgplay_init(const void *data, size_t size,
 	pp->downsample.stereo_frequency = stereo_frequency;
 	pp->machine = &atari_st;
 	pp->machine->init(data, size, offset, &regs, &ports);
+
+	psgplay_digital_to_stereo_callback(pp,
+		psgplay_digital_to_stereo_linear, NULL);
 
 	return pp;
 }
