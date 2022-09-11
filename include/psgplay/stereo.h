@@ -47,6 +47,18 @@ typedef void (*psgplay_digital_to_stereo_cb)(
 	size_t count, void *arg);
 
 /**
+ * psgplay_digital_to_stereo_empiric - empiric stereo mix of digital samples
+ * @stereo: stereo samples
+ * @digital: digital samples
+ * @count: number of stereo samples to transform into digital samples
+ * @arg: ignored, can be %NULL
+ *
+ * YM2149 PSG channel mix, as measured on Atari ST hardware.
+ */
+void psgplay_digital_to_stereo_empiric(struct psgplay_stereo *stereo,
+	const struct psgplay_digital *digital, size_t count, void *arg);
+
+/**
  * psgplay_digital_to_stereo_linear - linear stereo mix of digital samples
  * @stereo: stereo samples
  * @digital: digital samples

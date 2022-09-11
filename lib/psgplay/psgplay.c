@@ -236,6 +236,27 @@ void psgplay_digital_to_stereo_linear(struct psgplay_stereo *stereo,
 	}
 }
 
+void psgplay_digital_to_stereo_empiric(struct psgplay_stereo *stereo,
+	const struct psgplay_digital *digital, size_t count, void *arg)
+{
+	static const uint16_t dac[16][16][16] =
+#include "atari/psg-empiric.h"
+
+	for (size_t i = 0; i < count; i++) {
+		const s16 s = digital->mixer.mix ?
+			dac[min_t(uint8_t, digital[i].psg.lvc, 0xf)]
+			   [min_t(uint8_t, digital[i].psg.lvb, 0xf)]
+			   [min_t(uint8_t, digital[i].psg.lva, 0xf)] -
+			0x8000 : 0;
+
+		/* Simplistic half volume each to PSG and sound. */
+		stereo[i] = (struct psgplay_stereo) {
+			.left  = (digital[i].sound.left  + s) / 2,
+			.right = (digital[i].sound.right + s) / 2
+		};
+	}
+}
+
 void psgplay_digital_to_stereo_callback(struct psgplay *pp,
 	const psgplay_digital_to_stereo_cb cb, void *arg)
 {
