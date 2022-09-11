@@ -93,6 +93,7 @@ LIBPSGPLAY_HEADERS =							\
 	include/psgplay/digital.h					\
 	include/psgplay/psgplay.h					\
 	include/psgplay/sndh.h						\
+	include/psgplay/stereo.h					\
 	include/psgplay/version.h
 
 .PHONY: install-lib

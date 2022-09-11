@@ -148,6 +148,7 @@ PSG play is compiled into the static library
 [application programming interface](https://en.wikipedia.org/wiki/Application_programming_interface)
 (API) is documented in
 [`include/psgplay/psgplay.h`](https://github.com/frno7/psgplay/blob/master/include/psgplay/psgplay.h),
+[`include/psgplay/stereo.h`](https://github.com/frno7/psgplay/blob/master/include/psgplay/stereo.h),
 [`include/psgplay/sndh.h`](https://github.com/frno7/psgplay/blob/master/include/psgplay/sndh.h) and
 [`include/psgplay/version.h`](https://github.com/frno7/psgplay/blob/master/include/psgplay/version.h).
 
