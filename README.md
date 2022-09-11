@@ -84,6 +84,11 @@ Play options:
     -t, --track=<num>      set track number
     -f, --frequency=<num>  set audio frequency in Hz (default 44100)
 
+    --psg-mix=<empiric|linear>
+                           empiric mixes the three PSG channels as measured
+                           on Atari ST hardware; linear sums the channels to
+                           produce a cleaner sound (default linear)
+
 Disassembly options:
 
     --disassemble          disassemble SNDH file and exit; may be combined

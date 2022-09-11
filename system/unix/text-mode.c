@@ -47,18 +47,28 @@ struct tty_arg {
 	struct sample_buffer *sb;
 };
 
+static struct psgplay *psgplay_init__(const void *data,
+	size_t size, int track, int frequency)
+{
+	struct psgplay *pp = psgplay_init(data, size, track, frequency);
+
+	if (!pp)
+		pr_fatal_error("Failed to init PSG play\n");
+
+	psgplay_digital_to_stereo_callback(pp, psg_mix_option(), NULL);
+
+	return pp;
+}
+
 static struct sample_buffer sample_buffer_init(const void *data, size_t size,
 	const char *option_output, int track, int frequency,
 	const struct output *output)
 {
 	struct sample_buffer sb = {
-		.pp = psgplay_init(data, size, track, frequency),
+		.pp = psgplay_init__(data, size, track, frequency),
 		.output = output,
 		.output_arg = output->open(option_output, frequency, true),
 	};
-
-	if (!sb.pp)
-		pr_fatal_error("Failed to init PSG play\n");
 
 	return sb;
 }
@@ -98,9 +108,7 @@ static bool sample_buffer_play(struct sample_buffer *sb,
 {
 	BUG_ON(sb->pp);
 
-	sb->pp = psgplay_init(data, size, track, frequency);
-	if (!sb->pp)
-		return false;
+	sb->pp = psgplay_init__(data, size, track, frequency);
 
 	return true;
 }

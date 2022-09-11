@@ -101,6 +101,11 @@ void command_replay(const struct options *options, struct file file,
 		options->track, options->frequency);
 	ssize_t sample_count = 0;
 
+	if (!pp)
+		pr_fatal_error("%s: failed to init PSG play\n", progname);
+
+	psgplay_digital_to_stereo_callback(pp, psg_mix_option(), NULL);
+
 	for (;;) {
 		struct psgplay_stereo buffer[256];
 

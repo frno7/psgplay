@@ -64,6 +64,11 @@ static void help(FILE *file)
 "    -t, --track=<num>      set track number\n"
 "    -f, --frequency=<num>  set audio frequency in Hz (default 44100)\n"
 "\n"
+"    --psg-mix=<empiric|linear>\n"
+"                           empiric mixes the three PSG channels as measured\n"
+"                           on Atari ST hardware; linear sums the channels to\n"
+"                           produce a cleaner sound (default linear)\n"
+"\n"
 "Disassembly options:\n"
 "\n"
 "    --disassemble          disassemble SNDH file and exit; may be combined\n"
@@ -169,6 +174,18 @@ TRACE_DEVICE(TRACE_DEVICE_OPT)
 	return (struct trace_mode) { .m = m };
 }
 
+psgplay_digital_to_stereo_cb psg_mix_option(void)
+{
+	if (strcmp(option.psg_mix, "empiric") == 0)
+		return psgplay_digital_to_stereo_empiric;
+	if (strcmp(option.psg_mix, "linear") == 0)
+		return psgplay_digital_to_stereo_linear;
+
+	pr_fatal_error("unknown PSG mix: %s\n", option.psg_mix);
+
+	return NULL;
+}
+
 struct options *parse_options(int argc, char **argv)
 {
 	static const struct option options[] = {
@@ -188,6 +205,8 @@ struct options *parse_options(int argc, char **argv)
 		{ "track",               required_argument, NULL, 0 },
 		{ "frequency",           required_argument, NULL, 0 },
 
+		{ "psg-mix",             required_argument, NULL, 0 },
+
 		{ "disassemble",         no_argument,       NULL, 0 },
 		{ "disassemble-header",  no_argument,       NULL, 0 },
 		{ "disassemble-address", no_argument,       NULL, 0 },
@@ -204,6 +223,7 @@ struct options *parse_options(int argc, char **argv)
 
 	option.track = -1;
 	option.frequency = 44100;
+	option.psg_mix = "linear";
 
 	for (;;) {
 		int index = 0;
@@ -242,6 +262,8 @@ struct options *parse_options(int argc, char **argv)
 				goto opt_t;
 			else if (OPT("frequency"))
 				goto opt_f;
+			else if (OPT("psg-mix"))
+				option.psg_mix = optarg;
 
 			else if (OPT("trace"))
 				option.trace = trace_option(optarg);
