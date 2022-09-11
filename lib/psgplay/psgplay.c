@@ -44,14 +44,16 @@ struct psgplay {
 	struct stereo_buffer stereo_buffer;
 	struct digital_buffer digital_buffer;
 
-	int stereo_frequency;
-	u64 psg_cycle;
-	u64 downsample_sample_cycle;
+	struct psgplay_downsample {
+		int stereo_frequency;
+		u64 psg_cycle;
+		u64 downsample_sample_cycle;
 
-	struct {
-		struct fir8 left;
-		struct fir8 right;
-	} lowpass;
+		struct {
+			struct fir8 left;
+			struct fir8 right;
+		} lowpass;
+	} downsample;
 
 	const struct machine *machine;
 
@@ -233,19 +235,20 @@ static size_t stereo_downsample(
 	const struct psgplay_stereo *stereo,
 	size_t count)
 {
+	struct psgplay_downsample *ds = &pp->downsample;
 	size_t r = 0;
 
 	for (size_t i = 0; i < count; i++) {
-		const u64 n = (pp->stereo_frequency * pp->psg_cycle) / PSG_FREQUENCY;
+		const u64 n = (ds->stereo_frequency * ds->psg_cycle) / PSG_FREQUENCY;
 		const struct psgplay_stereo s = {
-			.left  = sample_lowpass(stereo[i].left,  &pp->lowpass.left),
-			.right = sample_lowpass(stereo[i].right, &pp->lowpass.right)
+			.left  = sample_lowpass(stereo[i].left,  &ds->lowpass.left),
+			.right = sample_lowpass(stereo[i].right, &ds->lowpass.right)
 		};
 
-		for (; pp->downsample_sample_cycle < n; pp->downsample_sample_cycle++)
+		for (; ds->downsample_sample_cycle < n; ds->downsample_sample_cycle++)
 			resample[r++] = s;
 
-		pp->psg_cycle += 8;
+		ds->psg_cycle += 8;
 	}
 
 	return r;
@@ -338,7 +341,7 @@ struct psgplay *psgplay_init(const void *data, size_t size,
 		.arg = pp
 	};
 
-	pp->stereo_frequency = stereo_frequency;
+	pp->downsample.stereo_frequency = stereo_frequency;
 	pp->machine = &atari_st;
 	pp->machine->init(data, size, offset, &regs, &ports);
 
@@ -414,7 +417,7 @@ ssize_t psgplay_read_stereo(struct psgplay *pp,
 	struct stereo_buffer *sb = &pp->stereo_buffer;
 	size_t index = 0;
 
-	if (!pp->stereo_frequency)
+	if (!pp->downsample.stereo_frequency)
 		return -EINVAL;
 
 	while (index < count) {
@@ -453,7 +456,7 @@ ssize_t psgplay_read_stereo(struct psgplay *pp,
 ssize_t psgplay_read_digital(struct psgplay *pp,
 	struct psgplay_digital *buffer, size_t count)
 {
-	if (pp->stereo_frequency)
+	if (pp->downsample.stereo_frequency)
 		return -EINVAL;
 
 	return psgplay_read_digital__(pp, buffer, count);
