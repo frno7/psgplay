@@ -63,24 +63,25 @@ struct psgplay {
 	int errno_;
 };
 
-static int buffer_stereo_sample(s16 left, s16 right, struct stereo_buffer *sb)
+static int buffer_stereo_sample(struct stereo_buffer *sb,
+	const struct psgplay_stereo *stereo, const size_t count)
 {
-	if (sb->capacity <= sb->count) {
-		const size_t capacity = sb->capacity +
-			max_t(size_t, sb->capacity, 1024);
+	for (size_t i = 0; i < count; i++) {
+		if (sb->capacity <= sb->count) {
+			const size_t capacity = sb->capacity +
+				max_t(size_t, sb->capacity, 1024);
 
-		void *sample = realloc(sb->sample,
-			capacity * sizeof(*sb->sample));
-		if (!sample)
-			return errno;
+			void *sample = realloc(sb->sample,
+				capacity * sizeof(*sb->sample));
+			if (!sample)
+				return errno;
 
-		sb->sample = sample;
-		sb->capacity = capacity;
+			sb->sample = sample;
+			sb->capacity = capacity;
+		}
+
+		sb->sample[sb->count++] = stereo[i];
 	}
-
-	sb->sample[sb->count].left = left;
-	sb->sample[sb->count].right = right;
-	sb->count++;
 
 	return 0;
 }
@@ -163,18 +164,6 @@ static int buffer_digital_mixer_sample(const struct mixer_sample *sample,
 	return err;
 }
 
-static void psgplay_downsample(s16 left, s16 right, struct psgplay *pp)
-{
-	const u64 n = (pp->stereo_frequency * pp->psg_cycle) / PSG_FREQUENCY;
-
-	for (; pp->downsample_sample_cycle < n; pp->downsample_sample_cycle++)
-		if (!pp->errno_)
-			pp->errno_ = buffer_stereo_sample(left, right,
-				&pp->stereo_buffer);
-
-	pp->psg_cycle += 8;
-}
-
 static s16 sample_lowpass(s16 sample, struct fir8 *lowpass)
 {
 	lowpass->xn[lowpass->k++ % ARRAY_SIZE(lowpass->xn)] = sample;
@@ -216,24 +205,69 @@ static s16 psg_dac(const u8 level)
 	return (level < 16 ? dac[level] : 0xffff) - 0x8000;
 }
 
-static void digital_to_stereo(const struct psgplay_digital *sample,
-	size_t count, struct psgplay *pp)
+static void digital_to_stereo(
+	struct psgplay *pp,
+	struct psgplay_stereo *stereo,
+	const struct psgplay_digital *digital,
+	size_t count)
 {
 	for (size_t i = 0; i < count; i++) {
-		const s16 sa = psg_dac(sample[i].psg.lva);
-		const s16 sb = psg_dac(sample[i].psg.lvb);
-		const s16 sc = psg_dac(sample[i].psg.lvc);
+		const s16 sa = psg_dac(digital[i].psg.lva);
+		const s16 sb = psg_dac(digital[i].psg.lvb);
+		const s16 sc = psg_dac(digital[i].psg.lvc);
 
 		/* Simplistic linear channel mix. */
-		const s16 s = sample->mixer.mix ? (sa + sb + sc) / 3 : 0;
+		const s16 s = digital->mixer.mix ? (sa + sb + sc) / 3 : 0;
 
 		/* Simplistic half volume each to PSG and sound. */
-		const s16 left  = (sample[i].sound.left  + s) / 2;
-		const s16 right = (sample[i].sound.right + s) / 2;
+		stereo[i] = (struct psgplay_stereo) {
+			.left  = (digital[i].sound.left  + s) / 2,
+			.right = (digital[i].sound.right + s) / 2
+		};
+	}
+}
 
-		psgplay_downsample(
-			sample_lowpass(left,  &pp->lowpass.left),
-			sample_lowpass(right, &pp->lowpass.right), pp);
+static size_t stereo_downsample(
+	struct psgplay *pp,
+	struct psgplay_stereo *resample,
+	const struct psgplay_stereo *stereo,
+	size_t count)
+{
+	size_t r = 0;
+
+	for (size_t i = 0; i < count; i++) {
+		const u64 n = (pp->stereo_frequency * pp->psg_cycle) / PSG_FREQUENCY;
+		const struct psgplay_stereo s = {
+			.left  = sample_lowpass(stereo[i].left,  &pp->lowpass.left),
+			.right = sample_lowpass(stereo[i].right, &pp->lowpass.right)
+		};
+
+		for (; pp->downsample_sample_cycle < n; pp->downsample_sample_cycle++)
+			resample[r++] = s;
+
+		pp->psg_cycle += 8;
+	}
+
+	return r;
+}
+
+static void digital_to_stereo_downsample(struct psgplay *pp,
+	const struct psgplay_digital *digital, const size_t count)
+{
+	struct psgplay_stereo stereo[4096];
+	struct psgplay_stereo resample[ARRAY_SIZE(stereo)];
+	size_t i = 0;
+
+	while (i < count && !pp->errno_) {
+		const size_t n = min(count - i, ARRAY_SIZE(stereo));
+
+		digital_to_stereo(pp, stereo, &digital[i], n);
+
+		const size_t r = stereo_downsample(pp, resample, stereo, n);
+
+		pp->errno_ = buffer_stereo_sample(&pp->stereo_buffer, resample, r);
+
+		i += n;
 	}
 }
 
@@ -400,7 +434,7 @@ ssize_t psgplay_read_stereo(struct psgplay *pp,
 			if (n < 0)
 				return n;
 
-			digital_to_stereo(d, n, pp);
+			digital_to_stereo_downsample(pp, d, n);
 		}
 
 		const size_t n = min(count - index, sb->count - sb->index);
