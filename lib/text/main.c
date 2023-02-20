@@ -35,25 +35,44 @@ static void main_form(struct vt_buffer *vtb, const struct text_sndh *sndh)
 
 static void main_data(struct vt_buffer *vtb, const struct text_sndh *sndh)
 {
-	int subtune = 0;
+	int title_count = 0;
+	int time_count = 0;
 
 	sndh_for_each_tag (sndh->data, sndh->size)
 		if (strcmp(sndh_tag_name, "COMM") == 0) {
 			vt_printf(vtb, 1, 0, vt_attr_normal,
 				"%s", sndh_tag_value);
 		} else if (strcmp(sndh_tag_name, "!#SN") == 0) {
-			subtune++;
+			title_count++;
 
-			vt_printf(vtb, 3 + subtune, 5,
+			vt_printf(vtb, 3 + title_count, 5,
 				vt_attr_normal, "%s", sndh_tag_value);
 		}
 
-	if (!subtune)
+	if (!title_count)
 		for (int i = 0; i < sndh->subtune_count; i++)
 			vt_printf(vtb, 4 + i, 5, vt_attr_normal,
 				"%s", sndh->title);
 
 	vt_printf(vtb, 2, 0, vt_attr_normal, "%s", sndh->title);
+
+	sndh_for_each_tag (sndh->data, sndh->size)
+		if (strcmp(sndh_tag_name, "TIME") == 0) {
+			int t;
+
+			time_count++;
+
+			if (sscanf(sndh_tag_value, "%d", &t) != 1)
+				continue;
+
+			if (t)
+				vt_printf(vtb, 3 + time_count, 34,
+					vt_attr_normal, " %02d:%02d",
+					t / 60, t % 60);
+			else
+				vt_printf(vtb, 3 + time_count, 34,
+					vt_attr_normal, " --:--");
+		}
 }
 
 static void cursor_hide(struct vt_buffer *vtb, int cursor)
