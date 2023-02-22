@@ -85,9 +85,9 @@ Play options:
     -f, --frequency=<num>  set audio frequency in Hz (default 44100)
 
     --psg-mix=<empiric|linear>
-                           empiric mixes the three PSG channels as measured
-                           on Atari ST hardware; linear sums the channels to
-                           produce a cleaner sound (default linear)
+                           empiric (default) mixes the three PSG channels as
+                           measured on Atari ST hardware; linear sums the
+                           channels to produce a cleaner sound
 
 Disassembly options:
 

@@ -387,7 +387,7 @@ struct psgplay *psgplay_init(const void *data, size_t size,
 	pp->machine->init(data, size, offset, &regs, &ports);
 
 	psgplay_digital_to_stereo_callback(pp,
-		psgplay_digital_to_stereo_linear, NULL);
+		psgplay_digital_to_stereo_empiric, NULL);
 
 	psgplay_stereo_downsample_callback(pp,
 		stereo_downsample, &pp->downsample);

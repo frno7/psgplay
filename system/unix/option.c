@@ -65,9 +65,9 @@ static void help(FILE *file)
 "    -f, --frequency=<num>  set audio frequency in Hz (default 44100)\n"
 "\n"
 "    --psg-mix=<empiric|linear>\n"
-"                           empiric mixes the three PSG channels as measured\n"
-"                           on Atari ST hardware; linear sums the channels to\n"
-"                           produce a cleaner sound (default linear)\n"
+"                           empiric (default) mixes the three PSG channels as\n"
+"                           measured on Atari ST hardware; linear sums the\n"
+"                           channels to produce a cleaner sound\n"
 "\n"
 "Disassembly options:\n"
 "\n"
@@ -223,7 +223,7 @@ struct options *parse_options(int argc, char **argv)
 
 	option.track = -1;
 	option.frequency = 44100;
-	option.psg_mix = "linear";
+	option.psg_mix = "empiric";
 
 	for (;;) {
 		int index = 0;
