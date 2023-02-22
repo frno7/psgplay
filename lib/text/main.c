@@ -37,6 +37,7 @@ static void main_data(struct vt_buffer *vtb, const struct text_sndh *sndh)
 {
 	int title_count = 0;
 	int time_count = 0;
+	int time_total = 0;
 
 	sndh_for_each_tag (sndh->data, sndh->size)
 		if (strcmp(sndh_tag_name, "COMM") == 0) {
@@ -65,14 +66,25 @@ static void main_data(struct vt_buffer *vtb, const struct text_sndh *sndh)
 			if (sscanf(sndh_tag_value, "%d", &t) != 1)
 				continue;
 
-			if (t)
+			if (!t) {
+				vt_printf(vtb, 3 + time_count, 34,
+					vt_attr_normal, " --:--");
+
+				time_total = -1;
+			} else
 				vt_printf(vtb, 3 + time_count, 34,
 					vt_attr_normal, " %02d:%02d",
 					t / 60, t % 60);
-			else
-				vt_printf(vtb, 3 + time_count, 34,
-					vt_attr_normal, " --:--");
+
+			if (time_total >= 0)
+				time_total += t;
 		}
+
+	if (time_total > 0)
+		vt_printf(vtb, 24, 35, vt_attr_reverse, "%02d:%02d",
+			time_total / 60, time_total % 60);
+	else if (time_total < 0)
+		vt_printf(vtb, 24, 35, vt_attr_reverse, "--:--");
 }
 
 static void cursor_hide(struct vt_buffer *vtb, int cursor)
@@ -152,11 +164,10 @@ static void main_init(struct vt_buffer *vtb, struct text_state *view,
 	vt_clear(vtb);
 
 	main_title(vtb, 0, "PSG play");
+	main_title(vtb, vtb->server.size.rows - 1, "");
 
 	main_form(vtb, sndh);
 	main_data(vtb, sndh);
-
-	main_title(vtb, vtb->server.size.rows - 1, "");
 }
 
 static u64 main_view(struct vt_buffer *vtb, struct text_state *view,
