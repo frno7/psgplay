@@ -3,6 +3,7 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
+#include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -256,6 +257,12 @@ static u64 model_update(struct sample_buffer *sb,
 	return sample_buffer_update(sb, timestamp);
 }
 
+static unicode_t nonspace_charset_atari_st_to_utf32(u8 c, void *arg)
+{
+	return isspace(c) || iscntrl(c) ?
+		c : charset_atari_st_to_utf32(c, arg);
+}
+
 void text_replay(const struct options *options, struct file file,
 	const struct output *output)
 {
@@ -308,7 +315,7 @@ void text_replay(const struct options *options, struct file file,
 	for (;;) {
 		vt_write_fifo_utf8_from_charset(
 			&tty_vt.vtb, &tty_out.fifo,
-			charset_atari_st_to_utf32, NULL);
+			nonspace_charset_atari_st_to_utf32, NULL);
 
 		const struct poll_fifo pfs[] = {
 			{ .fd = STDIN_FILENO,  .in  = &tty_in.fifo  },
