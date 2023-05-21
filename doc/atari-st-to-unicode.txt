@@ -12,8 +12,8 @@
 0x0B	0x266A	# EIGHTH NOTE                                       	# ♪	AtariST
 0x0C	0x240C	# SYMBOL FOR FORM FEED                              	# ␌	AtariST
 0x0D	0x240D	# SYMBOL FOR CARRIAGE RETURN                        	# ␍	AtariST
-0x0E	0x000E	# SHIFT OUT                                         	# <SO>	ISO646
-0x0F	0x000F	# SHIFT IN                                          	# <SI>	ISO646
+0x0E	0xE00E	# ATARI LOGO LEFT PART                                	# 	AtariST
+0x0F	0xE00F	# ATARI LOGO RIGHT PART                              	# 	AtariST
 0x10	0x1FBF0	# SEGMENTED DIGIT ZERO                              	# 🯰	AtariST
 0x11	0x1FBF1	# SEGMENTED DIGIT ONE                               	# 🯱	AtariST
 0x12	0x1FBF2	# SEGMENTED DIGIT TWO                               	# 🯲	AtariST
@@ -26,11 +26,11 @@
 0x19	0x1FBF9	# SEGMENTED DIGIT NINE                              	# 🯹	AtariST
 0x1A	0x0259	# LATIN SMALL LETTER SCHWA                          	# ə	AtariST
 0x1B	0x241B	# SYMBOL FOR ESCAPE                                 	# ␛	AtariST
-0x1C	0x001C	# FILE SEPARATOR                                    	# <FS>	ISO646
-0x1D	0x001D	# GROUP SEPARATOR                                   	# <GS>	ISO646
-0x1E	0x001E	# RECORD SEPARATOR                                  	# <RS>	ISO646
-0x1F	0x001F	# UNIT SEPARATOR                                    	# <US>	ISO646
-0x20	0x0020	# SPACE                                             	# <SP>	ISO646
+0x1C	0xE01C	# JR DOBS UPPER LEFT PART                             	# 	AtariST
+0x1D	0xE01D	# JR DOBS UPPER RIGHT PART                             	# 	AtariST
+0x1E	0xE01E	# JR DOBS LOWER LEFT PART                              	# 	AtariST
+0x1F	0xE01F	# JR DOBS LOWER RIGHT PART                             	# 	AtariST
+0x20	0x0020	# SPACE                                             	#  	ASCII
 0x21	0x0021	# EXCLAMATION MARK                                  	# !	ASCII
 0x22	0x0022	# QUOTATION MARK                                    	# "	ASCII
 0x23	0x0023	# NUMBER SIGN                                       	# #	ASCII
