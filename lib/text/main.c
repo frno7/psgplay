@@ -59,12 +59,13 @@ static void main_data(struct vt_buffer *vtb, const struct text_sndh *sndh)
 
 	sndh_for_each_tag (sndh->data, sndh->size)
 		if (strcmp(sndh_tag_name, "TIME") == 0) {
-			int t;
-
 			time_count++;
 
-			if (sscanf(sndh_tag_value, "%d", &t) != 1)
+			char *end = NULL;
+			const long v = strtol(sndh_tag_value, &end, 10);
+			if (*end != '\0')
 				continue;
+			const int t = v;
 
 			if (!t) {
 				vt_printf(vtb, 3 + time_count, 34,
