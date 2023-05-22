@@ -187,13 +187,77 @@ static s16 sample_lowpass(s16 sample, struct fir8 *lowpass)
 	return x / ARRAY_SIZE(lowpass->xn);
 }
 
-static struct psgplay_stereo stereo_mix(
+struct mixer {
+	struct {
+		int left;
+		int right;
+	} volume;
+	struct {
+		float left;
+		float right;
+	} gain;
+};
+
+static struct mixer mixer_init()
+{
+	return (struct mixer) { .gain = { .left = 1.0f, .right = 1.0 } };
+}
+
+static float gain_from_volume(const int volume)
+{
+	static const float gain[] = {		/* 0 .. -120 dB */
+		1.000000000,
+		0.891250938, 0.794328235, 0.707945784, 0.630957344,
+		0.562341325, 0.501187234, 0.446683592, 0.398107171,
+		0.354813389, 0.316227766, 0.281838293, 0.251188643,
+		0.223872114, 0.199526231, 0.177827941, 0.158489319,
+		0.141253754, 0.125892541, 0.112201845, 0.100000000,
+		0.089125094, 0.079432823, 0.070794578, 0.063095734,
+		0.056234133, 0.050118723, 0.044668359, 0.039810717,
+		0.035481339, 0.031622777, 0.028183829, 0.025118864,
+		0.022387211, 0.019952623, 0.017782794, 0.015848932,
+		0.014125375, 0.012589254, 0.011220185, 0.010000000,
+		0.008912509, 0.007943282, 0.007079458, 0.006309573,
+		0.005623413, 0.005011872, 0.004466836, 0.003981072,
+		0.003548134, 0.003162278, 0.002818383, 0.002511886,
+		0.002238721, 0.001995262, 0.001778279, 0.001584893,
+		0.001412538, 0.001258925, 0.001122018, 0.001000000,
+		0.000891251, 0.000794328, 0.000707946, 0.000630957,
+		0.000562341, 0.000501187, 0.000446684, 0.000398107,
+		0.000354813, 0.000316228, 0.000281838, 0.000251189,
+		0.000223872, 0.000199526, 0.000177828, 0.000158489,
+		0.000141254, 0.000125893, 0.000112202, 0.000100000,
+		0.000089125, 0.000079433, 0.000070795, 0.000063096,
+		0.000056234, 0.000050119, 0.000044668, 0.000039811,
+		0.000035481, 0.000031623, 0.000028184, 0.000025119,
+		0.000022387, 0.000019953, 0.000017783, 0.000015849,
+		0.000014125, 0.000012589, 0.000011220, 0.000010000,
+		0.000008913, 0.000007943, 0.000007079, 0.000006310,
+		0.000005623, 0.000005012, 0.000004467, 0.000003981,
+		0.000003548, 0.000003162, 0.000002818, 0.000002512,
+		0.000002239, 0.000001995, 0.000001778, 0.000001585,
+		0.000001413, 0.000001259, 0.000001122, 0.000001000,
+	};
+
+	return gain[clamp_t(int, 0, ARRAY_SIZE(gain) - 1, -volume)];
+}
+
+static struct psgplay_stereo stereo_mix(struct mixer *m,
 	const s16 s, const struct psgplay_digital d)
 {
+	if (m->volume.left  != d.mixer.volume.main + d.mixer.volume.left ||
+	    m->volume.right != d.mixer.volume.main + d.mixer.volume.right) {
+		m->volume.left  = d.mixer.volume.main + d.mixer.volume.left;
+		m->volume.right = d.mixer.volume.main + d.mixer.volume.right;
+
+		m->gain.left  = gain_from_volume(m->volume.left);
+		m->gain.right = gain_from_volume(m->volume.right);
+	}
+
 	return (struct psgplay_stereo) {
 		/* Simplistic half volume each to PSG and sound. */
-		.left  = (d.sound.left  + s) / 2,
-		.right = (d.sound.right + s) / 2
+		.left  = m->gain.left  * (d.sound.left  + s) / 2,
+		.right = m->gain.right * (d.sound.right + s) / 2
 	};
 }
 
@@ -230,6 +294,8 @@ static s16 psg_dac(const u8 level)
 void psgplay_digital_to_stereo_linear(struct psgplay_stereo *stereo,
 	const struct psgplay_digital *digital, size_t count, void *arg)
 {
+	struct mixer m = mixer_init();
+
 	for (size_t i = 0; i < count; i++) {
 		const s16 sa = psg_dac(digital[i].psg.lva);
 		const s16 sb = psg_dac(digital[i].psg.lvb);
@@ -238,7 +304,7 @@ void psgplay_digital_to_stereo_linear(struct psgplay_stereo *stereo,
 		/* Simplistic linear channel mix. */
 		const s16 s = digital->mixer.mix ? (sa + sb + sc) / 3 : 0;
 
-		stereo[i] = stereo_mix(s, digital[i]);
+		stereo[i] = stereo_mix(&m, s, digital[i]);
 	}
 }
 
@@ -248,6 +314,8 @@ void psgplay_digital_to_stereo_empiric(struct psgplay_stereo *stereo,
 	static const uint16_t dac[16][16][16] =
 #include "atari/psg-empiric.h"
 
+	struct mixer m = mixer_init();
+
 	for (size_t i = 0; i < count; i++) {
 		const s16 s = digital->mixer.mix ?
 			dac[min_t(uint8_t, digital[i].psg.lvc, 0xf)]
@@ -255,7 +323,7 @@ void psgplay_digital_to_stereo_empiric(struct psgplay_stereo *stereo,
 			   [min_t(uint8_t, digital[i].psg.lva, 0xf)] -
 			0x8000 : 0;
 
-		stereo[i] = stereo_mix(s, digital[i]);
+		stereo[i] = stereo_mix(&m, s, digital[i]);
 	}
 }
 
