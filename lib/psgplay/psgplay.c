@@ -187,6 +187,16 @@ static s16 sample_lowpass(s16 sample, struct fir8 *lowpass)
 	return x / ARRAY_SIZE(lowpass->xn);
 }
 
+static struct psgplay_stereo stereo_mix(
+	const s16 s, const struct psgplay_digital d)
+{
+	return (struct psgplay_stereo) {
+		/* Simplistic half volume each to PSG and sound. */
+		.left  = (d.sound.left  + s) / 2,
+		.right = (d.sound.right + s) / 2
+	};
+}
+
 static s16 psg_dac(const u8 level)
 {
 	/*
@@ -228,11 +238,7 @@ void psgplay_digital_to_stereo_linear(struct psgplay_stereo *stereo,
 		/* Simplistic linear channel mix. */
 		const s16 s = digital->mixer.mix ? (sa + sb + sc) / 3 : 0;
 
-		/* Simplistic half volume each to PSG and sound. */
-		stereo[i] = (struct psgplay_stereo) {
-			.left  = (digital[i].sound.left  + s) / 2,
-			.right = (digital[i].sound.right + s) / 2
-		};
+		stereo[i] = stereo_mix(s, digital[i]);
 	}
 }
 
@@ -249,11 +255,7 @@ void psgplay_digital_to_stereo_empiric(struct psgplay_stereo *stereo,
 			   [min_t(uint8_t, digital[i].psg.lva, 0xf)] -
 			0x8000 : 0;
 
-		/* Simplistic half volume each to PSG and sound. */
-		stereo[i] = (struct psgplay_stereo) {
-			.left  = (digital[i].sound.left  + s) / 2,
-			.right = (digital[i].sound.right + s) / 2
-		};
+		stereo[i] = stereo_mix(s, digital[i]);
 	}
 }
 
