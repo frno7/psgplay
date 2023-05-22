@@ -185,10 +185,7 @@ static void timer_delay_event(const struct device *device,
 	struct timer *timer, const struct timer_cycle timer_cycle)
 {
 	if (timer_ctrl(timer) == mfp_ctrl_stop) {
-		/* FIXME: Update counter with elapsed time */
-
-		timer->timeout.c = 0;
-		return;
+		return;		/* FIXME: Update counter with elapsed time */
 	}
 
 	/*
