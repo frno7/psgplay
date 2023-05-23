@@ -253,7 +253,7 @@ static float gain_from_volume(const int volume)
 		0.000001413, 0.000001259, 0.000001122, 0.000001000,
 	};
 
-	return gain[clamp_t(int, 0, ARRAY_SIZE(gain) - 1, -volume)];
+	return gain[clamp_t(int, -volume, 0, ARRAY_SIZE(gain) - 1)];
 }
 
 static inline void mixer_for_sample(struct mixer *m,
