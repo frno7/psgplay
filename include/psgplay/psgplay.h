@@ -35,6 +35,16 @@ struct psgplay *psgplay_init(const void *data, size_t size,
 void psgplay_free(struct psgplay *pp);
 
 /**
+ * psgplay_stop - stop a PSG play object previously initialised
+ * @pp: PSG play object to stop
+ *
+ * Calling psgplay_stop() is optional, but it will allow PSG play to
+ * fade out stereo samples, which prevents a sharp and often audible
+ * cut-off.
+ */
+void psgplay_stop(struct psgplay *pp);
+
+/**
  * psgplay_stop_at_time - stop PSG play after a given time
  * @pp: PSG play object to stop
  * @time: time in seconds to stop at

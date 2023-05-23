@@ -17,6 +17,8 @@
 #include "psgplay/psgplay.h"
 #include "psgplay/sndh.h"
 
+#define FADE_SAMPLES 2500	/* 10 ms with 250 kHz */
+
 struct fir8 {
 	s16 xn[8];
 	int k;
@@ -639,6 +641,12 @@ void psgplay_stop_digital_at_sample(struct psgplay *pp, size_t index)
 void psgplay_stop_at_time(struct psgplay *pp, float time)
 {
 	psgplay_stop_digital_at_sample(pp, 250e3 * time);
+}
+
+void psgplay_stop(struct psgplay *pp)
+{
+	psgplay_stop_digital_at_sample(pp,
+		pp->digital_buffer.total + FADE_SAMPLES);
 }
 
 void psgplay_instruction_callback(struct psgplay *pp,
