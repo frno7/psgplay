@@ -188,6 +188,7 @@ static s16 sample_lowpass(s16 sample, struct fir8 *lowpass)
 }
 
 struct mixer {
+	bool enable;
 	struct {
 		int left;
 		int right;
@@ -198,9 +199,22 @@ struct mixer {
 	} gain;
 };
 
-static struct mixer mixer_init()
+static struct mixer mixer_init(
+	const struct psgplay_digital *digital, size_t count)
 {
-	return (struct mixer) { .gain = { .left = 1.0f, .right = 1.0 } };
+	int8_t enable = 0;
+
+	for (size_t i = 0; i < count; i++)
+		enable |= digital[i].mixer.volume.main
+		       |  digital[i].mixer.volume.left
+		       |  digital[i].mixer.volume.right
+		       |  digital[i].mixer.tone.bass
+		       |  digital[i].mixer.tone.treble;
+
+	return (struct mixer) {
+		.enable = enable,
+		.gain = { .left = 1.0f, .right = 1.0 }
+	};
 }
 
 static float gain_from_volume(const int volume)
@@ -242,23 +256,37 @@ static float gain_from_volume(const int volume)
 	return gain[clamp_t(int, 0, ARRAY_SIZE(gain) - 1, -volume)];
 }
 
-static struct psgplay_stereo stereo_mix(struct mixer *m,
+static inline void mixer_for_sample(struct mixer *m,
+	const struct psgplay_digital d)
+{
+	if (m->volume.left  == d.mixer.volume.main + d.mixer.volume.left &&
+	    m->volume.right == d.mixer.volume.main + d.mixer.volume.right)
+		return;
+
+	m->volume.left  = d.mixer.volume.main + d.mixer.volume.left;
+	m->volume.right = d.mixer.volume.main + d.mixer.volume.right;
+
+	m->gain.left  = gain_from_volume(m->volume.left);
+	m->gain.right = gain_from_volume(m->volume.right);
+}
+
+static inline struct psgplay_stereo stereo_mix(struct mixer *m,
 	const s16 s, const struct psgplay_digital d)
 {
-	if (m->volume.left  != d.mixer.volume.main + d.mixer.volume.left ||
-	    m->volume.right != d.mixer.volume.main + d.mixer.volume.right) {
-		m->volume.left  = d.mixer.volume.main + d.mixer.volume.left;
-		m->volume.right = d.mixer.volume.main + d.mixer.volume.right;
+	if (m->enable) {
+		mixer_for_sample(m, d);
 
-		m->gain.left  = gain_from_volume(m->volume.left);
-		m->gain.right = gain_from_volume(m->volume.right);
-	}
-
-	return (struct psgplay_stereo) {
-		/* Simplistic half volume each to PSG and sound. */
-		.left  = m->gain.left  * (d.sound.left  + s) / 2,
-		.right = m->gain.right * (d.sound.right + s) / 2
-	};
+		return (struct psgplay_stereo) {
+			/* Simplistic half volume each to PSG and sound. */
+			.left  = m->gain.left  * (d.sound.left  + s) / 2,
+			.right = m->gain.right * (d.sound.right + s) / 2
+		};
+	} else
+		return (struct psgplay_stereo) {
+			/* Simplistic half volume each to PSG and sound. */
+			.left  = (d.sound.left  + s) / 2,
+			.right = (d.sound.right + s) / 2
+		};
 }
 
 static s16 psg_dac(const u8 level)
@@ -294,7 +322,7 @@ static s16 psg_dac(const u8 level)
 void psgplay_digital_to_stereo_linear(struct psgplay_stereo *stereo,
 	const struct psgplay_digital *digital, size_t count, void *arg)
 {
-	struct mixer m = mixer_init();
+	struct mixer m = mixer_init(digital, count);
 
 	for (size_t i = 0; i < count; i++) {
 		const s16 sa = psg_dac(digital[i].psg.lva);
@@ -314,7 +342,7 @@ void psgplay_digital_to_stereo_empiric(struct psgplay_stereo *stereo,
 	static const uint16_t dac[16][16][16] =
 #include "atari/psg-empiric.h"
 
-	struct mixer m = mixer_init();
+	struct mixer m = mixer_init(digital, count);
 
 	for (size_t i = 0; i < count; i++) {
 		const s16 s = digital->mixer.mix ?
