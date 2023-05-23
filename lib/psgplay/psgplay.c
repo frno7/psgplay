@@ -636,6 +636,11 @@ void psgplay_stop_digital_at_sample(struct psgplay *pp, size_t index)
 	pp->digital_buffer.stop = index;
 }
 
+void psgplay_stop_at_time(struct psgplay *pp, float time)
+{
+	psgplay_stop_digital_at_sample(pp, 250e3 * time);
+}
+
 void psgplay_instruction_callback(struct psgplay *pp,
 	void (*cb)(uint32_t pc, void *arg), void *arg)
 {

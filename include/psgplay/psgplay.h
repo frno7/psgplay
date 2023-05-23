@@ -35,6 +35,17 @@ struct psgplay *psgplay_init(const void *data, size_t size,
 void psgplay_free(struct psgplay *pp);
 
 /**
+ * psgplay_stop_at_time - stop PSG play after a given time
+ * @pp: PSG play object to stop
+ * @time: time in seconds to stop at
+ *
+ * Calling psgplay_stop_at_time() is optional, but it will allow PSG play
+ * to fade out stereo samples, which prevents a sharp and often audible
+ * cut-off.
+ */
+void psgplay_stop_at_time(struct psgplay *pp, float time);
+
+/**
  * psgplay_instruction_callback - invoke callback for every CPU instruction
  * @pp: PSG play object
  * @cb: callback
