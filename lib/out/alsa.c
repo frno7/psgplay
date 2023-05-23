@@ -34,6 +34,7 @@ struct alsa_stereo_sample {
 };
 
 struct alsa_state {
+	bool nonblocking;
 	const char *output;
 
 	snd_pcm_t *pcm_handle;
@@ -126,6 +127,24 @@ static bool alsa_resume(void *arg)
 	return true;
 }
 
+static void alsa_flush(void *arg)
+{
+	struct alsa_state *state = arg;
+
+	snd_pcm_nonblock(state->pcm_handle, 0);
+
+	while (!fifo_empty(&state->fifo))
+		alsa_sample_flush(state);
+
+	int err = snd_pcm_drain(state->pcm_handle);
+	if (err < 0)
+		pr_fatal_error("%s: ALSA snd_pcm_drain failed: %s\n",
+			state->output, snd_strerror(err));
+
+	if (state->nonblocking)
+		snd_pcm_nonblock(state->pcm_handle, SND_PCM_NONBLOCK);
+}
+
 static void alsa_drop(void *arg)
 {
 	struct alsa_state *state = arg;
@@ -150,6 +169,7 @@ static void *alsa_open(const char *output, int frequency, bool nonblocking)
 	int err;
 
 	*state = (struct alsa_state) {
+		.nonblocking = nonblocking,
 		.output = output,
 		.frequency = frequency,
 		.fifo = {
@@ -235,6 +255,7 @@ const struct output alsa_output = {
 	.sample	= alsa_sample,
 	.pause	= alsa_pause,
 	.resume	= alsa_resume,
+	.flush	= alsa_flush,
 	.drop	= alsa_drop,
 	.close	= alsa_close,
 #endif /* HAVE_ALSA */
