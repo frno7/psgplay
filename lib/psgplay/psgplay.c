@@ -26,6 +26,7 @@ struct stereo_buffer {
 	size_t index;
 	size_t count;
 	size_t capacity;
+	size_t total;
 	struct psgplay_stereo *sample;
 };
 
@@ -37,6 +38,7 @@ struct digital_buffer {
 		size_t mixer;
 	} count;
 	size_t capacity;
+	size_t total;
 	struct psgplay_digital *sample;
 };
 
@@ -551,6 +553,7 @@ static ssize_t psgplay_read_digital__(struct psgplay *pp,
 
 		index += n;
 		db->index += n;
+		db->total += n;
 	}
 
 	return index;
@@ -593,6 +596,7 @@ ssize_t psgplay_read_stereo(struct psgplay *pp,
 
 		index += n;
 		sb->index += n;
+		sb->total += n;
 	}
 
 	return index;
