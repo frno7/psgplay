@@ -219,8 +219,8 @@ static struct mixer mixer_init(
 
 static float gain_from_volume(const int volume)
 {
-	static const float gain[] = {		/* 0 .. -120 dB */
-		1.000000000,
+	static const float gain[] = {
+		1.000000000, /* g = 10^(v/20) for 0 ... -120 dB */
 		0.891250938, 0.794328235, 0.707945784, 0.630957344,
 		0.562341325, 0.501187234, 0.446683592, 0.398107171,
 		0.354813389, 0.316227766, 0.281838293, 0.251188643,
