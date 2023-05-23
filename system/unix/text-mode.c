@@ -105,8 +105,39 @@ static struct sample_buffer sample_buffer_init(
 	return sb;
 }
 
-static bool sample_buffer_stop(struct sample_buffer *sb, u64 timestamp)
+static void sample_buffer_flush(struct sample_buffer *sb)
 {
+	if (!sb->pp)
+		return;
+
+	psgplay_stop(sb->pp);
+
+	for (;;) {
+		if (sb->index == sb->size) {
+			sb->index = 0;
+			sb->size = psgplay_read_stereo(sb->pp,
+				sb->buffer, ARRAY_SIZE(sb->buffer));
+
+			if (!sb->size)
+				break;
+		}
+
+		while (sb->index < sb->size)
+			if (sb->output->sample(
+					sb->buffer[sb->index].left,
+					sb->buffer[sb->index].right,
+					sb->output_arg))
+				sb->index++;
+	}
+
+	if (sb->output->flush)
+		sb->output->flush(sb->output_arg);
+}
+
+static bool sample_buffer_stop(struct sample_buffer *sb)
+{
+	sample_buffer_flush(sb);
+
 	psgplay_free(sb->pp);
 
 	sb->pp = NULL;
@@ -252,7 +283,7 @@ static void model_restart(struct sample_buffer *sb,
 		return;
 	}
 
-	if (!sample_buffer_stop(sb, timestamp))
+	if (!sample_buffer_stop(sb))
 		return;
 
 	model->op = TRACK_STOP;
