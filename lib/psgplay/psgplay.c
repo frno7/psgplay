@@ -39,6 +39,7 @@ struct digital_buffer {
 	} count;
 	size_t capacity;
 	size_t total;
+	size_t stop;
 	struct psgplay_digital *sample;
 };
 
@@ -526,6 +527,13 @@ static ssize_t psgplay_read_digital__(struct psgplay *pp,
 	struct digital_buffer *db = &pp->digital_buffer;
 	size_t index = 0;
 
+	if (db->stop) {
+		if (db->total >= db->stop)
+			return 0;
+
+		count = min(count, db->stop - db->total);
+	}
+
 	cpu_instruction_callback(
 		pp->instruction_callback.cb,
 		pp->instruction_callback.arg);
@@ -584,6 +592,8 @@ ssize_t psgplay_read_stereo(struct psgplay *pp,
 
 			if (n < 0)
 				return n;
+			else if (!n)
+				return index;
 
 			digital_to_stereo_downsample(pp, d, n);
 		}
@@ -619,6 +629,11 @@ void psgplay_free(struct psgplay *pp)
 	free(pp->stereo_buffer.sample);
 	free(pp->digital_buffer.sample);
 	free(pp);
+}
+
+void psgplay_stop_digital_at_sample(struct psgplay *pp, size_t index)
+{
+	pp->digital_buffer.stop = index;
 }
 
 void psgplay_instruction_callback(struct psgplay *pp,

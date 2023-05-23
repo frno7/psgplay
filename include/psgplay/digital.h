@@ -86,9 +86,21 @@ struct psgplay_digital {
  * @buffer: buffer to read into, can be %NULL to ignore
  * @count: number of digital samples to read
  *
- * Return: number of read samples, or negative on failure
+ * Return: number of read samples, zero for end of samples indicating
+ * PSG play has been stopped, or negative on failure
  */
 ssize_t psgplay_read_digital(struct psgplay *pp,
 	struct psgplay_digital *buffer, size_t count);
+
+/**
+ * psgplay_stop_digital_at_sample - stop PSG play after a given sample index
+ * @pp: PSG play object to stop
+ * @index: digital sample index to stop at
+ *
+ * Calling psgplay_stop_digital_at_sample() is optional, but it will allow
+ * PSG play to fade out stereo samples, which prevents a sharp and often
+ * audible cut-off.
+ */
+void psgplay_stop_digital_at_sample(struct psgplay *pp, size_t index);
 
 #endif /* PSGPLAY_DIGITAL_H */

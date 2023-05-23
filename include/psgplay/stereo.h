@@ -29,7 +29,8 @@ struct psgplay_stereo {
  * @buffer: buffer to read into, can be %NULL to ignore
  * @count: number of stereo samples to read
  *
- * Return: number of read samples, or negative on failure
+ * Return: number of read samples, zero for end of samples indicating
+ * PSG play has been stopped, or negative on failure
  */
 ssize_t psgplay_read_stereo(struct psgplay *pp,
 	struct psgplay_stereo *buffer, size_t count);
