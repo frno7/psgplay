@@ -133,6 +133,8 @@ A cursor is shown with `>`. Keyboard controls:
 - `s` to stop;
 - `p` or `spacebar` to pause;
 - `1`, `2`, ..., `9` to play tunes 1, 2, ..., 9;
+- `-` to decrease volume;
+- `+` to increase volume;
 - `<` to play the previous tune;
 - `>` to play the next tune;
 - `k` or `up arrow` to move the cursor up;
@@ -398,6 +400,6 @@ artifacts such as the high level of noise produced with original Atari hardware.
 As described in issues
 [#9](https://github.com/frno7/psgplay/issues/9) and
 [#10](https://github.com/frno7/psgplay/issues/10),
-DMA sound and LMC1992 for tone and volume control specific to
+DMA sound and LMC1992 for tone control specific to
 [Atari STE](https://en.wikipedia.org/wiki/Atari_ST#STE_models)
 and related hardware are not yet fully emulated by PSG play.

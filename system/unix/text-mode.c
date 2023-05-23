@@ -42,31 +42,62 @@ struct sample_buffer {
 	void *output_arg;
 };
 
+struct sample_mixer {
+	struct text_mixer *tm;
+	psgplay_digital_to_stereo_cb cb;
+	struct psgplay_digital buffer[4096];
+};
+
 struct tty_arg {
 	struct vt_buffer *vtb;
 	const struct text_state *model;
 	struct sample_buffer *sb;
+	struct sample_mixer *sm;
 };
 
+void digital_to_stereo(struct psgplay_stereo *stereo,
+	const struct psgplay_digital *digital, size_t count, void *arg)
+{
+	struct sample_mixer *sm = arg;
+
+	if (!sm->tm->volume) {
+		sm->cb(stereo, digital, count, NULL);
+		return;
+	}
+
+	for (size_t k = 0; k < count; k += ARRAY_SIZE(sm->buffer)) {
+		const size_t n = min(count - k, ARRAY_SIZE(sm->buffer));
+
+		memcpy(sm->buffer, &digital[k],
+			sizeof(struct psgplay_digital[n]));
+
+		for (size_t i = 0; i < n; i++)
+			sm->buffer[i].mixer.volume.main = sm->tm->volume;
+
+		sm->cb(&stereo[k], sm->buffer, n, NULL);
+	}
+}
+
 static struct psgplay *psgplay_init__(const void *data,
-	size_t size, int track, int frequency)
+	size_t size, int track, int frequency, struct sample_mixer *sm)
 {
 	struct psgplay *pp = psgplay_init(data, size, track, frequency);
 
 	if (!pp)
 		pr_fatal_error("Failed to init PSG play\n");
 
-	psgplay_digital_to_stereo_callback(pp, psg_mix_option(), NULL);
+	psgplay_digital_to_stereo_callback(pp, digital_to_stereo, sm);
 
 	return pp;
 }
 
-static struct sample_buffer sample_buffer_init(const void *data, size_t size,
+static struct sample_buffer sample_buffer_init(
+	struct sample_mixer *sm, const void *data, size_t size,
 	const char *option_output, int track, int frequency,
 	const struct output *output)
 {
 	struct sample_buffer sb = {
-		.pp = psgplay_init__(data, size, track, frequency),
+		.pp = psgplay_init__(data, size, track, frequency, sm),
 		.output = output,
 		.output_arg = output->open(option_output, frequency, true),
 	};
@@ -105,11 +136,12 @@ static bool sample_buffer_resume(struct sample_buffer *sb)
 }
 
 static bool sample_buffer_play(struct sample_buffer *sb,
-	const void *data, size_t size, int track, int frequency, u64 timestamp)
+	struct sample_mixer *sm, const void *data, size_t size,
+	int track, int frequency, u64 timestamp)
 {
 	BUG_ON(sb->pp);
 
-	sb->pp = psgplay_init__(data, size, track, frequency);
+	sb->pp = psgplay_init__(data, size, track, frequency, sm);
 
 	return true;
 }
@@ -201,7 +233,7 @@ static void tty_resume(void *arg)
 }
 
 static void model_restart(struct sample_buffer *sb,
-	const struct options *options,
+	struct sample_mixer *sm, const struct options *options,
 	struct text_state *model, const struct text_state *ctrl,
 	const struct text_sndh *sndh, u64 timestamp)
 {
@@ -229,7 +261,7 @@ static void model_restart(struct sample_buffer *sb,
 	    ctrl->op != TRACK_RESTART)
 		return;
 
-	if (sample_buffer_play(sb, sndh->data, sndh->size,
+	if (sample_buffer_play(sb, sm, sndh->data, sndh->size,
 			ctrl->track, options->frequency, timestamp)) {
 		model->track = ctrl->track;
 		model->op = TRACK_PLAY;
@@ -240,7 +272,7 @@ static void model_restart(struct sample_buffer *sb,
 }
 
 static u64 model_update(struct sample_buffer *sb,
-	const struct options *options,
+	struct sample_mixer *sm, const struct options *options,
 	struct text_state *model, const struct text_state *ctrl,
 	const struct text_sndh *sndh, u64 timestamp)
 {
@@ -249,10 +281,11 @@ static u64 model_update(struct sample_buffer *sb,
 
 	model->cursor = ctrl->cursor;
 	model->redraw = ctrl->redraw;
+	model->mixer = ctrl->mixer;
 
 	if (ctrl->track != model->track ||
 	    ctrl->op != model->op)
-		model_restart(sb, options, model, ctrl, sndh, timestamp);
+		model_restart(sb, sm, options, model, ctrl, sndh, timestamp);
 
 	return sample_buffer_update(sb, timestamp);
 }
@@ -283,13 +316,18 @@ void text_replay(const struct options *options, struct file file,
 	const struct text_sndh sndh = text_sndh_init(
 		file_basename(file.path), file.path, file.data, file.size);
 
-	struct sample_buffer sb = sample_buffer_init(file.data, file.size,
+	struct sample_mixer sm = {
+		.tm = &model.mixer,
+		.cb = psg_mix_option(),
+	};
+	struct sample_buffer sb = sample_buffer_init(&sm, file.data, file.size,
 		options->output, options->track, options->frequency, output);
 
 	struct tty_arg tty_arg = {
 		.vtb = &tty_vt.vtb,
 		.model = &model,
 		.sb = &sb,
+		.sm = &sm,
 	};
 
 	struct tty_events tty_events = {
@@ -343,7 +381,7 @@ void text_replay(const struct options *options, struct file file,
 		if (model.mode->ctrl)
 			model.mode->ctrl(key, &ctrl, &model, &sndh);
 
-		clock_request_ms(model_update(&sb,
+		clock_request_ms(model_update(&sb, &sm,
 			options, &model, &ctrl, &sndh, clock_ms()));
 
 		if (model.mode->view)

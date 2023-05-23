@@ -22,6 +22,9 @@ struct text_state {
 		TRACK_PAUSE,
 		TRACK_RESTART,
 	} op;
+	struct text_mixer {
+		int volume;
+	} mixer;
 	u64 timestamp;
 	u64 pause_offset;
 	u64 pause_timestamp;

@@ -128,6 +128,22 @@ static void track_update(struct vt_buffer *vtb,
 		main_track(vtb, view->track, true);
 }
 
+static void volume_update(struct vt_buffer *vtb,
+	struct text_state *view, const struct text_state *model)
+{
+	if (view->mixer.volume == model->mixer.volume)
+		return;
+
+	view->mixer.volume = model->mixer.volume;
+
+	if (view->mixer.volume)
+		vt_printf(vtb, vtb->server.size.rows - 1, 0, vt_attr_reverse,
+			"Volume %d dB  ", view->mixer.volume);
+	else
+		vt_printf(vtb, vtb->server.size.rows - 1, 0, vt_attr_reverse,
+			"               ");
+}
+
 static u64 time_update(struct vt_buffer *vtb, struct text_state *view,
 	const struct text_state *model, u64 timestamp)
 {
@@ -185,6 +201,8 @@ static u64 main_view(struct vt_buffer *vtb, struct text_state *view,
 
 	track_update(vtb, view, model);
 
+	volume_update(vtb, view, model);
+
 	if (model->redraw)
 		vt_redraw(vtb);
 
@@ -240,6 +258,12 @@ static void main_ctrl(const unicode_t key, struct text_state *ctrl,
 			ctrl->cursor = ctrl->track;
 			ctrl->op = TRACK_RESTART;
 		}
+		break;
+	case '-':
+		ctrl->mixer.volume = max(-80, ctrl->mixer.volume - 1);
+		break;
+	case '+':
+		ctrl->mixer.volume = min(0, ctrl->mixer.volume + 1);
 		break;
 	case 'k':
 	case U_ARROW_UP:
