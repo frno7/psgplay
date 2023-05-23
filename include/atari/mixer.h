@@ -18,7 +18,7 @@ enum mixer_microwire_reg {
 MIXER_MICROWIRE_REGISTERS(MIXER_MICROWIRE_REG_ENUM)
 };
 
-#define MIXER_LCM1992_REGISTERS(reg)					\
+#define MIXER_LMC1992_REGISTERS(reg)					\
 	reg(0, mixer,        MIXER,        "Mixer")			\
 	reg(1, bass,         BASS,         "Bass")			\
 	reg(2, treble,       TREBLE,       "Treble")			\
@@ -26,10 +26,10 @@ MIXER_MICROWIRE_REGISTERS(MIXER_MICROWIRE_REG_ENUM)
 	reg(4, volume_right, VOLUME_RIGHT, "Right volume")		\
 	reg(5, volume_left,  VOLUME_LEFT,  "Left volume")
 
-enum mixer_lcm1992_reg {
-#define MIXER_LCM1992_REG_ENUM(register_, symbol_, label_, description_)\
-	MIXER_LCM1992_REG_##label_ = register_,
-MIXER_LCM1992_REGISTERS(MIXER_LCM1992_REG_ENUM)
+enum mixer_LMC1992_reg {
+#define MIXER_LMC1992_REG_ENUM(register_, symbol_, label_, description_)\
+	MIXER_LMC1992_REG_##label_ = register_,
+MIXER_LMC1992_REGISTERS(MIXER_LMC1992_REG_ENUM)
 };
 
 extern const struct device mixer_device;

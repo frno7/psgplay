@@ -148,31 +148,31 @@ static void microwire(const struct device *device,
 		return;
 
 	switch (reg)  {
-	case MIXER_LCM1992_REG_MIXER:
+	case MIXER_LMC1992_REG_MIXER:
 		state.microwire.sample.mix = ((data & 0x3) == 1);
 		break;
 
-	case MIXER_LCM1992_REG_BASS:
+	case MIXER_LMC1992_REG_BASS:
 		state.microwire.sample.tone.bass =
 			clamp(2 * (data & 0xf) - 12, -12, 12);
 		break;
 
-	case MIXER_LCM1992_REG_TREBLE:
+	case MIXER_LMC1992_REG_TREBLE:
 		state.microwire.sample.tone.treble =
 			clamp(2 * (data & 0xf) - 12, -12, 12);
 		break;
 
-	case MIXER_LCM1992_REG_VOLUME_MAIN:
+	case MIXER_LMC1992_REG_VOLUME_MAIN:
 		state.microwire.sample.volume.main =
 			clamp(2 * (data & 0x3f) - 80, -80, 0);
 		break;
 
-	case MIXER_LCM1992_REG_VOLUME_RIGHT:
+	case MIXER_LMC1992_REG_VOLUME_RIGHT:
 		state.microwire.sample.volume.right =
 			clamp(2 * (data & 0x1f) - 40, -40, 0);
 		break;
 
-	case MIXER_LCM1992_REG_VOLUME_LEFT:
+	case MIXER_LMC1992_REG_VOLUME_LEFT:
 		state.microwire.sample.volume.left =
 			clamp(2 * (data & 0x1f) - 40, -40, 0);
 		break;
