@@ -397,6 +397,11 @@ variation of the compatible models of original Atari hardware. The analogue
 emulation is currently simpler, aiming to be accurate but also avoid unwanted
 artifacts such as the high level of noise produced with original Atari hardware.
 
+The YM2149 PSG signal is unipolar, and has to be transformed to a bipolar
+signal for mixing with stereo samples. To avoid sharp and audible noise when
+starting and stopping playback, stereo samples fade in and out with a 10 ms
+logistic sigmoid at start and stop.
+
 As described in issues
 [#9](https://github.com/frno7/psgplay/issues/9) and
 [#10](https://github.com/frno7/psgplay/issues/10),

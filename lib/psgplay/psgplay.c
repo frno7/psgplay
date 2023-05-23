@@ -396,6 +396,67 @@ void psgplay_stereo_downsample_callback(struct psgplay *pp,
 	pp->stereo_downsample_callback.arg = arg;
 }
 
+static float fade(const float x)
+{
+	static const float gain[] = {
+		/*
+		 * logistic(x) = 1 / (1 + 2.7182818^-x)
+		 * gain(x) = logistic(12*x - 6)
+		 */
+		0.002472623, 0.003637179, 0.005347276, 0.007855073,
+		0.011525363, 0.016881421, 0.024664433, 0.035904679,
+		0.051994332, 0.074735184, 0.106306900, 0.149067261,
+		0.205080430, 0.275330813, 0.358784157, 0.451763392,
+		0.548236608, 0.641215843, 0.724669187, 0.794919570,
+		0.850932739, 0.893693100, 0.925264816, 0.948005668,
+		0.964095321, 0.975335567, 0.983118579, 0.988474637,
+		0.992144927, 0.994652724, 0.996362821, 0.997527377, 1.0
+	};
+
+	const float c = clamp(x, 0.0f, 1.0f) * (ARRAY_SIZE(gain) - 2);
+	const int i = c;
+	const float t = c - i;
+
+	return gain[i] * (1.0f - t) + gain[i + 1] * t;
+}
+
+static void stereo_fade_in(struct psgplay_stereo *stereo,
+	const size_t count, const ssize_t offset)
+{
+	const ssize_t n = FADE_SAMPLES;
+
+	for (ssize_t i = 0; i < count && offset + i < n; i++) {
+		const size_t k = offset + i;
+		const float g = fade((float)k / (float)n);
+
+		stereo[i].left  = g * stereo[i].left;
+		stereo[i].right = g * stereo[i].right;
+	}
+}
+
+static void stereo_fade_out(struct psgplay_stereo *stereo,
+	const size_t count, const ssize_t offset)
+{
+	const ssize_t n = FADE_SAMPLES;
+
+	for (ssize_t i = 0; i < count; i++) {
+		const ssize_t k = offset + i;
+		const float g = 1.0f - fade((float)k / (float)n);
+
+		stereo[i].left  = g * stereo[i].left;
+		stereo[i].right = g * stereo[i].right;
+	}
+}
+
+static void stereo_fade(struct psgplay_stereo *stereo,
+	const ssize_t count, const ssize_t offset, const ssize_t stop)
+{
+	stereo_fade_in(stereo, count, offset);
+
+	if (stop && offset + count + FADE_SAMPLES >= stop)
+		stereo_fade_out(stereo, count, offset - stop + FADE_SAMPLES);
+}
+
 static void digital_to_stereo_downsample(struct psgplay *pp,
 	const struct psgplay_digital *digital, const size_t count)
 {
@@ -408,6 +469,10 @@ static void digital_to_stereo_downsample(struct psgplay *pp,
 
 		pp->digital_to_stereo_callback.cb(stereo, &digital[i], n,
 			pp->digital_to_stereo_callback.arg);
+
+		stereo_fade(stereo, n,
+			pp->digital_buffer.total + i - count,
+			pp->digital_buffer.stop);
 
 		const size_t r = pp->stereo_downsample_callback.cb(resample,
 			stereo, n, pp->stereo_downsample_callback.arg);
