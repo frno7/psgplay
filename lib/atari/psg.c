@@ -24,13 +24,12 @@ struct psg_state {
 	union psg psg;
 
 	u8 reg_select;
-
-	struct device_cycle env_cycle;
 };
 
 static union psg psg;
 static u8 reg_select;
-static struct device_cycle env_cycle;
+static u32 env_index;
+static u32 env_wave_index;
 
 static struct {
 	psg_sample_f sample;
@@ -150,11 +149,17 @@ static u8 psg_env_level(const struct device_cycle psg_cycle)
 		{ RISE, ZERO, ZERO },	/* /___ */
 	};
 
-	const u64 ei = (psg_cycle.c - env_cycle.c) >> 4;
-	const u64 si = ei / psg_env_period();
-	const u32 wi = si < 16 ? si : 16 + ((16 + si) % 32);
+	if (env_index >= psg_env_period()) {
+		env_index = 0;
 
-	return wave[psg.envelope_shape.ctrl][wi];
+		if (++env_wave_index >= 3 * 16)
+			env_wave_index -= 2 * 16;
+	}
+
+	if ((psg_cycle.c & 0xf) == 0x8)
+		env_index++;
+
+	return wave[psg.envelope_shape.ctrl][env_wave_index];
 }
 
 #define PSG_LVN(channel_)						\
@@ -249,6 +254,9 @@ static void psg_wr_u8(const struct device *device, u32 dev_address, u8 data)
 		break;
 	case 2:
 	case 3:
+		if (reg_select == PSG_REG_SHAPE && psg.reg[reg_select] != data)
+			env_index = env_wave_index = 0;
+
 		if (reg_select < 16)
 			psg.reg[reg_select] = data;
 		break;
@@ -295,6 +303,7 @@ static void psg_reset(const struct device *device)
 	memset(&psg, 0, sizeof(psg));
 
 	psg.reg[PSG_REG_IOMIX] = 0xff;
+	env_index = env_wave_index = 0;
 
 	psg_emit_latest_cycle = 0;
 
