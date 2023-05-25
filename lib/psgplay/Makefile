@@ -62,6 +62,9 @@ LIBPSGPLAY_WEB_FUNCTIONS =						\
 	_psgplay_digital_to_stereo_empiric				\
 	_psgplay_digital_to_stereo_linear				\
 	_psgplay_stereo_downsample_callback				\
+	_psgplay_stop							\
+	_psgplay_stop_at_time						\
+	_psgplay_stop_digital_at_sample					\
 	_psgplay_free							\
 	_ice_identify							\
 	_ice_crunched_size						\
