@@ -95,11 +95,20 @@ ssize_t psgplay_read_digital(struct psgplay *pp,
 /**
  * psgplay_stop_digital_at_sample - stop PSG play after a given sample index
  * @pp: PSG play object to stop
- * @index: digital sample index to stop at
+ * @index: digital sample index, from the start of the SNDH tune, to stop at
  *
  * Calling psgplay_stop_digital_at_sample() is optional, but it will allow
  * PSG play to fade out stereo samples, which prevents a sharp and often
- * audible cut-off.
+ * audible cut-off noise.
+ *
+ * Note: psgplay_read_digital() will permanently return zero to indicate that
+ * it has finished and there are no more samples to be read.
+ *
+ * See also psgplay_stop() and psgplay_stop_at_time().
+ *
+ * The cut-off noise is due to the YM2149 PSG unipolar signal being
+ * transformed into a bipolar signal for stereo sample mixing. PSG play
+ * automatically fade in stereo samples for the first 10 ms.
  */
 void psgplay_stop_digital_at_sample(struct psgplay *pp, size_t index);
 
