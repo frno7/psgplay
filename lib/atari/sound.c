@@ -320,7 +320,7 @@ void sound_sample(sound_sample_f sample, void *sample_arg)
 }
 
 const struct device sound_device = {
-	.name = "sound",
+	.name = "snd",
 	.frequency = SOUND_FREQUENCY,
 	.bus = {
 		.address = 0xff8900,
