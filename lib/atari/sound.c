@@ -15,6 +15,7 @@
 #include "atari/irq.h"
 #include "atari/glue.h"
 #include "atari/machine.h"
+#include "atari/mfp.h"
 #include "atari/mmu.h"
 #include "atari/sound.h"
 
@@ -70,7 +71,7 @@ SOUND_SAMPLE_FREQUENCY(SOUND_SAMPLE_FREQUENCY_CASE)
 
 static void sound_start(void)
 {
-	/* FIXME: mfp_irq_sound(0); */
+	dma_sound_active(false);
 
 	state.ctrl = sound.ctrl;
 	state.start = (sound.starthi << 16) |
@@ -81,14 +82,14 @@ static void sound_start(void)
 		     sound.endlo;
 	state.mode = sound.mode;
 
-	/* FIXME: mfp_irq_sound(1); */
+	dma_sound_active(true);
 }
 
 static void sound_stop(void)
 {
 	memset(&state, 0, sizeof(state));
 
-	/* FIXME: mfp_irq_sound(0); */
+	dma_sound_active(false);
 }
 
 static bool sound_sample_emit(const struct device_cycle sound_cycle)

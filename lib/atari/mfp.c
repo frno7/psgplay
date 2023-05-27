@@ -59,6 +59,16 @@ DEFINE_TIMER(b, B,  8, TBDR, TBCR,  0);
 DEFINE_TIMER(c, C,  5, TCDR, TCDCR, 4);
 DEFINE_TIMER(d, D,  4, TDDR, TCDCR, 0);
 
+static struct {
+	u32 high;
+	u32 low;
+} tai;
+
+static bool mono_monitor_detect()
+{
+	return true;	/* FIXME: Only color monitor as of now */
+}
+
 static char *mfp_register_name(u32 reg)
 {
 	switch (reg) {
@@ -462,6 +472,7 @@ static void mfp_reset(const struct device *device)
 	BUILD_BUG_ON(sizeof(mfp) != 24);
 
 	memset(&mfp, 0, sizeof(mfp));
+	mfp.gpip.mono_monitor_detect = mono_monitor_detect();
 	mfp_hardwire();
 
 	timer_a.timeout.c = 0;
@@ -486,3 +497,26 @@ const struct device mfp_device = {
 	.id_u8  = mfp_id_u8,
 	.id_u16 = mfp_id_u16,
 };
+
+void dma_sound_active(bool level)
+{
+	static bool prev_level = 0;
+
+	if (level == prev_level)
+		return;
+
+	if (level)
+		tai.high++;
+	else
+		tai.low++;
+
+	if (!mfp.ddr.mono_monitor_detect &&
+	     mfp.iera.mono_monitor_detect &&
+	     mfp.aer.mono_monitor_detect == (level ^ mono_monitor_detect()))
+		mfp.ipra.mono_monitor_detect = 1;
+
+	request_device_event(&mfp_device,
+		device_from_machine_cycle(&mfp_device, machine_cycle()));
+
+	prev_level = level;
+}

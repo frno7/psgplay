@@ -11,6 +11,8 @@
 
 u32 mfp_irq_vector(void);
 
+void dma_sound_active(bool level);
+
 extern const struct device mfp_device;
 
 #endif /* ATARI_MFP_H */
