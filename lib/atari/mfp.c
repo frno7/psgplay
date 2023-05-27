@@ -358,6 +358,8 @@ static void mfp_wr_u8(const struct device *device,
 	if ((dev_address & 1) == 0 || ARRAY_SIZE(mfp.reg) <= reg)
 		return;
 
+	/* FIXME: Proper read/write of GPIP */
+
 	switch (reg) {
 		/*
 		 * IPRA and IPRB are readable; thus by polling IPRA and
