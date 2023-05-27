@@ -78,7 +78,7 @@ struct device_cycle device_cycle(const struct device *device)
 	};
 }
 
-static struct device_cycle device_from_machine_cycle(
+struct device_cycle device_from_machine_cycle(
 	const struct device *device, u64 machine_cycle)
 {
 	return (struct device_cycle) {

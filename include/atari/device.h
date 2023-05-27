@@ -58,6 +58,9 @@ const struct device *device_for_bus_address(u32 bus_address);
 
 struct device_cycle device_cycle(const struct device *device);
 
+struct device_cycle device_from_machine_cycle(
+	const struct device *device, u64 machine_cycle);
+
 void request_device_event(const struct device *device,
 	struct device_cycle device_cycle);
 
