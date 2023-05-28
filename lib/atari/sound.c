@@ -24,13 +24,12 @@
 #define DEVICE_SAMPLE_FREQUENCY 250000	/* 250 kHz */
 #define DEVICE_SAMPLE_CYCLES (SOUND_FREQUENCY / DEVICE_SAMPLE_FREQUENCY)
 
-static union sound sound;
 struct {
 	u32 start;
 	u32 end;
 
-	struct sound_ctrl ctrl;
-	struct sound_mode mode;
+	union sound hold;
+	union sound regs;
 
 	struct sound_sample sample;
 
@@ -71,30 +70,31 @@ SOUND_SAMPLE_FREQUENCY(SOUND_SAMPLE_FREQUENCY_CASE)
 
 static void sound_start(void)
 {
+	state.regs = state.hold;
+	state.start = (state.regs.starthi << 16) |
+		      (state.regs.startmi <<  8) |
+		       state.regs.startlo;
+	state.end = (state.regs.endhi << 16) |
+		    (state.regs.endmi <<  8) |
+		     state.regs.endlo;
+
 	dma_sound_active(false);
-
-	state.ctrl = sound.ctrl;
-	state.start = (sound.starthi << 16) |
-		      (sound.startmi <<  8) |
-		       sound.startlo;
-	state.end = (sound.endhi << 16) |
-		    (sound.endmi <<  8) |
-		     sound.endlo;
-	state.mode = sound.mode;
-
 	dma_sound_active(true);
 }
 
 static void sound_stop(void)
 {
-	memset(&state, 0, sizeof(state));
+	state.hold.ctrl.dma = 0;
+
+	state.regs = state.hold;
+	state.start = state.end = 0;
 
 	dma_sound_active(false);
 }
 
 static bool sound_sample_emit(const struct device_cycle sound_cycle)
 {
-	const u32 f = sound_frequency(state.mode);
+	const u32 f = sound_frequency(state.regs.mode);
 	const u64 c = sound_cycle.c;
 
 	return cycle_transform(f, SOUND_FREQUENCY, c) !=
@@ -127,7 +127,7 @@ static int8_t rd_fifo(struct fifo *fifo)
 
 static void fill_fifo(struct fifo *fifo)
 {
-	while (fifo_free(fifo) >= 2) {
+	while (state.regs.ctrl.dma && fifo_free(fifo) >= 2) {
 		const uint16_t w = dma_read_memory_16(state.start);
 
 		wr_fifo(fifo, w >> 8);
@@ -136,18 +136,17 @@ static void fill_fifo(struct fifo *fifo)
 		state.start += 2;
 
 		if (state.start == state.end)
-			(sound.ctrl.loop ? sound_start : sound_stop)();
+			(state.regs.ctrl.loop ? sound_start : sound_stop)();
 	}
 }
 
 static struct sound_sample sound_sample_cycle(
 	const struct device_cycle sound_cycle)
 {
-	if (state.ctrl.dma)
-		fill_fifo(&state.fifo);
+	fill_fifo(&state.fifo);
 
 	if (state.fifo.size && sound_sample_emit(sound_cycle)) {
-		if (state.mode.mono) {
+		if (state.regs.mode.mono) {
 			const s8 mono = rd_fifo(&state.fifo);
 
 			state.sample.left  = 256 * mono;
@@ -184,16 +183,16 @@ static void sound_emit(const struct device_cycle sound_cycle)
 	if (count && output.sample)
 		output.sample(buffer, count, output.sample_arg);
 
-	sound.counthi = (state.start >> 16) & 0x3f;
-	sound.countmi = state.start >> 8;
-	sound.countlo = state.start & 0xfe;
+	state.regs.counthi = (state.start >> 16) & 0x3f;
+	state.regs.countmi = state.start >> 8;
+	state.regs.countlo = state.start & 0xfe;
 
 	sound_emit_latest_cycle = sound_cycle.c;
 }
 
 static u64 completion_cycles(const u32 sample_count)
 {
-	const u32 f = sound_frequency(state.mode);
+	const u32 f = sound_frequency(state.regs.mode);
 	const u64 ds = cycle_transform_align(
 		DEVICE_SAMPLE_FREQUENCY, f, sample_count);
 	const u64 sc = cycle_transform_align(
@@ -207,8 +206,8 @@ static void sound_event(const struct device *device,
 {
 	sound_emit(sound_cycle);
 
-	if (state.ctrl.dma) {
-		const size_t m = state.mode.mono ? 1 : 2;
+	if (state.regs.ctrl.dma) {
+		const size_t m = state.regs.mode.mono ? 1 : 2;
 		const size_t remaining = (state.end - state.start) / m;
 		const size_t margin = ARRAY_SIZE(state.fifo.b) / m;
 
@@ -236,10 +235,10 @@ static u8 sound_rd_u8(const struct device *device, u32 dev_address)
 
 	sound_emit(sound_cycle);
 
-	if ((dev_address & 1) == 0 || ARRAY_SIZE(sound.reg) <= reg)
+	if ((dev_address & 1) == 0 || ARRAY_SIZE(state.regs.reg) <= reg)
 		return 0;
 
-	return sound.reg[reg];
+	return state.regs.reg[reg];
 }
 
 static u16 sound_rd_u16(const struct device *device, u32 dev_address)
@@ -247,34 +246,38 @@ static u16 sound_rd_u16(const struct device *device, u32 dev_address)
 	return sound_rd_u8(device, dev_address + 1);
 }
 
-static void sound_hardwire(void)
+static void sound_hardwire(union sound *regs)
 {
-	sound.reg[SOUND_REG_CTRL]    &= 0x03;
-	sound.reg[SOUND_REG_STARTHI] &= 0x3f;
-	sound.reg[SOUND_REG_STARTLO] &= 0xfe;
-	sound.reg[SOUND_REG_ENDHI]   &= 0x3f;
-	sound.reg[SOUND_REG_ENDLO]   &= 0xfe;
-	sound.reg[SOUND_REG_MODE]    &= 0x83;
+	regs->reg[SOUND_REG_CTRL]    &= 0x03;
+	regs->reg[SOUND_REG_STARTHI] &= 0x3f;
+	regs->reg[SOUND_REG_STARTLO] &= 0xfe;
+	regs->reg[SOUND_REG_ENDHI]   &= 0x3f;
+	regs->reg[SOUND_REG_ENDLO]   &= 0xfe;
+	regs->reg[SOUND_REG_MODE]    &= 0x83;
 
-	memset(sound.unused, 0, sizeof(sound.unused));
+	memset(regs->unused, 0, sizeof(regs->unused));
 }
 
 static void sound_wr_u8(const struct device *device, u32 dev_address, u8 data)
 {
 	const struct device_cycle sound_cycle = device_cycle(device);
 	const u32 reg = dev_address >> 1;
-	const struct sound_ctrl ctrl = sound.ctrl;
+
+	if ((dev_address & 1) == 0 || ARRAY_SIZE(state.regs.reg) <= reg)
+		return;
 
 	sound_emit(sound_cycle);
 
-	if ((dev_address & 1) == 0 || ARRAY_SIZE(sound.reg) <= reg)
-		return;
+	state.hold.reg[reg] = data;
+	sound_hardwire(&state.hold);
 
-	sound.reg[reg] = data;
-	sound_hardwire();
+	const bool ctrl_dma = state.hold.ctrl.dma != state.regs.ctrl.dma;
 
-	if (ctrl.dma != sound.ctrl.dma)
-		(sound.ctrl.dma ? sound_start : sound_stop)();
+	if (ctrl_dma || !state.regs.ctrl.dma)
+		state.regs.reg[reg] = state.hold.reg[reg];
+
+	if (ctrl_dma)
+		(state.regs.ctrl.dma ? sound_start : sound_stop)();
 }
 
 static void sound_wr_u16(const struct device *device, u32 dev_address, u16 data)
@@ -287,7 +290,7 @@ static size_t sound_id_u8(const struct device *device,
 {
 	const u32 reg = dev_address >> 1;
 
-	if ((dev_address & 1) == 0 || ARRAY_SIZE(sound.reg) <= reg)
+	if ((dev_address & 1) == 0 || ARRAY_SIZE(state.regs.reg) <= reg)
 		snprintf(buf, size, "%2u", dev_address);
 	else
 		snprintf(buf, size, "%s", sound_register_name(reg));
@@ -303,12 +306,9 @@ static size_t sound_id_u16(const struct device *device,
 
 static void sound_reset(const struct device *device)
 {
-	BUILD_BUG_ON(sizeof(sound) != 17);
+	BUILD_BUG_ON(sizeof(state.regs) != 17);
 
-	memset(&sound, 0, sizeof(sound));
 	memset(&state, 0, sizeof(state));
-	sound_hardwire();
-
 	sound_emit_latest_cycle = 0;
 
 	sound_event(device, device_cycle(device));
