@@ -42,13 +42,14 @@ The package
 [`media-sound/psgplay`](https://github.com/frno7/gentoo.overlay/tree/master/media-sound/psgplay)
 is available for [Gentoo Linux](https://www.gentoo.org/).
 
-Github [actions](https://github.com/frno7/psgplay/actions)
+Github [actions](https://github.com/frno7/psgplay/actions/workflows/compilation.yml)
 automatically compile and publish archives with PSG play for
 the [Atari ST](https://en.wikipedia.org/wiki/Atari_ST),
 as well as Linux and the architectures
 [`ppc64le`](https://en.wikipedia.org/wiki/ppc64le),
-[`aarch64`](https://en.wikipedia.org/wiki/AArch64) and
-[`x86-64`](https://en.wikipedia.org/wiki/X86-64). These are built with
+[`aarch64`](https://en.wikipedia.org/wiki/AArch64),
+[`x86-64`](https://en.wikipedia.org/wiki/X86-64) and
+[`wasm`](https://en.wikipedia.org/wiki/WebAssembly). These are built with
 [`.github/workflows/compilation.yml`](https://github.com/frno7/psgplay/blob/master/.github/workflows/compilation.yml).
 
 # How to use

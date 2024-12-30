@@ -18,14 +18,16 @@ jobs:
         run: |
           echo "ARCHIVE_TAG=${GITHUB_REF_NAME}-${GITHUB_SHA:0:8}" >> $GITHUB_ENV
 
+      - name: Fix repository ownership problem
+        run: |
+          # Avoid fatal: unsafe repository (directory is owned by someone else)
+          # Confer https://github.com/actions/checkout/issues/760
+          git config --global --add safe.directory "*"
+
       - name: Compile PSGPLAY.TOS archive for the Atari ST
         env:
           TARGET_COMPILE: m68k-elf-
         run: |
-          # Avoid fatal: unsafe repository (directory is owned by someone else)
-          # Confer https://github.com/actions/checkout/issues/760
-          git config --global --add safe.directory "$PWD"
-          git config --global --add safe.directory "$PWD"/lib/toslibc
           JOBS="$(getconf _NPROCESSORS_ONLN)"
           make -j"$JOBS" V=1 S=1 PSGPLAY.TOS
 
@@ -37,6 +39,35 @@ jobs:
           if-no-files-found: error
           compression-level: 9
           path: PSGPLAY.TOS
+
+  build-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Archive tag
+        run: |
+          echo "ARCHIVE_TAG=${GITHUB_REF_NAME}-${GITHUB_SHA:0:8}" >> $GITHUB_ENV
+
+      - uses: mymindstorm/setup-emsdk@v14
+
+      - name: Compile web assembly archive
+        run: |
+          JOBS="$(getconf _NPROCESSORS_ONLN)"
+          make -j"$JOBS" V=1 HOST_CC=emcc web
+
+      - name: Publish web assembly archive
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: "psgplay-web-${{ env.ARCHIVE_TAG }}"
+          if-no-files-found: error
+          compression-level: 9
+          path: |
+            lib/psgplay/libpsgplay.js
+            lib/psgplay/libpsgplay.wasm
 
   build-linux:
     strategy:
@@ -66,8 +97,7 @@ jobs:
           run: |
             # Avoid fatal: unsafe repository (directory is owned by someone else)
             # Confer https://github.com/actions/checkout/issues/760
-            git config --global --add safe.directory "$PWD"
-            git config --global --add safe.directory "$PWD"/lib/toslibc
+            git config --global --add safe.directory "*"
             JOBS="$(getconf _NPROCESSORS_ONLN)"
             make -j"$JOBS" V=1 ALSA=1 all test
 
@@ -78,7 +108,7 @@ jobs:
           sudo apt-get install -q -y git make gcc libc-dev xxd libasound2 libasound2-dev
           JOBS="$(getconf _NPROCESSORS_ONLN)"
           make -j"$JOBS" V=1 S=1 ALSA=1 all test
-          make V=1 S=1 ALSA=1 clean
+          git clean -fdx
           make -j"$JOBS" V=1 ALSA=1 psgplay
 
       - name: Publish PSG play archive for Linux
