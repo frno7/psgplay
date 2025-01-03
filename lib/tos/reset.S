@@ -48,6 +48,12 @@ _rom:	bra.s	.reset
 	cmp.l	#0x13c,a1
 	bne.s	.loop
 
+	/*
+	 * Initially disable noise and tone in IOMIX PSG register as some
+	 * SNDH files are known to inadvertently play sounds otherwise.
+	 */
+	move.l	#0x07003f00,0xffff8800.w
+
 	/* Install GEMDOS and XBIOS vectors */
 	move.l	#.gemdos,0x84
 	move.l	#.xbios,0xb8

@@ -302,7 +302,6 @@ static void psg_reset(const struct device *device)
 
 	memset(&psg, 0, sizeof(psg));
 
-	psg.reg[PSG_REG_IOMIX] = 0xff;
 	env_index = env_wave_index = 0;
 
 	psg_emit_latest_cycle = 0;
