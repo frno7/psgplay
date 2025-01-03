@@ -6,6 +6,8 @@ ifndef TOSLINK
 $(warning WARNING: Missing toslibc Git submodule; clone with the "--recurse-submodules" option, or do "git submodule update --init --recursive")
 endif
 
+include lib/cf2149/module/Makefile
+
 include lib/version/Makefile
 include lib/tos/Makefile
 include lib/ice/Makefile

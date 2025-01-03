@@ -13,6 +13,8 @@
 
 #include "system/atari/psg.h"
 
+#include "cf2149/module/cf2149.h"
+
 static bool key_click;
 
 static void save_disable_key_click(void)
@@ -43,14 +45,14 @@ void psg_init(void)
 
 u8 psg_mute(void)
 {
-	const u8 iomix = xbios_giaccess(0, PSG_REG_IOMIX);
+	const u8 iomix = xbios_giaccess(0, CF2149_REG_IOMIX);
 
-	xbios_giaccess(0x3f | iomix, XBIOS_GIACCESS_SET | PSG_REG_IOMIX);
+	xbios_giaccess(0x3f | iomix, XBIOS_GIACCESS_SET | CF2149_REG_IOMIX);
 
 	return iomix;
 }
 
 void psg_unmute(u8 iomix)
 {
-	xbios_giaccess(iomix, XBIOS_GIACCESS_SET | PSG_REG_IOMIX);
+	xbios_giaccess(iomix, XBIOS_GIACCESS_SET | CF2149_REG_IOMIX);
 }

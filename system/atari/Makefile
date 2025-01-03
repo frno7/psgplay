@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 
-PRG_CFLAGS += $(BASIC_TARGET_CFLAGS) -march=68000 -fno-PIC -nostdlib	\
+PRG_CFLAGS += $(BASIC_TARGET_CFLAGS) $(CF2149_CFLAGS)			\
+	-march=68000 -fno-PIC -nostdlib					\
 	-ffunction-sections -fdata-sections				\
 	-isystem lib/toslibc/include/toslibc -D_TOSLIBC_SOURCE
 

@@ -17,19 +17,12 @@
 #include "atari/machine.h"
 #include "atari/psg.h"
 
+#include "cf2149/module/cf2149.h"
+
 #define PSG_EVENT_FREQUENCY 100		/* 10 ms */
 #define PSG_EVENT_CYCLES (PSG_FREQUENCY / PSG_EVENT_FREQUENCY)
 
-struct psg_state {
-	union psg psg;
-
-	u8 reg_select;
-};
-
-static union psg psg;
-static u8 reg_select;
-static u32 env_index;
-static u32 env_wave_index;
+static struct cf2149_module cf2149;
 
 static struct {
 	psg_sample_f sample;
@@ -41,178 +34,35 @@ static char *psg_register_name(u32 reg)
 	switch (reg) {
 #define PSG_REG_NAME(register_, symbol_, label_, description_)		\
 	case register_: return #symbol_;
-PSG_REGISTERS(PSG_REG_NAME)
+CF2149_REGISTERS(PSG_REG_NAME)
 	default:
 		return "";
 	}
 }
 
-#define DEFINE_PSG_CHN_PERIOD(channel_)					\
-static u16 psg_ch ## channel_ ## _period(void)				\
-{									\
-	const u16 period = (psg.hi_ ## channel_.period << 8) |		\
-			    psg.lo_ ## channel_.period;			\
-									\
-	return period ? period : 1;					\
-}
-
-DEFINE_PSG_CHN_PERIOD(a)
-DEFINE_PSG_CHN_PERIOD(b)
-DEFINE_PSG_CHN_PERIOD(c)
-
-#define DEFINE_PSG_CHN_UPDATE(channel_)					\
-static bool psg_ch ## channel_ ## _update(				\
-	const struct device_cycle psg_cycle)				\
-{									\
-	static u16 cycle = 0;						\
-									\
-	const u16 period = psg_ch ## channel_ ## _period();		\
-	const bool t = cycle < period;					\
-									\
-	if (++cycle >= 2 * period)					\
-		cycle = 0;						\
-									\
-	return t;							\
-}
-
-DEFINE_PSG_CHN_UPDATE(a)
-DEFINE_PSG_CHN_UPDATE(b)
-DEFINE_PSG_CHN_UPDATE(c)
-
-#define DEFINE_PSG_MXN(channel_)					\
-static bool psg_mx ## channel_(const bool t, const bool n)		\
-{									\
-	return (psg.iomix.tone_ ## channel_ || t) &&			\
-	       (psg.iomix.noise_ ## channel_ || n);			\
-}
-
-DEFINE_PSG_MXN(a)
-DEFINE_PSG_MXN(b)
-DEFINE_PSG_MXN(c)
-
-static u16 psg_noise_period(void)
-{
-	return psg.noise.period ? psg.noise.period : 1;
-}
-
-/* 17 stage 2 tap LFSR with bits 17 and 14, having period 131072. */
-static bool psg_rng_update(const struct device_cycle psg_cycle)
-{
-	static u32 rng = 1;
-	static u32 cycle = 0;
-
-	const bool r = rng & 1;
-
-	if (++cycle >= 2 * psg_noise_period()) {
-		if (r)
-			rng = (rng >> 1) ^ 0x12000;
-		else
-			rng >>= 1;
-
-		cycle = 0;
-	}
-
-	return r;
-}
-
-static u16 psg_env_period(void)
-{
-	const u16 period = (psg.envelope_hi.period << 8) |
-			    psg.envelope_lo.period;
-
-	return period ? period : 1;
-}
-
-static u8 psg_env_level(const struct device_cycle psg_cycle)
-{
-#define RISE  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15
-#define FALL 15, 14, 13, 12, 11, 10,  9 , 8 , 7 , 6,  5,  4,  3,  2,  1,  0
-#define ZERO  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
-#define HOLD 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15
-
-	static const u8 wave[16][3 * 16] = {
-		{ FALL, ZERO, ZERO },	/* \___ */
-		{ FALL, ZERO, ZERO },	/* \___ */
-		{ FALL, ZERO, ZERO },	/* \___ */
-		{ FALL, ZERO, ZERO },	/* \___ */
-		{ RISE, ZERO, ZERO },	/* /___ */
-		{ RISE, ZERO, ZERO },	/* /___ */
-		{ RISE, ZERO, ZERO },	/* /___ */
-		{ RISE, ZERO, ZERO },	/* /___ */
-		{ FALL, FALL, FALL },	/* \\\\ */
-		{ FALL, ZERO, ZERO },	/* \___ */
-		{ FALL, RISE, FALL },	/* \/\/ */
-		{ FALL, HOLD, HOLD },	/* \--- */
-		{ RISE, RISE, RISE },	/* //// */
-		{ RISE, HOLD, HOLD },	/* /--- */
-		{ RISE, FALL, RISE },	/* /\/\ */
-		{ RISE, ZERO, ZERO },	/* /___ */
-	};
-
-	if (env_index >= psg_env_period()) {
-		env_index = 0;
-
-		if (++env_wave_index >= 3 * 16)
-			env_wave_index -= 2 * 16;
-	}
-
-	if ((psg_cycle.c & 0xf) == 0x8)
-		env_index++;
-
-	return wave[psg.envelope_shape.ctrl][env_wave_index];
-}
-
-#define PSG_LVN(channel_)						\
-static u8 psg_lv ## channel_(const bool mx, const u8 env)		\
-{									\
-	return mx ? (psg.level_ ## channel_.m ?				\
-			env : psg.level_ ## channel_.level) : 0;	\
-}
-
-PSG_LVN(a)
-PSG_LVN(b)
-PSG_LVN(c)
-
-static u64 psg_emit_latest_cycle;
 static void psg_emit(const struct device_cycle psg_cycle)
 {
+	const struct cf2149_clk clk = cf2149_clk_cycle(psg_cycle.c);
 	struct psg_sample buffer[256];
-	size_t count = 0;
+	struct cf2149_ac ac[ARRAY_SIZE(buffer)];
 
-	for (u64 c = ALIGN(psg_emit_latest_cycle, 8); c < psg_cycle.c; c += 8) {
-		const struct device_cycle psg_cycle = { .c = c };
+	for (;;) {
+		const size_t n = cf2149.port.rd_ac(&cf2149,
+			clk, &ac[0], ARRAY_SIZE(ac));
 
-		const bool cha = psg_cha_update(psg_cycle);
-		const bool chb = psg_chb_update(psg_cycle);
-		const bool chc = psg_chc_update(psg_cycle);
-		const bool rng = psg_rng_update(psg_cycle);
+		if (!n)
+			return;
 
-		const bool mxa = psg_mxa(cha, rng);
-		const bool mxb = psg_mxb(chb, rng);
-		const bool mxc = psg_mxc(chc, rng);
+		if (output.sample) {
+			for (size_t i = 0; i < n; i++) {
+				buffer[i].lva = ac[i].lva >> 1;
+				buffer[i].lvb = ac[i].lvb >> 1;
+				buffer[i].lvc = ac[i].lvc >> 1;
+			}
 
-		const u8 env = psg_env_level(psg_cycle);
-		const u8 lva = psg_lva(mxa, env);
-		const u8 lvb = psg_lvb(mxb, env);
-		const u8 lvc = psg_lvc(mxc, env);
-
-		buffer[count++] = (struct psg_sample) {
-			.lva = lva,
-			.lvb = lvb,
-			.lvc = lvc,
-		};
-
-		if (count >= ARRAY_SIZE(buffer)) {
-			if (output.sample)
-				output.sample(buffer, count, output.sample_arg);
-			count = 0;
+			output.sample(buffer, n, output.sample_arg);
 		}
 	}
-
-	if (count && output.sample)
-		output.sample(buffer, count, output.sample_arg);
-
-	psg_emit_latest_cycle = psg_cycle.c;
 }
 
 static void psg_event(const struct device *device,
@@ -226,9 +76,15 @@ static void psg_event(const struct device *device,
 
 static u8 psg_rd_u8(const struct device *device, u32 dev_address)
 {
+	const struct device_cycle psg_cycle = device_cycle(device);
+	const struct cf2149_clk clk = cf2149_clk_cycle(psg_cycle.c);
+
 	switch (dev_address) {
 	case 0:
-	case 1: return reg_select < 16 ? psg.reg[reg_select] : 0xff;
+	case 1:
+		cf2149.port.bdc(&cf2149, clk,
+			(union cf2149_bdc) { .r = CF2149_BDC_DTB });
+		return cf2149.port.rd_da(&cf2149, clk);
 	case 2:
 	case 3: return 0xff;
 	default:
@@ -244,21 +100,22 @@ static u16 psg_rd_u16(const struct device *device, u32 dev_address)
 static void psg_wr_u8(const struct device *device, u32 dev_address, u8 data)
 {
 	const struct device_cycle psg_cycle = device_cycle(device);
+	const struct cf2149_clk clk = cf2149_clk_cycle(psg_cycle.c);
 
 	psg_emit(psg_cycle);
 
 	switch (dev_address % 4) {
 	case 0:
 	case 1:
-		reg_select = data;
+		cf2149.port.bdc(&cf2149, clk,
+			(union cf2149_bdc) { .r = CF2149_BDC_BAR });
+		cf2149.port.wr_da(&cf2149, clk, data);
 		break;
 	case 2:
 	case 3:
-		if (reg_select == PSG_REG_SHAPE && psg.reg[reg_select] != data)
-			env_index = env_wave_index = 0;
-
-		if (reg_select < 16)
-			psg.reg[reg_select] = data;
+		cf2149.port.bdc(&cf2149, clk,
+			(union cf2149_bdc) { .r = CF2149_BDC_DWS });
+		cf2149.port.wr_da(&cf2149, clk, data);
 		break;
 	default:
 		BUG();
@@ -280,7 +137,8 @@ static size_t psg_id_u8(const struct device *device,
 		break;
 	case 2:
 	case 3:
-		snprintf(buf, size, "wr %s", psg_register_name(reg_select));
+		snprintf(buf, size, "wr %s",
+			psg_register_name(cf2149.state.reg_address));
 		break;
 	default:
 		snprintf(buf, size, "%2u", dev_address);
@@ -298,13 +156,12 @@ static size_t psg_id_u16(const struct device *device,
 
 static void psg_reset(const struct device *device)
 {
-	BUILD_BUG_ON(sizeof(psg) != 16);
+	const struct device_cycle psg_cycle = device_cycle(device);
+	const struct cf2149_clk clk = cf2149_clk_cycle(psg_cycle.c);
 
-	memset(&psg, 0, sizeof(psg));
+	cf2149 = cf2149_init();
 
-	env_index = env_wave_index = 0;
-
-	psg_emit_latest_cycle = 0;
+	cf2149.port.select_l(&cf2149, clk, CF2149_SELECT_MODE_CLKDIV8);
 
 	psg_event(device, device_cycle(device));
 }
@@ -321,9 +178,6 @@ const struct device psg_device = {
 	.bus = {
 		.address = 0xff8800,
 		.size = 256,
-	},
-	.state = {
-		.size = sizeof(struct psg_state),
 	},
 	.reset = psg_reset,
 	.event = psg_event,
