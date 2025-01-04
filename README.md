@@ -1,7 +1,7 @@
 ![compilation workflow](https://github.com/frno7/psgplay/actions/workflows/compilation.yml/badge.svg)
 
-![Atari ST loading screen](https://raw.githubusercontent.com/frno7/psgplay/master/doc/atari-load.png)
-![Atari ST main menu](https://raw.githubusercontent.com/frno7/psgplay/master/doc/atari-main.png)
+![Atari ST loading screen](https://raw.githubusercontent.com/frno7/psgplay/main/doc/atari-load.png)
+![Atari ST main menu](https://raw.githubusercontent.com/frno7/psgplay/main/doc/atari-main.png)
 
 PSG play is a music player and emulator for the
 [Atari ST](https://en.wikipedia.org/wiki/Atari_ST)
@@ -29,13 +29,13 @@ For [Javascript](https://en.wikipedia.org/wiki/JavaScript),
 focus on [demoscene](https://en.wikipedia.org/wiki/Demoscene) music.
 
 The `BUILD_CC`, `HOST_AR`, `HOST_CC`, and `TARGET_CC` with `TARGET_LD`
-[`Makefile`](https://github.com/frno7/psgplay/blob/master/Makefile)
+[`Makefile`](https://github.com/frno7/psgplay/blob/main/Makefile)
 variables can be configured for various compilation settings.
 The `BUILD_CFLAGS`, `HOST_CFLAGS`, `TARGET_CFLAGS`, and `TARGET_LDFLAGS`
 variables are available as well.
 
 Review the file
-[`INSTALL`](https://github.com/frno7/psgplay/blob/master/INSTALL)
+[`INSTALL`](https://github.com/frno7/psgplay/blob/main/INSTALL)
 for installation instructions.
 
 The package
@@ -50,7 +50,7 @@ as well as Linux and the architectures
 [`aarch64`](https://en.wikipedia.org/wiki/AArch64),
 [`x86-64`](https://en.wikipedia.org/wiki/X86-64) and
 [`wasm`](https://en.wikipedia.org/wiki/WebAssembly). These are built with
-[`.github/workflows/compilation.yml`](https://github.com/frno7/psgplay/blob/master/.github/workflows/compilation.yml).
+[`.github/workflows/compilation.yml`](https://github.com/frno7/psgplay/blob/main/.github/workflows/compilation.yml).
 
 # How to use
 
@@ -155,20 +155,20 @@ PSG play is compiled into the static library
 `lib/psgplay/psgplay.a` and the shared library `lib/psgplay/psgplay.so`. The
 [application programming interface](https://en.wikipedia.org/wiki/Application_programming_interface)
 (API) is documented in
-[`include/psgplay/psgplay.h`](https://github.com/frno7/psgplay/blob/master/include/psgplay/psgplay.h),
-[`include/psgplay/stereo.h`](https://github.com/frno7/psgplay/blob/master/include/psgplay/stereo.h),
-[`include/psgplay/sndh.h`](https://github.com/frno7/psgplay/blob/master/include/psgplay/sndh.h) and
-[`include/psgplay/version.h`](https://github.com/frno7/psgplay/blob/master/include/psgplay/version.h).
+[`include/psgplay/psgplay.h`](https://github.com/frno7/psgplay/blob/main/include/psgplay/psgplay.h),
+[`include/psgplay/stereo.h`](https://github.com/frno7/psgplay/blob/main/include/psgplay/stereo.h),
+[`include/psgplay/sndh.h`](https://github.com/frno7/psgplay/blob/main/include/psgplay/sndh.h) and
+[`include/psgplay/version.h`](https://github.com/frno7/psgplay/blob/main/include/psgplay/version.h).
 
 The library also supplies an unaltered 250 kHz digital form for custom
 analogue filters and mixers. This digital interface is documented in
-[`include/psgplay/digital.h`](https://github.com/frno7/psgplay/blob/master/include/psgplay/digital.h).
+[`include/psgplay/digital.h`](https://github.com/frno7/psgplay/blob/main/include/psgplay/digital.h).
 
 There are two simple examples on how to use the PSG play library:
 
-- [`lib/example/example-info.c`](https://github.com/frno7/psgplay/blob/master/lib/example/example-info.c)
+- [`lib/example/example-info.c`](https://github.com/frno7/psgplay/blob/main/lib/example/example-info.c)
   is an example on how to display SNDH tags;
-- [`lib/example/example-play.c`](https://github.com/frno7/psgplay/blob/master/lib/example/example-play.c)
+- [`lib/example/example-play.c`](https://github.com/frno7/psgplay/blob/main/lib/example/example-play.c)
   is an example on how to play an SNDH file in 44.1 kHz stereo.
 
 ## Disassembly
@@ -368,7 +368,7 @@ for quick and easy review, application and SNDH file reassembly:
 
 # How it works
 
-The [SNDH file format](https://github.com/frno7/psgplay/blob/master/doc/sndhv21.txt)
+The [SNDH file format](https://github.com/frno7/psgplay/blob/main/doc/sndhv21.txt)
 is an [Atari ST](https://en.wikipedia.org/wiki/Atari_ST)
 machine code executable form of music. A substantial part of Atari ST
 hardware must be emulated to play such files using other kinds of computers.
@@ -376,22 +376,22 @@ The five most complex parts emulated in software by PSG play are:
 
 - the [Motorola 68000](https://en.wikipedia.org/wiki/Motorola_68000)
   processor, via the [Musashi](https://github.com/kstenerud/Musashi) library
-  in [`lib/m68k`](https://github.com/frno7/psgplay/tree/master/lib/m68k);
+  in [`lib/m68k`](https://github.com/frno7/psgplay/tree/main/lib/m68k);
 
 - the [Programmable Sound Generator](https://en.wikipedia.org/wiki/Programmable_sound_generator)
   (PSG) [YM2149](https://en.wikipedia.org/wiki/General_Instrument_AY-3-8910)
-  in [`lib/atari/psg.c`](https://github.com/frno7/psgplay/tree/master/lib/atari/psg.c);
+  in [`lib/atari/psg.c`](https://github.com/frno7/psgplay/tree/main/lib/atari/psg.c);
 
 - the [DMA](https://en.wikipedia.org/wiki/Direct_memory_access) sound of the
   [Atari STE](https://en.wikipedia.org/wiki/Atari_ST#STE_models)
-  in [`lib/atari/sound.c`](https://github.com/frno7/psgplay/tree/master/lib/atari/sound.c);
+  in [`lib/atari/sound.c`](https://github.com/frno7/psgplay/tree/main/lib/atari/sound.c);
 
 - the LMC1992 mixer of the [Atari STE](https://en.wikipedia.org/wiki/Atari_ST#STE_models)
-  in [`lib/atari/mixer.c`](https://github.com/frno7/psgplay/tree/master/lib/atari/mixer.c);
+  in [`lib/atari/mixer.c`](https://github.com/frno7/psgplay/tree/main/lib/atari/mixer.c);
 
 - the [MC68901](https://archive.org/details/Motorola_MC68901_MFP_undated)
   multifunction peripheral (MFP) timer and interrupt controller in
-  [`lib/atari/mfp.c`](https://github.com/frno7/psgplay/tree/master/lib/atari/mfp.c).
+  [`lib/atari/mfp.c`](https://github.com/frno7/psgplay/tree/main/lib/atari/mfp.c).
 
 The digital emulation is currently fairly accurate, aiming to be within the
 variation of the compatible models of original Atari hardware. The analogue
