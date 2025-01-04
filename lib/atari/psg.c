@@ -43,25 +43,17 @@ CF2149_REGISTERS(PSG_REG_NAME)
 static void psg_emit(const struct device_cycle psg_cycle)
 {
 	const struct cf2149_clk clk = cf2149_clk_cycle(psg_cycle.c);
-	struct psg_sample buffer[256];
-	struct cf2149_ac ac[ARRAY_SIZE(buffer)];
+	struct cf2149_ac buffer[256];
 
 	for (;;) {
 		const size_t n = cf2149.port.rd_ac(&cf2149,
-			clk, &ac[0], ARRAY_SIZE(ac));
+			clk, &buffer[0], ARRAY_SIZE(buffer));
 
 		if (!n)
 			return;
 
-		if (output.sample) {
-			for (size_t i = 0; i < n; i++) {
-				buffer[i].lva = ac[i].lva >> 1;
-				buffer[i].lvb = ac[i].lvb >> 1;
-				buffer[i].lvc = ac[i].lvc >> 1;
-			}
-
+		if (output.sample)
 			output.sample(buffer, n, output.sample_arg);
-		}
 	}
 }
 

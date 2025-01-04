@@ -8,14 +8,10 @@
 
 #include "internal/types.h"
 
-struct psg_sample {
-	u8 lva;
-	u8 lvb;
-	u8 lvc;
-};
+struct cf2149_ac;
 
 typedef void (*psg_sample_f)(
-	const struct psg_sample *sample, size_t count, void *arg);
+	const struct cf2149_ac *sample, size_t count, void *arg);
 
 struct sound_sample {
 	s16 left;

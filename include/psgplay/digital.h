@@ -12,16 +12,44 @@
 
 struct psgplay;		/* PSG play object */
 
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define PSGPLAY_BITFIELD(field, more)					\
+	field;								\
+	more
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define PSGPLAY_BITFIELD(field, more)					\
+	more								\
+	field;
+#else
+#error "Bitfield neither big nor little endian?"
+#endif
+
+/**
+ * struct psgplay_digital_level - digital PSG level
+ * @b4: 4-bit channel level (AY-3-8910)
+ * @b5: 5-bit channel level (YM2149)
+ * @b6: 6-bit channel level
+ * @b7: 7-bit channel level
+ * @b8: 8-bit channel level
+ */
+union psgplay_digital_level {
+	struct { PSGPLAY_BITFIELD(uint8_t b4 : 4, PSGPLAY_BITFIELD(uint8_t : 4, ;)) };
+	struct { PSGPLAY_BITFIELD(uint8_t b5 : 5, PSGPLAY_BITFIELD(uint8_t : 3, ;)) };
+	struct { PSGPLAY_BITFIELD(uint8_t b6 : 6, PSGPLAY_BITFIELD(uint8_t : 2, ;)) };
+	struct { PSGPLAY_BITFIELD(uint8_t b7 : 7, PSGPLAY_BITFIELD(uint8_t : 1, ;)) };
+	uint8_t b8;
+};
+
 /**
  * struct psgplay_digital_psg - digital PSG sample
- * @lva: 0..15 level of channel A
- * @lvb: 0..15 level of channel B
- * @lvc: 0..15 level of channel c
+ * @lva: level of channel A
+ * @lvb: level of channel B
+ * @lvc: level of channel c
  */
 struct psgplay_digital_psg {
-	uint8_t lva;
-	uint8_t lvb;
-	uint8_t lvc;
+	union psgplay_digital_level lva;
+	union psgplay_digital_level lvb;
+	union psgplay_digital_level lvc;
 };
 
 /**
