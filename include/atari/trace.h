@@ -6,6 +6,8 @@
 #ifndef ATARI_TRACE_H
 #define ATARI_TRACE_H
 
+#include <stdint.h>
+
 #define TRACE_DEVICE(dev)						\
 	dev(all, ALL, 0)						\
 	dev(cpu, CPU, 1)						\
