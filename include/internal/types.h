@@ -20,15 +20,15 @@
 #error "bitfield neither big nor little endian?"
 #endif
 
-typedef int8_t s8;
-typedef int16_t s16;
-typedef int32_t s32;
-typedef int64_t s64;
+typedef int8_t s8;	/* FIXME: Deprecate */
+typedef int16_t s16;	/* FIXME: Deprecate */
+typedef int32_t s32;	/* FIXME: Deprecate */
+typedef int64_t s64;	/* FIXME: Deprecate */
 
-typedef uint8_t u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
-typedef uint64_t u64;
+typedef uint8_t u8;	/* FIXME: Deprecate */
+typedef uint16_t u16;	/* FIXME: Deprecate */
+typedef uint32_t u32;	/* FIXME: Deprecate */
+typedef uint64_t u64;	/* FIXME: Deprecate */
 
 /* Macro definitions from the Linux kernel. */
 
