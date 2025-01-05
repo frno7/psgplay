@@ -29,8 +29,8 @@ struct options {
 	const char *output;
 
 	const char *start;
-	const char *length;
 	const char *stop;
+	const char *length;
 
 	const char *mode;
 
@@ -56,7 +56,5 @@ bool text_mode_option(void);
 psgplay_digital_to_stereo_cb psg_mix_option(void);
 
 struct options *parse_options(int argc, char **argv);
-
-int option_verbosity(void);
 
 #endif /* PSGPLAY_SYSTEM_UNIX_OPTION_H */
