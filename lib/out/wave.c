@@ -103,8 +103,8 @@ static void wave_write_header(int fd, const char *output,
 		},
 	};
 
+	BUILD_BUG_ON(sizeof(wave_header) != 44);
 	BUG_ON((u32)total_size != total_size);
-	BUG_ON(sizeof(wave_header) != 44);
 
 	if (lseek(fd, 0, SEEK_SET) == -1)
 		pr_fatal_errno(output);
