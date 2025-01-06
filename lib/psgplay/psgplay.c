@@ -286,14 +286,14 @@ static inline struct psgplay_stereo stereo_mix(struct mixer *m,
 
 		return (struct psgplay_stereo) {
 			/* Simplistic half volume each to PSG and sound. */
-			.left  = m->gain.left  * (d.sound.left  + s) / 2,
-			.right = m->gain.right * (d.sound.right + s) / 2
+			.left  = m->gain.left  * (2*d.sound.left  + 4*s) / (2*4),
+			.right = m->gain.right * (2*d.sound.right + 4*s) / (2*4)
 		};
 	} else
 		return (struct psgplay_stereo) {
 			/* Simplistic half volume each to PSG and sound. */
-			.left  = (d.sound.left  + s) / 2,
-			.right = (d.sound.right + s) / 2
+			.left  = (2*d.sound.left  + 4*s) / (2*4),
+			.right = (2*d.sound.right + 4*s) / (2*4)
 		};
 }
 
