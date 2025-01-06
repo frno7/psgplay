@@ -26,18 +26,18 @@ struct psgplay;		/* PSG play object */
 
 /**
  * struct psgplay_digital_level - digital PSG level
- * @b4: 4-bit channel level (AY-3-8910)
- * @b5: 5-bit channel level (YM2149)
- * @b6: 6-bit channel level
- * @b7: 7-bit channel level
- * @b8: 8-bit channel level
+ * @u4: 4-bit channel level (AY-3-8910)
+ * @u5: 5-bit channel level (YM2149)
+ * @u6: 6-bit channel level
+ * @u7: 7-bit channel level
+ * @u8: 8-bit channel level
  */
 union psgplay_digital_level {
-	struct { PSGPLAY_BITFIELD(uint8_t b4 : 4, PSGPLAY_BITFIELD(uint8_t : 4, ;)) };
-	struct { PSGPLAY_BITFIELD(uint8_t b5 : 5, PSGPLAY_BITFIELD(uint8_t : 3, ;)) };
-	struct { PSGPLAY_BITFIELD(uint8_t b6 : 6, PSGPLAY_BITFIELD(uint8_t : 2, ;)) };
-	struct { PSGPLAY_BITFIELD(uint8_t b7 : 7, PSGPLAY_BITFIELD(uint8_t : 1, ;)) };
-	uint8_t b8;
+	struct { PSGPLAY_BITFIELD(uint8_t u4 : 4, PSGPLAY_BITFIELD(uint8_t : 4, ;)) };
+	struct { PSGPLAY_BITFIELD(uint8_t u5 : 5, PSGPLAY_BITFIELD(uint8_t : 3, ;)) };
+	struct { PSGPLAY_BITFIELD(uint8_t u6 : 6, PSGPLAY_BITFIELD(uint8_t : 2, ;)) };
+	struct { PSGPLAY_BITFIELD(uint8_t u7 : 7, PSGPLAY_BITFIELD(uint8_t : 1, ;)) };
+	uint8_t u8;
 };
 
 /**

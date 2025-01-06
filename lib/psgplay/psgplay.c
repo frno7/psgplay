@@ -132,9 +132,9 @@ static int buffer_digital_psg_sample(const struct cf2149_ac *sample,
 	if (!err)
 		db->sample[db->count.psg++].psg =
 			(struct psgplay_digital_psg) {
-				.lva.b8 = sample->lva.b8,
-				.lvb.b8 = sample->lvb.b8,
-				.lvc.b8 = sample->lvc.b8,
+				.lva.u8 = sample->lva.u8,
+				.lvb.u8 = sample->lvb.u8,
+				.lvc.u8 = sample->lvc.u8,
 			};
 
 	return err;
@@ -302,7 +302,7 @@ static int16_t psg_dac(const union psgplay_digital_level level)
 #define DAC_S16_BITS(S) ((S) * 0xffff - 0x8000)
 	static const int16_t dac[32] = CF2149_DAC_5_BIT_LEVEL(DAC_S16_BITS);
 
-	return dac[level.b5];
+	return dac[level.u5];
 }
 
 void psgplay_digital_to_stereo_linear(struct psgplay_stereo *stereo,
@@ -332,9 +332,9 @@ void psgplay_digital_to_stereo_empiric(struct psgplay_stereo *stereo,
 
 	for (size_t i = 0; i < count; i++) {
 		const int16_t s = digital->mixer.mix ?
-			dac[digital[i].psg.lvc.b4]
-			   [digital[i].psg.lvb.b4]
-			   [digital[i].psg.lva.b4] - 0x8000 : 0;
+			dac[digital[i].psg.lvc.u4]
+			   [digital[i].psg.lvb.u4]
+			   [digital[i].psg.lva.u4] - 0x8000 : 0;
 
 		stereo[i] = stereo_mix(&m, s, digital[i]);
 	}
