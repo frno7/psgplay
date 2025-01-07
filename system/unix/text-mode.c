@@ -29,6 +29,8 @@
 #include "system/unix/text-mode.h"
 #include "system/unix/tty.h"
 
+#define BUFFER_UPDATE_TIME 20	/* 20 ms */
+
 struct sample_buffer {
 	u64 timestamp;
 
@@ -196,7 +198,7 @@ static u64 sample_buffer_update(struct sample_buffer *sb, u64 timestamp)
 				sb->buffer[sb->index].left,
 				sb->buffer[sb->index].right,
 				sb->output_arg)) {
-			sb->timestamp = timestamp + 100;
+			sb->timestamp = timestamp + (BUFFER_UPDATE_TIME);
 			break;
 		}
 
