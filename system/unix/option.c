@@ -96,6 +96,7 @@ static void help(FILE *file)
 "\n"
 "Trace options:\n"
 "\n"
+"    --trace-output=<file>  write trace events to file (default stdout)\n"
 "    --trace=<device>,...   trace device operations of SNDH file and exit:\n"
 #define TRACE_DEVICE_HELP(symbol_, label_, id_) " " #symbol_
 "                          " TRACE_DEVICE(TRACE_DEVICE_HELP) "\n"
@@ -327,6 +328,7 @@ struct options *parse_options(int argc, char **argv)
 		{ "disassemble-address", no_argument,       NULL, 0 },
 		{ "remake-header",       no_argument,       NULL, 0 },
 
+		{ "trace-output",        required_argument, NULL, 0 },
 		{ "trace",               required_argument, NULL, 0 },
 
 		{ NULL, 0, NULL, 0 }
@@ -390,8 +392,6 @@ struct options *parse_options(int argc, char **argv)
 				set_psg_mix("volume");
 			}
 
-			else if (OPT("trace"))
-				option.trace = trace_option(optarg);
 			else if (OPT("disassemble"))
 				option.disassemble = DISASSEMBLE_TYPE_ALL;
 			else if (OPT("disassemble-header"))
@@ -400,6 +400,11 @@ struct options *parse_options(int argc, char **argv)
 				option.disassemble_address = true;
 			else if (OPT("remake-header"))
 				option.remake_header = true;
+
+			else if (OPT("trace-output"))
+				option.trace.output = optarg;
+			else if (OPT("trace"))
+				option.trace = trace_option(optarg);
 			break;
 
 		case 'h':

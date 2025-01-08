@@ -11,6 +11,7 @@
 
 #include "atari/bus.h"
 #include "atari/machine.h"
+#include "atari/trace.h"
 
 static void mmu_trace(struct machine *machine,
 	const char *op, uint32_t dev_address,
@@ -22,19 +23,10 @@ static void mmu_trace(struct machine *machine,
 {
 	char description[256];
 
-	/* FIXME: if (!dev->trace.format) with dev->trace.format(fmt, ...) */
+	if (!machine->trace || machine->trace->m == TRACE_DEVICE_NONE)
+		return;
+
 	return;
-
-	if (strcmp(dev->name, "dma") == 0)
-		goto trace;
-	if (strcmp(dev->name, "mfp") == 0)
-		goto trace;
-	if (strcmp(dev->name, "psg") == 0)
-		goto trace;
-	if (dev->bus.address + dev_address < 2048)
-		goto trace;
-
-trace:
 
 	if (sh)
 		sh(machine, dev, dev_address, description, sizeof(description));
@@ -42,13 +34,15 @@ trace:
 		description[0] = '\0';
 
 	if (description[0] != '\0')
-		printf("%s %8" PRIu64 "  %6x: %s %s%.*x %s\n",
+		fprintf(machine->trace->file,
+			"%s %8" PRIu64 "  %6x: %s %s%.*x %s\n",
 			dev->name, machine_cycle(machine),
 			dev->bus.address + dev_address,
 			op, spacing, size, value,
 			description);
 	else
-		printf("%s %8" PRIu64 "  %6x: %s %s%.*x\n",
+		fprintf(machine->trace->file,
+			"%s %8" PRIu64 "  %6x: %s %s%.*x\n",
 			dev->name, machine_cycle(machine),
 			dev->bus.address + dev_address,
 			op, spacing, size, value);

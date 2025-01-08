@@ -705,6 +705,7 @@ static void dasm_mark_text_trace_run(
 			.machine = &pp->machine,
 			.arg = arg,
 		};
+		pp->machine.trace = &options->trace;
 
 		psgplay_instruction_callback(pp, insn_cb, &insn_arg);
 
@@ -790,9 +791,11 @@ static int trace_print_insn_fmt(void *arg, const char *fmt, ...)
 
 static void trace_reg(struct machine *machine)
 {
-	printf("reg %8" PRIu64, machine_cycle(machine));
+	fprintf(machine->trace->file, "reg %8" PRIu64,
+		machine_cycle(machine));
 
-	printf(" pc %6" PRIx32, m68k_get_reg(&machine->cpu.m68k, NULL, M68K_REG_PC));
+	fprintf(machine->trace->file, " pc %6" PRIx32,
+		m68k_get_reg(&machine->cpu.m68k, NULL, M68K_REG_PC));
 
 #define TRACE_REGS(reg)							\
 	reg(sr, SR)							\
@@ -803,10 +806,11 @@ static void trace_reg(struct machine *machine)
 	reg(usp, USP)							\
 	reg(isp, ISP)
 #define TRACE_REG(symbol_, label_)					\
-	printf(" " #symbol_ " %x", m68k_get_reg(&machine->cpu.m68k, NULL, M68K_REG_ ## label_));
+	fprintf(machine->trace->file, " " #symbol_ " %x",		\
+		m68k_get_reg(&machine->cpu.m68k, NULL, M68K_REG_ ## label_));
 TRACE_REGS(TRACE_REG)
 
-	printf("\n");
+	fprintf(machine->trace->file, "\n");
 }
 
 static void check_stack_bounds(struct trace *trace,
@@ -826,8 +830,8 @@ static void cpu_instruction_trace(uint32_t pc, void *arg)
 	struct insn_arg *insn_arg = arg;
 	struct trace *trace = insn_arg->arg;
 
-	if (!TRACE_ENABLE(&insn_arg->options->trace, CPU))
-		goto trace_reg;
+	if (insn_arg->options->trace.m == TRACE_DEVICE_NONE)
+		return;
 
 	BUG_ON(pc % 2 != 0);
 
@@ -863,9 +867,9 @@ static void cpu_instruction_trace(uint32_t pc, void *arg)
 	BUG_ON(spec0 != spec1);
 	BUG_ON(!trace->sb.length);
 
-	printf("%s\n", trace->sb.s);
+	if (TRACE_ENABLE(&insn_arg->options->trace, CPU))
+		fprintf(insn_arg->machine->trace->file, "%s\n", trace->sb.s);
 
-trace_reg:
 	check_stack_bounds(trace, insn_arg->machine, insn_arg->options);
 
 	if (TRACE_ENABLE(&insn_arg->options->trace, REG))

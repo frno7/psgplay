@@ -6,6 +6,7 @@
 #ifndef ATARI_TRACE_H
 #define ATARI_TRACE_H
 
+#include <stdio.h>
 #include <stdint.h>
 
 #define TRACE_DEVICE(dev)						\
@@ -14,6 +15,7 @@
 	dev(reg, REG, 2)
 
 enum trace_device {
+	TRACE_DEVICE_NONE = 0,
 #define TRACE_DEVICE_ENUM(symbol_, label_, id_)				\
 	TRACE_DEVICE_##label_ = !id_ ? -1 : 1 << (id_ - 1),
 TRACE_DEVICE(TRACE_DEVICE_ENUM)
@@ -24,6 +26,8 @@ TRACE_DEVICE(TRACE_DEVICE_ENUM)
 
 struct trace_mode {
 	uint32_t m;
+	FILE *file;
+	const char *output;
 };
 
 #endif /* ATARI_TRACE_H */

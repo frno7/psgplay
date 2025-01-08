@@ -120,6 +120,19 @@ int main(int argc, char *argv[])
 {
 	struct options *options = parse_options(argc, argv);
 
+	if (options->trace.output) {
+		options->trace.file = fopen(options->trace.output, "w");
+
+		if (!options->trace.file) {
+			perror(options->trace.output);
+			exit(EXIT_FAILURE);
+		}
+	} else
+		options->trace.file = stdout;
+
+	if (options->trace.m != TRACE_DEVICE_NONE)
+		fprintf(options->trace.file, "sys type psgplay\n");
+
 	struct file file = sndh_read_file(options->input);
 	if (!file_valid(file))
 		pr_fatal_errno(options->input);
@@ -141,6 +154,12 @@ int main(int argc, char *argv[])
 	select_replay(options)(options, file, select_output(options));
 
 	file_free(file);
+
+	if (options->trace.output && fclose(options->trace.file) != 0) {
+		perror(options->trace.output);
+		exit(EXIT_FAILURE);
+	}
+
 
 	return EXIT_SUCCESS;
 }

@@ -53,6 +53,8 @@ struct machine {
 
 	uint64_t cycle;
 
+	struct trace_mode *trace;
+
 	struct {
 		void (*cb)(uint32_t pc, void *arg);
 		void *arg;
