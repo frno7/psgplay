@@ -169,7 +169,7 @@ static void idle_indefinitely(void)
 
 void start(size_t size, void *sndh, u32 track, u32 timer)
 {
-	BUILD_BUG_ON(sizeof(struct system_variables) != 0x102);
+	BUILD_BUG_ON(sizeof(struct system_variables) != 0x1b4);
 
 	file = (struct sndh_file) { .size = size, .sndh = sndh };
 
