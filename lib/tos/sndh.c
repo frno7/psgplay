@@ -5,6 +5,7 @@
 
 #include <stdlib.h>
 
+#include <tos/cookie.h>
 #include <tos/system-variable.h>
 
 #include "internal/macro.h"
@@ -23,6 +24,17 @@ struct timer_prescale {
 };
 
 struct system_variables *__system_variables = (struct system_variables *)0x400;
+
+static struct cookie cookie_jar[16] = {
+	{ .uid = COOKIE__CPU, .value = COOKIE__CPU_68000 },
+	{ .uid = COOKIE__VDO, .value = COOKIE__VDO_STE   },
+	{ .uid = COOKIE__MCH, .value = COOKIE__MCH_STE   },
+	{ .uid = COOKIE__SWI, .value = 0xff              },
+	{ .uid = COOKIE__SND, .value = COOKIE__SND_PSG
+				     | COOKIE__SND_DMA8  },
+	{ .uid = COOKIE__FPU, .value = COOKIE__FPU_NONE  },
+	{ .value = __ARRAY_SIZE(cookie_jar) }
+};
 
 struct sndh_file file;
 
@@ -174,6 +186,7 @@ void start(size_t size, void *sndh, u32 track, u32 timer)
 	file = (struct sndh_file) { .size = size, .sndh = sndh };
 
 	__system_variables->_membot = (u32)sndh + size + 1024;
+	__system_variables->_p_cookies = cookie_jar;
 
 	if (install_sndh_timer(u32_to_sndh_timer(timer)))
 		sndh_init(track, &file);
