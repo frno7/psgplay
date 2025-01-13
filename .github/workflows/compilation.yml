@@ -89,7 +89,9 @@ jobs:
           githubToken: ${{ github.token }}
           install: |
             apt-get update -q -y
-            apt-get install -q -y git make gcc libc-dev xxd libasound2 libasound2-dev
+            apt-get install -q -y git make gcc libc-dev xxd libasound2-dev
+            apt-get install -q -y libasound2 || \
+            apt-get install -q -y libasound2t64
           run: |
             # Avoid fatal: unsafe repository (directory is owned by someone else)
             # Confer https://github.com/actions/checkout/issues/760
@@ -101,7 +103,9 @@ jobs:
         if: ${{ matrix.arch == 'x86_64' }}
         run: |
           sudo apt-get update -q -y
-          sudo apt-get install -q -y git make gcc clang libc-dev xxd libasound2 libasound2-dev
+          sudo apt-get install -q -y git make gcc clang libc-dev xxd libasound2-dev
+          sudo apt-get install -q -y libasound2 || \
+          sudo apt-get install -q -y libasound2t64
           script/compile arch ${{ matrix.arch }}
 
       - name: Publish PSG play archive for Linux
