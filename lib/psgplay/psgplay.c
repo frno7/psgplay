@@ -281,19 +281,21 @@ static inline void mixer_for_sample(struct mixer *m,
 static inline struct psgplay_stereo stereo_mix(struct mixer *m,
 	const s16 s, const struct psgplay_digital d)
 {
+	const float psg_mix = 0.65;
+	const int p = 256 * psg_mix;
+	const int q = 256 - p;
+
 	if (m->enable) {
 		mixer_for_sample(m, d);
 
 		return (struct psgplay_stereo) {
-			/* Simplistic half volume each to PSG and sound. */
-			.left  = m->gain.left  * (2*d.sound.left  + 4*s) / (2*4),
-			.right = m->gain.right * (2*d.sound.right + 4*s) / (2*4)
+			.left  = m->gain.left  * (q*d.sound.left  + p*s) / 256,
+			.right = m->gain.right * (q*d.sound.right + p*s) / 256
 		};
 	} else
 		return (struct psgplay_stereo) {
-			/* Simplistic half volume each to PSG and sound. */
-			.left  = (2*d.sound.left  + 4*s) / (2*4),
-			.right = (2*d.sound.right + 4*s) / (2*4)
+			.left  = (q*d.sound.left  + p*s) / 256,
+			.right = (q*d.sound.right + p*s) / 256
 		};
 }
 
