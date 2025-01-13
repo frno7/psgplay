@@ -101,7 +101,7 @@ MFP_CTRL_DIV(MFP_CTRL_DIV_ENUM)
 struct mfp_##type {							\
 	__BITFIELD_FIELD(u8 unused : 3,					\
 	__BITFIELD_FIELD(u8 reset : 1,					\
-	__BITFIELD_FIELD(u8 pulse_width_mode : 1,			\
+	__BITFIELD_FIELD(u8 event : 1,					\
 	__BITFIELD_FIELD(u8 ctrl : 3,					\
 	;))))								\
 }

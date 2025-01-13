@@ -59,9 +59,8 @@ DEFINE_TIMER(b, B,  8, TBDR, TBCR,  0);
 DEFINE_TIMER(c, C,  5, TCDR, TCDCR, 4);
 DEFINE_TIMER(d, D,  4, TDDR, TCDCR, 0);
 
-static struct {
-	u32 high;
-	u32 low;
+static struct tabi {
+	u32 event;
 } tai;
 
 static bool mono_monitor_detect()
@@ -235,6 +234,25 @@ request_event:
 	request_device_event(device, mfp_from_timer_cycle_align(timer->timeout));
 }
 
+static void timer_event_count(const struct device *device,
+	struct timer *timer, struct tabi *tabi,
+	const struct timer_cycle timer_cycle)
+{
+	/*
+	 * A disabled channel is completely inactive; interrupts
+	 * received on the channel are ignored by the MFP.
+	 */
+	if (!timer_rd_interrupt_enable(timer))
+		return;
+
+	if (tabi->event < timer_period(timer))
+		return;
+
+	tabi->event %= timer_period(timer);
+
+	timer_wr_interrupt_pending(timer, true);
+}
+
 static int assert_mfp_irq(void)
 {
 	const u16 intr = mfp_ipr() & mfp_imr();
@@ -252,12 +270,14 @@ static void mfp_event(const struct device *device,
 {
 	const struct timer_cycle timer_cycle = timer_from_mfp_cycle(mfp_cycle);
 
-	if (mfp.tacr.pulse_width_mode)
-		WARN_ONCE("mfp.tacr.pulse_width_mode not implemented\n");
+	if (mfp.tacr.event && !mfp.tacr.ctrl)
+		timer_event_count(device, &timer_a, &tai, timer_cycle);
+	else if (mfp.tacr.event)
+		WARN_ONCE("mfp.tacr pulse width mode not implemented\n");
 	else
 		timer_delay_event(device, &timer_a, timer_cycle);
-	if (mfp.tbcr.pulse_width_mode)
-		WARN_ONCE("mfp.tbcr.pulse_width_mode not implemented\n");
+	if (mfp.tbcr.event)
+		WARN_ONCE("mfp.tbcr event count and pulse width modes not implemented\n");
 	else
 		timer_delay_event(device, &timer_b, timer_cycle);
 
@@ -505,10 +525,8 @@ void dma_sound_active(bool level)
 	if (level == prev_level)
 		return;
 
-	if (level)
-		tai.high++;
-	else
-		tai.low++;
+	if (level == mfp.aer.mono_monitor_detect)
+		tai.event++;
 
 	if (!mfp.ddr.mono_monitor_detect &&
 	     mfp.iera.mono_monitor_detect &&
