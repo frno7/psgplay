@@ -8,6 +8,7 @@
 #include <tos/cookie.h>
 #include <tos/system-variable.h>
 
+#include "internal/compare.h"
 #include "internal/macro.h"
 #include "internal/build-assert.h"
 #include "internal/check-compiler.h"
@@ -83,11 +84,10 @@ MFP_CTRL_DIV(MFP_CTRL_DIV_PRESCALE)
 		if (frequency > U32_MAX / prescale_div[i])
 			continue;
 
-		const u32 count = DIV_ROUND_CLOSEST_U32(
-			MFP_TIMER_FREQUENCY, prescale_div[i] * (u32)frequency);
-
-		if (count < 1 || 256 < count)
-			continue;
+		/* FIXME: Report unobtainable frequencies. */
+		const u32 count = clamp_t(u32,
+			DIV_ROUND_CLOSEST_U32(MFP_TIMER_FREQUENCY,
+				prescale_div[i] * (u32)frequency), 1, 256);
 
 		const u32 f = DIV_ROUND_CLOSEST_U32(
 			MFP_TIMER_FREQUENCY, prescale_div[i] * count);
