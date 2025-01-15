@@ -406,9 +406,7 @@ signal for mixing with stereo samples. To avoid sharp and audible noise when
 starting and stopping playback, stereo samples fade in and out with a 10 ms
 logistic sigmoid at start and stop.
 
-As described in issues
-[#9](https://github.com/frno7/psgplay/issues/9) and
-[#10](https://github.com/frno7/psgplay/issues/10),
-DMA sound and LMC1992 for tone control specific to
+As described in the issue [#9](https://github.com/frno7/psgplay/issues/9)
+the LMC1992 for tone control specific to
 [Atari STE](https://en.wikipedia.org/wiki/Atari_ST#STE_models)
-and related hardware are not yet fully emulated by PSG play.
+is not yet fully emulated by PSG play.
