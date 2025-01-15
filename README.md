@@ -9,6 +9,23 @@ PSG play is a music player and emulator for the
 [YM2149](https://en.wikipedia.org/wiki/General_Instrument_AY-3-8910)
 and files in the [SNDH archive](http://sndh.atari.org/).
 
+# How to download
+
+The package
+[`media-sound/psgplay`](https://github.com/frno7/gentoo.overlay/tree/master/media-sound/psgplay)
+is available for [Gentoo Linux](https://www.gentoo.org/).
+
+Github [actions](https://github.com/frno7/psgplay/actions/workflows/compilation.yml)
+automatically compile and publish archives with PSG play for
+the [Atari ST](https://en.wikipedia.org/wiki/Atari_ST),
+as well as Linux and the architectures
+[`ppc64le`](https://en.wikipedia.org/wiki/ppc64le),
+[`aarch64`](https://en.wikipedia.org/wiki/AArch64),
+[`x86-64`](https://en.wikipedia.org/wiki/X86-64), and a
+[`wasm`](https://en.wikipedia.org/wiki/WebAssembly) web browser library
+for use with [Cowbell](https://github.com/demozoo/cowbell). These are built with
+[`.github/workflows/compilation.yml`](https://github.com/frno7/psgplay/blob/main/.github/workflows/compilation.yml).
+
 # How to build
 
 This repository has Git [submodules](https://git-scm.com/docs/git-submodule)
@@ -37,20 +54,6 @@ variables are available as well.
 Review the file
 [`INSTALL`](https://github.com/frno7/psgplay/blob/main/INSTALL)
 for installation instructions.
-
-The package
-[`media-sound/psgplay`](https://github.com/frno7/gentoo.overlay/tree/master/media-sound/psgplay)
-is available for [Gentoo Linux](https://www.gentoo.org/).
-
-Github [actions](https://github.com/frno7/psgplay/actions/workflows/compilation.yml)
-automatically compile and publish archives with PSG play for
-the [Atari ST](https://en.wikipedia.org/wiki/Atari_ST),
-as well as Linux and the architectures
-[`ppc64le`](https://en.wikipedia.org/wiki/ppc64le),
-[`aarch64`](https://en.wikipedia.org/wiki/AArch64),
-[`x86-64`](https://en.wikipedia.org/wiki/X86-64) and
-[`wasm`](https://en.wikipedia.org/wiki/WebAssembly). These are built with
-[`.github/workflows/compilation.yml`](https://github.com/frno7/psgplay/blob/main/.github/workflows/compilation.yml).
 
 # How to use
 
