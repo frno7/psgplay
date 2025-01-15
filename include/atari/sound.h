@@ -78,4 +78,6 @@ extern const struct device sound_device;
 
 void sound_sample(sound_sample_f sample, void *sample_arg);
 
+void sound_check(u32 bus_address);
+
 #endif /* ATARI_SOUND_H */

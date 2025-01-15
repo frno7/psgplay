@@ -320,6 +320,21 @@ void sound_sample(sound_sample_f sample, void *sample_arg)
 	output.sample_arg = sample_arg;
 }
 
+void sound_check(u32 bus_address)
+{
+	/*
+	 * FIXME: Provisional check for Quartet files such as Spaz that
+	 * write to RAM during DMA playback.
+	 */
+	extern const struct device sound_device;
+	const struct device *device = &sound_device;
+
+	if (state.regs.ctrl.dma &&
+	    state.start <= bus_address &&
+	    bus_address <  state.end)
+		sound_emit(device_cycle(device));
+}
+
 const struct device sound_device = {
 	.name = "snd",
 	.frequency = SOUND_FREQUENCY,

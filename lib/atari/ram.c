@@ -9,6 +9,7 @@
 #include "atari/device.h"
 #include "atari/exception-vector.h"
 #include "atari/ram.h"
+#include "atari/sound.h"
 #include "atari/system-variable.h"
 
 static u8 ram[4 * 1024 * 1024];	/* 4 MiB of RAM */
@@ -31,12 +32,16 @@ static u16 ram_rd_u16(const struct device *device, u32 dev_address)
 static void ram_wr_u8(const struct device *device,
 	u32 dev_address, u8 data)
 {
+	sound_check(dev_address);
+
 	ram[dev_address] = data;
 }
 
 static void ram_wr_u16(const struct device *device,
 	u32 dev_address, u16 data)
 {
+	sound_check(dev_address);
+
 	ram[dev_address] = data >> 8;
 	ram[dev_address + 1] = data & 0xff;
 }
