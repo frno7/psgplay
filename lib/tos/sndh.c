@@ -26,6 +26,8 @@ struct timer_prescale {
 
 struct system_variables *__system_variables = (struct system_variables *)0x400;
 
+static void (*vblqueue[4])();
+
 static struct cookie cookie_jar[16] = {
 	{ .uid = COOKIE__CPU, .value = COOKIE__CPU_68000 },
 	{ .uid = COOKIE__VDO, .value = COOKIE__VDO_STE   },
@@ -186,6 +188,8 @@ void start(size_t size, void *sndh, u32 track, u32 timer)
 	file = (struct sndh_file) { .size = size, .sndh = sndh };
 
 	__system_variables->_membot = (u32)sndh + size + 1024;
+	__system_variables->nvbls = ARRAY_SIZE(vblqueue);
+	__system_variables->_vblqueue = vblqueue;
 	__system_variables->_p_cookies = cookie_jar;
 
 	if (install_sndh_timer(u32_to_sndh_timer(timer)))
