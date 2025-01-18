@@ -8,6 +8,7 @@ $(warning WARNING: Missing toslibc Git submodule; clone with the "--recurse-subm
 endif
 
 include lib/cf2149/module/Makefile
+include lib/cf68901/module/Makefile
 
 include lib/version/Makefile
 include lib/tos/Makefile

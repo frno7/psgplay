@@ -13,8 +13,8 @@
 struct mfp_map {
 #define MFP_REG_MAP(register_, symbol_, label_, description_)		\
 	u8 : 8;								\
-	__volatile__ struct mfp_##symbol_ symbol_;
-MFP_REGISTERS(MFP_REG_MAP)
+	__volatile__ struct cf68901_##symbol_ symbol_;
+CF68901_REGISTERS(MFP_REG_MAP)
 };
 
 static inline struct mfp_map *mfp_map(void)

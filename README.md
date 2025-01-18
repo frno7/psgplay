@@ -459,16 +459,16 @@ The five most complex parts emulated in software by PSG play are:
   (PSG) [YM2149](https://en.wikipedia.org/wiki/General_Instrument_AY-3-8910)
   in [`lib/cf2149/module/cf2149.c`](https://github.com/frno7/cf2149/blob/main/module/cf2149.c);
 
+- the [MC68901](https://archive.org/details/Motorola_MC68901_MFP_undated)
+  multifunction peripheral (MFP) timer and interrupt controller in
+  [`lib/cf68901/module/cf68901.c`](https://github.com/frno7/cf68901/blob/main/module/cf68901.c).
+
 - the [DMA](https://en.wikipedia.org/wiki/Direct_memory_access) sound of the
   [Atari STE](https://en.wikipedia.org/wiki/Atari_ST#STE)
   in [`lib/atari/sound.c`](https://github.com/frno7/psgplay/tree/main/lib/atari/sound.c);
 
 - the LMC1992 mixer of the [Atari STE](https://en.wikipedia.org/wiki/Atari_ST#STE_models)
   in [`lib/atari/mixer.c`](https://github.com/frno7/psgplay/tree/main/lib/atari/mixer.c);
-
-- the [MC68901](https://archive.org/details/Motorola_MC68901_MFP_undated)
-  multifunction peripheral (MFP) timer and interrupt controller in
-  [`lib/atari/mfp.c`](https://github.com/frno7/psgplay/tree/main/lib/atari/mfp.c).
 
 The digital emulation is currently fairly accurate, aiming to be within the
 variation of the compatible models of original Atari hardware. The analogue

@@ -21,4 +21,5 @@ ATARI_SRC := $(addprefix lib/atari/,					\
 	shifter.c							\
 	sound.c								\
 	system-variable.c)						\
-	$(CF2149_SRC)
+	$(CF2149_SRC)							\
+	$(CF68901_SRC)

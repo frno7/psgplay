@@ -7,7 +7,6 @@
 #define ATARI_MFP_H
 
 #include "bus.h"
-#include "mfp-register.h"
 
 u32 mfp_irq_vector(void);
 
