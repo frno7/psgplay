@@ -42,6 +42,7 @@ static void help(FILE *file)
 "    -h, --help             display this help and exit\n"
 "    --version              display version and exit\n"
 "    -v, --verbose          increase verbosity\n"
+"    --quiet                decrease verbosity\n"
 "\n"
 "    -i, --info             display SNDH file info and exit\n"
 "\n"
@@ -192,6 +193,7 @@ struct options *parse_options(int argc, char **argv)
 		{ "help",                no_argument,       NULL, 0 },
 		{ "version",             no_argument,       NULL, 0 },
 		{ "verbose",             no_argument,       NULL, 0 },
+		{ "quiet",               no_argument,       NULL, 0 },
 
 		{ "info",                no_argument,       NULL, 0 },
 		{ "output",              required_argument, NULL, 0 },
@@ -242,6 +244,8 @@ struct options *parse_options(int argc, char **argv)
 				version_exit();
 			else if (OPT("verbose"))
 				goto opt_v;
+			else if (OPT("quiet"))
+				option.verbose--;
 
 			else if (OPT("info"))
 				goto opt_i;

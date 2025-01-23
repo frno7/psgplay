@@ -118,7 +118,8 @@ int main(int argc, char *argv[])
 	if (!file_valid(file))
 		pr_fatal_errno(options->input);
 
-	sndh_diagnostic(file);
+	if (option_verbosity() >= 0)
+		sndh_diagnostic(file);
 
 	if (options->info)
 		info_exit(file);
