@@ -27,9 +27,10 @@ struct m68kda_code {
  * @r: register
  */
 struct m68kda_ea {
+	uint8_t : 2;
 	uint8_t m : 3;
 	uint8_t r : 3;
-};
+} BE_STORAGE;
 
 /**
  * struct m68kda_s_ea - single effective address operation in bits 5:0
@@ -44,8 +45,8 @@ struct m68kda_s_ea {
 
 /**
  * struct m68kda_d_ea - effective address destination operation in bits 11:6
- * @m: mode
  * @r: register
+ * @m: mode
  */
 struct m68kda_d_ea {
 	uint16_t : 4;
