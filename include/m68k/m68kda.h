@@ -119,18 +119,18 @@ struct m68kda;
 
 /**
  * struct m68kda_brief_ext - brief extension word
- * @d: sign-extended displacement
  * @a: index register type where 0 = Dn and 1 = An
  * @r: index register
  * @l: index size where 0 = sign-extended word and 1 = long word
  * @z: ought to be zero
+ * @d: sign-extended displacement
  */
 struct m68kda_brief_ext {
-	int8_t d;
 	uint8_t a : 1;
 	uint8_t r : 3;
 	uint8_t l : 1;
 	uint8_t z : 3;
+	int8_t d;
 } BE_STORAGE;
 
 union m68kda_opdata {
