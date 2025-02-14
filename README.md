@@ -92,6 +92,9 @@ Play options:
                            empiric (default) mixes the three PSG channels as
                            measured on Atari ST hardware; linear sums the
                            channels to produce a cleaner sound
+    --psg-balance=<A:B:C>  set balance between -1 (left) and +1 (right) for
+                           PSG channels A, B and C. For example -0.5:0:+0.5
+                           for stereo effect. Default is 0:0:0 for mono.
 
 Disassembly options:
 

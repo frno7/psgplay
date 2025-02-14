@@ -69,6 +69,9 @@ static void help(FILE *file)
 "                           empiric (default) mixes the three PSG channels as\n"
 "                           measured on Atari ST hardware; linear sums the\n"
 "                           channels to produce a cleaner sound\n"
+"    --psg-balance=<A:B:C>  set balance between -1 (left) and +1 (right) for\n"
+"                           PSG channels A, B and C. For example -0.5:0:+0.5\n"
+"                           for stereo effect. Default is 0:0:0 for mono.\n"
 "\n"
 "Disassembly options:\n"
 "\n"
@@ -154,6 +157,36 @@ bool text_mode_option(void)
 	return true;
 }
 
+static struct psgplay_psg_stereo_balance balance_option(const char *s)
+{
+	struct string_split b;
+	float abc[3] = { };
+	size_t i = 0;
+
+	for_each_string_split (b, s, ":") {
+		if (b.sep)
+			continue;
+		if (i >= ARRAY_SIZE(abc))
+			pr_fatal_error("too many balances: %s\n", s);
+
+		char *e;
+		abc[i++] = strtof(b.s, &e);
+
+		if (e != &b.s[b.length])
+			pr_fatal_error("invalid balance: %.*s\n",
+				(int)b.length, b.s);
+	}
+
+	if (i != ARRAY_SIZE(abc))
+		pr_fatal_error("too few balances: %s\n", s);
+
+	return (struct psgplay_psg_stereo_balance) {
+		.a = abc[0],
+		.b = abc[1],
+		.c = abc[2],
+	};
+}
+
 static struct trace_mode trace_option(const char *s)
 {
 	struct string_split dev;
@@ -181,8 +214,18 @@ psgplay_digital_to_stereo_cb psg_mix_option(void)
 		return psgplay_digital_to_stereo_empiric;
 	if (strcmp(option.psg_mix, "linear") == 0)
 		return psgplay_digital_to_stereo_linear;
+	if (strcmp(option.psg_mix, "balance") == 0)
+		return psgplay_digital_to_stereo_balance;
 
 	pr_fatal_error("unknown PSG mix: %s\n", option.psg_mix);
+
+	return NULL;
+}
+
+void *psg_mix_arg(void)
+{
+	if (strcmp(option.psg_mix, "balance") == 0)
+		return &option.psg_balance;
 
 	return NULL;
 }
@@ -208,6 +251,7 @@ struct options *parse_options(int argc, char **argv)
 		{ "frequency",           required_argument, NULL, 0 },
 
 		{ "psg-mix",             required_argument, NULL, 0 },
+		{ "psg-balance",         required_argument, NULL, 0 },
 
 		{ "disassemble",         no_argument,       NULL, 0 },
 		{ "disassemble-header",  no_argument,       NULL, 0 },
@@ -268,6 +312,10 @@ struct options *parse_options(int argc, char **argv)
 				goto opt_f;
 			else if (OPT("psg-mix"))
 				option.psg_mix = optarg;
+			else if (OPT("psg-balance")) {
+				option.psg_balance = balance_option(optarg);
+				option.psg_mix = "balance";
+			}
 
 			else if (OPT("trace"))
 				option.trace = trace_option(optarg);

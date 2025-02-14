@@ -38,6 +38,7 @@ struct options {
 	int frequency;
 
 	const char *psg_mix;
+	struct psgplay_psg_stereo_balance psg_balance;
 
 	const char *input;
 
@@ -54,6 +55,7 @@ bool command_mode_option(void);
 bool text_mode_option(void);
 
 psgplay_digital_to_stereo_cb psg_mix_option(void);
+void *psg_mix_arg(void);
 
 struct options *parse_options(int argc, char **argv);
 

@@ -47,6 +47,7 @@ struct sample_buffer {
 struct sample_mixer {
 	struct text_mixer *tm;
 	psgplay_digital_to_stereo_cb cb;
+	void *arg;
 	struct psgplay_digital buffer[4096];
 };
 
@@ -63,7 +64,7 @@ void digital_to_stereo(struct psgplay_stereo *stereo,
 	struct sample_mixer *sm = arg;
 
 	if (!sm->tm->volume) {
-		sm->cb(stereo, digital, count, NULL);
+		sm->cb(stereo, digital, count, sm->arg);
 		return;
 	}
 
@@ -76,7 +77,7 @@ void digital_to_stereo(struct psgplay_stereo *stereo,
 		for (size_t i = 0; i < n; i++)
 			sm->buffer[i].mixer.volume.main = sm->tm->volume;
 
-		sm->cb(&stereo[k], sm->buffer, n, NULL);
+		sm->cb(&stereo[k], sm->buffer, n, sm->arg);
 	}
 }
 
@@ -352,6 +353,7 @@ void text_replay(const struct options *options, struct file file,
 	struct sample_mixer sm = {
 		.tm = &model.mixer,
 		.cb = psg_mix_option(),
+		.arg = psg_mix_arg(),
 	};
 	struct sample_buffer sb = sample_buffer_init(&sm, file.data, file.size,
 		options->output, options->track, options->frequency, output);

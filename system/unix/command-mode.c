@@ -100,7 +100,8 @@ void command_replay(const struct options *options, struct file file,
 	if (!pp)
 		pr_fatal_error("%s: failed to init PSG play\n", progname);
 
-	psgplay_digital_to_stereo_callback(pp, psg_mix_option(), NULL);
+	psgplay_digital_to_stereo_callback(pp,
+		psg_mix_option(), psg_mix_arg());
 
 	if (time_stop >= 0)
 		psgplay_stop_at_time(pp, time_stop);
