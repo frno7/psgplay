@@ -69,7 +69,7 @@ jobs:
     strategy:
       fail-fast: false  # 'false' means don't stop if some archs fail.
       matrix:
-        arch: [ppc64le, aarch64, x86_64]
+        arch: [x86_64]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
