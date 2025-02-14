@@ -324,6 +324,32 @@ void psgplay_digital_to_stereo_linear(struct psgplay_stereo *stereo,
 	}
 }
 
+void psgplay_digital_to_stereo_balance(struct psgplay_stereo *stereo,
+	const struct psgplay_digital *digital, size_t count, void *arg)
+{
+	struct psgplay_psg_stereo_balance *w = arg;
+	struct mixer m = mixer_init(digital, count);
+
+#define BALANCE(ch, op) (int)(clamp(256.f * (1.f op w->ch), 0.f, 256.f) + 0.5f)
+	const int la = BALANCE(a, -), ra = BALANCE(a, +);
+	const int lb = BALANCE(b, -), rb = BALANCE(b, +);
+	const int lc = BALANCE(c, -), rc = BALANCE(c, +);
+
+	for (size_t i = 0; i < count; i++) {
+		const int16_t sa = psg_dac(digital[i].psg.lva);
+		const int16_t sb = psg_dac(digital[i].psg.lvb);
+		const int16_t sc = psg_dac(digital[i].psg.lvc);
+
+		if (digital->mixer.mix) {
+			const s16 sl = (la*sa + lb*sb + lc*sc) / (256 * 3);
+			const s16 sr = (ra*sa + rb*sb + rc*sc) / (256 * 3);
+
+			stereo[i] = stereo_mix(&m, sl, sr, digital[i]);
+		} else
+			stereo[i] = stereo_mix(&m, 0, 0, digital[i]);
+	}
+}
+
 void psgplay_digital_to_stereo_empiric(struct psgplay_stereo *stereo,
 	const struct psgplay_digital *digital, size_t count, void *arg)
 {
