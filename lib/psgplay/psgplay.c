@@ -279,7 +279,7 @@ static inline void mixer_for_sample(struct mixer *m,
 }
 
 static inline struct psgplay_stereo stereo_mix(struct mixer *m,
-	const s16 s, const struct psgplay_digital d)
+	const s16 sl, const s16 sr, const struct psgplay_digital d)
 {
 	const float psg_mix = 0.65;
 	const int p = 256 * psg_mix;
@@ -289,13 +289,13 @@ static inline struct psgplay_stereo stereo_mix(struct mixer *m,
 		mixer_for_sample(m, d);
 
 		return (struct psgplay_stereo) {
-			.left  = m->gain.left  * (q*d.sound.left  + p*s) / 256,
-			.right = m->gain.right * (q*d.sound.right + p*s) / 256
+			.left  = m->gain.left  * (q*d.sound.left  + p*sl) / 256,
+			.right = m->gain.right * (q*d.sound.right + p*sr) / 256
 		};
 	} else
 		return (struct psgplay_stereo) {
-			.left  = (q*d.sound.left  + p*s) / 256,
-			.right = (q*d.sound.right + p*s) / 256
+			.left  = (q*d.sound.left  + p*sl) / 256,
+			.right = (q*d.sound.right + p*sr) / 256
 		};
 }
 
@@ -320,7 +320,7 @@ void psgplay_digital_to_stereo_linear(struct psgplay_stereo *stereo,
 		/* Simplistic linear channel mix. */
 		const s16 s = digital->mixer.mix ? (sa + sb + sc) / 3 : 0;
 
-		stereo[i] = stereo_mix(&m, s, digital[i]);
+		stereo[i] = stereo_mix(&m, s, s, digital[i]);
 	}
 }
 
@@ -338,7 +338,7 @@ void psgplay_digital_to_stereo_empiric(struct psgplay_stereo *stereo,
 			   [digital[i].psg.lvb.u4]
 			   [digital[i].psg.lva.u4] - 0x8000 : 0;
 
-		stereo[i] = stereo_mix(&m, s, digital[i]);
+		stereo[i] = stereo_mix(&m, s, s, digital[i]);
 	}
 }
 
