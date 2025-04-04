@@ -36,6 +36,10 @@ Build for Linux with ALSA:
 
 	$ make ALSA=1 psgplay
 
+Build for Linux or Mac OS with PortAudio:
+
+	$ make PORTAUDIO=1 psgplay
+
 Build for the Atari ST:
 
 	$ make TARGET_COMPILE=m68k-elf- PSGPLAY.TOS

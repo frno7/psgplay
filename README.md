@@ -34,7 +34,10 @@ so clone it with the `--recurse-submodules` option, or do
 
 For Linux and Mac OS, do `make psgplay` to compile `psgplay`. To use
 [Advanced Linux Sound Architecture](https://en.wikipedia.org/wiki/Advanced_Linux_Sound_Architecture)
-(ALSA) and _interactive text mode_, do `make ALSA=1 psgplay`.
+(ALSA) and _interactive text mode_, do `make ALSA=1 psgplay`. To use
+[PortAudio](https://portaudio.com)(PORTAUDIO) and _interactive text mode_,
+do `make PORTAUDIO=1 psgplay`.
+
 
 For Atari ST, do `make TARGET_COMPILE=m68k-elf- PSGPLAY.TOS`.
 
@@ -113,11 +116,10 @@ Tracing options:
 
 ## Interactive text mode
 
-PSG play defaults to _interactive text mode_ if it is compiled with ALSA
-for Linux, or is compiled for Atari ST. Mac OS does not support
-_interactive text mode_, only _command mode_ with
-[WAVE](https://en.wikipedia.org/wiki/WAV) format output,
-as described in issue [#8](https://github.com/frno7/psgplay/issues/8).
+PSG play defaults to _interactive text mode_ if it is compiled with either ALSA
+or PortAudio for Linux or MacOS, or is compiled for Atari ST. If no audio
+output support is present, PSG play will default to
+[WAVE](https://en.wikipedia.org/wiki/WAV) format output.
 
 For Linux, [TTY](https://en.wikipedia.org/wiki/Tty_(Unix)) mode and
 [ECMA-48](https://en.wikipedia.org/wiki/ANSI_escape_code) are used,
@@ -151,7 +153,7 @@ A cursor is shown with `>`. Keyboard controls:
 ## Command mode
 
 PSG play runs in _command mode_ if it is not compiled with ALSA for Linux,
-or is compiled for Mac OS, or the options `-o`, `--output`, `--start`,
+or with PortAudio for Linux or Mac OS, or the options `-o`, `--output`, `--start`,
 `--stop`, `--length`, `--disassemble` or `--trace` are given. Atari ST
 does not support _command mode_.
 

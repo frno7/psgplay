@@ -64,8 +64,7 @@ separated with a colon, and optionally subseconds.
 .TP
 .BR \-m ", " \-\-mode "=<" \fIcommand\fR "|" \fItext\fR ">"
 \fIPSG play\fR defaults to \fIinteractive text mode\fR if it is compiled
-with ALSA for Linux. Mac OS does not support interactive text mode, only
-\fIcommand mode\fR with WAVE format output.
+with either ALSA for Linux or PortAudio for Linux or MacOS.
 
 .TP
 .BR \-t ", " \-\-track "=<" \fInumber\fR ">"
@@ -142,8 +141,8 @@ The SNDH file is loaded in memory at address 4000 (in hexadecimal).
 .RE
 
 .SH COMMAND MODE
-\fIPSG play\fR runs in command mode if it is not compiled with ALSA for
-Linux, or is compiled for Mac OS, or the options \fB-o\fR, \fB--output\fR,
+\fIPSG play\fR runs in command mode if it is not compiled with either ALSA for
+Linux, or PortAudio for Linux or Mac OS, or the options \fB-o\fR, \fB--output\fR,
 \fB--start\fR, \fB--stop\fR, \fB--length\fR, \fB--disassemble\fR or
 \fB--trace\fR are given. Atari ST does not support command mode.
 
