@@ -168,7 +168,8 @@ static void *portaudio_open(const char *output, int frequency, bool nonblocking)
 		Pa_GetDeviceInfo(params.device)->defaultLowOutputLatency;
 	params.hostApiSpecificStreamInfo = NULL;
 
-	err = Pa_OpenStream(&stream, NULL, &params, frequency, 4096, paClipOff, NULL, NULL);
+	err = Pa_OpenStream(&stream, NULL, &params, frequency, PORTAUDIO_BUFFER_SIZE,
+		paClipOff, NULL, NULL);
 	if (err != paNoError) goto error;
 
 	struct portaudio_state *state = xmalloc(sizeof(struct portaudio_state));
