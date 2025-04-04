@@ -14,6 +14,7 @@ Makefile options:
   V              - set to 1 to compile verbosely
   S              - set to 1 for sanitation checks
   ALSA           - set to 1 to support ALSA for Linux
+  PORTAUDIO      - set to 1 to support PortAudio for Linux
 
   BUILD_CC       - set a C compiler to use for the build system
   HOST_AR        - set an archiver to use for the host system
@@ -35,6 +36,10 @@ Build for Linux or Mac OS:
 Build for Linux with ALSA:
 
 	$ make ALSA=1 psgplay
+
+Build for Linux or Mac OS with PortAudio:
+
+	$ make PORTAUDIO=1 psgplay
 
 Build for the Atari ST:
 

@@ -15,6 +15,7 @@
 #include "psgplay/sndh.h"
 
 #include "out/alsa.h"
+#include "out/portaudio.h"
 #include "out/wave.h"
 
 #include "system/unix/command-mode.h"
@@ -91,6 +92,11 @@ static void select_subtune(int *track, struct file file)
 
 static const struct output *select_output(const struct options *options)
 {
+#ifdef HAVE_PORTAUDIO
+	if (!options->output)
+		return &portaudio_output;
+#endif /* HAVE_PORTAUDIO */
+
 	if (alsa_output_handle(options->output)) {
 #ifdef HAVE_ALSA
 		return &alsa_output;
