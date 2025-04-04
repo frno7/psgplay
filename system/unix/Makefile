@@ -52,6 +52,14 @@ PSGPLAY_ALSA_LIB := $(shell pkg-config --silence-errors --libs alsa || echo -las
 PSGPLAY_LIBS += $(PSGPLAY_ALSA_LIB)
 endif
 
+ifeq (1,$(PORTAUDIO))
+PSGPLAY_PORTAUDIO_LIB := $(shell pkg-config --silence-errors --libs portaudio-2.0)
+PSGPLAY_PORTAUDIO_CFLAGS := $(shell pkg-config --silence-errors --cflags portaudio-2.0)
+PSGPLAY_CFLAGS += $(PSGPLAY_PORTAUDIO_CFLAGS)
+PSGPLAY_LIBS += $(PSGPLAY_PORTAUDIO_LIB)
+endif
+
+
 $(PSGPLAY): $(PSGPLAY_OBJ) $(LIBPSGPLAY_STATIC)
 	$(QUIET_LINK)$(HOST_CC) $(PSGPLAY_CFLAGS) -o $@ $^ $(PSGPLAY_LIBS)
 
