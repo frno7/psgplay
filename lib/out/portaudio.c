@@ -151,7 +151,7 @@ static void portaudio_drop(void *arg)
 
 static void *portaudio_open(const char *output, int frequency, bool nonblocking)
 {
-	PaStreamParameters params;
+	PaStreamParameters params = { };
 	PaStream *stream;
 	PaError err;
 
