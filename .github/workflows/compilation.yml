@@ -16,7 +16,7 @@ jobs:
 
       - name: Archive tag
         run: |
-          echo "ARCHIVE_TAG=${GITHUB_REF_NAME}-${GITHUB_SHA:0:8}" >> $GITHUB_ENV
+          echo "ARCHIVE_TAG=${GITHUB_REF_NAME}-${GITHUB_SHA:0:8}" | sed 's#/#-#g' >> $GITHUB_ENV
 
       - name: Fix repository ownership problem
         run: |
@@ -46,7 +46,7 @@ jobs:
 
       - name: Archive tag
         run: |
-          echo "ARCHIVE_TAG=${GITHUB_REF_NAME}-${GITHUB_SHA:0:8}" >> $GITHUB_ENV
+          echo "ARCHIVE_TAG=${GITHUB_REF_NAME}-${GITHUB_SHA:0:8}" | sed 's#/#-#g' >> $GITHUB_ENV
 
       - uses: mymindstorm/setup-emsdk@v14
 
@@ -78,7 +78,7 @@ jobs:
 
       - name: Archive tag
         run: |
-          echo "ARCHIVE_TAG=${{ matrix.arch }}-${GITHUB_REF_NAME}-${GITHUB_SHA:0:8}" >> $GITHUB_ENV
+          echo "ARCHIVE_TAG=${{ matrix.arch }}-${GITHUB_REF_NAME}-${GITHUB_SHA:0:8}" | sed 's#/#-#g' >> $GITHUB_ENV
 
       - uses: uraimo/run-on-arch-action@v2.2.0
         name: Compile PSG play archive for Linux/${{ matrix.arch }}
