@@ -18,9 +18,7 @@ is available for [Gentoo Linux](https://www.gentoo.org/).
 Github [actions](https://github.com/frno7/psgplay/actions/workflows/compilation.yml)
 automatically compile and publish archives with PSG play for
 the [Atari ST](https://en.wikipedia.org/wiki/Atari_ST),
-as well as Linux and the architectures
-[`ppc64le`](https://en.wikipedia.org/wiki/ppc64le),
-[`aarch64`](https://en.wikipedia.org/wiki/AArch64),
+as well as Linux and the architecture
 [`x86-64`](https://en.wikipedia.org/wiki/X86-64), and a
 [`wasm`](https://en.wikipedia.org/wiki/WebAssembly) web browser library
 for use with [Cowbell](https://github.com/demozoo/cowbell). These are built with
