@@ -3,6 +3,7 @@ Makefile targets:
   all            - compile PSG play, libraries and examples (default)
   install        - install PSG play, libraries and manual page
   test           - test components of PSG play
+  psgplay        - compile PSG play for Linux or Mac OS
   PSGPLAY.TOS    - compile PSG play for the Atari ST
   web            - compile for Javascript and Webassembly
   gtags          - make tags for the GNU Global source code tagging system
@@ -11,14 +12,18 @@ Makefile targets:
 
 Makefile options:
 
+  -j [n]         - n simultaneous jobs for speed; unlimited with no argument
   V              - set to 1 to compile verbosely
   S              - set to 1 for sanitation checks
   ALSA           - set to 1 to support ALSA for Linux
-  PORTAUDIO      - set to 1 to support PortAudio for Linux
+  PORTAUDIO      - set to 1 to support PortAudio for Linux or Mac OS
+
+  CC             - same as HOST_CC (described below)
+  AR             - same as HOST_AR (described below)
 
   BUILD_CC       - set a C compiler to use for the build system
-  HOST_AR        - set an archiver to use for the host system
   HOST_CC        - set a C compiler to use for the host system
+  HOST_AR        - set an archiver to use for the host system
   TARGET_CC      - set a m68k C compiler to use for Atari ST code
   TARGET_LD      - set a m68k linker to use for Atari ST code
 
@@ -26,6 +31,10 @@ Makefile options:
   HOST_CFLAGS    - set C flags for the host system
   TARGET_CFLAGS  - set C flags for Atari ST code
   TARGET_LDFLAGS - set linker flags for Atari ST code
+
+  BUILD_COMPILE  - set C compiler and archiver prefix for the build system
+  HOST_COMPILE   - set C compiler and archiver prefix for the host system
+  TARGET_COMPILE - set C compiler and archiver prefix for the Atari ST
 
 Examples:
 
