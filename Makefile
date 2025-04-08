@@ -35,7 +35,7 @@ ifeq ($(UNAME_S),Darwin)
 HOST_LD     := /usr/bin/clang
 HOST_RANLIB := /usr/bin/ranlib
 else
-HOST_LD			= $(LD)
+HOST_LD			= $(CC)
 HOST_RANLIB	= $(RANLIB)
 endif
 
