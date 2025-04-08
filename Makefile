@@ -20,12 +20,23 @@ else
 BUILD_CC = $(CC)
 endif
 
+UNAME_S := $(shell uname -s)
+
 ifdef HOST_COMPILE
 HOST_CC = $(HOST_COMPILE)gcc
 HOST_AR = $(HOST_COMPILE)ar
 else
 HOST_CC = $(CC)
 HOST_AR = $(AR)
+HOST_RANLIB ?= ranlib
+endif
+
+ifeq ($(UNAME_S),Darwin)
+HOST_LD     := /usr/bin/clang
+HOST_RANLIB := /usr/bin/ranlib
+else
+HOST_LD			= $(LD)
+HOST_RANLIB	= $(RANLIB)
 endif
 
 ifdef TARGET_COMPILE

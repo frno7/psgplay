@@ -45,7 +45,11 @@ $(foreach f,$(PSGPLAY_SRC),$(eval $(call PSGPLAY_target,$(f))))
 
 ALL_OBJ += $(PSGPLAY_OBJ) system/unix/system-unix-disassemble.o
 
-PSGPLAY_LIBS = -lm
+ifeq ($(UNAME_S),Darwin)
+MATH_LIB =
+else
+MATH_LIB = -lm
+endif
 
 ifeq (1,$(ALSA))
 PSGPLAY_ALSA_LIB := $(shell pkg-config --silence-errors --libs alsa || echo -lasound)
@@ -60,7 +64,7 @@ PSGPLAY_LIBS += $(PSGPLAY_PORTAUDIO_LIB)
 endif
 
 $(PSGPLAY): $(PSGPLAY_OBJ) $(LIBPSGPLAY_STATIC)
-	$(QUIET_LINK)$(HOST_CC) $(PSGPLAY_CFLAGS) -o $@ $^ $(PSGPLAY_LIBS)
+	$(QUIET_LINK)$(HOST_LD) $(PSGPLAY_CFLAGS) -o $@ $^ $(PSGPLAY_LIBS)
 
 .PHONY: install-psgplay
 install-psgplay: $(PSGPLAY)
