@@ -46,9 +46,9 @@ $(foreach f,$(PSGPLAY_SRC),$(eval $(call PSGPLAY_target,$(f))))
 ALL_OBJ += $(PSGPLAY_OBJ) system/unix/system-unix-disassemble.o
 
 ifeq ($(UNAME_S),Darwin)
-MATH_LIB =
+PSGPLAY_LIBS =
 else
-MATH_LIB = -lm
+PSGPLAY_LIBS = -lm
 endif
 
 ifeq (1,$(ALSA))
