@@ -39,15 +39,19 @@ endef
 $(foreach f,$(LIBPSGPLAY_SRC),$(eval $(call LIBPSGPLAY_target,$(f))))
 
 LIBPSGPLAY_STATIC := lib/psgplay/libpsgplay.a
-LIBPSGPLAY_SHARED := lib/psgplay/libpsgplay.so
+LIBPSGPLAY_SHARED := lib/psgplay/libpsgplay.$(SHLIB_EXT)
 
 $(LIBPSGPLAY_STATIC): $(LIBPSGPLAY_OBJ)
 	$(QUIET_AR)$(HOST_AR) $(HOST_ARFLAGS) $@ $^
 
-LIBPSGPLAY_SOFLAGS = -shared -Wl,-soname,libpsgplay.so.$(PSGPLAY_VERSION_MAJOR)
+ifeq (Darwin,$(BUILD_SYSTEM))
+LIBPSGPLAY_SOFLAGS = -dynamiclib -install_name @rpath/libpsgplay.$(PSGPLAY_VERSION_MAJOR).$(SHLIB_EXT)
+else
+LIBPSGPLAY_SOFLAGS = -shared -Wl,-soname,libpsgplay.$(SHLIB_EXT).$(PSGPLAY_VERSION_MAJOR) $(HOST_CFLAGS)
+endif
 
 $(LIBPSGPLAY_SHARED): $(LIBPSGPLAY_OBJ)
-	$(QUIET_CC)$(HOST_CC) $(LIBPSGPLAY_SOFLAGS) $(HOST_CFLAGS) -o $@ $^
+	$(QUIET_CC)$(HOST_CC) $(LIBPSGPLAY_SOFLAGS) -o $@ $^
 
 LIBPSGPLAY_PC := lib/psgplay/libpsgplay.pc
 
@@ -124,9 +128,9 @@ install-lib-static: $(LIBPSGPLAY_STATIC)
 .PHONY: install-lib-shared
 install-lib-shared: $(LIBPSGPLAY_SHARED)
 	$(INSTALL) -d -m 755 $(DESTDIR)$(libdir)
-	$(INSTALL) $(LIBPSGPLAY_SHARED) $(DESTDIR)$(libdir)/libpsgplay.so.$(PSGPLAY_VERSION_MINOR)
-	ln -s libpsgplay.so.$(PSGPLAY_VERSION_MINOR) $(DESTDIR)$(libdir)/libpsgplay.so.$(PSGPLAY_VERSION_MAJOR)
-	ln -s libpsgplay.so.$(PSGPLAY_VERSION_MAJOR) $(DESTDIR)$(libdir)/libpsgplay.so
+	$(INSTALL) $(LIBPSGPLAY_SHARED) $(DESTDIR)$(libdir)/libpsgplay.$(SHLIB_EXT).$(PSGPLAY_VERSION_MINOR)
+	ln -s libpsgplay.$(SHLIB_EXT).$(PSGPLAY_VERSION_MINOR) $(DESTDIR)$(libdir)/libpsgplay.$(SHLIB_EXT).$(PSGPLAY_VERSION_MAJOR)
+	ln -s libpsgplay.$(SHLIB_EXT).$(PSGPLAY_VERSION_MAJOR) $(DESTDIR)$(libdir)/libpsgplay.$(SHLIB_EXT)
 
 .PHONY: install-pkg
 install-pkg: $(LIBPSGPLAY_PC)

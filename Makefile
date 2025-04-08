@@ -49,8 +49,10 @@ TARGET_CFLAGS = $(CFLAGS)
 
 ifeq (Darwin,$(BUILD_SYSTEM))
 HOST_ARFLAGS = -static -o
+SHLIB_EXT = dylib
 else
 HOST_ARFLAGS = rcs
+SHLIB_EXT = so
 endif
 
 INSTALL = install
