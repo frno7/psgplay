@@ -42,7 +42,11 @@ arch()
 	ppc64le |\
 	aarch64)
 		cc --version | sed -n 1p
-		make -j"$JOBS" $V ALSA=1 all test
+		if [[ "$(uname -s)" == "Darwin" ]]; then
+			make -j"$JOBS" $V PORTAUDIO=1 all test
+		else
+			make -j"$JOBS" $V ALSA=1 all test
+		fi
 		;;
 	x86_64)
 		gcc --version | sed -n 1p

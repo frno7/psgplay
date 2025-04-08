@@ -116,3 +116,36 @@ jobs:
           if-no-files-found: error
           compression-level: 9
           path: psgplay
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          brew update
+          brew install portaudio
+
+      - name: Configure Homebrew GCC toolchain
+        run: |
+          echo "HOST_COMPILE_TYPE=homebrew-gcc" >> $GITHUB_ENV
+          echo "PORTAUDIO=1" >> $GITHUB_ENV
+
+      - name: Compile PSG play archive for macOS
+        run: |
+          git config --global --add safe.directory "*"
+          rm -f build-log.txt
+          script/compile arch aarch64
+
+      - name: Publish PSG play archive for macOS
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: "psgplay-macos-${{ github.ref_name }}-${{ github.sha }}"
+          if-no-files-found: error
+          compression-level: 9
+          path: psgplay
+
