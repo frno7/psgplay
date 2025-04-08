@@ -23,20 +23,45 @@ endif
 UNAME_S := $(shell uname -s)
 
 ifdef HOST_COMPILE
-HOST_CC = $(HOST_COMPILE)gcc
-HOST_AR = $(HOST_COMPILE)ar
+HOST_CC     = $(HOST_COMPILE)gcc
+HOST_AR     = $(HOST_COMPILE)ar
+HOST_RANLIB = $(RANLIB)
 else
-HOST_CC = $(CC)
-HOST_AR = $(AR)
-HOST_RANLIB ?= ranlib
+HOST_CC     = $(CC)
+HOST_AR     = $(AR)
+HOST_RANLIB = $(RANLIB)
 endif
 
+ifeq ($(HOST_COMPILE_TYPE),homebrew-gcc)
+
 ifeq ($(UNAME_S),Darwin)
-HOST_LD     := /usr/bin/clang
-HOST_RANLIB := /usr/bin/ranlib
+HOMEBREW_GCC := $(shell find -L $(shell brew --prefix)/bin -type f \
+	-name 'gcc-[0-9]*' 2>/dev/null | sort -Vr | head -n1)
+
+ifneq ($(HOMEBREW_GCC),)
+HOST_CC := $(HOMEBREW_GCC)
+HOST_LD := /usr/bin/clang
+
 else
-HOST_LD			= $(CC)
-HOST_RANLIB	= $(RANLIB)
+$(error HOST_COMPILE_TYPE=homebrew-gcc requested but gcc could not be found)
+endif
+endif
+endif
+
+HOST_AR     := $(AR)
+HOST_RANLIB := $(RANLIB)
+
+ifeq ($(UNAME_S),Darwin)
+HOST_AR     := /usr/bin/ar
+HOST_RANLIB := /usr/bin/ranlib
+endif
+
+ifndef HOST_LD
+ifeq ($(UNAME_S),Darwin)
+HOST_LD := /usr/bin/clang
+else
+HOST_LD := $(CC)
+endif
 endif
 
 ifdef TARGET_COMPILE
