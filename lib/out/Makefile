@@ -10,5 +10,5 @@ endif
 
 OUT_SRC := $(addprefix lib/out/,					\
 	   alsa.c							\
-	   portaudio.c				\
+	   portaudio.c							\
 	   wave.c)
