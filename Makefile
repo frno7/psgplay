@@ -29,7 +29,11 @@ HOST_AR = $(HOST_COMPILE)ar
 else
 HOST_CC = $(CC)
 HOST_LD = $(CC)
+ifeq (Darwin,$(BUILD_SYSTEM))
+HOST_AR = libtool
+else
 HOST_AR = $(AR)
+endif
 endif
 
 ifdef TARGET_COMPILE
@@ -43,7 +47,11 @@ BUILD_CFLAGS = $(CFLAGS)
 HOST_CFLAGS = $(CFLAGS)
 TARGET_CFLAGS = $(CFLAGS)
 
+ifeq (Darwin,$(BUILD_SYSTEM))
+HOST_ARFLAGS = -static -o
+else
 HOST_ARFLAGS = rcs
+endif
 
 INSTALL = install
 XXD = xxd
