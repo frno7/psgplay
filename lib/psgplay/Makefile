@@ -42,7 +42,7 @@ LIBPSGPLAY_STATIC := lib/psgplay/libpsgplay.a
 LIBPSGPLAY_SHARED := lib/psgplay/libpsgplay.so
 
 $(LIBPSGPLAY_STATIC): $(LIBPSGPLAY_OBJ)
-	$(QUIET_AR)$(HOST_AR) rcs $@ $^
+	$(QUIET_AR)$(HOST_AR) $(HOST_ARFLAGS) $@ $^
 
 LIBPSGPLAY_SOFLAGS = -shared -Wl,-soname,libpsgplay.so.$(PSGPLAY_VERSION_MAJOR)
 

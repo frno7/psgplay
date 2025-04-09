@@ -29,6 +29,7 @@ Makefile options:
 
   BUILD_CFLAGS   - set C flags for the build system
   HOST_CFLAGS    - set C flags for the host system
+  HOST_ARFLAGS   - set archiver flags for the host system
   TARGET_CFLAGS  - set C flags for Atari ST code
   TARGET_LDFLAGS - set linker flags for Atari ST code
 
