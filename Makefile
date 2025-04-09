@@ -24,9 +24,11 @@ endif
 
 ifdef HOST_COMPILE
 HOST_CC = $(HOST_COMPILE)gcc
+HOST_LD = $(HOST_COMPILE)gcc
 HOST_AR = $(HOST_COMPILE)ar
 else
 HOST_CC = $(CC)
+HOST_LD = $(CC)
 HOST_AR = $(AR)
 endif
 

@@ -23,6 +23,7 @@ Makefile options:
 
   BUILD_CC       - set a C compiler to use for the build system
   HOST_CC        - set a C compiler to use for the host system
+  HOST_LD        - set a linker to use for the host system
   HOST_AR        - set an archiver to use for the host system
   TARGET_CC      - set a m68k C compiler to use for Atari ST code
   TARGET_LD      - set a m68k linker to use for Atari ST code
