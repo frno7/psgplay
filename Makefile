@@ -14,6 +14,8 @@ pkgdir = $(libdir)/pkgconfig
 
 export prefix includedir libdir
 
+BUILD_SYSTEM := $(shell uname -s)
+
 ifdef BUILD_COMPILE
 BUILD_CC = $(BUILD_COMPILE)gcc
 else
