@@ -4,6 +4,7 @@
 *.sndh
 *.o
 *.o.d
+*.dylib
 /GPATH
 /GRTAGS
 /GTAGS
