@@ -45,7 +45,11 @@ $(foreach f,$(PSGPLAY_SRC),$(eval $(call PSGPLAY_target,$(f))))
 
 ALL_OBJ += $(PSGPLAY_OBJ) system/unix/system-unix-disassemble.o
 
+ifeq (Darwin,$(BUILD_SYSTEM))
+PSGPLAY_LIBS =
+else
 PSGPLAY_LIBS = -lm
+endif
 
 ifeq (1,$(ALSA))
 PSGPLAY_ALSA_LIB := $(shell pkg-config --silence-errors --libs alsa || echo -lasound)
