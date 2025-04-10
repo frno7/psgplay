@@ -24,6 +24,9 @@
 
 #define PREFIX_TABLE_BITS   10	/* Configure 0..16 for size of lookup table */
 
+#define TOKEN_MAX 32
+#define TOKEN_FMT "%31s %31s %31s %31s %31s"  // TOKEN_MAX - 1
+
 /**
  * M68KDG_OPERAND_SIZE(op) - operand sizes
  * @c: category
@@ -288,8 +291,21 @@ static void insn_line(struct strbuf *sb, const struct fields *f)
 		insn_entry(sb, f, 0, 0);
 }
 
-static void insn_table(struct strbuf *sb, const char *s)
-{
+static bool parse_fields(const char *line, struct fields *f) {
+	char buf1[TOKEN_MAX], buf2[TOKEN_MAX], buf3[TOKEN_MAX], buf4[TOKEN_MAX], buf5[TOKEN_MAX];
+
+	if (sscanf(line, TOKEN_FMT, buf1, buf2, buf3, buf4, buf5) != 5)
+		return false;
+
+	f->mnemonic = strdup(buf1);
+	f->pattern  = strdup(buf2);
+	f->ea       = strdup(buf3);
+	f->op0      = strdup(buf4);
+	f->op1      = strdup(buf5);
+	return true;
+}
+
+static void insn_table(struct strbuf *sb, const char *s) {
 	struct string_split line;
 	bool parse = false;
 
@@ -302,9 +318,7 @@ static void insn_table(struct strbuf *sb, const char *s)
 			parse = true;
 		} else if (!parse || line.sep) {
 			continue;
-		} else if (sscanf(line.s, "%ms %ms %ms %ms %ms",
-				&f.mnemonic, &f.pattern,
-				&f.ea, &f.op0, &f.op1) == 5) {
+		} else if (parse_fields(line.s, &f)) {
 			insn_line(sb, &f);
 		}
 
