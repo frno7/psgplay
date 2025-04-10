@@ -216,7 +216,18 @@ static void *alsa_open(const char *output, int frequency, bool nonblocking)
 		pr_fatal_error("%s: ALSA snd_pcm_hw_params_set_channels failed: %s\n",
 			output, snd_strerror(err));
 
-	unsigned int buffer_time = 100000;	/* 100 ms */
+	/*
+	 * The 100 ms audio buffer time is chosen so that for example
+	 * interactively changing the volume is reasonably responsive. An
+	 * assumption is that the nonblocking case, primarily the interactive
+	 * text mode, updates the buffer in approximately 20 ms cycles.
+	 *
+	 * The blocking case could have a much larger buffer, primarily in
+	 * the command mode, since it's noninteractive, and thereby become
+	 * much more resilient against process scheduling problems causing
+	 * choppy audio due to high system load and performance problems.
+	 */
+	const unsigned int buffer_time = 100000;	/* 100 ms */
 	err = snd_pcm_hw_params_set_buffer_time_near(state->pcm_handle,
 		state->hwparams, &buffer_time, NULL);
 	if (err < 0)

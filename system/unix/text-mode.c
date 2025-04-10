@@ -29,6 +29,15 @@
 #include "system/unix/text-mode.h"
 #include "system/unix/tty.h"
 
+/*
+ * The audio buffer update time is chosen so that interactive text mode
+ * is reasonably responsive to keyboard input, for example when changing
+ * volume, and also updates the timer displayed in the upper right corner.
+ *
+ * An assumption is that the audio output buffers for ALSA and PortAudio
+ * etc. last for about 100 ms, so missing a 20 ms update cycle once or
+ * twice won't cause any problems.
+ */
 #define BUFFER_UPDATE_TIME 20	/* 20 ms */
 
 struct sample_buffer {
