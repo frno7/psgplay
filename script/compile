@@ -64,7 +64,7 @@ arch()
 		cc --version | sed -n 1p
 		make -j"$JOBS" $V ALSA=1 psgplay
 		;;
-	arm-homebrew-gcc-portaudio)
+	macos-homebrew-gcc-portaudio)
 		HOMEBREW_GCC="$(find -L "$(brew --prefix)"/bin -name 'gcc-[0-9]*' 2>/dev/null | sort -Vr | head -n1)"
 		if [ -z "$HOMEBREW_GCC" ]; then
 			echo "Error: No Homebrew gcc-N found." >&2
