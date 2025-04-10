@@ -72,7 +72,7 @@ arch()
 		fi
 		echo "Using Homebrew GCC: $HOMEBREW_GCC"
 		"$HOMEBREW_GCC" --version | sed -n 1p
-		make -j"$JOBS" $V PORTAUDIO=1 HOST_CC="$HOMEBREW_GCC" BUILD_CC="$HOMEBREW_GCC" HOST_LD="/usr/bin/clang"
+		make -j"$JOBS" $V PORTAUDIO=1 CC="$HOMEBREW_GCC" LD="/usr/bin/clang"
 		;;
 	*)
 		echo "$0: '$1' is not an arch." >&2
