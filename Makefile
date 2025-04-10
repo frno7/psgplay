@@ -16,6 +16,8 @@ export prefix includedir libdir
 
 BUILD_SYSTEM := $(shell uname -s)
 
+LD = $(CC)
+
 ifdef BUILD_COMPILE
 BUILD_CC = $(BUILD_COMPILE)gcc
 else
@@ -28,7 +30,7 @@ HOST_LD = $(HOST_COMPILE)gcc
 HOST_AR = $(HOST_COMPILE)ar
 else
 HOST_CC = $(CC)
-HOST_LD = $(CC)
+HOST_LD = $(LD)
 ifeq (Darwin,$(BUILD_SYSTEM))
 HOST_AR = libtool
 else
