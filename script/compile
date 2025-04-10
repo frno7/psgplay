@@ -20,6 +20,16 @@ clean()
 	fi
 }
 
+which_homebrew_gcc() {
+	local path
+	path="$(find -L "$(brew --prefix)"/bin -name 'gcc-[0-9]*' 2>/dev/null | sort -Vr | head -n1)"
+	if [ -z "$path" ]; then
+		echo "Error: No Homebrew gcc-N found." >&2
+		return 1
+	fi
+	echo "$path"
+}
+
 arch()
 {
 	[ -z "$1" ] && exit
@@ -64,14 +74,9 @@ arch()
 		cc --version | sed -n 1p
 		make -j"$JOBS" $V ALSA=1 psgplay
 		;;
-	macos-homebrew-gcc-portaudio)
-		HOMEBREW_GCC="$(find -L "$(brew --prefix)"/bin -name 'gcc-[0-9]*' 2>/dev/null | sort -Vr | head -n1)"
-		if [ -z "$HOMEBREW_GCC" ]; then
-			echo "Error: No Homebrew gcc-N found." >&2
-			exit 1
-		fi
-		echo "Using Homebrew GCC: $HOMEBREW_GCC"
-		"$HOMEBREW_GCC" --version | sed -n 1p
+	mac-homebrew-gcc-portaudio)
+		HOMEBREW_GCC="$(which_homebrew_gcc)" || exit 1
+		echo "Using Homebrew GCC: $HOMEBREW_GCC ($("$HOMEBREW_GCC" --version | sed -n 1p))"
 		make -j"$JOBS" $V PORTAUDIO=1 CC="$HOMEBREW_GCC" LD="/usr/bin/clang"
 		;;
 	*)
