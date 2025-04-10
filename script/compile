@@ -35,6 +35,10 @@ arch()
 		m68k-elf-gcc --version | sed -n 1p
 		make -j"$JOBS" $V S=1 TARGET_COMPILE=m68k-elf- PSGPLAY.TOS lib/tos/tos
 		;;
+	mac)
+		cc --version | sed -n 1p
+		make -j"$JOBS" $V psgplay example
+		;;
 	web)
 		emcc --version | sed -n 1p
 		make -j"$JOBS" $V HOST_CC=emcc web
