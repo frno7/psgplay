@@ -58,7 +58,7 @@ jobs:
           # Avoid fatal: unsafe repository (directory is owned by someone else)
           # Confer https://github.com/actions/checkout/issues/760
           git config --global --add safe.directory "*"
-          script/compile arch mac macos-homebrew-gcc-portaudio
+          script/compile arch mac mac-homebrew-gcc-portaudio
 
       - name: Publish PSG play archive for Mac
         if: ${{ success() }}
