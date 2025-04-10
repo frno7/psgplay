@@ -64,7 +64,17 @@ arch()
 		cc --version | sed -n 1p
 		make -j"$JOBS" $V ALSA=1 psgplay
 		;;
-	*)
+  arm-homebrew-gcc-portaudio)
+    HOMEBREW_GCC="$(find -L "$(brew --prefix)"/bin -name 'gcc-[0-9]*' 2>/dev/null | sort -Vr | head -n1)"
+    if [ -z "$HOMEBREW_GCC" ]; then
+      echo "Error: No Homebrew gcc-N found." >&2
+      exit 1
+    fi
+    echo "Using Homebrew GCC: $HOMEBREW_GCC"
+    "$HOMEBREW_GCC" --version | sed -n 1p
+    make -j"$JOBS" $V PORTAUDIO=1 HOST_CC="$HOMEBREW_GCC" BUILD_CC="$HOMEBREW_GCC" HOST_LD="/usr/bin/clang"
+    ;;
+  *)
 		echo "$0: '$1' is not an arch." >&2
 		exit 1
 	esac
