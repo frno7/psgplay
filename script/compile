@@ -22,7 +22,8 @@ clean()
 
 which_homebrew_gcc() {
 	local path
-	path="$(find -L "$(brew --prefix)"/bin -name 'gcc-[0-9]*' 2>/dev/null | sort -Vr | head -n1)"
+	local prefix="${HOMEBREW_PREFIX:-$(brew --prefix)}"
+	path="$(find -L "$prefix/bin" -name 'gcc-[0-9]*' 2>/dev/null | sort -Vr | head -n1)"
 	if [ -z "$path" ]; then
 		echo "Error: No Homebrew gcc-N found." >&2
 		return 1
