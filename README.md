@@ -12,8 +12,10 @@ and files in the [SNDH archive](http://sndh.atari.org/).
 # How to download
 
 The package
-[`media-sound/psgplay`](https://github.com/frno7/gentoo.overlay/tree/master/media-sound/psgplay)
-is available for [Gentoo Linux](https://www.gentoo.org/).
+[`media-sound/psgplay`](https://github.com/frno7/gentoo.overlay/tree/main/media-sound/psgplay)
+is available for [Gentoo Linux](https://en.wikipedia.org/wiki/Gentoo_Linux).
+The package [`psgplay-git`](https://aur.archlinux.org/packages/psgplay-git) is
+also available for [Arch Linux](https://en.wikipedia.org/wiki/Arch_Linux).
 
 Github [actions](https://github.com/frno7/psgplay/actions/workflows/compilation.yml)
 automatically compile and publish archives with PSG play for
