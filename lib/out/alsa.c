@@ -227,7 +227,7 @@ static void *alsa_open(const char *output, int frequency, bool nonblocking)
 	 * much more resilient against process scheduling problems causing
 	 * choppy audio due to high system load and performance problems.
 	 */
-	const unsigned int buffer_time = 100000;	/* 100 ms */
+	unsigned int buffer_time = 100000;	/* 100 ms */
 	err = snd_pcm_hw_params_set_buffer_time_near(state->pcm_handle,
 		state->hwparams, &buffer_time, NULL);
 	if (err < 0)
