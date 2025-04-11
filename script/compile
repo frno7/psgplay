@@ -20,6 +20,11 @@ clean()
 	fi
 }
 
+make_jv()
+{
+	make -j"$JOBS" $V $@
+}
+
 which_mac_homebrew_gcc()
 {
 	local prefix="${HOMEBREW_PREFIX:-$(brew --prefix)}"
@@ -48,41 +53,41 @@ arch()
 		;;
 	atari-st)
 		m68k-elf-gcc --version | sed -n 1p
-		make -j"$JOBS" $V S=1 TARGET_COMPILE=m68k-elf- PSGPLAY.TOS lib/tos/tos
+		make_jv S=1 TARGET_COMPILE=m68k-elf- PSGPLAY.TOS lib/tos/tos
 		;;
 	mac)
 		cc --version | sed -n 1p
-		make -j"$JOBS" $V psgplay example
+		make_jv psgplay example
 		;;
 	mac-homebrew-gcc-portaudio)
 		local HOMEBREW_GCC="$(which_mac_homebrew_gcc)"
 		echo "$HOMEBREW_GCC $("$HOMEBREW_GCC" --version | sed -n 1p)"
-		make -j"$JOBS" $V PORTAUDIO=1 CC="$HOMEBREW_GCC" LD=/usr/bin/clang
+		make_jv PORTAUDIO=1 CC="$HOMEBREW_GCC" LD=/usr/bin/clang
 		;;
 	web)
 		emcc --version | sed -n 1p
-		make -j"$JOBS" $V HOST_CC=emcc web
+		make_jv HOST_CC=emcc web
 		;;
 	ppc64le |\
 	aarch64)
 		cc --version | sed -n 1p
-		make -j"$JOBS" $V ALSA=1 all test
+		make_jv ALSA=1 all test
 		;;
 	x86_64)
 		gcc --version | sed -n 1p
-		make -j"$JOBS" $V S=1 ALSA=1 CC=gcc all test
+		make_jv S=1 ALSA=1 CC=gcc all test
 		clean
 
 		clang --version | sed -n 1p
-		make -j"$JOBS" $V S=1 ALSA=1 CC=clang psgplay
+		make_jv S=1 ALSA=1 CC=clang psgplay
 		clean
 
 		cc --version | sed -n 1p
-		make -j"$JOBS" $V psgplay
+		make_jv psgplay
 		clean
 
 		cc --version | sed -n 1p
-		make -j"$JOBS" $V ALSA=1 psgplay
+		make_jv ALSA=1 psgplay
 		;;
 	*)
 		echo "$compile: '$1' is not an arch." >&2
