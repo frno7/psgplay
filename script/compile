@@ -14,10 +14,25 @@ clean()
 	local CLEAN=$(git clean -n -fdx)
 	if [ -n "$CLEAN" ]
 	then
-		echo "$0: Unclean:" >&2
+		echo "$compile: Unclean:" >&2
 		echo "$CLEAN" >&2
 		exit 1
 	fi
+}
+
+which_homebrew_gcc()
+{
+	local prefix="${HOMEBREW_PREFIX:-$(brew --prefix)}"
+	local path="$(find -L "$prefix/bin" -name 'gcc-[0-9]*' 2>/dev/null |
+		sort -Vr | head -n1)"
+
+	if [ -z "$path" ]
+	then
+		echo "$compile: Error: Homebrew gcc-<n> not found." >&2
+		exit 1
+	fi
+
+	echo "$path"
 }
 
 arch()
@@ -38,6 +53,11 @@ arch()
 	mac)
 		cc --version | sed -n 1p
 		make -j"$JOBS" $V psgplay example
+		;;
+	mac-homebrew-gcc-portaudio)
+		local HOMEBREW_GCC="$(which_homebrew_gcc)"
+		echo "$HOMEBREW_GCC $("$HOMEBREW_GCC" --version | sed -n 1p)"
+		make -j"$JOBS" $V PORTAUDIO=1 CC="$HOMEBREW_GCC" LD=/usr/bin/clang
 		;;
 	web)
 		emcc --version | sed -n 1p
@@ -65,7 +85,7 @@ arch()
 		make -j"$JOBS" $V ALSA=1 psgplay
 		;;
 	*)
-		echo "$0: '$1' is not an arch." >&2
+		echo "$compile: '$1' is not an arch." >&2
 		exit 1
 	esac
 
@@ -79,6 +99,6 @@ arch)
 	arch "$@"
 	;;
 *)
-	echo "$0: '$1' is not a command." >&2
+	echo "$compile: '$1' is not a command." >&2
 	exit 1
 esac
