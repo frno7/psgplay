@@ -7,6 +7,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -87,6 +88,33 @@ static struct {
 	int insns;
 	int size;
 } prefixes;
+
+static int sscan(const char *s, size_t length, ...)
+{
+	char *t = xstrndup(s, length);
+	struct string_split field;
+	va_list ap;
+	int n = 0;
+
+	va_start(ap, length);
+
+	for_each_string_split (field, t, " ") {
+		if (field.length == 1 && field.s[0] == ' ')
+			continue;
+
+		char **f = va_arg(ap, char **);
+		if (!f)
+			break;
+
+		*f = xstrndup(field.s, field.length);
+		n++;
+	}
+
+	va_end(ap);
+	free(t);
+
+	return n;
+}
 
 static void prefix_table(struct strbuf *sb, const char *s)
 {
@@ -302,9 +330,9 @@ static void insn_table(struct strbuf *sb, const char *s)
 			parse = true;
 		} else if (!parse || line.sep) {
 			continue;
-		} else if (sscanf(line.s, "%ms %ms %ms %ms %ms",
+		} else if (sscan(line.s, line.length,
 				&f.mnemonic, &f.pattern,
-				&f.ea, &f.op0, &f.op1) == 5) {
+				&f.ea, &f.op0, &f.op1, NULL) == 5) {
 			insn_line(sb, &f);
 		}
 
