@@ -48,12 +48,17 @@ jobs:
         run: |
           echo "ARCHIVE_TAG=${GITHUB_REF_NAME}-${GITHUB_SHA:0:8}" | sed 's#/#-#g' >> $GITHUB_ENV
 
+      - name: Update brew with gcc and portaudio
+        run: |
+          brew update
+          brew install portaudio gcc
+
       - name: Compile PSG play archive for Mac
         run: |
           # Avoid fatal: unsafe repository (directory is owned by someone else)
           # Confer https://github.com/actions/checkout/issues/760
           git config --global --add safe.directory "*"
-          script/compile arch mac
+          script/compile arch mac mac-homebrew-gcc-portaudio
 
       - name: Publish PSG play archive for Mac
         if: ${{ success() }}
