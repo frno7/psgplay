@@ -6,6 +6,7 @@ Makefile targets:
   psgplay        - compile PSG play for Linux or Mac OS
   PSGPLAY.TOS    - compile PSG play for the Atari ST
   web            - compile for Javascript and Webassembly
+  example        - compile examples using the PSG play library
   gtags          - make tags for the GNU Global source code tagging system
   version        - display PSG play version
   clean          - remove generated files
@@ -18,7 +19,8 @@ Makefile options:
   ALSA           - set to 1 to support ALSA for Linux
   PORTAUDIO      - set to 1 to support PortAudio for Linux or Mac OS
 
-  CC             - same as HOST_CC (described below)
+  CC             - same as BUILD_CC and HOST_CC (described below)
+  LD             - same as HOST_LD (described below)
   AR             - same as HOST_AR (described below)
 
   BUILD_CC       - set a C compiler to use for the build system
@@ -69,3 +71,5 @@ Build Javascript and Webassembly libraries using the Emscripten compiler:
 Build a cross-compiled program for the MIPS/R5900 architecture:
 
 	$ make HOST_CC=mipsr5900el-unknown-linux-gnu-gcc psgplay
+
+In addition, review script/compile for more examples.
