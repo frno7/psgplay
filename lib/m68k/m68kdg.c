@@ -89,31 +89,29 @@ static struct {
 	int size;
 } prefixes;
 
-static int sscan(const char *s, size_t length, ...)
+static bool sscan(const char *s, size_t length, ...)
 {
 	char *t = xstrndup(s, length);
 	struct string_split field;
+	bool valid = true;
 	va_list ap;
-	int n = 0;
 
 	va_start(ap, length);
 
-	for_each_string_split (field, t, " ") {
-		if (field.length == 1 && field.s[0] == ' ')
-			continue;
-
+	for_each_string_split (field, t, " ") if (!field.sep) {
 		char **f = va_arg(ap, char **);
 		if (!f)
-			break;
+			goto end;
 
 		*f = xstrndup(field.s, field.length);
-		n++;
 	}
+	valid = !va_arg(ap, char **);
 
+end:
 	va_end(ap);
 	free(t);
 
-	return n;
+	return valid;
 }
 
 static void prefix_table(struct strbuf *sb, const char *s)
@@ -332,7 +330,7 @@ static void insn_table(struct strbuf *sb, const char *s)
 			continue;
 		} else if (sscan(line.s, line.length,
 				&f.mnemonic, &f.pattern,
-				&f.ea, &f.op0, &f.op1, NULL) == 5) {
+				&f.ea, &f.op0, &f.op1, NULL)) {
 			insn_line(sb, &f);
 		}
 
@@ -370,5 +368,5 @@ int main(int argc, char *argv[])
 
 	sbfree(&sb);
 
-	return valid ?  EXIT_SUCCESS : EXIT_FAILURE;
+	return valid ? EXIT_SUCCESS : EXIT_FAILURE;
 }
