@@ -21,15 +21,14 @@ static struct {
 void m68k_instruction_callback(int pc)
 {
 #if 0	/* FIXME */
-	printf("%08x: %04x %s\n",
-		ADDRESS_68K(REG_PPC), REG_IR,
-		m68ki_disassemble_quick(ADDRESS_68K(REG_PPC), M68K_CPU_TYPE_68000));
+	printf("%08x: %04x %s\n", pc, REG_IR,
+		m68ki_disassemble_quick(pc, M68K_CPU_TYPE_68000));
 #endif
 
 	if (!instruction_callback.cb)
 		return;
 
-	instruction_callback.cb(ADDRESS_68K(REG_PPC), instruction_callback.arg);
+	instruction_callback.cb(pc, instruction_callback.arg);
 }
 
 void cpu_instruction_callback(void (*cb)(uint32_t pc, void *arg), void *arg)
