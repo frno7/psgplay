@@ -38,8 +38,7 @@ static void mmu_bus_wait(const struct device *dev)
 	valid_device_bus_address(bus_address, dev) ? dev
 #define DMA_DEVICES(bus_address)					\
 	DMA_DEVICE(bus_address, &ram_device) :				\
-	DMA_DEVICE(bus_address, &rom0_device) :				\
-	DMA_DEVICE(bus_address, &rom1_device) : NULL
+	DMA_DEVICE(bus_address, &rom_device) : NULL
 
 u8 dma_read_memory_8(u32 bus_address)
 {

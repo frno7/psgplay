@@ -8,7 +8,6 @@
 
 #include "atari/device.h"
 
-extern const struct device rom0_device;
-extern const struct device rom1_device;
+extern const struct device rom_device;
 
 #endif /* ATARI_ROM_H */

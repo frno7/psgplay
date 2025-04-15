@@ -20,19 +20,7 @@ static u16 rom_rd_u16(const struct device *device, u32 dev_address)
 		(tos[dev_address] << 8) | tos[dev_address + 1] : 0;
 }
 
-const struct device rom0_device = {
-	.name = "rom",
-	.bus = {
-		.address = 0,
-		.size = 8,
-	},
-	.rd_u8  = rom_rd_u8,
-	.rd_u16 = rom_rd_u16,
-	.wr_u8  = bus_error_wr_u8,
-	.wr_u16 = bus_error_wr_u16,
-};
-
-const struct device rom1_device = {
+const struct device rom_device = {
 	.name = "rom",
 	.frequency = 8000000,
 	.bus = {

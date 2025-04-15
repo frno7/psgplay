@@ -25,8 +25,7 @@ static struct machine_device {
 	u64 machine_cycle_event;
 	const struct device *device;
 } list[] = {
-	{ .device = &rom0_device    },
-	{ .device = &rom1_device    },
+	{ .device = &rom_device     },
 	{ .device = &glue_device    },
 	{ .device = &ram_device     },
 	{ .device = &mfp_device     },

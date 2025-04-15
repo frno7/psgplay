@@ -12,11 +12,14 @@
 #include "atari/sound.h"
 #include "atari/system-variable.h"
 
+#include "tos/tos.h"
+
 static u8 ram[4 * 1024 * 1024];	/* 4 MiB of RAM */
 
 static void ram_reset(const struct device *device)
 {
-	memset(ram, 0, sizeof(ram));
+	memcpy(&ram[0], tos, 8);	/* ROM overlay during reset */
+	memset(&ram[8], 0, sizeof(ram) - 8);
 }
 
 static u8 ram_rd_u8(const struct device *device, u32 dev_address)
