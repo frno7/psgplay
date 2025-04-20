@@ -21,7 +21,8 @@
 
 struct timer_prescale {
 	enum mfp_ctrl ctrl;
-	u8 count;
+	uint8_t divisor;
+	uint8_t count;
 };
 
 struct system_variables *__system_variables = (struct system_variables *)0x400;
@@ -44,6 +45,7 @@ struct sndh_file file;
 static struct {
 	enum sndh_timer_type type;
 	struct timer_prescale prescale;
+	uint8_t dividend;
 } timer_state;
 
 static u32 gemdos_malloc(const u32 amount)
@@ -82,17 +84,19 @@ MFP_CTRL_DIV(MFP_CTRL_DIV_PRESCALE)
 	if (frequency < 1)
 		return false;
 
+	for (size_t divisor = 1; divisor <= 8; divisor++)
 	for (size_t i = 0; i < ARRAY_SIZE(prescale_div); i++) {
-		if (frequency > U32_MAX / prescale_div[i])
+		const u32 d = prescale_div[i] * divisor;
+		if (frequency > U32_MAX / d)
 			continue;
 
 		/* FIXME: Report unobtainable frequencies. */
 		const u32 count = clamp_t(u32,
 			DIV_ROUND_CLOSEST_U32(MFP_TIMER_FREQUENCY,
-				prescale_div[i] * (u32)frequency), 1, 256);
+				d * (u32)frequency), 1, 256);
 
 		const u32 f = DIV_ROUND_CLOSEST_U32(
-			MFP_TIMER_FREQUENCY, prescale_div[i] * count);
+			MFP_TIMER_FREQUENCY, d * count);
 		const int diff = abs(f - frequency);
 
 		if (best >= 0 && diff >= best)
@@ -102,6 +106,7 @@ MFP_CTRL_DIV(MFP_CTRL_DIV_PRESCALE)
 		valid = true;
 		*prescale = (struct timer_prescale) {
 			.ctrl = 1 + i,
+			.divisor = divisor,
 			.count = count & 0xff,
 		};
 	}
@@ -122,11 +127,20 @@ static bool install_sndh_vbl(int frequency)
 	return true;	/* The VBL frequency is constant. */
 }
 
+static bool timer_division(void)
+{
+	if (timer_state.dividend >= timer_state.prescale.divisor)
+		timer_state.dividend = 0;
+
+	return !timer_state.dividend++;
+}
+
 #define DEFINE_TIMER_EXCEPTION(name_, type_, ab_, ctrl_)		\
 	void timer_##name_##_exception(void)				\
 	{								\
 		if (timer_state.type == SNDH_TIMER_##type_)		\
-			sndh_play(&file);				\
+			if (timer_division())				\
+				sndh_play(&file);			\
 									\
 		/* Some SNDH files mess with the counters, restore. */	\
 		mfp_map()->ctrl_ = timer_state.prescale.ctrl;		\
