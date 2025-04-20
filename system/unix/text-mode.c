@@ -148,8 +148,6 @@ static void sample_buffer_flush(struct sample_buffer *sb)
 
 static bool sample_buffer_stop(struct sample_buffer *sb)
 {
-	sample_buffer_flush(sb);
-
 	psgplay_free(sb->pp);
 
 	sb->pp = NULL;
@@ -294,6 +292,9 @@ static void model_restart(struct sample_buffer *sb,
 		model->op = ctrl->op;
 		return;
 	}
+
+	if (model->op == TRACK_PLAY)
+		sample_buffer_flush(sb);
 
 	if (!sample_buffer_stop(sb))
 		return;
