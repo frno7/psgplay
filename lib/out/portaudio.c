@@ -44,9 +44,17 @@ struct portaudio_state {
 
 	int frequency;
 
+	volatile bool needs_flush;
+
 	struct portaudio_stereo_sample buffer[PORTAUDIO_BUFFER_SIZE];
 	struct fifo fifo;
 };
+
+static int portaudio_callback(const void *inputBuffer, void *outputBuffer,
+	unsigned long framesPerBuffer,
+	const PaStreamCallbackTimeInfo *timeInfo,
+	PaStreamCallbackFlags statusFlags,
+	void *userData);
 
 static void portaudio_sample_flush(struct portaudio_state *state)
 {
@@ -60,13 +68,15 @@ static void portaudio_sample_flush(struct portaudio_state *state)
 	const size_t r = fifo_peek(&state->fifo,
 		(const void **)&buffer);
 
+	BUG_ON(state->nonblocking);
 	BUG_ON(!r);
 	BUG_ON(r % sizeof(*buffer));
 
 	const ssize_t write_count = r / sizeof(*buffer);
+
 	PaError err = Pa_WriteStream(state->stream, buffer, write_count);
 	if (err != paNoError)
-		pr_fatal_error("PortAudio Pa_WriteStream failed: %s",
+		pr_fatal_error("portaudio_sample_flush: Pa_WriteStream failed: %s",
 			Pa_GetErrorText(err));
 
 	fifo_skip(&state->fifo, write_count * sizeof(*buffer));
@@ -77,7 +87,9 @@ static bool portaudio_sample(s16 left, s16 right, void *arg)
 	struct portaudio_state *state = arg;
 
 	if (fifo_full(&state->fifo)) {
-		portaudio_sample_flush(state);
+		if (!state->nonblocking)
+			portaudio_sample_flush(state);
+
 		return false;
 	}
 
@@ -91,9 +103,6 @@ static bool portaudio_sample(s16 left, s16 right, void *arg)
 
 	BUG_ON(w != sizeof(stereo_sample));
 
-	if (fifo_full(&state->fifo))
-		portaudio_sample_flush(state);
-
 	return true;
 }
 
@@ -101,12 +110,9 @@ static bool portaudio_pause(void *arg)
 {
 	struct portaudio_state *state = arg;
 
-	if (Pa_IsStreamStopped(state->stream))
-		return true;
-
 	PaError err = Pa_StopStream(state->stream);
 	if (err != paNoError)
-		pr_fatal_error("PortAudio Pa_StopStream failed: %s\n",
+		pr_fatal_error("portaudio_pause: Pa_StopStream failed: %s\n",
 			Pa_GetErrorText(err));
 
 	return true;
@@ -118,7 +124,7 @@ static bool portaudio_resume(void *arg)
 
 	PaError err = Pa_StartStream(state->stream);
 	if (err != paNoError)
-		pr_fatal_error("PortAudio Pa_StartStream failed: %s\n",
+		pr_fatal_error("portaudio_resume: Pa_StartStream failed: %s\n",
 			Pa_GetErrorText(err));
 
 	return true;
@@ -127,6 +133,11 @@ static bool portaudio_resume(void *arg)
 static void portaudio_flush(void *arg)
 {
 	struct portaudio_state *state = arg;
+
+	if (state->nonblocking) {
+		state->needs_flush = true;
+		return;
+	}
 
 	while (!fifo_empty(&state->fifo))
 		portaudio_sample_flush(state);
@@ -139,51 +150,62 @@ static void portaudio_drop(void *arg)
 
 	fifo_clear(&state->fifo);
 
-	if (Pa_IsStreamStopped(state->stream))
-		return;
-
 	err = Pa_AbortStream(state->stream);
-
 	if (err != paNoError)
-		pr_fatal_error("PortAudio Pa_AbortStream failed: %s\n",
+		pr_fatal_error("portaudio_drop: Pa_AbortStream failed: %s\n",
+			Pa_GetErrorText(err));
+
+	err = Pa_StartStream(state->stream);
+	if (err != paNoError)
+		pr_fatal_error("portaudio_drop: Pa_StartStream failed: %s\n",
 			Pa_GetErrorText(err));
 }
 
 static void *portaudio_open(const char *output, int frequency, bool nonblocking)
 {
-	PaStreamParameters params = { };
-	PaStream *stream;
 	PaError err;
 
 	err = Pa_Initialize();
 	if (err != paNoError)
 		goto error;
 
-	params.device = Pa_GetDefaultOutputDevice();
-	if (params.device == paNoDevice)
-		pr_fatal_error("PortAudio error: No default output device detected.\n");
+	PaDeviceIndex device = Pa_GetDefaultOutputDevice();
+	if (device == paNoDevice)
+		pr_fatal_error(
+			"portaudio_open error: No default output device detected.\n");
 
-	params.channelCount = 2;
-	params.sampleFormat = paInt16;
-	params.suggestedLatency =
-		Pa_GetDeviceInfo(params.device)->defaultLowOutputLatency;
-	params.hostApiSpecificStreamInfo = NULL;
+	const PaDeviceInfo *deviceInfo = Pa_GetDeviceInfo(device);
+	if (!deviceInfo)
+		pr_fatal_error("portaudio_open error: Cannot get device info.\n");
 
+	PaStreamParameters params = {
+		.device = device,
+		.channelCount = 2,
+		.sampleFormat = paInt16,
+		.suggestedLatency = deviceInfo->defaultLowOutputLatency,
+		.hostApiSpecificStreamInfo = NULL
+	};
+
+	struct portaudio_state *state = xmalloc(sizeof(struct portaudio_state));
+
+	PaStream *stream;
 	err = Pa_OpenStream(&stream, NULL, &params, frequency,
-		PORTAUDIO_BUFFER_SIZE, paClipOff, NULL, NULL);
+		PORTAUDIO_BUFFER_SIZE, paClipOff,
+		nonblocking ? portaudio_callback : NULL,
+		nonblocking ? state : NULL);
 	if (err != paNoError)
 		goto error;
 
-	struct portaudio_state *state = xmalloc(sizeof(struct portaudio_state));
 	*state = (struct portaudio_state) {
 		.nonblocking = nonblocking,
 		.output = output,
-		.stream = stream,
 		.frequency = frequency,
 		.fifo = {
 			.capacity = sizeof(state->buffer),
 			.buffer = state->buffer
 		},
+		.needs_flush = false,
+		.stream = stream
 	};
 
 	err = Pa_StartStream(state->stream);
@@ -193,30 +215,68 @@ static void *portaudio_open(const char *output, int frequency, bool nonblocking)
 	return state;
 
 error:
-	pr_fatal_error("Error initializing PortAudio: %s\n", Pa_GetErrorText(err));
+	pr_fatal_error("portaudio_open: Error initializing PortAudio: %s\n",
+				Pa_GetErrorText(err));
 }
 
 static void portaudio_close(void *arg)
 {
 	struct portaudio_state *state = arg;
-	PaError err;
 
-	portaudio_sample_flush(state);
-
-	if (!Pa_IsStreamStopped(state->stream)) {
-		err = Pa_StopStream(state->stream);
-		if (err != paNoError)
-			goto error;
+	if (state->nonblocking) {
+		fifo_clear(&state->fifo);
+		state->needs_flush = true;
+		return;
 	}
 
+	PaError err;
+
+	err = Pa_StopStream(state->stream);
+	if (err != paNoError)
+		pr_fatal_error("portaudio_close: Pa_StopStream: %s\n",
+			Pa_GetErrorText(err));
+
+	err = Pa_CloseStream(state->stream);
+	if (err != paNoError)
+		pr_fatal_error("portaudio_close: Pa_CloseStream: %s\n",
+			Pa_GetErrorText(err));
+
+	Pa_Terminate();
+
 	free(state);
+}
 
-	err = Pa_Terminate();
-	if (err == paNoError)
-		return;
+static int portaudio_callback(const void *inputBuffer, void *outputBuffer,
+	unsigned long framesPerBuffer,
+	const PaStreamCallbackTimeInfo *timeInfo,
+	PaStreamCallbackFlags statusFlags,
+	void *userData)
+{
+	(void)inputBuffer;
+	(void)timeInfo;
+	(void)statusFlags;
 
-error:
-	pr_fatal_error("Error shutting down PortAudio: %s\n", Pa_GetErrorText(err));
+	struct portaudio_state *state = userData;
+
+	size_t requested_bytes = framesPerBuffer * sizeof(struct portaudio_stereo_sample);
+
+	memset(outputBuffer, 0, requested_bytes);
+
+	if (state->needs_flush && fifo_empty(&state->fifo)) {
+		state->needs_flush = false;
+		return paComplete;
+	}
+
+	const struct portaudio_stereo_sample *in;
+
+	size_t available = fifo_peek(&state->fifo, (const void **)&in);
+
+	if (available > 0) {
+		memcpy(outputBuffer, in, available);
+		fifo_skip(&state->fifo, available);
+	}
+
+	return paContinue;
 }
 
 #endif /* HAVE_PORTAUDIO */
