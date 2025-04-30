@@ -157,7 +157,7 @@ bool text_mode_option(void)
 	return true;
 }
 
-static struct psgplay_psg_stereo_balance balance_option(const char *s)
+static struct psgplay_psg_stereo_balance psg_balance_option(const char *s)
 {
 	struct string_split b;
 	float abc[3] = { };
@@ -313,7 +313,7 @@ struct options *parse_options(int argc, char **argv)
 			else if (OPT("psg-mix"))
 				option.psg_mix = optarg;
 			else if (OPT("psg-balance")) {
-				option.psg_balance = balance_option(optarg);
+				option.psg_balance = psg_balance_option(optarg);
 				option.psg_mix = "balance";
 			}
 
