@@ -82,7 +82,7 @@ static void help(FILE *file)
 "    --disassemble-address  display address column in disassembly\n"
 "    --remake-header        remake SNDH file header in disassembly\n"
 "\n"
-"Tracing options:\n"
+"Trace options:\n"
 "\n"
 "    --trace=<device>,...   trace device operations of SNDH file and exit:\n"
 #define TRACE_DEVICE_HELP(symbol_, label_, id_) " " #symbol_
