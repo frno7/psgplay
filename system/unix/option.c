@@ -72,6 +72,9 @@ static void help(FILE *file)
 "    --psg-balance=<A:B:C>  set balance between -1 (left) and +1 (right) for\n"
 "                           PSG channels A, B and C. For example -0.5:0:+0.5\n"
 "                           for stereo effect. Default is 0:0:0 for mono.\n"
+"    --psg-volume=<A:B:C>   set volume between 0 (off) and +1 (max) for\n"
+"                           PSG channels A, B and C. For example 0:0:1 to\n"
+"                           play channel C only. Default is 1:1:1.\n"
 "\n"
 "Disassembly options:\n"
 "\n"
@@ -187,6 +190,36 @@ static struct psgplay_psg_stereo_balance psg_balance_option(const char *s)
 	};
 }
 
+static struct psgplay_psg_stereo_volume psg_volume_option(const char *s)
+{
+	struct string_split b;
+	float abc[3] = { };
+	size_t i = 0;
+
+	for_each_string_split (b, s, ":") {
+		if (b.sep)
+			continue;
+		if (i >= ARRAY_SIZE(abc))
+			pr_fatal_error("too many volumes: %s\n", s);
+
+		char *e;
+		abc[i++] = strtof(b.s, &e);
+
+		if (e != &b.s[b.length])
+			pr_fatal_error("invalid volume: %.*s\n",
+				(int)b.length, b.s);
+	}
+
+	if (i != ARRAY_SIZE(abc))
+		pr_fatal_error("too few volumes: %s\n", s);
+
+	return (struct psgplay_psg_stereo_volume) {
+		.a = abc[0],
+		.b = abc[1],
+		.c = abc[2],
+	};
+}
+
 static struct trace_mode trace_option(const char *s)
 {
 	struct string_split dev;
@@ -216,6 +249,8 @@ psgplay_digital_to_stereo_cb psg_mix_option(void)
 		return psgplay_digital_to_stereo_linear;
 	if (strcmp(option.psg_mix, "balance") == 0)
 		return psgplay_digital_to_stereo_balance;
+	if (strcmp(option.psg_mix, "volume") == 0)
+		return psgplay_digital_to_stereo_volume;
 
 	pr_fatal_error("unknown PSG mix: %s\n", option.psg_mix);
 
@@ -226,6 +261,8 @@ void *psg_mix_arg(void)
 {
 	if (strcmp(option.psg_mix, "balance") == 0)
 		return &option.psg_balance;
+	if (strcmp(option.psg_mix, "volume") == 0)
+		return &option.psg_volume;
 
 	return NULL;
 }
@@ -252,6 +289,7 @@ struct options *parse_options(int argc, char **argv)
 
 		{ "psg-mix",             required_argument, NULL, 0 },
 		{ "psg-balance",         required_argument, NULL, 0 },
+		{ "psg-volume",          required_argument, NULL, 0 },
 
 		{ "disassemble",         no_argument,       NULL, 0 },
 		{ "disassemble-header",  no_argument,       NULL, 0 },
@@ -315,6 +353,10 @@ struct options *parse_options(int argc, char **argv)
 			else if (OPT("psg-balance")) {
 				option.psg_balance = psg_balance_option(optarg);
 				option.psg_mix = "balance";
+			}
+			else if (OPT("psg-volume")) {
+				option.psg_volume = psg_volume_option(optarg);
+				option.psg_mix = "volume";
 			}
 
 			else if (OPT("trace"))

@@ -97,6 +97,9 @@ Play options:
     --psg-balance=<A:B:C>  set balance between -1 (left) and +1 (right) for
                            PSG channels A, B and C. For example -0.5:0:+0.5
                            for stereo effect. Default is 0:0:0 for mono.
+    --psg-volume=<A:B:C>   set volume between 0 (off) and +1 (max) for
+                           PSG channels A, B and C. For example 0:0:1 to
+                           play channel C only. Default is 1:1:1.
 
 Disassembly options:
 

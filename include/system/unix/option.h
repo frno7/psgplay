@@ -39,6 +39,7 @@ struct options {
 
 	const char *psg_mix;
 	struct psgplay_psg_stereo_balance psg_balance;
+	struct psgplay_psg_stereo_volume psg_volume;
 
 	const char *input;
 
