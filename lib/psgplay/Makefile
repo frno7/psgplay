@@ -69,6 +69,7 @@ LIBPSGPLAY_WEB_FUNCTIONS =						\
 	_psgplay_digital_to_stereo_empiric				\
 	_psgplay_digital_to_stereo_linear				\
 	_psgplay_digital_to_stereo_balance				\
+	_psgplay_digital_to_stereo_volume				\
 	_psgplay_stereo_downsample_callback				\
 	_psgplay_stop							\
 	_psgplay_stop_at_time						\

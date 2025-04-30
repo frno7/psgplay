@@ -92,6 +92,28 @@ void psgplay_digital_to_stereo_balance(struct psgplay_stereo *stereo,
 	const struct psgplay_digital *digital, size_t count, void *arg);
 
 /**
+ * struct psgplay_psg_stereo_volume - PSG play stereo channel volume
+ * @a: channel A volume, range 0 (off) .. +1 (max)
+ * @b: channel B volume, range 0 (off) .. +1 (max)
+ * @c: channel C volume, range 0 (off) .. +1 (max)
+ */
+struct psgplay_psg_stereo_volume {
+	float a;
+	float b;
+	float c;
+};
+
+/**
+ * psgplay_digital_to_stereo_volume - volume stereo mix of digital samples
+ * @stereo: stereo samples
+ * @digital: digital samples
+ * @count: number of stereo samples to transform into digital samples
+ * @arg: pointer to struct psgplay_psg_stereo_volume
+ */
+void psgplay_digital_to_stereo_volume(struct psgplay_stereo *stereo,
+	const struct psgplay_digital *digital, size_t count, void *arg);
+
+/**
  * psgplay_digital_to_stereo_callback - invoke callback to transform digital
  * 	samples into stereo samples
  * @pp: PSG play object

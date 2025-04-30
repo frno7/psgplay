@@ -351,6 +351,30 @@ void psgplay_digital_to_stereo_balance(struct psgplay_stereo *stereo,
 	}
 }
 
+void psgplay_digital_to_stereo_volume(struct psgplay_stereo *stereo,
+	const struct psgplay_digital *digital, size_t count, void *arg)
+{
+	struct psgplay_psg_stereo_volume *w = arg;
+	struct mixer m = mixer_init(digital, count);
+
+#define VOLUME(ch) (int)clamp(256.f * w->ch, 0.f, 256.f)
+	const int va = VOLUME(a);
+	const int vb = VOLUME(b);
+	const int vc = VOLUME(c);
+#undef VOLUME
+
+	for (size_t i = 0; i < count; i++) {
+		const int16_t sa = psg_dac(digital[i].psg.lva);
+		const int16_t sb = psg_dac(digital[i].psg.lvb);
+		const int16_t sc = psg_dac(digital[i].psg.lvc);
+
+		const int16_t s = digital->mixer.mix ?
+			(va*sa + vb*sb + vc*sc) / (256 * 3) : 0;
+
+		stereo[i] = stereo_mix(&m, s, s, digital[i]);
+	}
+}
+
 void psgplay_digital_to_stereo_empiric(struct psgplay_stereo *stereo,
 	const struct psgplay_digital *digital, size_t count, void *arg)
 {
