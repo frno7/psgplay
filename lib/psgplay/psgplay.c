@@ -334,6 +334,7 @@ void psgplay_digital_to_stereo_balance(struct psgplay_stereo *stereo,
 	const int la = BALANCE(a, -), ra = BALANCE(a, +);
 	const int lb = BALANCE(b, -), rb = BALANCE(b, +);
 	const int lc = BALANCE(c, -), rc = BALANCE(c, +);
+#undef BALANCE
 
 	for (size_t i = 0; i < count; i++) {
 		const int16_t sa = psg_dac(digital[i].psg.lva);
