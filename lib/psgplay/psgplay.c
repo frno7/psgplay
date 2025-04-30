@@ -23,7 +23,7 @@
 #define FADE_SAMPLES 2500	/* 10 ms with 250 kHz */
 
 struct fir8 {
-	s16 xn[8];
+	int16_t xn[8];
 	int k;
 };
 
@@ -184,7 +184,7 @@ static int buffer_digital_mixer_sample(const struct mixer_sample *sample,
 	return err;
 }
 
-static s16 sample_lowpass(s16 sample, struct fir8 *lowpass)
+static int16_t sample_lowpass(int16_t sample, struct fir8 *lowpass)
 {
 	lowpass->xn[lowpass->k++ % ARRAY_SIZE(lowpass->xn)] = sample;
 
@@ -279,7 +279,7 @@ static inline void mixer_for_sample(struct mixer *m,
 }
 
 static inline struct psgplay_stereo stereo_mix(struct mixer *m,
-	const s16 sl, const s16 sr, const struct psgplay_digital d)
+	const int16_t sl, const int16_t sr, const struct psgplay_digital d)
 {
 	const float psg_mix = 0.65;
 	const int p = 256 * psg_mix;
@@ -318,7 +318,7 @@ void psgplay_digital_to_stereo_linear(struct psgplay_stereo *stereo,
 		const int16_t sc = psg_dac(digital[i].psg.lvc);
 
 		/* Simplistic linear channel mix. */
-		const s16 s = digital->mixer.mix ? (sa + sb + sc) / 3 : 0;
+		const int16_t s = digital->mixer.mix ? (sa + sb + sc) / 3 : 0;
 
 		stereo[i] = stereo_mix(&m, s, s, digital[i]);
 	}
@@ -341,8 +341,8 @@ void psgplay_digital_to_stereo_balance(struct psgplay_stereo *stereo,
 		const int16_t sc = psg_dac(digital[i].psg.lvc);
 
 		if (digital->mixer.mix) {
-			const s16 sl = (la*sa + lb*sb + lc*sc) / (256 * 3);
-			const s16 sr = (ra*sa + rb*sb + rc*sc) / (256 * 3);
+			const int16_t sl = (la*sa + lb*sb + lc*sc) / (256 * 3);
+			const int16_t sr = (ra*sa + rb*sb + rc*sc) / (256 * 3);
 
 			stereo[i] = stereo_mix(&m, sl, sr, digital[i]);
 		} else
