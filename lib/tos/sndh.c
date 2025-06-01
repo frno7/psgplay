@@ -37,7 +37,7 @@ static struct cookie cookie_jar[16] = {
 	{ .uid = COOKIE__SND, .value = COOKIE__SND_PSG
 				     | COOKIE__SND_DMA8  },
 	{ .uid = COOKIE__FPU, .value = COOKIE__FPU_NONE  },
-	{ .value = __ARRAY_SIZE(cookie_jar) }
+	{ .value = ARRAY_SIZE(cookie_jar) }
 };
 
 struct sndh_file file;
