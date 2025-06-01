@@ -16,7 +16,7 @@ lib/tos/reset.o: lib/tos/reset.S
 lib/tos/sndh.o: lib/tos/sndh.c
 	$(QUIET_CC)$(TARGET_CC) $(TOS_CFLAGS) $(TARGET_CFLAGS) -c -o $@ $<
 
-TOS_TOSLIBC_OBJ += $(addprefix $(TOSLIBC_LIB_SUBDIR),			\
+TOS_TOSLIBC_OBJ += $(addprefix $(TOSLIBC_lib_dir),			\
 	__mulsi3.o							\
 	__udivmodsi4.o							\
 	__udivsi3.o)

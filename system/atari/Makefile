@@ -6,7 +6,7 @@ PRG_CFLAGS += $(BASIC_TARGET_CFLAGS) $(CF2149_CFLAGS)			\
 	-isystem lib/toslibc/include/toslibc -D_TOSLIBC_SOURCE
 
 PRG_LDFLAGS += --relocatable --gc-sections --strip-all --entry _start	\
-	--script=lib/toslibc/script/prg.ld
+	-L$(TOSLIBC_lib_dir) --script=$(TOSLIBC_SCRIPT_PRG_LD)
 
 PSGPLAY_TOS := PSGPLAY.TOS
 PSGPLAY_PRG_OBJ := system/atari/PSGPLAY.PRG.o
@@ -19,6 +19,8 @@ SYSTEM_ATARI_SRC :=							\
 	lib/text/load.c							\
 	lib/text/main.c							\
 	lib/text/mode.c							\
+	lib/unicode/atari.c						\
+	lib/unicode/utf8.c						\
 	lib/vt/vt52.c							\
 	lib/vt/vt.c							\
 	system/atari/clock.c						\
@@ -42,7 +44,7 @@ $(foreach f,$(SYSTEM_ATARI_SRC),$(eval $(call SYSTEM_ATARI_target,$(f))))
 
 ALL_OBJ += $(SYSTEM_ATARI_OBJ) $(PSGPLAY_PRG_OBJ)
 
-$(PSGPLAY_PRG_OBJ): $(TOSLIBC) $(SYSTEM_ATARI_OBJ)
+$(PSGPLAY_PRG_OBJ): $(TOSLIBC) $(TOSLIBC_SCRIPT_PRG_LD) $(SYSTEM_ATARI_OBJ)
 	$(QUIET_LINK)$(TARGET_LD) $(PRG_LDFLAGS) $(TARGET_LDFLAGS) -o $@ \
 		$(SYSTEM_ATARI_OBJ) $(TOSLIBC)
 

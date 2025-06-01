@@ -2,6 +2,7 @@
 
 -include lib/toslibc/lib/Makefile
 -include lib/toslibc/tool/Makefile
+-include lib/toslibc/script/Makefile
 ifndef TOSLINK
 $(warning WARNING: Missing toslibc Git submodule; clone with the "--recurse-submodules" option, or do "git submodule update --init --recursive")
 endif
