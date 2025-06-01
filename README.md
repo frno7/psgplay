@@ -11,11 +11,11 @@ and files in the [SNDH archive](http://sndh.atari.org/).
 
 # How to download
 
-The package
-[`media-sound/psgplay`](https://github.com/frno7/gentoo.overlay/tree/main/media-sound/psgplay)
-is available for [Gentoo Linux](https://en.wikipedia.org/wiki/Gentoo_Linux).
-The package [`psgplay-git`](https://aur.archlinux.org/packages/psgplay-git) is
-also available for [Arch Linux](https://en.wikipedia.org/wiki/Arch_Linux).
+- [Gentoo Linux](https://en.wikipedia.org/wiki/Gentoo_Linux) has a
+  [`media-sound/psgplay`](https://github.com/frno7/gentoo.overlay/tree/main/media-sound/psgplay)
+  package.
+- [Arch Linux](https://en.wikipedia.org/wiki/Arch_Linux) has a
+  [`psgplay-git`](https://aur.archlinux.org/packages/psgplay-git) package.
 
 Github [actions](https://github.com/frno7/psgplay/actions/workflows/compilation.yml)
 automatically compile and publish archives with PSG play for
@@ -52,6 +52,14 @@ The `BUILD_CC`, `HOST_AR`, `HOST_CC`, and `TARGET_CC` with `TARGET_LD`
 variables can be configured for various compilation settings.
 The `BUILD_CFLAGS`, `HOST_CFLAGS`, `TARGET_CFLAGS`, and `TARGET_LDFLAGS`
 variables are available as well.
+
+Type `make install` to install everything, by default in `~/.local/usr`.
+Set `prefix` to change the directory, for example
+`make prefix=$HOME/some/place/else install`. More specific subtargets than
+`install` are also available, for instance `install-lib`, `install-psgplay`,
+and so on. Set `DESTDIR` for
+[staged installs](https://www.gnu.org/prep/standards/html_node/DESTDIR.html).
+
 
 Review the file
 [`INSTALL`](https://github.com/frno7/psgplay/blob/main/INSTALL)
