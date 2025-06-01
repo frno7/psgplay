@@ -135,8 +135,8 @@ install-lib-shared: $(LIBPSGPLAY_SHARED)
 
 .PHONY: install-pkg-config
 install-pkg-config: $(LIBPSGPLAY_PC)
-	$(INSTALL) -d -m 755 $(DESTDIR)$(pkgdir)
-	$(INSTALL) -m 644 $(LIBPSGPLAY_PC) $(DESTDIR)$(pkgdir)
+	$(INSTALL) -d -m 755 $(DESTDIR)$(pkgconfigdir)
+	$(INSTALL) -m 644 $(LIBPSGPLAY_PC) $(DESTDIR)$(pkgconfigdir)
 
 OTHER_CLEAN += $(LIBPSGPLAY_STATIC) $(LIBPSGPLAY_SHARED)		\
 	$(LIBPSGPLAY_JAVASCRIPT) $(LIBPSGPLAY_WEBASSEMBLY)		\

@@ -10,7 +10,7 @@ mandir = $(datarootdir)/man
 man1dir = $(mandir)/man1
 includedir = $(prefix)/include
 libdir = $(exec_prefix)/lib
-pkgdir = $(libdir)/pkgconfig
+pkgconfigdir = $(libdir)/pkgconfig
 
 export prefix includedir libdir
 
