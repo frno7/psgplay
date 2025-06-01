@@ -1,44 +1,55 @@
 Makefile targets:
 
-  all            - compile PSG play, libraries and examples (default)
-  install        - install PSG play, libraries and manual page
-  test           - test components of PSG play
-  psgplay        - compile PSG play for Linux or Mac OS
-  PSGPLAY.TOS    - compile PSG play for the Atari ST
-  web            - compile for Javascript and Webassembly
-  example        - compile examples using the PSG play library
-  gtags          - make tags for the GNU Global source code tagging system
-  version        - display PSG play version
-  clean          - remove generated files
+  all             - compile PSG play, libraries and examples (default)
+  install         - install PSG play, libraries and manual page
+  test            - test components of PSG play
+  psgplay         - compile PSG play for Linux or Mac OS
+  PSGPLAY.TOS     - compile PSG play for the Atari ST
+  web             - compile for Javascript and Webassembly
+  example         - compile examples using the PSG play library
+  gtags           - make tags for the GNU Global source code tagging system
+  version         - display PSG play version
+  clean           - remove generated files
+
+  install         - compile and install everything in $prefix
+  install-lib     - compile and install only PSG play library in $prefix
+  install-psgplay - compile and install only PSG play program in $prefix
+  install-man     - compile and install only PSG play manual in $prefix
 
 Makefile options:
 
-  -j [n]         - n simultaneous jobs for speed; unlimited with no argument
-  V              - set to 1 to compile verbosely
-  S              - set to 1 for sanitation checks
-  ALSA           - set to 1 to support ALSA for Linux
-  PORTAUDIO      - set to 1 to support PortAudio for Linux or Mac OS
+  -j [n]          - n simultaneous jobs for speed; unlimited with no argument
 
-  CC             - same as BUILD_CC and HOST_CC (described below)
-  LD             - same as HOST_LD (described below)
-  AR             - same as HOST_AR (described below)
+  prefix          - installation prefix (default ~/.local/usr)
+  ...             - review main Makefile for more dirs (bindir, libdir, etc.)
+  DESTDIR         - directory for staged installs, confer
+                    <https://www.gnu.org/prep/standards/html_node/DESTDIR.html>
 
-  BUILD_CC       - set a C compiler to use for the build system
-  HOST_CC        - set a C compiler to use for the host system
-  HOST_LD        - set a linker to use for the host system
-  HOST_AR        - set an archiver to use for the host system
-  TARGET_CC      - set a m68k C compiler to use for Atari ST code
-  TARGET_LD      - set a m68k linker to use for Atari ST code
+  V               - set to 1 to compile verbosely
+  S               - set to 1 for sanitation checks
+  ALSA            - set to 1 to support ALSA for Linux
+  PORTAUDIO       - set to 1 to support PortAudio for Linux or Mac OS
 
-  BUILD_CFLAGS   - set C flags for the build system
-  HOST_CFLAGS    - set C flags for the host system
-  HOST_ARFLAGS   - set archiver flags for the host system
-  TARGET_CFLAGS  - set C flags for Atari ST code
-  TARGET_LDFLAGS - set linker flags for Atari ST code
+  CC              - same as BUILD_CC and HOST_CC (described below)
+  LD              - same as HOST_LD (described below)
+  AR              - same as HOST_AR (described below)
 
-  BUILD_COMPILE  - set C compiler and archiver prefix for the build system
-  HOST_COMPILE   - set C compiler and archiver prefix for the host system
-  TARGET_COMPILE - set C compiler and archiver prefix for the Atari ST
+  BUILD_CC        - set a C compiler to use for the build system
+  HOST_CC         - set a C compiler to use for the host system
+  HOST_LD         - set a linker to use for the host system
+  HOST_AR         - set an archiver to use for the host system
+  TARGET_CC       - set a m68k C compiler to use for Atari ST code
+  TARGET_LD       - set a m68k linker to use for Atari ST code
+
+  BUILD_CFLAGS    - set C flags for the build system
+  HOST_CFLAGS     - set C flags for the host system
+  HOST_ARFLAGS    - set archiver flags for the host system
+  TARGET_CFLAGS   - set C flags for Atari ST code
+  TARGET_LDFLAGS  - set linker flags for Atari ST code
+
+  BUILD_COMPILE   - set C compiler and archiver prefix for the build system
+  HOST_COMPILE    - set C compiler and archiver prefix for the host system
+  TARGET_COMPILE  - set C compiler and archiver prefix for the Atari ST
 
 Examples:
 
