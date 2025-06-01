@@ -114,7 +114,7 @@ LIBPSGPLAY_HEADERS =							\
 	include/psgplay/version.h
 
 .PHONY: install-lib
-install-lib: install-include install-lib-static install-lib-shared install-pkg
+install-lib: install-include install-lib-static install-lib-shared install-pkg-config
 
 .PHONY: install-include
 install-include:
@@ -133,8 +133,8 @@ install-lib-shared: $(LIBPSGPLAY_SHARED)
 	ln -s libpsgplay.$(SHLIB_EXT).$(PSGPLAY_VERSION_MINOR) $(DESTDIR)$(libdir)/libpsgplay.$(SHLIB_EXT).$(PSGPLAY_VERSION_MAJOR)
 	ln -s libpsgplay.$(SHLIB_EXT).$(PSGPLAY_VERSION_MAJOR) $(DESTDIR)$(libdir)/libpsgplay.$(SHLIB_EXT)
 
-.PHONY: install-pkg
-install-pkg: $(LIBPSGPLAY_PC)
+.PHONY: install-pkg-config
+install-pkg-config: $(LIBPSGPLAY_PC)
 	$(INSTALL) -d -m 755 $(DESTDIR)$(pkgdir)
 	$(INSTALL) -m 644 $(LIBPSGPLAY_PC) $(DESTDIR)$(pkgdir)
 
