@@ -59,6 +59,8 @@ jobs:
           # Confer https://github.com/actions/checkout/issues/760
           git config --global --add safe.directory "*"
           script/compile arch mac mac-homebrew-gcc-portaudio
+          make V=1 install-psgplay install-include install-lib-static install-pkg-config install-man
+          ls -lR ~/.local/usr
 
       - name: Publish PSG play archive for Mac
         if: ${{ success() }}
@@ -130,6 +132,8 @@ jobs:
             git config --global --add safe.directory "*"
             rm -f build-log.txt
             script/compile arch ${{ matrix.arch }}
+            make V=1 install-psgplay install-include install-lib-static install-pkg-config install-man
+            ls -lR ~/.local/usr
 
       - name: Compile PSG play archive for Linux/x86_64
         if: ${{ matrix.arch == 'x86_64' }}
@@ -139,6 +143,8 @@ jobs:
           sudo apt-get install -q -y libasound2 || \
           sudo apt-get install -q -y libasound2t64
           script/compile arch ${{ matrix.arch }}
+          make V=1 install-psgplay install-include install-lib-static install-pkg-config install-man
+          ls -lR ~/.local/usr
 
       - name: Publish PSG play archive for Linux
         if: ${{ success() }}
