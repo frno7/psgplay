@@ -58,9 +58,6 @@ SHLIB_EXT = so
 endif
 
 INSTALL = install
-XXD = xxd
-
-export XXD
 
 ifeq (1,$(S))
 S_CFLAGS = -fsanitize=address -fsanitize=leak -fsanitize=undefined	\

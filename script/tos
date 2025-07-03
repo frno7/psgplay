@@ -9,16 +9,14 @@ then
 	exit 1
 fi
 
-if [ x"$XXD" = x ]
-then
-	echo "$0"': error: the XXD environment variable for the "xxd" command is undefined' >&2
-	exit 1
-fi
-
 src="$1"
 dst="$2"
 
-echo 'static u8 tos[] = {'	 >"$dst".tmp
-"$XXD" -i <"$src"		>>"$dst".tmp
-echo '};'			>>"$dst".tmp
+hex() {
+	od -A n -vt x1 <lib/tos/tos | sed 's/\([0-9a-fA-F]\{2\}\)/0x\1,/g'
+}
+
+echo 'static u8 tos[] = {'		 >"$dst".tmp
+hex				<"$src"	>>"$dst".tmp
+echo '};'				>>"$dst".tmp
 mv "$dst".tmp "$dst"
