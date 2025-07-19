@@ -72,7 +72,8 @@ struct psgplay {
 		psgplay_stereo_downsample_cb cb;
 		void *arg;
 	} stereo_downsample_callback;
-
+	
+	uint16_t dac[32][32][32];
 	const struct machine *machine;
 
 	struct {
@@ -307,7 +308,7 @@ static int16_t psg_dac(const union psgplay_digital_level level)
 	return dac[level.u5];
 }
 
-void psgplay_digital_to_stereo_linear(struct psgplay_stereo *stereo,
+void psgplay_digital_to_stereo_linear(struct psgplay *pp, struct psgplay_stereo *stereo,
 	const struct psgplay_digital *digital, size_t count, void *arg)
 {
 	struct mixer m = mixer_init(digital, count);
@@ -324,7 +325,7 @@ void psgplay_digital_to_stereo_linear(struct psgplay_stereo *stereo,
 	}
 }
 
-void psgplay_digital_to_stereo_balance(struct psgplay_stereo *stereo,
+void psgplay_digital_to_stereo_balance(struct psgplay *pp, struct psgplay_stereo *stereo,
 	const struct psgplay_digital *digital, size_t count, void *arg)
 {
 	struct psgplay_psg_stereo_balance *w = arg;
@@ -351,7 +352,7 @@ void psgplay_digital_to_stereo_balance(struct psgplay_stereo *stereo,
 	}
 }
 
-void psgplay_digital_to_stereo_volume(struct psgplay_stereo *stereo,
+void psgplay_digital_to_stereo_volume(struct psgplay *pp, struct psgplay_stereo *stereo,
 	const struct psgplay_digital *digital, size_t count, void *arg)
 {
 	struct psgplay_psg_stereo_volume *w = arg;
@@ -375,19 +376,16 @@ void psgplay_digital_to_stereo_volume(struct psgplay_stereo *stereo,
 	}
 }
 
-void psgplay_digital_to_stereo_empiric(struct psgplay_stereo *stereo,
+void psgplay_digital_to_stereo_empiric(struct psgplay *pp, struct psgplay_stereo *stereo,
 	const struct psgplay_digital *digital, size_t count, void *arg)
 {
-	static const uint16_t dac[16][16][16] =
-#include "atari/psg-empiric.h"
-
 	struct mixer m = mixer_init(digital, count);
-
+	
 	for (size_t i = 0; i < count; i++) {
 		const int16_t s = digital->mixer.mix ?
-			dac[digital[i].psg.lvc.u4]
-			   [digital[i].psg.lvb.u4]
-			   [digital[i].psg.lva.u4] - 0x8000 : 0;
+			pp->dac[digital[i].psg.lvc.u5]
+			   [digital[i].psg.lvb.u5]
+			   [digital[i].psg.lva.u5] - 0x8000 : 0;
 
 		stereo[i] = stereo_mix(&m, s, s, digital[i]);
 	}
@@ -499,8 +497,8 @@ static void digital_to_stereo_downsample(struct psgplay *pp,
 
 	while (i < count && !pp->errno_) {
 		const size_t n = min(count - i, ARRAY_SIZE(stereo));
-
-		pp->digital_to_stereo_callback.cb(stereo, &digital[i], n,
+		
+		pp->digital_to_stereo_callback.cb(pp, stereo, &digital[i], n,
 			pp->digital_to_stereo_callback.arg);
 
 		stereo_fade(stereo, n,
@@ -559,6 +557,70 @@ static u32 parse_timer(const void *data, size_t size)
 	return sndh_timer_to_u32(timer);
 }
 
+void psgplay_build_volume_table(struct psgplay *pp)
+{
+	double MaxVol = 65119.0;				/* Normal Mode Maximum value in table */
+	double FOURTH2 = 1.19;					/* Fourth root of two from YM2149 */
+	double WARP = 1.666666666666666667;		/* measured as 1.65932 from 46602 */
+
+	double conductance;
+	double conductance_[32];
+	int	i, j, k;
+
+	/**
+	 * YM2149 and R8=1k follows (2^-1/4)^(n-31) better when 2 voices are
+	 * summed (A+B or B+C or C+A) rather than individually (A or B or C):
+	 *	 conductance = 2.0/3.0/(1.0-1.0/WARP)-2.0/3.0;
+	 * When taken into consideration with three voices.
+	 *
+	 * Note that the YM2149 does not use laser trimmed resistances, thus
+	 * has offsets that are added and/or multiplied with (2^-1/4)^(n-31).
+	 */
+	conductance = 2.0 / 3.0 / (1.0 - 1.0 / WARP) - 2.0 / 3.0; /* conductance = 1.0 */
+
+	/**
+	 * Because the YM current output (voltage source with series resistances)
+	 * is connected to a grounded resistor to develop the output voltage
+	 * (instead of a current to voltage converter), the output transfer
+	 * function is not linear. Thus:
+	 * 2.0*conductance_[n] = 1.0/(1.0-1.0/FOURTH2/(1.0/conductance + 1.0))-1.0;
+	 */
+	for (i = 31; i >= 1; i--) {
+		conductance_[i] = conductance / 2.0;
+		conductance = 1.0 / (1.0 - 1.0 / FOURTH2 / (1.0 / conductance + 1.0)) - 1.0;
+	}
+	conductance_[0] = 1.0e-8; /* Avoid divide by zero */
+
+	/**
+	 * YM2149 AC + DC components model:
+	 * (Note that Maxvol is 65119 in Simoes' table, 65535 in Gerard's)
+	 *
+	 * Sum the conductances as a function of a voltage divider:
+	 * Vout=Vin*Rout/(Rout+Rin)
+	 */
+	for (i = 0; i < 32; i++)
+		for (j = 0; j < 32; j++)
+			for (k = 0; k < 32; k++)
+			{
+				pp->dac[i][j][k] = (short)(0.5 + (MaxVol * WARP) / (1.0 +
+					1.0 / (conductance_[i] + conductance_[j] + conductance_[k])));
+			}
+
+	/**
+	 * YM2149 DC component model:
+	 * R8=1k (pulldown) + YM//1K (pullup) with YM 50% duty PWM
+	 * (Note that MaxVol is 46602 in Paulo Simoes Quartet mode table)
+	 *
+	 *	for (i = 0; i < 32; i++)
+	 *		for (j = 0; j < 32; j++)
+	 *			for (k = 0; k < 32; k++)
+	 *			{
+	 *				volumetable[i][j][k] = (ymu16)(0.5+(MaxVol*WARP)/(1.0 +
+	 *					2.0/(conductance_[i]+conductance_[j]+conductance_[k])));
+	 *			}
+	 */
+}
+
 struct psgplay *psgplay_init(const void *data, size_t size,
 	int track, int stereo_frequency)
 {
@@ -582,16 +644,19 @@ struct psgplay *psgplay_init(const void *data, size_t size,
 		.mixer_sample = mixer_digital,
 		.arg = pp
 	};
+	
+	psgplay_build_volume_table(pp);
 
 	pp->downsample.stereo_frequency = stereo_frequency;
 	pp->machine = &atari_st;
 	pp->machine->init(data, size, offset, &regs, &ports);
-
+	
 	psgplay_digital_to_stereo_callback(pp,
 		psgplay_digital_to_stereo_empiric, NULL);
 
 	psgplay_stereo_downsample_callback(pp,
 		stereo_downsample, &pp->downsample);
+	
 
 	return pp;
 }

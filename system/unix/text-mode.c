@@ -67,13 +67,13 @@ struct tty_arg {
 	struct sample_mixer *sm;
 };
 
-void digital_to_stereo(struct psgplay_stereo *stereo,
+void digital_to_stereo(struct psgplay *pp, struct psgplay_stereo *stereo,
 	const struct psgplay_digital *digital, size_t count, void *arg)
 {
 	struct sample_mixer *sm = arg;
 
 	if (!sm->tm->volume) {
-		sm->cb(stereo, digital, count, sm->arg);
+		sm->cb(pp, stereo, digital, count, sm->arg);
 		return;
 	}
 
@@ -86,7 +86,7 @@ void digital_to_stereo(struct psgplay_stereo *stereo,
 		for (size_t i = 0; i < n; i++)
 			sm->buffer[i].mixer.volume.main = sm->tm->volume;
 
-		sm->cb(&stereo[k], sm->buffer, n, sm->arg);
+		sm->cb(pp, &stereo[k], sm->buffer, n, sm->arg);
 	}
 }
 

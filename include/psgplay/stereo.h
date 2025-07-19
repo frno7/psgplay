@@ -44,11 +44,13 @@ ssize_t psgplay_read_stereo(struct psgplay *pp,
  * @arg: argument supplied to psgplay_digital_to_stereo_callback()
  */
 typedef void (*psgplay_digital_to_stereo_cb)(
+	struct psgplay *pp,
 	struct psgplay_stereo *stereo, const struct psgplay_digital *digital,
 	size_t count, void *arg);
 
 /**
  * psgplay_digital_to_stereo_empiric - empiric stereo mix of digital samples
+ * @pp: PSG play object
  * @stereo: stereo samples
  * @digital: digital samples
  * @count: number of stereo samples to transform into digital samples
@@ -56,17 +58,18 @@ typedef void (*psgplay_digital_to_stereo_cb)(
  *
  * YM2149 PSG channel mix, as measured on Atari ST hardware.
  */
-void psgplay_digital_to_stereo_empiric(struct psgplay_stereo *stereo,
+void psgplay_digital_to_stereo_empiric(struct psgplay *pp, struct psgplay_stereo *stereo,
 	const struct psgplay_digital *digital, size_t count, void *arg);
 
 /**
  * psgplay_digital_to_stereo_linear - linear stereo mix of digital samples
+ * @pp: PSG play object
  * @stereo: stereo samples
  * @digital: digital samples
  * @count: number of stereo samples to transform into digital samples
  * @arg: ignored, can be %NULL
  */
-void psgplay_digital_to_stereo_linear(struct psgplay_stereo *stereo,
+void psgplay_digital_to_stereo_linear(struct psgplay *pp, struct psgplay_stereo *stereo,
 	const struct psgplay_digital *digital, size_t count, void *arg);
 
 /**
@@ -88,7 +91,7 @@ struct psgplay_psg_stereo_balance {
  * @count: number of stereo samples to transform into digital samples
  * @arg: pointer to struct psgplay_psg_stereo_balance
  */
-void psgplay_digital_to_stereo_balance(struct psgplay_stereo *stereo,
+void psgplay_digital_to_stereo_balance(struct psgplay *pp, struct psgplay_stereo *stereo,
 	const struct psgplay_digital *digital, size_t count, void *arg);
 
 /**
@@ -105,12 +108,13 @@ struct psgplay_psg_stereo_volume {
 
 /**
  * psgplay_digital_to_stereo_volume - volume stereo mix of digital samples
+ * @pp: PSG play object
  * @stereo: stereo samples
  * @digital: digital samples
  * @count: number of stereo samples to transform into digital samples
  * @arg: pointer to struct psgplay_psg_stereo_volume
  */
-void psgplay_digital_to_stereo_volume(struct psgplay_stereo *stereo,
+void psgplay_digital_to_stereo_volume(struct psgplay *pp, struct psgplay_stereo *stereo,
 	const struct psgplay_digital *digital, size_t count, void *arg);
 
 /**
