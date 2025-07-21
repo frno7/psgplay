@@ -5,6 +5,7 @@ lib/atari/ram.c lib/atari/rom.c: $(LIBPSGPLAY_TOS_HEADER)
 ATARI_SRC := $(addprefix lib/atari/,					\
 	bus.c								\
 	cpu.c								\
+	dac.c								\
 	device.c							\
 	exception-vector.c						\
 	fdc.c								\

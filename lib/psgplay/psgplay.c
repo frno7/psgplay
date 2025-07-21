@@ -11,6 +11,7 @@
 #include "internal/compare.h"
 
 #include "atari/cpu.h"
+#include "atari/dac.h"
 #include "atari/machine.h"
 #include "atari/psg.h"
 
@@ -378,16 +379,14 @@ void psgplay_digital_to_stereo_volume(struct psgplay_stereo *stereo,
 void psgplay_digital_to_stereo_empiric(struct psgplay_stereo *stereo,
 	const struct psgplay_digital *digital, size_t count, void *arg)
 {
-	static const uint16_t dac[16][16][16] =
-#include "atari/psg-empiric.h"
-
+	const struct cf2149_dac *dac = cf2149_atari_st_dac();
 	struct mixer m = mixer_init(digital, count);
 
 	for (size_t i = 0; i < count; i++) {
 		const int16_t s = digital->mixer.mix ?
-			dac[digital[i].psg.lvc.u4]
-			   [digital[i].psg.lvb.u4]
-			   [digital[i].psg.lva.u4] - 0x8000 : 0;
+			dac->lvl[digital[i].psg.lvc.u5]
+				[digital[i].psg.lvb.u5]
+				[digital[i].psg.lva.u5] - 0x8000 : 0;
 
 		stereo[i] = stereo_mix(&m, s, s, digital[i]);
 	}
