@@ -10,6 +10,10 @@
 #define BE_STORAGE __attribute__(( __scalar_storage_order__("big-endian") ))
 #define LE_STORAGE __attribute__(( __scalar_storage_order__("little-endian") ))
 
+#if !defined(offsetof)
+#define offsetof(TYPE, MEMBER)  __builtin_offsetof(TYPE, MEMBER)
+#endif /* offsetof */
+
 /* Macro definitions from the Linux kernel. */
 
 /**
