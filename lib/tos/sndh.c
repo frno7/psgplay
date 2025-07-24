@@ -19,6 +19,8 @@
 
 #include "atari/mfp-map.h"
 
+#define memory_barrier() __sync_synchronize()
+
 struct timer_prescale {
 	enum mfp_ctrl ctrl;
 	uint8_t divisor;
@@ -46,6 +48,7 @@ static struct {
 	enum sndh_timer_type type;
 	struct timer_prescale prescale;
 	uint8_t dividend;
+	bool play;
 } timer_state;
 
 static u32 gemdos_malloc(const u32 amount)
@@ -138,9 +141,9 @@ static bool timer_division(void)
 #define DEFINE_TIMER_EXCEPTION(name_, type_, ab_, ctrl_)		\
 	void timer_##name_##_exception(void)				\
 	{								\
-		if (timer_state.type == SNDH_TIMER_##type_)		\
-			if (timer_division())				\
-				sndh_play(&file);			\
+		if (timer_state.type == SNDH_TIMER_##type_ &&		\
+		    timer_state.play && timer_division())		\
+			sndh_play(&file);				\
 									\
 		/* Some SNDH files mess with the counters, restore. */	\
 		mfp_map()->ctrl_ = timer_state.prescale.ctrl;		\
@@ -208,6 +211,10 @@ void start(size_t size, void *sndh, u32 track, u32 timer)
 
 	if (install_sndh_timer(u32_to_sndh_timer(timer)))
 		sndh_init(track, &file);
+
+	memory_barrier();
+	timer_state.play = true;  /* Play after SNDH init has completed. */
+	memory_barrier();
 
 	idle_indefinitely();
 }
