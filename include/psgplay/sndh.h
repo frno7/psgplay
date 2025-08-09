@@ -195,8 +195,7 @@ size_t sndh_play_address(const void *data, const size_t size);
 #define sndh_for_each_tag_with_header_size_and_diagnostic(data, size, header_size, diag)\
 	for (struct sndh_cursor sndh_cursor__ =				\
 	     sndh_first_tag((data), (size), (header_size), (diag));	\
-	     sndh_valid_tag(&sndh_cursor__);				\
-	     sndh_next_tag(&sndh_cursor__))
+	     sndh_next_tag(&sndh_cursor__), sndh_valid_tag(&sndh_cursor__);)
 
 /**
  * struct sndh_diagnostic - SNDH tag diagnostic message callbacks

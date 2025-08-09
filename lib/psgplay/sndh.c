@@ -415,8 +415,6 @@ struct sndh_cursor sndh_first_tag(const void *data, const size_t size,
 		}
 	};
 
-	sndh_next_tag(&cursor);
-
 	return cursor;
 }
 
