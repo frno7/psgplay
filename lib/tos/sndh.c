@@ -145,12 +145,18 @@ static bool timer_division(void)
 		    timer_state.play && timer_division())		\
 			sndh_play(&file);				\
 									\
+		memory_barrier();					\
+									\
 		/* Some SNDH files mess with the counters, restore. */	\
 		mfp_map()->ctrl_ = timer_state.prescale.ctrl;		\
 		mfp_map()->t##name_##dr.count = timer_state.prescale.count; \
 									\
+		memory_barrier();					\
+									\
 		/* Timer is now served. */				\
 		mfp_map()->is##ab_.timer_##name_ = false;		\
+									\
+		memory_barrier();					\
 	}								\
 									\
 	static bool install_sndh_timer_##name_(int frequency)		\
@@ -164,6 +170,8 @@ static bool timer_division(void)
 		mfp_map()->ip##ab_.timer_##name_ = false;		\
 		mfp_map()->is##ab_.timer_##name_ = false;		\
 		mfp_map()->im##ab_.timer_##name_ = true;		\
+									\
+		memory_barrier();					\
 									\
 		timer_state.type = SNDH_TIMER_##type_;			\
 									\
@@ -185,6 +193,15 @@ static bool install_sndh_timer(const struct sndh_timer timer)
 					      install_sndh_vbl);
 
 	return install_sndh_timer(timer.frequency);
+}
+
+static void play()
+{
+	memory_barrier();
+
+	timer_state.play = true;
+
+	memory_barrier();
 }
 
 static void idle(void)
@@ -209,12 +226,11 @@ void start(size_t size, void *sndh, u32 track, u32 timer)
 	__system_variables->_vblqueue = vblqueue;
 	__system_variables->_p_cookies = cookie_jar;
 
-	if (install_sndh_timer(u32_to_sndh_timer(timer)))
+	if (install_sndh_timer(u32_to_sndh_timer(timer))) {
 		sndh_init(track, &file);
 
-	memory_barrier();
-	timer_state.play = true;  /* Play after SNDH init has completed. */
-	memory_barrier();
+		play();		/* Play after SNDH init has completed. */
+	}
 
 	idle_indefinitely();
 }
