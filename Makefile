@@ -76,6 +76,7 @@ all:
 include doc/Makefile
 include lib/Makefile
 include system/Makefile
+include test/Makefile
 
 ALL_DEP = $(sort $(ALL_OBJ:%=%.d))
 
@@ -92,6 +93,9 @@ install: install-psgplay install-man install-lib
 
 .PHONY: test
 test: test-m68kdt
+ifdef TARGET_CC
+test: $(PSGPLAY_TEST_SNDH)
+endif
 
 .PHONY: version
 version:
