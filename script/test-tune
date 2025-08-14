@@ -1,0 +1,31 @@
+#!/bin/bash
+
+set -e
+set -o pipefail
+
+list_file_tunes()
+{
+	local f="$(echo "$f" | sed 's/\..*$//')"
+
+	cat "$1" |
+		sed '/^	t(.*)[ 	\\]*$/!d' |
+		sed 's/^[^"]*"//;s/".*$//' |
+		awk '{ print "'"$f"'" " " NR " " $0 }'
+}
+
+list_all_tunes()
+{
+	for f in "$@"
+	do
+		list_file_tunes "$f"
+	done
+}
+
+cmd_list()
+{
+	list_all_tunes "$@" | sed 's/ /-/;s/ .*$//'
+}
+
+cmd="$1"
+shift
+cmd_"$cmd" "$@"
