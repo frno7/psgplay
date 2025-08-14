@@ -2,6 +2,7 @@
 /psgplay
 /PSGPLAY.*
 *.sndh
+*.wave
 *.o
 *.o.d
 *.elf
