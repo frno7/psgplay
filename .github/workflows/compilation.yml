@@ -26,7 +26,7 @@ jobs:
 
       - name: Compile PSGPLAY.TOS archive for the Atari ST
         run: |
-          script/compile arch atari-st
+          script/compile arch test atari-st
 
       - name: Publish PSGPLAY.TOS archive for the Atari ST
         if: ${{ success() }}

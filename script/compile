@@ -55,6 +55,10 @@ arch()
 		m68k-elf-gcc --version | sed -n 1p
 		make_jv S=1 TARGET_COMPILE=m68k-elf- PSGPLAY.TOS lib/tos/tos
 		;;
+	test)
+		m68k-elf-gcc --version | sed -n 1p
+		make_jv S=1 TARGET_COMPILE=m68k-elf- test
+		;;
 	mac)
 		cc --version | sed -n 1p
 		make_jv psgplay example
