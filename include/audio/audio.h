@@ -28,4 +28,6 @@ struct audio *audio_alloc(struct audio_format format);
 
 void audio_free(struct audio *audio);
 
+struct audio *audio_read_wave(const char *path);
+
 #endif /* PSGPLAY_AUDIO_H */
