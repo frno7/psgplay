@@ -94,7 +94,7 @@ install: install-psgplay install-man install-lib
 .PHONY: test
 test: test-m68kdt
 ifdef TARGET_CC
-test: test-wave
+test: test-svg
 endif
 
 .PHONY: version

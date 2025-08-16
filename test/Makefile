@@ -2,12 +2,17 @@
 
 PSGPLAY_test_dir := $(dir $(lastword $(MAKEFILE_LIST)))
 
-PSGPLAY_TEST_SRC := $(wildcard $(PSGPLAY_test_dir)*.c)
+PSGPLAY_TEST_SRC := $(addprefix $(PSGPLAY_test_dir),			\
+	pitch.c)
 PSGPLAY_TEST_OBJ = $(PSGPLAY_TEST_SRC:%.c=%.o)
 PSGPLAY_TEST_ELF = $(PSGPLAY_TEST_SRC:%.c=%.elf)
 PSGPLAY_TEST_SNDH = $(PSGPLAY_TEST_SRC:%.c=%.sndh)
 PSGPLAY_TEST_TUNE := $(shell script/test-tune list $(PSGPLAY_TEST_SRC))
 PSGPLAY_TEST_WAVE = $(PSGPLAY_TEST_TUNE:%=%.wave)
+PSGPLAY_TEST_SVG = $(PSGPLAY_TEST_TUNE:%=%.svg)
+PSGPLAY_TEST_PNG = $(PSGPLAY_TEST_TUNE:%=%.png)
+PSGPLAY_TEST_VERIFY = $(PSGPLAY_TEST_SRC:%.c=%-verify)
+PSGPLAY_TEST_VERIFY_OBJ = $(PSGPLAY_TEST_VERIFY:%=%.o)
 
 PSGPLAY_TEST_SNDH_CFLAGS += $(BASIC_TARGET_CFLAGS) $(CF2149_CFLAGS)	\
 	-march=68000 -mpcrel -fpie -nostdlib				\
@@ -16,8 +21,10 @@ PSGPLAY_TEST_SNDH_CFLAGS += $(BASIC_TARGET_CFLAGS) $(CF2149_CFLAGS)	\
 PSGPLAY_TEST_SNDH_LDFLAGS += --relocatable --gc-sections --strip-all	\
 	--entry _sndh -L$(TOSLIBC_lib_dir) --script=$(TOSLIBC_SCRIPT_SNDH_LD)
 
-ALL_OBJ += $(PSGPLAY_TEST_OBJ)
-OTHER_CLEAN += $(PSGPLAY_TEST_ELF) $(PSGPLAY_TEST_SNDH) $(PSGPLAY_TEST_WAVE)
+ALL_OBJ += $(PSGPLAY_TEST_OBJ) $(PSGPLAY_TEST_VERIFY_OBJ)
+OTHER_CLEAN += $(PSGPLAY_TEST_ELF) $(PSGPLAY_TEST_SNDH)			\
+	$(PSGPLAY_TEST_WAVE) $(PSGPLAY_TEST_SVG) $(PSGPLAY_TEST_PNG)	\
+	$(PSGPLAY_TEST_VERIFY)
 
 ifdef TARGET_CC
 
@@ -25,19 +32,25 @@ PSGPLAY_TEST = ./$(PSGPLAY)
 PSGPLAY_TEST_FLAGS = --start 1 --length 60
 
 PSGPLAY_TEST_sndh_tune ?= $(shell echo "$(1)" | sed 's/^.*-\([0-9]\+\).*$$/\1/')
-PSGPLAY_TEST_sndh_file ?= $(shell echo "$(1)" | sed 's/-[0-9]\+.*$$//').sndh
+PSGPLAY_TEST_sndh_base ?= $(shell echo "$(1)" | sed 's/-[0-9]\+.*$$//')
 
 define PSGPLAY_TEST_target
-$(1).wave: $(PSGPLAY) $$(call PSGPLAY_TEST_sndh_file,$(1).wave)
+$(1).wave: $(PSGPLAY) $$(call PSGPLAY_TEST_sndh_base,$(1)).sndh
 	$$(QUIET_TEST)$$(PSGPLAY_TEST) -o $$@ $(PSGPLAY_TEST_FLAGS)	\
 		-t $$(call PSGPLAY_TEST_sndh_tune,$$@)			\
-		   $$(call PSGPLAY_TEST_sndh_file,$$@)
+		   $$(call PSGPLAY_TEST_sndh_base,$$@).sndh
+
+$(1).svg: $$(call PSGPLAY_TEST_sndh_base,$(1))-verify $(1).wave
+	$$(QUIET_GEN)$$< graph -t $$(call PSGPLAY_TEST_sndh_tune,$$@)	\
+		-o $$@ $(1).wave
 endef
 
 $(foreach t,$(PSGPLAY_TEST_TUNE),$(eval $(call PSGPLAY_TEST_target,$(t))))
 
 .PHONY: test-wave
 test-wave: $(PSGPLAY_TEST_WAVE)
+test-svg: $(PSGPLAY_TEST_SVG)
+test-png: $(PSGPLAY_TEST_PNG)
 
 $(PSGPLAY_TEST_OBJ): %.o: %.c
 	$(QUIET_CC)$(TARGET_CC) $(PSGPLAY_TEST_SNDH_CFLAGS)		\
@@ -60,5 +73,20 @@ $(PSGPLAY_TEST_SNDH): $(TOSLINK)
 
 $(PSGPLAY_TEST_SNDH): %.sndh: %.elf
 	$(QUIET_LINK)$(TOSLINK) -o $@ $<
+
+PSGPLAY_TEST_VERIFY_CFLAGS = $(BASIC_HOST_CFLAGS) $(HOST_CFLAGS)
+
+$(PSGPLAY_TEST_VERIFY_OBJ): %.o: %.c
+	$(QUIET_CC)$(HOST_CC) $(PSGPLAY_TEST_VERIFY_CFLAGS) -c -o $@ $<
+
+$(PSGPLAY_TEST_VERIFY): $(PSGPLAY_LIB_TEST_OBJ)
+$(PSGPLAY_TEST_VERIFY): %: %.o
+	$(QUIET_LINK)$(HOST_CC) $(PSGPLAY_TEST_VERIFY_CFLAGS) -o $@ $^
+
+SVGTOPNG = rsvg-convert
+SVGTOPNG_FLAGS = --background-color=white
+
+$(PSGPLAY_TEST_PNG): %.png: %.svg
+	$(QUIET_GEN)$(SVGTOPNG) -o $@ $(SVGTOPNG_FLAGS) $<
 
 endif
