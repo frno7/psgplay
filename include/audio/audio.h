@@ -24,4 +24,8 @@ struct audio {
 	struct audio_sample samples[];
 };
 
+struct audio *audio_alloc(struct audio_format format);
+
+void audio_free(struct audio *audio);
+
 #endif /* PSGPLAY_AUDIO_H */
