@@ -30,4 +30,7 @@ void audio_free(struct audio *audio);
 
 struct audio *audio_read_wave(const char *path);
 
+struct audio *audio_range(const struct audio *audio,
+	size_t offset, size_t length);
+
 #endif /* PSGPLAY_AUDIO_H */
