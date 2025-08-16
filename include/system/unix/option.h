@@ -14,7 +14,7 @@
 #define OPTION_TIME_UNDEFINED -1
 #define OPTION_STOP_NEVER     -2
 
-extern char progname[];
+extern const char *progname;
 
 enum disassemble_type {
 	DISASSEMBLE_TYPE_NONE,

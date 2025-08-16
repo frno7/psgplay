@@ -29,7 +29,7 @@
 #include "system/atari/psg.h"
 #include "system/atari/timer.h"
 
-char progname[] = "PSGPLAY";
+const char *progname = "PSGPLAY";
 
 bool timer_c(uint32_t vector, struct xbra_regs *regs, void *arg)
 {

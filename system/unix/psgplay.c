@@ -27,7 +27,7 @@
 #include "system/unix/sndh.h"
 #include "system/unix/text-mode.h"
 
-char progname[] = "psgplay";
+const char *progname = "psgplay";
 
 typedef void (*replay_f)(const struct options *options, struct file file,
 	const struct output *output);

@@ -19,7 +19,7 @@
 
 #include "psgplay/version.h"
 
-char progname[] = "m68kdt";
+const char *progname = "m68kdt";
 
 static struct options {
 	int verbose;

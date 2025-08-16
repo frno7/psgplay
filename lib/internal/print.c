@@ -12,7 +12,7 @@
 #include "internal/print.h"
 #include "internal/types.h"
 
-#define PROGNAME "psgplay"
+const char *progname __attribute__((weak)) = "psgplay";
 
 static void report(const char *prefix, const char *suffix,
 	const char *fmt, va_list ap)
@@ -21,7 +21,7 @@ static void report(const char *prefix, const char *suffix,
 
 	vsnprintf(msg, sizeof(msg), fmt, ap);
 
-	fprintf(stderr, "%s: %s%s%s%s%s", PROGNAME,
+	fprintf(stderr, "%s: %s%s%s%s%s", progname,
 		prefix, prefix[0] ? ": " : "",
 		suffix, suffix[0] ? ": " : "",
 		msg);
@@ -88,7 +88,7 @@ void NORETURN pr_bug(const char *file, int line,
 	const char *func, const char *expr)
 {
 	fprintf(stderr, "%s: BUG: %s:%d: %s: %s\n",
-		PROGNAME, file, line, func, expr);
+		progname, file, line, func, expr);
 
 	exit(EXIT_FAILURE);
 }

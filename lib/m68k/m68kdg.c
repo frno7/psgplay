@@ -23,6 +23,8 @@
 #include "system/unix/file.h"
 #include "system/unix/string.h"
 
+const char *progname = "m68kdg";
+
 #define PREFIX_TABLE_BITS   10	/* Configure 0..16 for size of lookup table */
 
 /**

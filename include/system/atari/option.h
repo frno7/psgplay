@@ -6,7 +6,7 @@
 #ifndef PSGPLAY_SYSTEM_ATARI_OPTION_H
 #define PSGPLAY_SYSTEM_ATARI_OPTION_H
 
-extern char progname[];
+extern const char *progname;
 
 struct options {
 	const char *input;
