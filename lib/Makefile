@@ -26,3 +26,4 @@ include lib/out/Makefile
 include lib/vt/Makefile
 include lib/unicode/Makefile
 include lib/text/Makefile
+include lib/test/Makefile
