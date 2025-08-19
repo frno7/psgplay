@@ -64,3 +64,34 @@ struct audio *audio_range(const struct audio *audio,
 
 	return range;
 }
+
+struct audio_meter audio_meter(const struct audio *audio)
+{
+	struct audio_meter meter = { };
+	struct {
+		int64_t left;
+		int64_t right;
+	} sum = { };
+
+	if (!audio->format.sample_count)
+		return meter;
+
+	meter.left.minimum  = meter.left.maximum  = audio->samples[0].left;
+	meter.right.minimum = meter.right.maximum = audio->samples[0].right;
+
+	for (size_t i = 1; i < audio->format.sample_count; i++) {
+		meter.left.minimum  = min(meter.left.minimum,  audio->samples[i].left);
+		meter.right.minimum = min(meter.right.minimum, audio->samples[i].right);
+
+		meter.left.maximum  = max(meter.left.maximum,  audio->samples[i].left);
+		meter.right.maximum = max(meter.right.maximum, audio->samples[i].right);
+
+		sum.left  += audio->samples[i].left;
+		sum.right += audio->samples[i].right;
+	}
+
+	meter.left.average  = sum.left  / (int64_t)audio->format.sample_count;
+	meter.right.average = sum.right / (int64_t)audio->format.sample_count;
+
+	return meter;
+}
