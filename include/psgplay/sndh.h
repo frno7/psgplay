@@ -146,7 +146,7 @@ size_t sndh_play_address(const void *data, const size_t size);
  * @data: SNDH data
  * @size: size in bytes of SNDH data
  *
- * Note that some tags such as "TIME" and "#!SN" may have multiple values
+ * Note that some tags such as "TIME" and "!#SN" may have multiple values
  * and be given more than once.
  */
 #define sndh_for_each_tag(data, size)					\
@@ -159,7 +159,7 @@ size_t sndh_play_address(const void *data, const size_t size);
  * @diag: pointer to &struct sndh_diagnostic with warning and error callbacks,
  * 	or %NULL to ignore
  *
- * Note that some tags such as "TIME" and "#!SN" may have multiple values
+ * Note that some tags such as "TIME" and "!#SN" may have multiple values
  * and be given more than once.
  */
 #define sndh_for_each_tag_with_diagnostic(data, size, diag)		\
@@ -173,7 +173,7 @@ size_t sndh_play_address(const void *data, const size_t size);
  * @header_size: pointer to &size_t to store SNDH header size, or %NULL to
  * 	ignore
  *
- * Note that some tags such as "TIME" and "#!SN" may have multiple values
+ * Note that some tags such as "TIME" and "!#SN" may have multiple values
  * and be given more than once.
  */
 #define sndh_for_each_tag_with_header_size(data, size, header_size)	\
@@ -189,7 +189,7 @@ size_t sndh_play_address(const void *data, const size_t size);
  * @diag: pointer to &struct sndh_diagnostic with warning and error callbacks,
  * 	or %NULL to ignore
  *
- * Note that some tags such as "TIME" and "#!SN" may have multiple values
+ * Note that some tags such as "TIME" and "!#SN" may have multiple values
  * and be given more than once.
  */
 #define sndh_for_each_tag_with_header_size_and_diagnostic(data, size, header_size, diag)\
