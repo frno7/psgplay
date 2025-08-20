@@ -343,8 +343,8 @@ static bool match_tag(struct sndh_cursor *cursor)
 
 	if (cursor->subtag.read && cursor->offset < cursor->subtag.bound)
 		return cursor->subtag.read(cursor);
-	else
-		cursor->subtag.read = NULL;
+
+	cursor->subtag.read = NULL;
 
 restart:
 	for (size_t i = 0; i < ARRAY_SIZE(tags); i++)
@@ -420,6 +420,9 @@ struct sndh_cursor sndh_first_tag(const void *data, const size_t size,
 
 bool sndh_valid_tag(const struct sndh_cursor *cursor)
 {
+	if (!cursor->file.data)
+		return false;
+
 	if (cursor->hdns)
 		return false;
 
@@ -437,6 +440,9 @@ bool sndh_valid_tag(const struct sndh_cursor *cursor)
 
 void sndh_next_tag(struct sndh_cursor *cursor)
 {
+	if (!cursor->file.data)
+		return;
+
 	const bool valid = match_tag(cursor);
 
 	if (cursor->header.size)
