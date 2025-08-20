@@ -95,3 +95,15 @@ struct audio_meter audio_meter(const struct audio *audio)
 
 	return meter;
 }
+
+struct audio *audio_map(const struct audio *audio, struct audio_map_cb cb)
+{
+	struct audio *map = xmalloc(sizeof(*map) +
+		sizeof(struct audio_sample[audio->format.sample_count]));
+
+	map->format = audio->format;
+	for (size_t i = 0; i < audio->format.sample_count; i++)
+		map->samples[i] = cb.f(audio->samples[i], cb.arg);
+
+	return map;
+}

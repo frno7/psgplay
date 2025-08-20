@@ -32,6 +32,11 @@ struct audio_meter {
 	} left, right;
 };
 
+struct audio_map_cb {
+	struct audio_sample (*f)(struct audio_sample sample, void *arg);
+	void *arg;
+};
+
 struct audio *audio_alloc(struct audio_format format);
 
 void audio_free(struct audio *audio);
@@ -42,5 +47,7 @@ struct audio *audio_range(const struct audio *audio,
 	size_t offset, size_t length);
 
 struct audio_meter audio_meter(const struct audio *audio);
+
+struct audio *audio_map(const struct audio *audio, struct audio_map_cb cb);
 
 #endif /* PSGPLAY_AUDIO_H */
