@@ -37,6 +37,17 @@ struct audio_map_cb {
 	void *arg;
 };
 
+struct audio_zero_crossing {
+	size_t index;
+	bool neg_to_pos;
+};
+
+struct audio_zero_crossing_periodic {
+	size_t count;
+	struct audio_zero_crossing first;
+	struct audio_zero_crossing last;
+};
+
 struct audio *audio_alloc(struct audio_format format);
 
 void audio_free(struct audio *audio);
@@ -51,5 +62,8 @@ struct audio_meter audio_meter(const struct audio *audio);
 struct audio *audio_map(const struct audio *audio, struct audio_map_cb cb);
 
 struct audio *audio_normalise(const struct audio *audio, float peak);
+
+struct audio_zero_crossing_periodic audio_zero_crossing_periodic(
+	const struct audio *audio);
 
 #endif /* PSGPLAY_AUDIO_H */
