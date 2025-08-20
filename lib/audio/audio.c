@@ -107,3 +107,48 @@ struct audio *audio_map(const struct audio *audio, struct audio_map_cb cb)
 
 	return map;
 }
+
+struct audio_normalise {
+	float gain;
+	struct {
+		int16_t average;
+	} left, right;
+};
+
+#define norm_channel(norm, sample)					\
+	clamp_t(float, norm->gain * (sample - norm->left.average),	\
+		-0x8000, 0x7fff)
+
+static struct audio_sample normalise(struct audio_sample sample, void *arg)
+{
+	const struct audio_normalise *norm = arg;
+
+	return (struct audio_sample) {
+		.left  = norm_channel(norm, sample.left),
+		.right = norm_channel(norm, sample.right),
+	};
+}
+
+struct audio *audio_normalise(const struct audio *audio, float peak)
+{
+	const struct audio_meter meter = audio_meter(audio);
+	const int16_t amplitude =
+		max(meter.left.maximum  - meter.left.minimum,
+		    meter.right.maximum - meter.right.minimum);
+	struct audio_normalise norm = {
+		.gain = !peak ? 1.0f :
+			peak * (amplitude ? 65535.0f / amplitude : 0.0f),
+		.left = {
+			.average = meter.left.average
+		},
+		.right = {
+			.average = meter.right.average
+		},
+	};
+	const struct audio_map_cb norm_cb = {
+		.f = normalise,
+		.arg = &norm,
+	};
+
+	return audio_map(audio, norm_cb);
+}

@@ -50,4 +50,6 @@ struct audio_meter audio_meter(const struct audio *audio);
 
 struct audio *audio_map(const struct audio *audio, struct audio_map_cb cb);
 
+struct audio *audio_normalise(const struct audio *audio, float peak);
+
 #endif /* PSGPLAY_AUDIO_H */
