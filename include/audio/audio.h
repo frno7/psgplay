@@ -48,6 +48,11 @@ struct audio_zero_crossing_periodic {
 	struct audio_zero_crossing last;
 };
 
+struct audio_wave {
+	double period;
+	double phase;
+};
+
 struct audio *audio_alloc(struct audio_format format);
 
 void audio_free(struct audio *audio);
@@ -65,5 +70,7 @@ struct audio *audio_normalise(const struct audio *audio, float peak);
 
 struct audio_zero_crossing_periodic audio_zero_crossing_periodic(
 	const struct audio *audio);
+
+struct audio_wave audio_wave_estimate(struct audio_zero_crossing_periodic zcp);
 
 #endif /* PSGPLAY_AUDIO_H */

@@ -185,3 +185,19 @@ struct audio_zero_crossing_periodic audio_zero_crossing_periodic(
 
 	return zcp;
 }
+
+struct audio_wave audio_wave_estimate(struct audio_zero_crossing_periodic zcp)
+{
+	if (zcp.count < 2)
+		return (struct audio_wave) { };
+
+	const double period =
+		(zcp.last.index - zcp.first.index) / (0.5 * (zcp.count - 1));
+
+	return (struct audio_wave) {
+		.period = period,
+		.phase = zcp.first.neg_to_pos ?
+				zcp.first.index :
+				zcp.first.index - 0.5 * period,
+	};
+}
