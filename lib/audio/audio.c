@@ -153,10 +153,29 @@ struct audio *audio_normalise(const struct audio *audio, float peak)
 	return audio_map(audio, norm_cb);
 }
 
-static void zero_crossing_periodic(
-	struct audio_zero_crossing_periodic *zcp,
-	size_t i, bool neg_to_pos)
+#define zero_crossing(a, b)						\
+	(((a).left  < 0 && (b).left  >= 0) ||				\
+	 ((a).right < 0 && (b).right >= 0))
+
+bool audio_zero_crossing(const struct audio *audio,
+	struct audio_zero_crossing_cb cb)
 {
+	for (size_t i = 0; i + 1 < audio->format.sample_count; i++)
+		if (zero_crossing(audio->samples[i], audio->samples[i + 1])) {
+			if (!cb.f(i, true, cb.arg))
+				return false;
+		} else if (zero_crossing(audio->samples[i + 1], audio->samples[i])) {
+			if (!cb.f(i, false, cb.arg))
+				return false;
+		}
+
+	return true;
+}
+
+static bool zero_crossing_periodic(size_t i, bool neg_to_pos, void *arg)
+{
+	struct audio_zero_crossing_periodic *zcp = arg;
+
 	zcp->last = (struct audio_zero_crossing) {
 		.index = i,
 		.neg_to_pos = neg_to_pos,
@@ -166,22 +185,19 @@ static void zero_crossing_periodic(
 		zcp->first = zcp->last;
 
 	zcp->count++;
-}
 
-#define zero_crossing(a, b)						\
-	(((a).left  < 0 && (b).left  >= 0) ||				\
-	 ((a).right < 0 && (b).right >= 0))
+	return true;
+}
 
 struct audio_zero_crossing_periodic audio_zero_crossing_periodic(
 	const struct audio *audio)
 {
 	struct audio_zero_crossing_periodic zcp = { };
 
-	for (size_t i = 0; i + 1 < audio->format.sample_count; i++)
-		if (zero_crossing(audio->samples[i], audio->samples[i + 1]))
-			zero_crossing_periodic(&zcp, i, true);
-		else if (zero_crossing(audio->samples[i + 1], audio->samples[i]))
-			zero_crossing_periodic(&zcp, i, false);
+	audio_zero_crossing(audio, (struct audio_zero_crossing_cb) {
+			.f = zero_crossing_periodic,
+			.arg = &zcp,
+		});
 
 	return zcp;
 }

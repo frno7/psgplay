@@ -42,6 +42,11 @@ struct audio_zero_crossing {
 	bool neg_to_pos;
 };
 
+struct audio_zero_crossing_cb {
+	bool (*f)(size_t index, bool neg_to_pos, void *arg);
+	void *arg;
+};
+
 struct audio_zero_crossing_periodic {
 	size_t count;
 	struct audio_zero_crossing first;
@@ -67,6 +72,9 @@ struct audio_meter audio_meter(const struct audio *audio);
 struct audio *audio_map(const struct audio *audio, struct audio_map_cb cb);
 
 struct audio *audio_normalise(const struct audio *audio, float peak);
+
+bool audio_zero_crossing(const struct audio *audio,
+	struct audio_zero_crossing_cb cb);
 
 struct audio_zero_crossing_periodic audio_zero_crossing_periodic(
 	const struct audio *audio);
