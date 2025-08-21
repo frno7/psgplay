@@ -43,6 +43,10 @@ $(1).wave: $(PSGPLAY) $$(call PSGPLAY_TEST_sndh_base,$(1)).sndh
 $(1).svg: $$(call PSGPLAY_TEST_sndh_base,$(1))-verify $(1).wave
 	$$(QUIET_GEN)$$< graph -t $$(call PSGPLAY_TEST_sndh_tune,$$@)	\
 		-o $$@ $(1).wave
+
+$(1).report: $$(call PSGPLAY_TEST_sndh_base,$(1))-verify $(1).wave
+	$$(QUIET_GEN)$$< report -t $$(call PSGPLAY_TEST_sndh_tune,$$@)	\
+		-o $$@ $(1).wave
 endef
 
 $(foreach t,$(PSGPLAY_TEST_TUNE),$(eval $(call PSGPLAY_TEST_target,$(t))))

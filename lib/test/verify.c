@@ -28,15 +28,9 @@ static bool encode_file(const void *data, size_t size, void *arg)
 	return true;
 }
 
-int main(int argc, char *argv[])
+static void graph(const struct options *options,
+	const struct audio *audio)
 {
-	struct options *options = parse_options(argc, argv);
-
-	if (strcmp(options->command, "graph") != 0)
-		pr_fatal_error("%s: unknown command\n", options->command);
-
-	struct audio *audio = audio_read_wave(options->input);
-
 	struct audio *cut = audio_range(audio, 0, 250);
 	struct audio *norm = audio_normalise(cut, 0.8f);
 	const struct audio_meter meter = audio_meter(norm);
@@ -75,6 +69,50 @@ int main(int argc, char *argv[])
 
 	audio_free(norm);
 	audio_free(cut);
+}
+
+static void report(const struct options *options,
+	const struct audio *audio)
+{
+	struct audio *norm = audio_normalise(audio, 0.8f);
+	const struct audio_zero_crossing_periodic zcp =
+		audio_zero_crossing_periodic(norm);
+	const struct audio_wave wave = audio_wave_estimate(zcp);
+	char report[1024];
+
+	snprintf(report, sizeof(report),
+		"samples %zu\n"
+		"duration %.1f s\n"
+		"frequency %d Hz\n"
+		"square wave period %f samples\n"
+		"square wave frequency %f Hz\n"
+		"square wave phase %f samples\n",
+		audio->format.sample_count,
+		audio->format.sample_count / (double)audio->format.frequency,
+		audio->format.frequency,
+		wave.period,
+		wave.period ? audio->format.frequency / wave.period : 0.0,
+		wave.phase);
+
+	if (!file_write(options->output, report, strlen(report)))
+		pr_fatal_errno(options->output);
+
+	audio_free(norm);
+}
+
+int main(int argc, char *argv[])
+{
+	struct options *options = parse_options(argc, argv);
+
+	struct audio *audio = audio_read_wave(options->input);
+
+	if (strcmp(options->command, "graph") == 0)
+		graph(options, audio);
+	else if (strcmp(options->command, "report") == 0)
+		report(options, audio);
+	else
+		pr_fatal_error("%s: unknown command\n", options->command);
+
 	audio_free(audio);
 
 	return EXIT_SUCCESS;
