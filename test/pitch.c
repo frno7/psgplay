@@ -3,9 +3,7 @@
 #include <asm/psg.h>
 #include <asm/sndh.h>
 
-#define tune_value_names(t)						\
-	t(440, "A4 pitch standard A440 440 Hz")				\
-	t(262, "C4 middle C 262 Hz")
+#include "test/pitch.h"
 
 sndh_title("Pitch");
 sndh_tune_value_names(int, tune_value_names);

@@ -2,12 +2,17 @@
 
 PSGPLAY_test_dir := $(dir $(lastword $(MAKEFILE_LIST)))
 
-PSGPLAY_TEST_SRC := $(addprefix $(PSGPLAY_test_dir),			\
-	pitch.c)
+PSGPLAY_TESTS :=							\
+	pitch
+PSGPLAY_TEST_INCLUDE :=							\
+	$(addsuffix .h,$(addprefix include/test/,$(PSGPLAY_TESTS)))
+PSGPLAY_TEST_SRC :=							\
+	$(addsuffix .c,$(addprefix $(PSGPLAY_test_dir),$(PSGPLAY_TESTS)))
 PSGPLAY_TEST_OBJ = $(PSGPLAY_TEST_SRC:%.c=%.o)
 PSGPLAY_TEST_ELF = $(PSGPLAY_TEST_SRC:%.c=%.elf)
 PSGPLAY_TEST_SNDH = $(PSGPLAY_TEST_SRC:%.c=%.sndh)
-PSGPLAY_TEST_TUNE := $(shell script/test-tune list $(PSGPLAY_TEST_SRC))
+PSGPLAY_TEST_TUNE := $(addprefix $(PSGPLAY_test_dir),$(notdir		\
+	$(shell script/test-tune list $(PSGPLAY_TEST_INCLUDE))))
 PSGPLAY_TEST_WAVE = $(PSGPLAY_TEST_TUNE:%=%.wave)
 PSGPLAY_TEST_SVG = $(PSGPLAY_TEST_TUNE:%=%.svg)
 PSGPLAY_TEST_PNG = $(PSGPLAY_TEST_TUNE:%=%.png)
@@ -36,10 +41,9 @@ PSGPLAY_TEST_sndh_tune ?= $(shell echo "$(1)" | sed 's/^.*-\([0-9]\+\).*$$/\1/')
 PSGPLAY_TEST_sndh_base ?= $(shell echo "$(1)" | sed 's/-[0-9]\+.*$$//')
 
 define PSGPLAY_TEST_target
-$(1).wave: $(PSGPLAY) $$(call PSGPLAY_TEST_sndh_base,$(1)).sndh
+$(1).wave: $$(call PSGPLAY_TEST_sndh_base,$(1)).sndh $(PSGPLAY)
 	$$(QUIET_TEST)$$(PSGPLAY_TEST) -o $$@ $(PSGPLAY_TEST_FLAGS)	\
-		-t $$(call PSGPLAY_TEST_sndh_tune,$$@)			\
-		   $$(call PSGPLAY_TEST_sndh_base,$$@).sndh
+		-t $$(call PSGPLAY_TEST_sndh_tune,$$@) $$<
 
 $(1).svg: $$(call PSGPLAY_TEST_sndh_base,$(1))-verify $(1).wave
 	$$(QUIET_GEN)$$< graph -t $$(call PSGPLAY_TEST_sndh_tune,$$@)	\
