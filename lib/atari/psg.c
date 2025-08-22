@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "toslibc/asm/machine.h"
+
 #include "internal/assert.h"
 #include "internal/macro.h"
 
@@ -20,7 +22,7 @@
 #include "cf2149/module/cf2149.h"
 
 #define PSG_EVENT_FREQUENCY 100		/* 10 ms */
-#define PSG_EVENT_CYCLES (PSG_FREQUENCY / PSG_EVENT_FREQUENCY)
+#define PSG_EVENT_CYCLES (ATARI_STE_PSG_CLK / PSG_EVENT_FREQUENCY)
 
 static struct cf2149_module cf2149;
 
@@ -166,7 +168,7 @@ void psg_sample(psg_sample_f sample, void *sample_arg)
 
 const struct device psg_device = {
 	.name = "psg",
-	.frequency = PSG_FREQUENCY,
+	.frequency = ATARI_STE_PSG_CLK,
 	.bus = {
 		.address = 0xff8800,
 		.size = 256,

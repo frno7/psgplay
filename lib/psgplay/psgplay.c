@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "toslibc/asm/machine.h"
+
 #include "internal/assert.h"
 #include "internal/compare.h"
 
@@ -406,7 +408,8 @@ static size_t stereo_downsample(struct psgplay_stereo *resample,
 	size_t r = 0;
 
 	for (size_t i = 0; i < count; i++) {
-		const u64 n = (ds->stereo_frequency * ds->psg_cycle) / PSG_FREQUENCY;
+		const u64 n = (ds->stereo_frequency * ds->psg_cycle) /
+			ATARI_STE_PSG_CLK;
 		const struct psgplay_stereo s = {
 			.left  = sample_lowpass(stereo[i].left,  &ds->lowpass.left),
 			.right = sample_lowpass(stereo[i].right, &ds->lowpass.right)

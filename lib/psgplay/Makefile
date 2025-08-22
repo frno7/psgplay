@@ -29,7 +29,10 @@ LIBPSGPLAY_OBJ := $(LIBPSGPLAY_PUBLIC_OBJ) $(LIBPSGPLAY_HIDDEN_OBJ)
 ALL_OBJ += $(LIBPSGPLAY_OBJ) lib/psgplay/m68kda.o lib/psgplay/m68kds.o
 
 $(LIBPSGPLAY_HIDDEN_OBJ):						\
-	LIBPSGPLAY_CFLAGS += -fvisibility=hidden -I lib/toslibc/include
+	LIBPSGPLAY_CFLAGS += -fvisibility=hidden -Ilib/toslibc/include
+
+$(LIBPSGPLAY_OBJ):							\
+	LIBPSGPLAY_CFLAGS += -Ilib/toslibc/include
 
 define LIBPSGPLAY_target
 $(call LIBPSGPLAY_object,$(1)): $(1)

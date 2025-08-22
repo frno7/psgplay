@@ -9,8 +9,6 @@
 #include "atari/bus.h"
 #include "atari/sample.h"
 
-#define PSG_FREQUENCY 2000000
-
 extern const struct device psg_device;
 
 void psg_sample(psg_sample_f sample, void *sample_arg);
