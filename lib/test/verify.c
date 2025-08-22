@@ -89,13 +89,15 @@ static void report(const struct options *options,
 		"frequency %d Hz\n"
 		"square wave period %f samples\n"
 		"square wave frequency %f Hz\n"
-		"square wave phase %f samples\n",
+		"square wave phase %f samples\n"
+		"square wave deviation max %f samples\n",
 		cut->format.sample_count,
 		cut->format.sample_count / (double)cut->format.frequency,
 		cut->format.frequency,
 		wave.period,
 		wave.period ? cut->format.frequency / wave.period : 0.0,
-		wave.phase);
+		wave.phase,
+		audio_zero_crossing_periodic_deviation(norm, wave).maximum);
 
 	if (!file_write(options->output, report, strlen(report)))
 		pr_fatal_errno(options->output);
