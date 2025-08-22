@@ -74,7 +74,10 @@ static void graph(const struct options *options,
 static void report(const struct options *options,
 	const struct audio *audio)
 {
-	struct audio *norm = audio_normalise(audio, 0.8f);
+	/* FIXME: Avoid cutting the last second with --no-fade option. */
+	struct audio *cut = audio_range(audio, 0,
+		audio->format.sample_count - audio->format.frequency);
+	struct audio *norm = audio_normalise(cut, 0.8f);
 	const struct audio_zero_crossing_periodic zcp =
 		audio_zero_crossing_periodic(norm);
 	const struct audio_wave wave = audio_wave_estimate(zcp);
@@ -87,17 +90,18 @@ static void report(const struct options *options,
 		"square wave period %f samples\n"
 		"square wave frequency %f Hz\n"
 		"square wave phase %f samples\n",
-		audio->format.sample_count,
-		audio->format.sample_count / (double)audio->format.frequency,
-		audio->format.frequency,
+		cut->format.sample_count,
+		cut->format.sample_count / (double)cut->format.frequency,
+		cut->format.frequency,
 		wave.period,
-		wave.period ? audio->format.frequency / wave.period : 0.0,
+		wave.period ? cut->format.frequency / wave.period : 0.0,
 		wave.phase);
 
 	if (!file_write(options->output, report, strlen(report)))
 		pr_fatal_errno(options->output);
 
 	audio_free(norm);
+	audio_free(cut);
 }
 
 int main(int argc, char *argv[])
