@@ -50,7 +50,7 @@ struct audio *audio_range(const struct audio *audio,
 	const size_t lo = offset;
 	const size_t hi = offset + length;
 	const size_t lo_ = min3(lo, hi, audio->format.sample_count);
-	const size_t hi_ = min(hi - lo_, audio->format.sample_count - lo_);
+	const size_t hi_ = min(hi, audio->format.sample_count);
 	const size_t n = hi_ - lo_;
 
 	struct audio *range = xmalloc(sizeof(*range) +
