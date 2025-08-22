@@ -53,6 +53,10 @@ struct audio_zero_crossing_periodic {
 	struct audio_zero_crossing last;
 };
 
+struct audio_zero_crossing_periodic_deviation {
+	double maximum;
+};
+
 struct audio_wave {
 	double period;
 	double phase;
@@ -78,6 +82,10 @@ bool audio_zero_crossing(const struct audio *audio,
 
 struct audio_zero_crossing_periodic audio_zero_crossing_periodic(
 	const struct audio *audio);
+
+struct audio_zero_crossing_periodic_deviation
+	audio_zero_crossing_periodic_deviation(const struct audio *audio,
+		struct audio_wave wave);
 
 struct audio_wave audio_wave_estimate(struct audio_zero_crossing_periodic zcp);
 

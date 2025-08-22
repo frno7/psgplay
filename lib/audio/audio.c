@@ -3,6 +3,7 @@
  * Copyright (C) 2025 Fredrik Noring
  */
 
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -200,6 +201,40 @@ struct audio_zero_crossing_periodic audio_zero_crossing_periodic(
 		});
 
 	return zcp;
+}
+
+struct zcp_deviation {
+	struct audio_zero_crossing_periodic_deviation deviation;
+	struct audio_wave wave;
+	double k;
+};
+
+static bool zcp_deviation(size_t i, bool neg_to_pos, void *arg)
+{
+	struct zcp_deviation *zcpd = arg;
+	const double j = zcpd->wave.phase + zcpd->k * zcpd->wave.period;
+
+	zcpd->deviation.maximum = max(zcpd->deviation.maximum, fabs(i - j));
+	zcpd->k += 0.5;
+
+	return true;
+}
+
+struct audio_zero_crossing_periodic_deviation
+	audio_zero_crossing_periodic_deviation(const struct audio *audio,
+		struct audio_wave wave)
+{
+	struct zcp_deviation zcpd = {
+		.wave = wave,
+		.k = wave.phase < 0.0 ? 0.5 : 0.0,
+	};
+
+	audio_zero_crossing(audio, (struct audio_zero_crossing_cb) {
+			.f = zcp_deviation,
+			.arg = &zcpd,
+		});
+
+	return zcpd.deviation;
 }
 
 struct audio_wave audio_wave_estimate(struct audio_zero_crossing_periodic zcp)
