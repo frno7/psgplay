@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "toslibc/asm/machine.h"
+
 #include "internal/assert.h"
 #include "internal/macro.h"
 
@@ -18,6 +20,8 @@
 #include "atari/mfp.h"
 #include "atari/mmu.h"
 #include "atari/sound.h"
+
+#define SOUND_FREQUENCY (ATARI_STE_EXT_OSC / 4)
 
 #define SOUND_EVENT_FREQUENCY 100		/* 10 ms */
 #define SOUND_EVENT_CYCLES (SOUND_FREQUENCY / SOUND_EVENT_FREQUENCY)

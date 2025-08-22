@@ -9,8 +9,6 @@
 #include "atari/bus.h"
 #include "atari/sample.h"
 
-#define SOUND_FREQUENCY 2000000
-
 #define SOUND_REGISTERS(reg)						\
 	reg( 0, ctrl,    CTRL,    "DMA control")			\
 	reg( 1, starthi, STARTHI, "Sample start address high byte")	\
