@@ -65,7 +65,7 @@ static void parse_options(int argc, char **argv)
 
 #define OPT(option) (strcmp(options[index].name, (option)) == 0)
 
-	argv[0] = progname;	/* For better getopt_long error messages. */
+	argv[0] = (char *)progname; /* For better getopt_long error messages. */
 
 	for (;;) {
 		int index = 0;
