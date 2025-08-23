@@ -4,7 +4,8 @@ PSGPLAY_test_dir := $(dir $(lastword $(MAKEFILE_LIST)))
 
 PSGPLAY_TESTS :=							\
 	pitch								\
-	tempo
+	tempo								\
+	tempo16hz
 PSGPLAY_TEST_INCLUDE :=							\
 	$(addsuffix .h,$(addprefix include/test/,$(PSGPLAY_TESTS)))
 PSGPLAY_TEST_SRC :=							\
