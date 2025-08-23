@@ -14,7 +14,7 @@ void sndh_init(int tune)
 
 	snd_psg_wr_iomix(SND_PSG_IOMIX_OFF);
 	snd_psg_wr_freq_a(pitch);
-	snd_psg_wr_level_a(15);
+	snd_psg_wr_level_a(SND_PSG_LEVEL_MAX);
 }
 
 void sndh_play()

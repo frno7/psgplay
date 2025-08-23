@@ -28,9 +28,9 @@ static inline void tempo_init(struct tempo_sample *sample)
 	snd_dma_wr_start(&sample[0]);
 	snd_dma_wr_end(&sample[1]);
 
-	snd_dma_wr_mode((struct snd_dma_mode) {
-		.mono = false,
-		.frequency = SND_DMA_FREQUENCY_50066,
+	snd_dma_wrs_mode({
+		.mode = SND_DMA_MODE_STEREO8,
+		.frequency = SND_DMA_FREQUENCY_50066
 	});
 }
 
@@ -40,17 +40,14 @@ static inline void tempo_play(struct tempo_sample *sample)
 		sample[0].left  = 0x7f;
 		sample[0].right = 0x7f;
 
-		snd_dma_wr_ctrl((struct snd_dma_ctrl) {
-			.loop = true,
-			.dma = true,
-		});
+		snd_dma_wrs_ctrl({ .play_repeat = true, .play = true });
 	} else
 		sample[0].u16 = ~sample[0].u16;
 }
 
 static inline void tempo_exit(struct tempo_sample *sample)
 {
-	snd_dma_wr_ctrl((struct snd_dma_ctrl) { .dma = false });
+	snd_dma_wrs_ctrl({ .play = false });
 }
 
 #endif /* PSGPLAY_TEST_TEMPO_H */
