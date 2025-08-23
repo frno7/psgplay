@@ -1,10 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 
-#include "test/report.h"
-
 #include "test/tempo16hz.h"
-
-tune_names(int, tune_value_names);
+#include "test/report.h"
 
 void report(const struct audio *audio, const struct options *options)
 {

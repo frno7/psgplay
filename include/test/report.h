@@ -12,7 +12,7 @@
 
 #define TUNE_DEFINE_TITLE(value, title)	title,
 
-#define tune_names(type, names)						\
+#define tune_names(names)						\
 	const char *tune_names_[] = {					\
 		names(TUNE_DEFINE_TITLE)				\
 	}
@@ -23,6 +23,10 @@ static inline const char *tune_name(const struct options *options)
 
 	return tune_names_[options->track - 1];
 }
+
+#if defined(tune_value_names)
+tune_names(tune_value_names);
+#endif
 
 void report(const struct audio *audio, const struct options *options);
 
