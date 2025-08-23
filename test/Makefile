@@ -58,6 +58,9 @@ endef
 
 $(foreach t,$(PSGPLAY_TEST_TUNE),$(eval $(call PSGPLAY_TEST_target,$(t))))
 
+.PHONY: test-sndh
+test-sndh: $(PSGPLAY_TEST_SNDH)
+
 .PHONY: test-wave
 test-wave: $(PSGPLAY_TEST_WAVE)
 
