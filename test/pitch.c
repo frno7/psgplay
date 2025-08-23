@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 
-#include <asm/psg.h>
+#include <asm/snd/psg.h>
 #include <asm/sndh.h>
 
 #include "test/pitch.h"
@@ -12,16 +12,17 @@ void sndh_init(int tune)
 {
 	const int pitch = sndh_tune_select_value(tune);
 
-	psg_wr_freq_a(pitch);
-	psg_wr_level_a(15);
+	snd_psg_wr_iomix(SND_PSG_IOMIX_OFF);
+	snd_psg_wr_freq_a(pitch);
+	snd_psg_wr_level_a(15);
 }
 
 void sndh_play()
 {
-	psg_wr_iomix(PSG_IOMIX_TONE_A);
+	snd_psg_wr_iomix(SND_PSG_IOMIX_TONE_A);
 }
 
 void sndh_exit()
 {
-	psg_wr_iomix(PSG_IOMIX_OFF);
+	snd_psg_wr_iomix(SND_PSG_IOMIX_OFF);
 }
