@@ -743,7 +743,7 @@ void write_body(FILE* filep, body_struct* body, replace_struct* replace)
 /* Generate a base function name from an opcode struct */
 void get_base_name(char* base_name, opcode_struct* op)
 {
-	sprintf(base_name, "m68k_op_%s", op->name);
+	snprintf(base_name, MAX_LINE_LENGTH, "m68k_op_%s", op->name);
 	if(op->size > 0)
 		sprintf(base_name+strlen(base_name), "_%d", op->size);
 	if(strcmp(op->spec_proc, UNSPECIFIED) != 0)
