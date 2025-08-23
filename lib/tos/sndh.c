@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include <asm/interrupt.h>
+#include <asm/io.h>
 #include <tos/cookie.h>
 #include <tos/system-variable.h>
 
@@ -19,8 +20,6 @@
 #include "psgplay/sndh.h"
 
 #include "atari/mfp-map.h"
-
-#define memory_barrier() __sync_synchronize()
 
 struct timer_prescale {
 	enum mfp_ctrl ctrl;
@@ -146,18 +145,18 @@ static bool timer_division(void)
 		    timer_state.play && timer_division())		\
 			sndh_play(&file);				\
 									\
-		memory_barrier();					\
+		barrier();						\
 									\
 		/* Some SNDH files mess with the counters, restore. */	\
 		mfp_map()->ctrl_ = timer_state.prescale.ctrl;		\
 		mfp_map()->t##name_##dr.count = timer_state.prescale.count; \
 									\
-		memory_barrier();					\
+		barrier();						\
 									\
 		/* Timer is now served. */				\
 		mfp_map()->is##ab_.timer_##name_ = false;		\
 									\
-		memory_barrier();					\
+		barrier();						\
 	}								\
 									\
 	static bool install_sndh_timer_##name_(int frequency)		\
@@ -172,7 +171,7 @@ static bool timer_division(void)
 		mfp_map()->is##ab_.timer_##name_ = false;		\
 		mfp_map()->im##ab_.timer_##name_ = true;		\
 									\
-		memory_barrier();					\
+		barrier();						\
 									\
 		timer_state.type = SNDH_TIMER_##type_;			\
 									\
@@ -198,11 +197,11 @@ static bool install_sndh_timer(const struct sndh_timer timer)
 
 static void play()
 {
-	memory_barrier();
+	barrier();
 
 	timer_state.play = true;
 
-	memory_barrier();
+	barrier();
 }
 
 static void idle(void)
