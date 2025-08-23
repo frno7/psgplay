@@ -59,11 +59,11 @@ _rom:	bra.s	.reset
 	move.l	#.xbios,0xb8
 
 	/* Install VBL and timer A, B, C and D vectors */
-	move.l	#.vbl,0x70
-	move.l	#.timer_a,0x134
-	move.l	#.timer_b,0x120
-	move.l	#.timer_c,0x114
-	move.l	#.timer_d,0x110
+	move.l	#vbl_exception,0x70
+	move.l	#timer_a_exception,0x134
+	move.l	#timer_b_exception,0x120
+	move.l	#timer_c_exception,0x114
+	move.l	#timer_d_exception,0x110
 
 	move.l	d2,-(sp)	/* u32 timer */
 	move.l	d1,-(sp)	/* u32 track */
@@ -89,16 +89,3 @@ _rom:	bra.s	.reset
 
 	trap gemdos
 	trap xbios
-
-.macro	exception	name
-.\name:	movem.l	d0-a6,-(sp)
-	jsr	\name\()_exception
-	movem.l	(sp)+,d0-a6
-	rte
-.endm
-
-	exception vbl
-	exception timer_a
-	exception timer_b
-	exception timer_c
-	exception timer_d

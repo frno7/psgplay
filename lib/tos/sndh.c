@@ -5,6 +5,7 @@
 
 #include <stdlib.h>
 
+#include <asm/interrupt.h>
 #include <tos/cookie.h>
 #include <tos/system-variable.h>
 
@@ -117,7 +118,7 @@ MFP_CTRL_DIV(MFP_CTRL_DIV_PRESCALE)
 	return valid;
 }
 
-void vbl_exception(void)
+INTERRUPT void vbl_exception(void)
 {
 	if (timer_state.type == SNDH_TIMER_V)
 		sndh_play(&file);
@@ -139,7 +140,7 @@ static bool timer_division(void)
 }
 
 #define DEFINE_TIMER_EXCEPTION(name_, type_, ab_, ctrl_)		\
-	void timer_##name_##_exception(void)				\
+	INTERRUPT void timer_##name_##_exception(void)			\
 	{								\
 		if (timer_state.type == SNDH_TIMER_##type_ &&		\
 		    timer_state.play && timer_division())		\
