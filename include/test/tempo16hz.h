@@ -6,7 +6,7 @@
 #ifndef PSGPLAY_TEST_TEMPO16HZ_H
 #define PSGPLAY_TEST_TEMPO16HZ_H
 
-#define tempo16hz_tune_value_names(t)					\
+#define tune_value_names(t)						\
 	t(0, "16 Hz timer D half period (8 Hz)")
 
 #endif /* PSGPLAY_TEST_TEMPO16HZ_H */

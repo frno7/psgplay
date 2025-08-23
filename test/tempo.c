@@ -3,9 +3,10 @@
 #include <asm/snd/sndh.h>
 
 #include "test/tempo.h"
+#include "test/tempo-dma.h"
 
 sndh_title("Tempo");
-sndh_tune_value_names(int, tempo_tune_value_names);
+sndh_tune_value_names(int, tune_value_names);
 sndh_timer(SNDH_TIMER_VBL, 50);
 
 static struct tempo_sample sample[1];

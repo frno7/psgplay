@@ -2,11 +2,11 @@
 
 #include <asm/snd/sndh.h>
 
-#include "test/tempo.h"
+#include "test/tempo-dma.h"
 #include "test/tempo16hz.h"
 
 sndh_title("Tempo 16 Hz");
-sndh_tune_value_names(int, tempo16hz_tune_value_names);
+sndh_tune_value_names(int, tune_value_names);
 sndh_timer(SNDH_TIMER_D, 16);
 
 static struct tempo_sample sample[1];

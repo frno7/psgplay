@@ -15,8 +15,30 @@
 #include "graph/svg.h"
 
 #include "test/option.h"
+#include "test/report.h"
 
 const char *progname;
+
+static int tune_from_path(const char *path)
+{
+	size_t k = 0;
+
+	/* Find last '-' in path, for example om "test/tempo-123.wave". */
+	for (size_t i = 0; path[i]; i++)
+		if (path[i] == '-')
+			k = i;
+	if (path[k] != '-')
+		return 0;
+
+	const char *s = &path[k + 1];
+	char *e;
+
+	const unsigned long n = strtoul(s, &e, 10);
+	if (s == e)
+		return 0;
+
+	return *e == '.' || *e == '\0' ? n : 0;
+}
 
 static bool encode_file(const void *data, size_t size, void *arg)
 {
@@ -71,13 +93,10 @@ static void graph(const struct options *options,
 	audio_free(cut);
 }
 
-static void report(const struct options *options,
-	const struct audio *audio)
+void report_square_wave_estimate(int tune, const char *name,
+	const struct audio *audio, const struct options *options)
 {
-	/* FIXME: Avoid cutting the last second with --no-fade option. */
-	struct audio *cut = audio_range(audio, 0,
-		audio->format.sample_count - audio->format.frequency);
-	struct audio *norm = audio_normalise(cut, 0.8f);
+	struct audio *norm = audio_normalise(audio, 0.8f);
 	const struct audio_zero_crossing_periodic zcp =
 		audio_zero_crossing_periodic(norm);
 	const struct audio_wave wave = audio_wave_estimate(zcp);
@@ -85,6 +104,8 @@ static void report(const struct options *options,
 
 	snprintf(report, sizeof(report),
 		"path %s\n"
+		"index %d\n"
+		"name %s\n"
 		"sample count %zu samples\n"
 		"sample duration %.1f s\n"
 		"sample frequency %d Hz\n"
@@ -93,11 +114,13 @@ static void report(const struct options *options,
 		"square wave phase %f samples\n"
 		"square wave deviation max %f samples\n",
 		options->input,
-		cut->format.sample_count,
-		cut->format.sample_count / (double)cut->format.frequency,
-		cut->format.frequency,
+		tune,
+		name,
+		audio->format.sample_count,
+		audio->format.sample_count / (double)audio->format.frequency,
+		audio->format.frequency,
 		wave.period,
-		wave.period ? cut->format.frequency / wave.period : 0.0,
+		wave.period ? audio->format.frequency / wave.period : 0.0,
 		wave.phase,
 		audio_zero_crossing_periodic_deviation(norm, wave).maximum);
 
@@ -105,22 +128,34 @@ static void report(const struct options *options,
 		pr_fatal_errno(options->output);
 
 	audio_free(norm);
-	audio_free(cut);
 }
 
 int main(int argc, char *argv[])
 {
 	struct options *options = parse_options(argc, argv);
 
+	const int tune = tune_from_path(options->input);
+	if (!tune)
+		pr_fatal_error("%s: Tune number missing in path\n",
+			options->input);
+
 	struct audio *audio = audio_read_wave(options->input);
 
+	/* FIXME: Avoid trimming the last second with --no-fade option. */
+	if (audio->format.sample_count < 2 * audio->format.frequency)
+		pr_fatal_error("%s: too short: must be at least %d samples\n",
+			options->input, 2 * audio->format.frequency);
+	struct audio *trim = audio_range(audio, 0,
+		audio->format.sample_count - audio->format.frequency);
+
 	if (strcmp(options->command, "graph") == 0)
-		graph(options, audio);
+		graph(options, trim);
 	else if (strcmp(options->command, "report") == 0)
-		report(options, audio);
+		report(tune, trim, options);
 	else
 		pr_fatal_error("%s: unknown command\n", options->command);
 
+	audio_free(trim);
 	audio_free(audio);
 
 	return EXIT_SUCCESS;
