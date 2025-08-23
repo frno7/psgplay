@@ -84,13 +84,15 @@ static void report(const struct options *options,
 	char report[1024];
 
 	snprintf(report, sizeof(report),
-		"samples %zu\n"
-		"duration %.1f s\n"
-		"frequency %d Hz\n"
+		"path %s\n"
+		"sample count %zu samples\n"
+		"sample duration %.1f s\n"
+		"sample frequency %d Hz\n"
 		"square wave period %f samples\n"
 		"square wave frequency %f Hz\n"
 		"square wave phase %f samples\n"
 		"square wave deviation max %f samples\n",
+		options->input,
 		cut->format.sample_count,
 		cut->format.sample_count / (double)cut->format.frequency,
 		cut->format.frequency,
