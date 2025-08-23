@@ -48,6 +48,27 @@ static void NORETURN help_exit(int code)
 	exit(code);
 }
 
+static int track_from_path(const char *path)
+{
+	size_t k = 0;
+
+	/* Find last '-' in path, for example in "test/tempo-123.wave". */
+	for (size_t i = 0; path[i]; i++)
+		if (path[i] == '-')
+			k = i;
+	if (path[k] != '-')
+		return 0;
+
+	const char *s = &path[k + 1];
+	char *e;
+
+	const unsigned long n = strtoul(s, &e, 10);
+	if (s == e)
+		return 0;
+
+	return *e == '.' || *e == '\0' ? n : 0;
+}
+
 struct options *parse_options(int argc, char **argv)
 {
 	static const struct option options[] = {
@@ -110,7 +131,6 @@ opt_t:			option.track = atoi(optarg);
 
 #undef OPT
 out:
-
 	if (optind == argc)
 		help_exit(EXIT_FAILURE);
 	if (optind + 1 == argc)
@@ -121,6 +141,12 @@ out:
 
 	option.command = argv[optind];
 	option.input = argv[optind + 1];
+
+	if (!option.track)
+		option.track = track_from_path(option.input);
+	if (!option.track)
+		pr_fatal_error("%s: track not in file name and not given with --track\n",
+			option.input);
 
 	return &option;
 }

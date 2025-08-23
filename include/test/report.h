@@ -17,16 +17,16 @@
 		names(TUNE_DEFINE_TITLE)				\
 	}
 
-static inline const char *tune_name(int tune)
+static inline const char *tune_name(const struct options *options)
 {
 	extern const char *tune_names_[];
 
-	return tune_names_[tune - 1];
+	return tune_names_[options->track - 1];
 }
 
-void report(int tune, const struct audio *audio, const struct options *options);
+void report(const struct audio *audio, const struct options *options);
 
-void report_square_wave_estimate(int tune, const char *name,
-	const struct audio *audio, const struct options *options);
+void report_square_wave_estimate(const struct audio *audio,
+	const char *name, const struct options *options);
 
 #endif /* PSGPLAY_TEST_REPORT_H */

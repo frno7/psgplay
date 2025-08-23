@@ -19,27 +19,6 @@
 
 const char *progname;
 
-static int tune_from_path(const char *path)
-{
-	size_t k = 0;
-
-	/* Find last '-' in path, for example om "test/tempo-123.wave". */
-	for (size_t i = 0; path[i]; i++)
-		if (path[i] == '-')
-			k = i;
-	if (path[k] != '-')
-		return 0;
-
-	const char *s = &path[k + 1];
-	char *e;
-
-	const unsigned long n = strtoul(s, &e, 10);
-	if (s == e)
-		return 0;
-
-	return *e == '.' || *e == '\0' ? n : 0;
-}
-
 static bool encode_file(const void *data, size_t size, void *arg)
 {
 	int fd = *(int *)arg;
@@ -93,8 +72,8 @@ static void graph(const struct options *options,
 	audio_free(cut);
 }
 
-void report_square_wave_estimate(int tune, const char *name,
-	const struct audio *audio, const struct options *options)
+void report_square_wave_estimate(const struct audio *audio,
+	const char *name, const struct options *options)
 {
 	struct audio *norm = audio_normalise(audio, 0.8f);
 	const struct audio_zero_crossing_periodic zcp =
@@ -114,7 +93,7 @@ void report_square_wave_estimate(int tune, const char *name,
 		"square wave phase %f samples\n"
 		"square wave deviation max %f samples\n",
 		options->input,
-		tune,
+		options->track,
 		name,
 		audio->format.sample_count,
 		audio->format.sample_count / (double)audio->format.frequency,
@@ -134,11 +113,6 @@ int main(int argc, char *argv[])
 {
 	struct options *options = parse_options(argc, argv);
 
-	const int tune = tune_from_path(options->input);
-	if (!tune)
-		pr_fatal_error("%s: Tune number missing in path\n",
-			options->input);
-
 	struct audio *audio = audio_read_wave(options->input);
 
 	/* FIXME: Avoid trimming the last second with --no-fade option. */
@@ -151,7 +125,7 @@ int main(int argc, char *argv[])
 	if (strcmp(options->command, "graph") == 0)
 		graph(options, trim);
 	else if (strcmp(options->command, "report") == 0)
-		report(tune, trim, options);
+		report(trim, options);
 	else
 		pr_fatal_error("%s: unknown command\n", options->command);
 

@@ -6,7 +6,7 @@
 
 tune_names(int, tune_value_names);
 
-void report(int tune, const struct audio *audio, const struct options *options)
+void report(const struct audio *audio, const struct options *options)
 {
-	report_square_wave_estimate(tune, tune_name(tune), audio, options);
+	report_square_wave_estimate(audio, tune_name(options), options);
 }
