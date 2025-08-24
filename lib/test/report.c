@@ -17,12 +17,14 @@ void report_input(struct strbuf *sb, const struct audio *audio,
 {
 	sbprintf(sb,
 		"path %s\n"
+		"name %s\n"
 		"index %d\n"
 		"title %s\n"
 		"sample count %zu samples\n"
 		"sample duration %.1f s\n"
 		"sample frequency %d Hz\n",
 		options->input,
+		options->name,
 		options->track,
 		name,
 		audio->format.sample_count,

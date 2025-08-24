@@ -48,6 +48,28 @@ static void NORETURN help_exit(int code)
 	exit(code);
 }
 
+static void name_from_input()
+{
+	const char *path = option.input;
+	size_t j = 0;
+	size_t k = 0;
+
+	/* Find last '/' and '-' in path, for example in "test/tempo-123.wave". */
+	for (size_t i = 0; path[i]; i++) {
+		if (path[i] == '/')
+			j = i;
+		if (path[i] == '-')
+			k = i;
+	}
+	if (path[j] == '/')
+		j++;
+
+	const size_t len = k >= j ? k - j : 0;
+
+	snprintf(option.name, ARRAY_SIZE(option.name), "%.*s",
+		(int)min_t(size_t, len, ARRAY_SIZE(option.name) - 1), &path[j]);
+}
+
 static int track_from_path(const char *path)
 {
 	size_t k = 0;
@@ -141,6 +163,8 @@ out:
 
 	option.command = argv[optind];
 	option.input = argv[optind + 1];
+
+	name_from_input(&option);
 
 	if (!option.track)
 		option.track = track_from_path(option.input);

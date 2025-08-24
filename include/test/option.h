@@ -11,6 +11,8 @@
 extern const char *progname;
 
 struct options {
+	char name[64];
+
 	int verbose;
 
 	const char *command;
