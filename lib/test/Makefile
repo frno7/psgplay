@@ -11,6 +11,7 @@ PSGPLAY_LIB_TEST_SRC :=							\
 	lib/internal/print.c						\
 	lib/internal/string.c						\
 	lib/test/option.c						\
+	lib/test/report.c						\
 	lib/test/verify.c						\
 	system/unix/file.c						\
 	system/unix/memory.c						\
