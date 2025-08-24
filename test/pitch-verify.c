@@ -9,18 +9,24 @@
 
 test_value_names(int, tune_value_names);
 
+static int tone_period(const struct options *options)
+{
+	return (int)round(ATARI_STE_PSG_CLK / (16.0 * test_value(options)));
+}
+
+static double tone_frequency(const struct options *options)
+{
+	return ATARI_STE_PSG_CLK / (16.0 * tone_period(options));
+}
+
 void report(struct strbuf *sb, const struct audio *audio,
 	const struct options *options)
 {
 	report_square_wave_estimate(sb, audio, test_name(options), options);
 
-	const int tone_period = (int)round(ATARI_STE_PSG_CLK /
-		(16.0 * test_value(options)));
-	const double tone_frequency = ATARI_STE_PSG_CLK / (16.0 * tone_period);
-
 	sbprintf(sb,
 		"tone period %d cycles\n"
 		"tone frequency %f Hz\n",
-		tone_period,
-		tone_frequency);
+		tone_period(options),
+		tone_frequency(options));
 }
