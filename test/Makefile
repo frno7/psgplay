@@ -72,7 +72,10 @@ test-png: $(PSGPLAY_TEST_PNG)
 
 .PHONY: test-report
 test-report: $(PSGPLAY_TEST_REPORT)
-	@cat $(PSGPLAY_TEST_REPORT)
+
+.PHONY: verify-report
+verify-report: $(PSGPLAY_TEST_REPORT)
+	@cat $^
 
 $(PSGPLAY_TEST_OBJ): %.o: %.c
 	$(QUIET_CC)$(TARGET_CC) $(PSGPLAY_TEST_SNDH_CFLAGS)		\
