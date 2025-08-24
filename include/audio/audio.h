@@ -89,4 +89,10 @@ struct audio_zero_crossing_periodic_deviation
 
 struct audio_wave audio_wave_estimate(struct audio_zero_crossing_periodic zcp);
 
+static inline double audio_frequency_from_period(double period,
+	double sampling_frequency)
+{
+	return period ? sampling_frequency / period : 0.0;
+}
+
 #endif /* PSGPLAY_AUDIO_H */
