@@ -6,6 +6,7 @@
 #ifndef PSGPLAY_SYSTEM_UNIX_STRING_H
 #define PSGPLAY_SYSTEM_UNIX_STRING_H
 
+#include <stdarg.h>
 #include <stdbool.h>
 
 char *xstrdup(const char *s);
