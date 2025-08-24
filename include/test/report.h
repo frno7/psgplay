@@ -12,23 +12,33 @@
 
 #include "test/option.h"
 
-#define TUNE_DEFINE_TITLE(value, title)	title,
+#define TEST_DEFINE_VALUE(value, name)	value,
 
-#define tune_names(names)						\
-	const char *tune_names_[] = {					\
-		names(TUNE_DEFINE_TITLE)				\
+#define test_values(type, names)					\
+	const type test_values_[] = {					\
+		names(TEST_DEFINE_VALUE)				\
 	}
 
-static inline const char *tune_name(const struct options *options)
-{
-	extern const char *tune_names_[];
+#define TEST_DEFINE_NAME(value, name)	name,
 
-	return tune_names_[options->track - 1];
-}
+#define test_names(names)						\
+	const char *test_names_[] = {					\
+		names(TEST_DEFINE_NAME)					\
+	}
 
-#if defined(tune_value_names)
-tune_names(tune_value_names);
-#endif
+#define test_value_names(type, names)					\
+	test_values(type, names);					\
+	test_names(names);						\
+									\
+	static inline type test_value(const struct options *options)	\
+	{								\
+		return test_values_[options->track - 1];		\
+	}								\
+									\
+	static inline const char *test_name(const struct options *options) \
+	{								\
+		return test_names_[options->track - 1];			\
+	}
 
 void report(struct strbuf *sb, const struct audio *audio,
 	const struct options *options);
