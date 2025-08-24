@@ -30,8 +30,10 @@ void report(struct strbuf *sb, const struct audio *audio,
 	report_input(sb, audio, test_name(options), options);
 
 	sbprintf(sb,
+		"tone clock %d / 16 Hz\n"
 		"tone period %d cycles\n"
 		"tone frequency %f Hz\n",
+		ATARI_STE_PSG_CLK,
 		tone_period(options),
 		tone_frequency(options));
 
