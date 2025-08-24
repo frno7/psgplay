@@ -21,16 +21,15 @@ const char *progname;
 
 static bool encode_file(const void *data, size_t size, void *arg)
 {
-	int fd = *(int *)arg;
+	struct strbuf *sb = arg;
 
-	if (xwrite(fd, data, size) != size)
-		pr_fatal_errno("Failed to write\n");
+	sbprintf(sb, "%*s", (int)size, data);
 
 	return true;
 }
 
-static void graph(const struct options *options,
-	const struct audio *audio)
+static void graph(struct strbuf *sb, const struct audio *audio,
+	const struct options *options)
 {
 	struct audio *cut = audio_range(audio, 0, 250);
 	struct audio *norm = audio_normalise(cut, 0.8f);
@@ -38,10 +37,6 @@ static void graph(const struct options *options,
 	const struct audio_zero_crossing_periodic zcp =
 		audio_zero_crossing_periodic(norm);
 	const struct audio_wave wave = audio_wave_estimate(zcp);
-
-	int fd = xopen(options->output, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (fd == -1)
-		pr_fatal_errno(options->output);
 
 	struct graph_encoder *encoder = graph_encoder_init(
 		(struct graph_bounds) {
@@ -52,7 +47,7 @@ static void graph(const struct options *options,
 		},
 		(struct graph_encoder_cb) {
 			.f = encode_file,
-			.arg = &fd,
+			.arg = sb,
 		},
 		&svg_encoder);
 
@@ -64,9 +59,6 @@ static void graph(const struct options *options,
 	encoder->module->footer(encoder);
 
 	graph_encoder_free(encoder);
-
-	if (xclose(fd) == -1)
-		pr_fatal_errno(options->output);
 
 	audio_free(norm);
 	audio_free(cut);
@@ -85,19 +77,20 @@ int main(int argc, char *argv[])
 	struct audio *trim = audio_range(audio, 0,
 		audio->format.sample_count - audio->format.frequency);
 
+	struct strbuf sb = { };
+
 	if (strcmp(options->command, "graph") == 0) {
-		graph(options, trim);
+		graph(&sb, trim, options);
 	} else if (strcmp(options->command, "report") == 0) {
-		struct strbuf sb = { };
-
 		report(&sb, trim, options);
-
-		if (!file_write(options->output, sb.s, sb.length))
-			pr_fatal_errno(options->output);
-
-		sbfree(&sb);
 	} else
 		pr_fatal_error("%s: unknown command\n", options->command);
+
+	if (options->output && sb.length &&
+	    !file_write(options->output, sb.s, sb.length))
+		pr_fatal_errno(options->output);
+
+	sbfree(&sb);
 
 	audio_free(trim);
 	audio_free(audio);
