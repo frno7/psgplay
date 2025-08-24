@@ -3,7 +3,8 @@
 #include "test/pitch.h"
 #include "test/report.h"
 
-void report(const struct audio *audio, const struct options *options)
+void report(struct strbuf *sb, const struct audio *audio,
+	const struct options *options)
 {
-	report_square_wave_estimate(audio, tune_name(options), options);
+	report_square_wave_estimate(sb, audio, tune_name(options), options);
 }

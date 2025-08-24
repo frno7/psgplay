@@ -85,11 +85,18 @@ int main(int argc, char *argv[])
 	struct audio *trim = audio_range(audio, 0,
 		audio->format.sample_count - audio->format.frequency);
 
-	if (strcmp(options->command, "graph") == 0)
+	if (strcmp(options->command, "graph") == 0) {
 		graph(options, trim);
-	else if (strcmp(options->command, "report") == 0)
-		report(trim, options);
-	else
+	} else if (strcmp(options->command, "report") == 0) {
+		struct strbuf sb = { };
+
+		report(&sb, trim, options);
+
+		if (!file_write(options->output, sb.s, sb.length))
+			pr_fatal_errno(options->output);
+
+		sbfree(&sb);
+	} else
 		pr_fatal_error("%s: unknown command\n", options->command);
 
 	audio_free(trim);

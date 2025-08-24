@@ -8,6 +8,8 @@
 
 #include "audio/audio.h"
 
+#include "system/unix/string.h"
+
 #include "test/option.h"
 
 #define TUNE_DEFINE_TITLE(value, title)	title,
@@ -28,9 +30,13 @@ static inline const char *tune_name(const struct options *options)
 tune_names(tune_value_names);
 #endif
 
-void report(const struct audio *audio, const struct options *options);
+void report(struct strbuf *sb, const struct audio *audio,
+	const struct options *options);
 
-void report_square_wave_estimate(const struct audio *audio,
+void report_input(struct strbuf *sb, const struct audio *audio,
+	const char *name, const struct options *options);
+
+void report_square_wave_estimate(struct strbuf *sb, const struct audio *audio,
 	const char *name, const struct options *options);
 
 #endif /* PSGPLAY_TEST_REPORT_H */
