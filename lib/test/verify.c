@@ -16,6 +16,7 @@
 
 #include "test/option.h"
 #include "test/report.h"
+#include "test/verify.h"
 
 const char *progname;
 
@@ -79,7 +80,16 @@ int main(int argc, char *argv[])
 
 	struct strbuf sb = { };
 
-	if (strcmp(options->command, "graph") == 0) {
+	if (strcmp(options->command, "verify") == 0) {
+		const char *error = verify(trim, options);
+
+		if (error) {
+			report(&sb, trim, options);
+
+			pr_fatal_error("%s\n%s%s: error: verify: %s\n",
+				options->input, sb.s, options->input, error);
+		}
+	} else if (strcmp(options->command, "graph") == 0) {
 		graph(&sb, trim, options);
 	} else if (strcmp(options->command, "report") == 0) {
 		report(&sb, trim, options);

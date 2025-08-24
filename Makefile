@@ -120,5 +120,6 @@ QUIET_LINK    = $(Q:@=@echo    '  LD      '$@;)
 QUIET_RM      = $(Q:@=@echo    '  RM      '$@;)
 QUIET_CHECK   = $(Q:@=@echo    '  CHECK   '$@;)
 QUIET_TEST    = $(Q:@=@echo    '  TEST    '$@;)
+QUIET_VERIFY  = $(Q:@=@echo    '  VERIFY  '$@;)
 
 $(eval -include $(ALL_DEP))

@@ -5,6 +5,8 @@
 #include "toslibc/asm/machine.h"
 
 #include "test/report.h"
+#include "test/verify.h"
+
 #include "test/pitch.h"
 
 test_value_names(int, tune_value_names);
@@ -22,10 +24,10 @@ static double tone_frequency(const struct options *options)
 void report(struct strbuf *sb, const struct audio *audio,
 	const struct options *options)
 {
-	const struct test_wave_deviation deviation =
+	const struct test_wave_deviation wave_deviation =
 		test_wave_deviation(audio);
 	const struct test_wave_error error = test_wave_error(
-		audio->format, deviation, tone_frequency(options));
+		audio->format, wave_deviation, tone_frequency(options));
 
 	report_input(sb, audio, test_name(options), options);
 
@@ -37,11 +39,27 @@ void report(struct strbuf *sb, const struct audio *audio,
 		tone_period(options),
 		tone_frequency(options));
 
-	report_wave_estimate(sb, audio->format, deviation);
+	report_wave_estimate(sb, audio->format, wave_deviation);
 
 	sbprintf(sb,
 		"wave error absolute frequency %f Hz\n"
 		"wave error relative frequency %.2e\n",
 		error.absolute_frequency,
 		error.relative_frequency);
+}
+
+char *verify(const struct audio *audio, const struct options *options)
+{
+	const struct test_wave_deviation wave_deviation =
+		test_wave_deviation(audio);
+	const struct test_wave_error error = test_wave_error(
+		audio->format, wave_deviation, tone_frequency(options));
+
+	verify_assert (wave_deviation.deviation.maximum <= 1.8)
+		return "wave deviation max";
+
+	verify_assert (error.relative_frequency <= 5e-7)
+		return "wave error relative frequency";
+
+	return NULL;
 }
