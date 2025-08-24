@@ -22,11 +22,24 @@ static double tone_frequency(const struct options *options)
 void report(struct strbuf *sb, const struct audio *audio,
 	const struct options *options)
 {
-	report_square_wave_estimate(sb, audio, test_name(options), options);
+	const struct test_wave_deviation deviation =
+		test_wave_deviation(audio);
+	const struct test_wave_error error = test_wave_error(
+		audio->format, deviation, tone_frequency(options));
+
+	report_input(sb, audio, test_name(options), options);
 
 	sbprintf(sb,
 		"tone period %d cycles\n"
 		"tone frequency %f Hz\n",
 		tone_period(options),
 		tone_frequency(options));
+
+	report_wave_estimate(sb, audio->format, deviation);
+
+	sbprintf(sb,
+		"wave error absolute frequency %f Hz\n"
+		"wave error relative frequency %.2e\n",
+		error.absolute_frequency,
+		error.relative_frequency);
 }

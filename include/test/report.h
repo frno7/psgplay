@@ -40,13 +40,28 @@
 		return test_names_[options->track - 1];			\
 	}
 
+struct test_wave_deviation {
+	struct audio_wave wave;
+	struct audio_zero_crossing_periodic_deviation deviation;
+};
+
+struct test_wave_error {
+	double absolute_frequency;
+	double relative_frequency;
+};
+
 void report(struct strbuf *sb, const struct audio *audio,
 	const struct options *options);
 
 void report_input(struct strbuf *sb, const struct audio *audio,
 	const char *name, const struct options *options);
 
-void report_square_wave_estimate(struct strbuf *sb, const struct audio *audio,
-	const char *name, const struct options *options);
+struct test_wave_deviation test_wave_deviation(const struct audio *audio);
+
+struct test_wave_error test_wave_error(struct audio_format audio_format,
+	struct test_wave_deviation wave_deviation, double reference_frequency);
+
+void report_wave_estimate(struct strbuf *sb, struct audio_format audio_format,
+	struct test_wave_deviation wave_deviation);
 
 #endif /* PSGPLAY_TEST_REPORT_H */
