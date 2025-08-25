@@ -5,6 +5,8 @@
 
 #include <stdio.h>
 
+#include "toslibc/asm/machine.h"
+
 #include "internal/assert.h"
 
 #include "atari/bus.h"
@@ -47,7 +49,7 @@ void glue_irq_clr(int irq)
 
 static void request_vbl_event(struct device_cycle device_cycle)
 {
-	const u64 pal_vbl = 160256;	/* FIXME */
+	const u64 pal_vbl = ATARI_STE_CYCLES_PER_VBL_PAL;
 
 	vbl_cycle.c = device_cycle.c + (pal_vbl - (device_cycle.c % pal_vbl));
 
