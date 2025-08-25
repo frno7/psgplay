@@ -13,10 +13,10 @@
 struct snd_dma_alt_sample {
 	union {
 		struct {
-			uint8_t left;
-			uint8_t right;
+			int8_t left;
+			int8_t right;
 		};
-		uint16_t u16;
+		int16_t u16;
 	};
 };
 
