@@ -409,7 +409,7 @@ static size_t stereo_downsample(struct psgplay_stereo *resample,
 
 	for (size_t i = 0; i < count; i++) {
 		const u64 n = (ds->stereo_frequency * ds->psg_cycle) /
-			ATARI_STE_PSG_CLK;
+			PSG_FREQUENCY;
 		const struct psgplay_stereo s = {
 			.left  = sample_lowpass(stereo[i].left,  &ds->lowpass.left),
 			.right = sample_lowpass(stereo[i].right, &ds->lowpass.right)

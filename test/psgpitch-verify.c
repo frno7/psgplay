@@ -12,12 +12,14 @@ test_value_names(int, tune_value_names);
 
 static int tone_period(const struct options *options)
 {
-	return (int)round(ATARI_STE_PSG_CLK / (16.0 * test_value(options)));
+	return (int)round((double)ATARI_STE_EXT_OSC /
+		(ATARI_STE_SND_PSG_DIV * 16.0 * test_value(options)));
 }
 
 static double tone_frequency(const struct options *options)
 {
-	return ATARI_STE_PSG_CLK / (16.0 * tone_period(options));
+	return (double)ATARI_STE_EXT_OSC /
+		(ATARI_STE_SND_PSG_DIV * 16.0 * tone_period(options));
 }
 
 #define INIT								\
@@ -34,10 +36,10 @@ void report(struct strbuf *sb, const struct audio *audio,
 	report_input(sb, audio, test_name(options), options);
 
 	sbprintf(sb,
-		"tone clock %d / 16 Hz\n"
+		"tone clock %d / %d / 16 Hz\n"
 		"tone period %d cycles\n"
 		"tone frequency %f Hz\n",
-		ATARI_STE_PSG_CLK,
+		ATARI_STE_EXT_OSC, ATARI_STE_SND_PSG_DIV,
 		tone_period(options),
 		tone_frequency(options));
 

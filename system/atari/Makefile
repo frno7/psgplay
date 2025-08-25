@@ -3,7 +3,8 @@
 PRG_CFLAGS += $(BASIC_TARGET_CFLAGS) $(CF2149_CFLAGS)			\
 	-march=68000 -fno-PIC -nostdlib					\
 	-ffunction-sections -fdata-sections				\
-	-isystem lib/toslibc/include/toslibc -D_TOSLIBC_SOURCE
+	-Ilib/toslibc/include -isystem lib/toslibc/include/toslibc	\
+	-D_TOSLIBC_SOURCE
 
 PRG_LDFLAGS += --relocatable --gc-sections --strip-all --entry _start	\
 	-L$(TOSLIBC_lib_dir) --script=$(TOSLIBC_SCRIPT_PRG_LD)
