@@ -28,7 +28,7 @@ void report_input(struct strbuf *sb, const struct audio *audio,
 		options->track,
 		name,
 		audio->format.sample_count,
-		audio->format.sample_count / (double)audio->format.frequency,
+		audio_duration(audio->format),
 		audio->format.frequency);
 }
 

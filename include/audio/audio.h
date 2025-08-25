@@ -95,4 +95,9 @@ static inline double audio_frequency_from_period(double period,
 	return period ? sampling_frequency / period : 0.0;
 }
 
+static inline double audio_duration(const struct audio_format format)
+{
+	return format.sample_count / (double)format.frequency;
+}
+
 #endif /* PSGPLAY_AUDIO_H */

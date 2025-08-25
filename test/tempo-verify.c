@@ -78,6 +78,9 @@ char *verify(const struct audio *audio, const struct options *options)
 {
 	INIT;
 
+	verify_assert (audio_duration(audio->format) >= 60.0)
+		return "sample duration";
+
 	verify_assert (wave_deviation.deviation.maximum <= 5.0)
 		return "wave deviation max";
 
