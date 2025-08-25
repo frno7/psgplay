@@ -6,24 +6,24 @@
 
 #include "atari/mfp-map.h"
 
+#include "test/snd-dma-alt.h"
 #include "test/tempo.h"
-#include "test/tempo-dma.h"
 
 sndh_title("Tempo");
 sndh_tune_value_names(struct timer_preset, tune_value_names);
 sndh_timer(SNDH_TIMER_B, 16);
 
-static struct tempo_sample sample[1];
+static struct snd_dma_alt_sample sample[1];
 static struct timer_preset preset;
 
 static INTERRUPT void vbl_play()
 {
-	tempo_play(sample);
+	snd_dma_alt_play(sample);
 }
 
 static INTERRUPT void timer_a_play()
 {
-	tempo_play(sample);
+	snd_dma_alt_play(sample);
 
 	barrier();
 
@@ -36,7 +36,7 @@ void sndh_init(int tune)
 {
 	preset = sndh_tune_select_value(tune);
 
-	tempo_init(sample);
+	snd_dma_alt_init(sample);
 
 	if (preset.frequency == 50) {
 		iowr32((uint32_t)vbl_play, 0x70);
@@ -59,12 +59,12 @@ void sndh_init(int tune)
 void sndh_play()
 {
 	if (!preset.ctrl && preset.frequency == 16)
-		tempo_play(sample);
+		snd_dma_alt_play(sample);
 }
 
 void sndh_exit()
 {
-	tempo_exit(sample);
+	snd_dma_alt_exit(sample);
 
 	// FIXME: Restore vectors and MFP
 }

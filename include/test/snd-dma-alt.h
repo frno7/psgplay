@@ -3,14 +3,14 @@
  * Copyright (C) 2025 Fredrik Noring
  */
 
-#ifndef PSGPLAY_TEST_TEMPO_DMA_H
-#define PSGPLAY_TEST_TEMPO_DMA_H
+#ifndef PSGPLAY_TEST_SND_DMA_ALT_H
+#define PSGPLAY_TEST_SND_DMA_ALT_H
 
 #include <stdbool.h>
 
 #include <asm/snd/dma.h>
 
-struct tempo_sample {
+struct snd_dma_alt_sample {
 	union {
 		struct {
 			uint8_t left;
@@ -20,7 +20,7 @@ struct tempo_sample {
 	};
 };
 
-static inline void tempo_init(struct tempo_sample *sample)
+static inline void snd_dma_alt_init(struct snd_dma_alt_sample *sample)
 {
 	snd_dma_wr_start(&sample[0]);
 	snd_dma_wr_end(&sample[1]);
@@ -31,7 +31,7 @@ static inline void tempo_init(struct tempo_sample *sample)
 	});
 }
 
-static inline void tempo_play(struct tempo_sample *sample)
+static inline void snd_dma_alt_play(struct snd_dma_alt_sample *sample)
 {
 	if (!sample[0].u16) {
 		sample[0].left  = 0x7f;
@@ -42,9 +42,9 @@ static inline void tempo_play(struct tempo_sample *sample)
 		sample[0].u16 = ~sample[0].u16;
 }
 
-static inline void tempo_exit(struct tempo_sample *sample)
+static inline void snd_dma_alt_exit(struct snd_dma_alt_sample *sample)
 {
 	snd_dma_wrs_ctrl({ .play = false });
 }
 
-#endif /* PSGPLAY_TEST_TEMPO_DMA_H */
+#endif /* PSGPLAY_TEST_SND_DMA_ALT_H */
