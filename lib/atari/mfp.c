@@ -18,7 +18,7 @@
 #include "atari/mfp.h"
 #include "atari/mfp-map.h"
 
-#define MFP_FREQUENCY	4000000
+#define MFP_FREQUENCY	(CPU_FREQUENCY / 2)
 
 union mfp {
 	struct {
