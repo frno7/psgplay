@@ -425,7 +425,7 @@ tone frequency 32.999160 Hz
 wave period 1336.397512 samples
 wave frequency 32.999163 Hz
 wave phase 45.000000 samples
-wave deviation max 1.124129 samples
+wave phase deviation max 1.124129 samples
 wave error absolute frequency 0.000004 Hz
 wave error relative frequency 1.17e-07
 ```
