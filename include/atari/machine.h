@@ -10,8 +10,9 @@
 
 #include "atari/sample.h"
 
+#define CPU_FREQUENCY 8000000
+
 #define MACHINE_PROGRAM   0x40000	/* 256 KiB */
-#define MACHINE_FREQUENCY 8000000
 #define MACHINE_RUN_SLICE   10000
 
 struct machine_registers {

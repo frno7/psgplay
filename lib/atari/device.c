@@ -73,7 +73,7 @@ struct device_cycle device_cycle(const struct device *device)
 {
 	return (struct device_cycle) {
 		.c = cycle_transform(device->frequency,
-			MACHINE_FREQUENCY, machine_cycle())
+			CPU_FREQUENCY, machine_cycle())
 	};
 }
 
@@ -82,7 +82,7 @@ struct device_cycle device_from_machine_cycle(
 {
 	return (struct device_cycle) {
 		.c = cycle_transform(device->frequency,
-			MACHINE_FREQUENCY, machine_cycle)
+			CPU_FREQUENCY, machine_cycle)
 	};
 }
 
@@ -91,21 +91,21 @@ static struct device_slice device_from_machine_slice(
 {
 	return (struct device_slice) {
 		.s = cycle_transform(device->frequency,
-			MACHINE_FREQUENCY, machine_slice)
+			CPU_FREQUENCY, machine_slice)
 	};
 }
 
 static u64 machine_from_device_cycle(const struct device *device,
 	const struct device_cycle device_cycle)
 {
-	return cycle_transform(MACHINE_FREQUENCY,
+	return cycle_transform(CPU_FREQUENCY,
 			device->frequency, device_cycle.c);
 }
 
 static u64 machine_from_device_slice(const struct device *device,
 	const struct device_slice device_slice)
 {
-	return cycle_transform(MACHINE_FREQUENCY,
+	return cycle_transform(CPU_FREQUENCY,
 			device->frequency, device_slice.s);
 }
 
