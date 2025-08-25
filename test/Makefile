@@ -3,6 +3,7 @@
 PSGPLAY_test_dir := $(dir $(lastword $(MAKEFILE_LIST)))
 
 PSGPLAY_TESTS :=							\
+	dmapitch							\
 	psgpitch							\
 	tempo
 PSGPLAY_TEST_INCLUDE :=							\
