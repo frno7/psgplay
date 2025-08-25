@@ -384,6 +384,61 @@ for quick and easy review, application and SNDH file reassembly:
  	dc.b	$2f,$00,$41,$fa,$00,$6e,$4a,$50
 ```
 
+# Test and verification
+
+Various technical aspects such as pitch, tempo, etc. can be tested and
+verified with quality metrics and audio graphs. The tests are SNDH files
+compiled from C, so an `m68k-elf` cross-compiler is required:
+
+- `make -j TARGET_COMPILE=m68k-elf- test` compiles all tests.
+- `make -j TARGET_COMPILE=m68k-elf- verify` compiles and verifies all tests.
+- `make -j TARGET_COMPILE=m68k-elf- report` compiles and reports quality
+   metrics for all tests.
+
+More specific tests can be compiled, verified and reported. For example
+`verify-psgpitch` to verify all `psgpitch` tests, or
+`verify-psgpitch-3` to verify only the third test, and so on.
+
+Making audio graph and report files:
+
+- `make -j TARGET_COMPILE=m68k-elf- test/psgpitch-1.svg` compiles an SVG
+  graph file `test/psgpitch-1.svg`.
+- `make -j TARGET_COMPILE=m68k-elf- test/psgpitch-1.png` compiles a PNG
+  graph file `test/psgpitch-1.png`.
+- `make -j TARGET_COMPILE=m68k-elf- test/psgpitch-1.report` compiles a
+  report file `test/psgpitch-1.report`.
+
+Example report:
+
+```
+$ make -j TARGET_COMPILE=m68k-elf- report-psgpitch-2
+path test/psgpitch-2.wave
+name psgpitch
+index 2
+title PSG square wave C1 double low C 33 Hz
+sample count 2686419 samples
+sample duration 60.9 s
+sample frequency 44100 Hz
+tone clock 2002653 / 16 Hz
+tone period 3793 cycles
+tone frequency 32.999160 Hz
+wave period 1336.397512 samples
+wave frequency 32.999163 Hz
+wave phase 45.000000 samples
+wave deviation max 1.124129 samples
+wave error absolute frequency 0.000004 Hz
+wave error relative frequency 1.17e-07
+```
+
+Set the `PSGPLAY_TEST` Makefile option to run the test suite with a command
+other than `psgplay`, for example a command using [Hatari](https://hatari-emu.org/)
+instead. Note that the last second is automatically cut from input WAVE
+files during testing, to avoid artifacts due to audio fading out, etc.
+
+Review the file
+[`INSTALL`](https://github.com/frno7/psgplay/blob/main/INSTALL)
+for test and verification instructions.
+
 # How it works
 
 The [SNDH file format](https://github.com/frno7/psgplay/blob/main/doc/sndhv21.txt)

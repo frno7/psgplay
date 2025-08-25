@@ -2,7 +2,6 @@ Makefile targets:
 
   all             - compile PSG play, libraries and examples (default)
   install         - install PSG play, libraries and manual page
-  test            - test components of PSG play
   psgplay         - compile PSG play for Linux or Mac OS
   PSGPLAY.TOS     - compile PSG play for the Atari ST
   web             - compile for Javascript and Webassembly
@@ -15,6 +14,34 @@ Makefile targets:
   install-lib     - compile and install only PSG play library in $prefix
   install-psgplay - compile and install only PSG play program in $prefix
   install-man     - compile and install only PSG play manual in $prefix
+
+Test and verification targets and options (requires TARGET_COMPILE=m68k-elf-):
+
+  test            - compile all tests for PSG play
+  verify          - compile and verify all tests for PSG play
+  report          - compile and report all tests for PSG play
+
+  test-<name>     - compile tests for <name> (psgpitch, tempo, etc.)
+  test-<name>-<n> - compile tests for <name>-<n> (tempo-1, tempo-2, etc.)
+  verify-<name>   - compile and verify tests for <name>
+  verify-<name>-<n> compile and verify tests for <name>-<n>
+  report-<name>   - compile and report tests for <name>
+  report-<name>-<n> compile and report tests for <name>-<n>
+
+  test-sndh       - compile SNDH files for all tests
+  test-wave       - compile WAVE files for all tests
+  test-svg        - compile SVG graphs for all tests
+  test-png        - compile PNG graphs for all tests
+  test-report     - compile report files for all tests
+
+  test/<name>-<n>.report
+                  - compile report file for test <name>-<n>
+  test/<name>-<n>.svg
+                  - compile SVG audio graph for test <name>-<n>
+  test/<name>-<n>.png
+                  - compile PNG audio graph for test <name>-<n>
+
+  PSGPLAY_TEST    - set optional program to test, other than the psgplay command
 
 Makefile options:
 
