@@ -62,7 +62,7 @@ arch()
 	verify)
 		m68k-elf-gcc --version | sed -n 1p
 		make_jv S=1 TARGET_COMPILE=m68k-elf- verify
-		make_jv S=1 TARGET_COMPILE=m68k-elf- verify-report
+		make_jv S=1 TARGET_COMPILE=m68k-elf- report
 		;;
 	mac)
 		cc --version | sed -n 1p

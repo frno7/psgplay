@@ -20,7 +20,8 @@ PSGPLAY_TEST_PNG = $(PSGPLAY_TEST_TUNE:%=%.png)
 PSGPLAY_TEST_REPORT = $(PSGPLAY_TEST_TUNE:%=%.report)
 PSGPLAY_TEST_VERIFY = $(PSGPLAY_TEST_SRC:%.c=%-verify)
 PSGPLAY_TEST_VERIFY_OBJ = $(PSGPLAY_TEST_VERIFY:%=%.o)
-PSGPLAY_TEST_VERIFY_TUNE = $(subst -,-verify-,$(PSGPLAY_TEST_TUNE))
+PSGPLAY_TEST_VERIFY_TUNE = $(addprefix verify-,$(notdir $(PSGPLAY_TEST_TUNE)))
+PSGPLAY_TEST_REPORT_TUNE = $(addprefix report-,$(notdir $(PSGPLAY_TEST_TUNE)))
 
 PSGPLAY_TEST_SNDH_CFLAGS += $(BASIC_TARGET_CFLAGS) $(CF2149_CFLAGS)	\
 	-march=68000 -mpcrel -fpie -nostdlib				\
@@ -55,10 +56,14 @@ $(1).report: $$(call PSGPLAY_TEST_sndh_base,$(1))-verify $(1).wave
 	$$(QUIET_GEN)$$< report -t $$(call PSGPLAY_TEST_sndh_tune,$$@)	\
 		-o $$@ $(1).wave
 
-.PHONY: $(subst -,-verify-,$(1))
-$(subst -,-verify-,$(1)): $$(call PSGPLAY_TEST_sndh_base,$(1))-verify $(1).wave
+.PHONY: verify-$(notdir $(1))
+verify-$(notdir $(1)): $$(call PSGPLAY_TEST_sndh_base,$(1))-verify $(1).wave
 	$$(QUIET_VERIFY)$$< verify -t $$(call PSGPLAY_TEST_sndh_tune,$$@) \
 		$(1).wave
+
+.PHONY: report-$(notdir $(1))
+report-$(notdir $(1)): $(1).report
+	@cat $$^
 endef
 
 $(foreach t,$(PSGPLAY_TEST_TUNE),$(eval $(call PSGPLAY_TEST_target,$(t))))
@@ -81,9 +86,20 @@ test-report: $(PSGPLAY_TEST_REPORT)
 .PHONY: verify
 verify: $(PSGPLAY_TEST_VERIFY_TUNE)
 
-.PHONY: verify-report
-verify-report: $(PSGPLAY_TEST_REPORT)
+.PHONY: report
+report: $(PSGPLAY_TEST_REPORT)
 	@cat $^
+
+define PSGPLAY_VERIFY_target
+.PHONY: verify-$(1)
+verify-$(1): $(filter verify-$(1)-%,$(PSGPLAY_TEST_VERIFY_TUNE))
+
+.PHONY: report-$(1)
+report-$(1): $(filter $(addprefix $(PSGPLAY_test_dir),$(1))-%,$(PSGPLAY_TEST_REPORT))
+	@cat $$^
+endef
+
+$(foreach t,$(PSGPLAY_TESTS),$(eval $(call PSGPLAY_VERIFY_target,$(t))))
 
 $(PSGPLAY_TEST_OBJ): %.o: %.c
 	$(QUIET_CC)$(TARGET_CC) $(PSGPLAY_TEST_SNDH_CFLAGS)		\
