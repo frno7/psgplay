@@ -19,38 +19,42 @@ static double timer_frequency(const struct options *options)
 	return (double)ATARI_MFP_XTAL / (preset.divisor * preset.count);
 }
 
+#define INIT								\
+	const struct timer_preset preset = test_value(options);		\
+									\
+	/*								\
+	 * One interrupt is half a period, so				\
+	 * multiply with 0.5 and 2.0 accordingly.			\
+	 */								\
+	const struct test_wave_deviation wave_deviation =		\
+		test_wave_deviation(audio);				\
+	const struct test_wave_error error = test_wave_error(		\
+		audio->format, wave_deviation, 0.5 * timer_frequency(options)); \
+									\
+	const double interrupt_frequency = 2.0 *			\
+		audio_frequency_from_period(				\
+			wave_deviation.wave.period,			\
+			audio->format.frequency)
+
 void report(struct strbuf *sb, const struct audio *audio,
 	const struct options *options)
 {
-	const struct timer_preset preset = test_value(options);
-
-	/*
-	 * One interrupt is half a period, so
-	 * multiply with 0.5 and 2.0 accordingly.
-	 */
-	const struct test_wave_deviation wave_deviation =
-		test_wave_deviation(audio);
-	const struct test_wave_error error = test_wave_error(
-		audio->format, wave_deviation, 0.5 * timer_frequency(options));
+	INIT;
 
 	report_input(sb, audio, test_name(options), options);
 
-	sbprintf(sb,
-		"timer clock %d Hz\n"
-		"timer divisor %d cycles\n"
-		"timer count %d cycles\n"
-		"timer frequency %f Hz\n",
-		ATARI_MFP_XTAL,
-		preset.divisor,
-		preset.count,
-		timer_frequency(options));
+	if (preset.ctrl)
+		sbprintf(sb,
+			"timer clock %d Hz\n"
+			"timer divisor %d cycles\n"
+			"timer count %d cycles\n",
+			ATARI_MFP_XTAL,
+			preset.divisor,
+			preset.count);
+
+	sbprintf(sb, "timer frequency %f Hz\n", timer_frequency(options));
 
 	report_wave_estimate(sb, audio->format, wave_deviation);
-
-	const double interrupt_frequency = 2.0 *
-		audio_frequency_from_period(
-			wave_deviation.wave.period,
-			audio->format.frequency);
 
 	sbprintf(sb,
 		"interrupt frequency %f Hz\n"

@@ -21,13 +21,16 @@ static double tone_frequency(const struct options *options)
 	return ATARI_STE_PSG_CLK / (16.0 * tone_period(options));
 }
 
+#define INIT								\
+	const struct test_wave_deviation wave_deviation =		\
+		test_wave_deviation(audio);				\
+	const struct test_wave_error error = test_wave_error(		\
+		audio->format, wave_deviation, tone_frequency(options))
+
 void report(struct strbuf *sb, const struct audio *audio,
 	const struct options *options)
 {
-	const struct test_wave_deviation wave_deviation =
-		test_wave_deviation(audio);
-	const struct test_wave_error error = test_wave_error(
-		audio->format, wave_deviation, tone_frequency(options));
+	INIT;
 
 	report_input(sb, audio, test_name(options), options);
 
@@ -50,10 +53,7 @@ void report(struct strbuf *sb, const struct audio *audio,
 
 char *verify(const struct audio *audio, const struct options *options)
 {
-	const struct test_wave_deviation wave_deviation =
-		test_wave_deviation(audio);
-	const struct test_wave_error error = test_wave_error(
-		audio->format, wave_deviation, tone_frequency(options));
+	INIT;
 
 	verify_assert (wave_deviation.deviation.maximum <= 1.8)
 		return "wave deviation max";
