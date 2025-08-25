@@ -6,8 +6,7 @@
 
 #include "test/report.h"
 #include "test/verify.h"
-
-#include "test/pitch.h"
+#include "test/psgpitch.h"
 
 test_value_names(int, tune_value_names);
 

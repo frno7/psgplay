@@ -3,9 +3,9 @@
 #include <asm/snd/psg.h>
 #include <asm/snd/sndh.h>
 
-#include "test/pitch.h"
+#include "test/psgpitch.h"
 
-sndh_title("Pitch");
+sndh_title("PSG pitch");
 sndh_tune_value_names(int, tune_value_names);
 
 void sndh_init(int tune)
