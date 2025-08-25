@@ -3,8 +3,7 @@
 #include <asm/snd/sndh.h>
 #include <asm/interrupt.h>
 #include <asm/io.h>
-
-#include "atari/mfp-map.h"
+#include <asm/mfp.h>
 
 #include "test/snd-dma-alt.h"
 #include "test/tempo.h"
@@ -25,11 +24,7 @@ static INTERRUPT void timer_a_play()
 {
 	snd_dma_alt_play(sample);
 
-	barrier();
-
-	mfp_map()->isra.timer_a = false;
-
-	barrier();
+	mfp_clrs_isra({ .timer_a = true });
 }
 
 void sndh_init(int tune)
@@ -43,16 +38,12 @@ void sndh_init(int tune)
 	} else if (preset.ctrl) {
 		iowr32((uint32_t)timer_a_play, 0x134);
 
-		barrier();
-
-		mfp_map()->tacr.ctrl = preset.ctrl;
-		mfp_map()->tadr.count = preset.count;
-		mfp_map()->iera.timer_a = true;
-		mfp_map()->ipra.timer_a = false;
-		mfp_map()->isra.timer_a = false;
-		mfp_map()->imra.timer_a = true;
-
-		barrier();
+		mfp_wrs_tacr({ .ctrl = preset.ctrl });
+		mfp_wrs_tadr({ .count = preset.count });
+		mfp_sets_iera({ .timer_a = true });
+		mfp_clrs_ipra({ .timer_a = true });
+		mfp_clrs_isra({ .timer_a = true });
+		mfp_sets_imra({ .timer_a = true });
 	}
 }
 
