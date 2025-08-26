@@ -224,11 +224,10 @@ void start(size_t size, void *sndh, u32 track, u32 timer)
 	__system_variables->_vblqueue = vblqueue;
 	__system_variables->_p_cookies = cookie_jar;
 
-	if (install_sndh_timer(u32_to_sndh_timer(timer))) {
-		sndh_init(track, &file);
+	sndh_init(track, &file);
 
+	if (install_sndh_timer(u32_to_sndh_timer(timer)))
 		play();		/* Play after SNDH init has completed. */
-	}
 
 	idle_indefinitely();
 }
