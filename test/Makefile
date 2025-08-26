@@ -43,10 +43,10 @@ OTHER_CLEAN += $(PSGPLAY_TEST_ELF) $(PSGPLAY_TEST_SNDH)			\
 	$(PSGPLAY_TEST_WAVE) $(PSGPLAY_TEST_SVG) $(PSGPLAY_TEST_PNG)	\
 	$(PSGPLAY_TEST_REPORT) $(PSGPLAY_TEST_VERIFY)
 
-ifdef TARGET_CC
-
 PSGPLAY_TEST = ./$(PSGPLAY)
 PSGPLAY_TEST_FLAGS = --length 63
+
+ifdef TARGET_CC
 
 PSGPLAY_TEST_sndh_tune ?= $(shell echo "$(1)" | sed 's/^.*-\([0-9]\+\).*$$/\1/')
 PSGPLAY_TEST_sndh_base ?= $(shell echo "$(1)" | sed 's/-[0-9]\+.*$$//')
@@ -149,4 +149,68 @@ SVGTOPNG_FLAGS = --background-color=white
 $(PSGPLAY_TEST_PNG): %.png: %.svg
 	$(QUIET_GEN)$(SVGTOPNG) -o $@ $(SVGTOPNG_FLAGS) $<
 
-endif
+endif # TARGET_CC
+
+SNDH_ARCHIVE_SUITE = $(addprefix $(PSGPLAY_test_dir),archive.suite)
+
+ifdef SNDH_ARCHIVE_DIR
+
+.PHONY: $(SNDH_ARCHIVE_SUITE)
+$(SNDH_ARCHIVE_SUITE):
+	$(QUIET_GEN)script/archive-suite enum $(PSGPLAY_TEST) $(SNDH_ARCHIVE_DIR) $@
+
+SNDH_ARCHIVE_SUITE_LENGTH := $(shell wc -l $(SNDH_ARCHIVE_SUITE) | cut -f1 -d' ')
+
+define SNDH_ARCHIVE_target_file_tune
+test/archive-$$(SNDH_ARCHIVE_TAG)$(1)-$(2).sha256:			\
+	FILE=$(shell script/archive-suite name $(1) $(SNDH_ARCHIVE_SUITE))
+test/archive-$$(SNDH_ARCHIVE_TAG)$(1)-$(2).sha256:
+	@echo '  SHA256  $$(@) $(PSGPLAY_TEST) $(PSGPLAY_TEST_FLAGS) $$(FILE)'
+	@$(PSGPLAY_TEST) --quiet -t $(2) $$(PSGPLAY_TEST_FLAGS)		\
+		-o $$(@:%.sha256=%.wave) "$$(SNDH_ARCHIVE_DIR)/$$(FILE)"
+	@sha256sum $$(@:%.sha256=%.wave) | sed 's# .*$$$$# $(2) $$(FILE)#' \
+		>$$(@:%.sha256=%.tmp)
+	@rm $$(@:%.sha256=%.wave)
+	@mv $$(@:%.sha256=%.tmp) $$@
+
+SNDH_ARCHIVE_SUITE_SHA256 += test/archive-$$(SNDH_ARCHIVE_TAG)$(1)-$(2).sha256
+
+.PHONY: verify-archive-sha256-$(1)-$(2)-sha256
+verify-archive-sha256-$(1)-$(2)-sha256:					\
+	FILE=$(shell script/archive-suite name $(1) $(SNDH_ARCHIVE_SUITE))
+verify-archive-sha256-$(1)-$(2)-sha256:
+	@echo '  VERIFY  $$(FILE) $(2) $$(FILE)'
+	@[ "$$(SNDH_ARCHIVE_TAG)"x = ""x ]
+	@[ "$$(SNDH_ARCHIVE_TAG_A)"x != "$$(SNDH_ARCHIVE_TAG_B)"x ]
+	@cmp --quiet test/archive-$$(SNDH_ARCHIVE_TAG_A)$(1)-$(2).sha256 \
+		     test/archive-$$(SNDH_ARCHIVE_TAG_B)$(1)-$(2).sha256
+
+SNDH_ARCHIVE_SUITE_VERIFY_SHA256 += verify-archive-sha256-$(1)-$(2)-sha256
+endef
+
+define SNDH_ARCHIVE_target_file
+$(foreach t,$(shell script/archive-suite tune-seq $(1) $(SNDH_ARCHIVE_SUITE)),\
+	$(eval $(call SNDH_ARCHIVE_target_file_tune,$(1),$(t))))
+endef
+
+$(foreach n,$(shell seq $(SNDH_ARCHIVE_SUITE_LENGTH)),			\
+	$(eval $(call SNDH_ARCHIVE_target_file,$(n))))
+
+.PHONY: test-archive
+test-archive: $(SNDH_ARCHIVE_SUITE_SHA256)
+
+.PHONY: verify-archive
+verify-archive: $(SNDH_ARCHIVE_SUITE_VERIFY_SHA256)
+
+.PHONY: verify-archive-old-new
+verify-archive-old-new: SNDH_ARCHIVE_TAG_A=old-
+verify-archive-old-new: SNDH_ARCHIVE_TAG_B=new-
+verify-archive-old-new: verify-archive
+
+else
+
+.PHONY: $(SNDH_ARCHIVE_SUITE)
+$(SNDH_ARCHIVE_SUITE):
+	$(error SNDH_ARCHIVE_DIR undefined)
+
+endif # SNDH_ARCHIVE_DIR

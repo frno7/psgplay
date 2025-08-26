@@ -1,0 +1,47 @@
+#!/bin/bash
+
+set -e
+set -o pipefail
+
+tune_count()
+{
+	"$cmd" --quiet --info "$1" | awk '
+		BEGIN { n=1 }
+		$1 == "tag" && $2 == "field" && $3 == "##" { n=$4; exit }
+		END { print n }
+	'
+}
+
+cmd_enum()
+{
+	local cmd="$1"
+	local archive_dir="$2"
+	local archive_suite="$3"
+
+	while read n file
+	do
+		echo "$(tune_count "${archive_dir}/$file") $file"
+	done <"${archive_suite}" | sort -k2 >"${archive_suite}".tmp
+
+	mv "${archive_suite}".tmp "${archive_suite}"
+}
+
+cmd_tune-seq()
+{
+	local n="$1"
+	local archive_suite="$2"
+
+	seq $(sed -n "$n"'{s/ .*$//;p;q}' <"${archive_suite}")
+}
+
+cmd_name()
+{
+	local n="$1"
+	local archive_suite="$2"
+
+	sed -n "$n"'{s/[0-9]\+ \+//;p;q}' <"${archive_suite}"
+}
+
+cmd="$1"
+shift
+cmd_"$cmd" "$@"
