@@ -5,6 +5,11 @@ PSGPLAY_test_dir := $(dir $(lastword $(MAKEFILE_LIST)))
 PSGPLAY_TESTS :=							\
 	dmapitch							\
 	psgpitch							\
+	sndhtimera							\
+	sndhtimerb							\
+	sndhtimerc							\
+	sndhtimerd							\
+	sndhtimervbl							\
 	tempo
 PSGPLAY_TEST_INCLUDE :=							\
 	$(addsuffix .h,$(addprefix include/test/,$(PSGPLAY_TESTS)))
@@ -26,7 +31,8 @@ PSGPLAY_TEST_REPORT_TUNE = $(addprefix report-,$(notdir $(PSGPLAY_TEST_TUNE)))
 
 PSGPLAY_TEST_SNDH_CFLAGS += $(BASIC_TARGET_CFLAGS) $(CF2149_CFLAGS)	\
 	-march=68000 -mpcrel -fpie -nostdlib				\
-	-isystem lib/toslibc/include/toslibc -D_TOSLIBC_SOURCE
+	-Ilib/toslibc/include -isystem lib/toslibc/include/toslibc	\
+	-D_TOSLIBC_SOURCE
 
 PSGPLAY_TEST_SNDH_LDFLAGS += --relocatable --gc-sections --strip-all	\
 	--entry _sndh -L$(TOSLIBC_lib_dir) --script=$(TOSLIBC_SCRIPT_SNDH_LD)

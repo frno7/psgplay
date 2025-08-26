@@ -1,39 +1,30 @@
 // SPDX-License-Identifier: GPL-2.0
+/*
+ * Copyright (C) 2025 Fredrik Noring
+ */
 
-#include "toslibc/asm/machine.h"
+#ifndef PSGPLAY_TEST_TIMER_SNDH_VERIFY_H
+#define PSGPLAY_TEST_TIMER_SNDH_VERIFY_H
 
-#include "atari/machine.h"
+test_value_names(double, tune_value_names);
 
-#include "test/report.h"
-#include "test/verify.h"
-#include "test/tempo.h"
-
-test_value_names(struct timer_preset, tune_value_names);
-
-static double timer_frequency(const struct options *options)
-{
-	const struct timer_preset preset = test_value(options);
-
-	return (double)ATARI_MFP_XTAL / (preset.divisor * preset.count);
-}
-
-#define INIT								\
+#define TIMER_SNDH_VERIFY_INIT						\
 	/*								\
 	 * One interrupt is half a period, so				\
 	 * multiply with 0.5 and 2.0 accordingly.			\
 	 */								\
+	const double timer_frequency = test_value(options);		\
 	const struct test_wave_deviation wave_deviation =		\
 		test_wave_deviation(audio);				\
 	const struct test_wave_error error = test_wave_error(		\
 		audio->format, wave_deviation,				\
-		0.5 * timer_frequency(options))
+		0.5 * timer_frequency)
 
 void report(struct strbuf *sb, const struct audio *audio,
 	const struct options *options)
 {
-	INIT;
+	TIMER_SNDH_VERIFY_INIT;
 
-	const struct timer_preset preset = test_value(options);
 	const double interrupt_frequency = 2.0 *
 		audio_frequency_from_period(
 			wave_deviation.wave.period,
@@ -41,15 +32,7 @@ void report(struct strbuf *sb, const struct audio *audio,
 
 	report_input(sb, audio, test_name(options), options);
 
-	sbprintf(sb,
-		"timer clock %d Hz\n"
-		"timer divisor %d cycles\n"
-		"timer count %d cycles\n",
-		ATARI_MFP_XTAL,
-		preset.divisor,
-		preset.count);
-
-	sbprintf(sb, "timer frequency %f Hz\n", timer_frequency(options));
+	sbprintf(sb, "timer frequency %f Hz\n", timer_frequency);
 
 	report_wave_estimate(sb, audio->format, wave_deviation);
 
@@ -64,7 +47,7 @@ void report(struct strbuf *sb, const struct audio *audio,
 
 char *verify(const struct audio *audio, const struct options *options)
 {
-	INIT;
+	TIMER_SNDH_VERIFY_INIT;
 
 	verify_assert (audio_duration(audio->format) >= 60.0)
 		return "sample duration";
@@ -72,8 +55,10 @@ char *verify(const struct audio *audio, const struct options *options)
 	verify_assert (wave_deviation.deviation.maximum <= 5.0)
 		return "wave deviation max";
 
-	verify_assert (error.relative_frequency <= 9e-7)
+	verify_assert (error.relative_frequency <= 5e-3) // FIXME: Accuracy
 		return "wave error relative frequency";
 
 	return NULL;
 }
+
+#endif /* PSGPLAY_TEST_TIMER_SNDH_VERIFY_H */

@@ -9,17 +9,12 @@
 struct timer_preset {
 	int ctrl;
 	int divisor;
-	union {
-		int count;
-		int frequency;
-	};
+	int count;
 };
 
 #define T(c, d, n) { .ctrl = (c), .divisor = (d), .count = (n) }
 
 #define tune_value_names(t)						\
-	t(T(0,   0, 16), "16 Hz timer B")				\
-	t(T(0,   0, 50), "50 Hz VBL")					\
 	t(T(7, 200, 11), "1117 Hz timer A")				\
 	t(T(6, 100, 17), "1445 Hz timer A")				\
 	t(T(5,  64, 19), "2021 Hz timer A")				\
