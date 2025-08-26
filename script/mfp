@@ -1,0 +1,75 @@
+#!/usr/bin/env -S runhaskell -iverify/tool --ghc-arg=-Wall --ghc-arg=-Wno-missing-signatures --ghc-arg=-Wno-type-defaults
+{-# LANGUAGE RecordWildCards #-}
+-- SPDX-License-Identifier: GPL-2.0
+-- Copyright (C) 2025 Fredrik Noring
+
+import Data.List (sortBy, uncons)
+import Data.Maybe (fromJust)
+import Text.Printf (printf)
+import System.Environment (getArgs)
+import System.Exit (exitFailure)
+import System.IO (hPutStr, stderr)
+
+xtal :: Int
+xtal = 2457600 -- Hz
+
+data Timer = Timer
+    { timerMode    :: Int
+    , timerCount   :: Int
+    , timerDivisor :: Int
+    } deriving (Show)
+
+modePrescale :: Int -> Int
+modePrescale 1 = 4
+modePrescale 2 = 10
+modePrescale 3 = 16
+modePrescale 4 = 50
+modePrescale 5 = 64
+modePrescale 6 = 100
+modePrescale 7 = 200
+modePrescale m = error $ "Invalid timer mode " ++ show m
+
+timers = [ Timer m c d | m <- [1..7], c <- [1..255], d <- [1..8] ]
+
+freq :: Timer -> Double
+freq Timer {..} = fromIntegral xtal / fromIntegral d
+    where d = modePrescale timerMode * timerCount * timerDivisor
+
+err :: Int -> Timer -> Int
+err f Timer {..} = modePrescale timerMode * timerCount * timerDivisor * f - xtal
+
+order :: Int -> [Timer]
+order f = sortBy cmp timers
+    where cmp a b = compare (rank a) (rank b)
+          rank t = (abs $ err f t) * 10 + timerDivisor t
+
+bestFreq :: Int -> Timer
+bestFreq f = fst $ fromJust $ uncons $ order f
+
+showBestFreq :: String -> String
+showBestFreq f = unlines $
+    [ printf "frequency %s Hz" f
+    , printf "timer frequency %.6f Hz" (freq t)
+    , printf "timer clock %d Hz" xtal
+    , printf "timer mode %d prescale %d" timerMode (modePrescale timerMode)
+    , printf "timer count %d" timerCount
+    , printf "timer divisor %d" timerDivisor
+    , printf "timer quality %s" $ quality $ err (read f) t
+    ]
+    where t = bestFreq $ read f
+          Timer {..} = t
+          quality 0 = "perfect"
+          quality _ = "approximation"
+
+help :: String
+help = "usage: mfp <cmd> [args]...\n"
+    ++ "\n"
+
+cmd :: [String] -> IO ()
+cmd ["freq", f] = putStr $ showBestFreq f
+cmd ["timers"]  = putStr $ unlines $ show <$> timers
+cmd ("help":_)  = putStr help
+cmd _           = hPutStr stderr help >> exitFailure
+
+main :: IO ()
+main = getArgs >>= cmd
