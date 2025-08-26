@@ -7,6 +7,8 @@
 
 #include <asm/interrupt.h>
 #include <asm/io.h>
+#include <asm/machine.h>
+#include <asm/mfp.h>
 #include <tos/cookie.h>
 #include <tos/system-variable.h>
 
@@ -18,8 +20,6 @@
 #include "internal/limits.h"
 
 #include "psgplay/sndh.h"
-
-#include "atari/mfp-map.h"
 
 struct timer_prescale {
 	enum mfp_ctrl ctrl;
@@ -95,11 +95,11 @@ MFP_CTRL_DIV(MFP_CTRL_DIV_PRESCALE)
 
 		/* FIXME: Report unobtainable frequencies. */
 		const u32 count = clamp_t(u32,
-			DIV_ROUND_CLOSEST_U32(MFP_TIMER_FREQUENCY,
+			DIV_ROUND_CLOSEST_U32(ATARI_MFP_XTAL,
 				d * (u32)frequency), 1, 256);
 
 		const u32 f = DIV_ROUND_CLOSEST_U32(
-			MFP_TIMER_FREQUENCY, d * count);
+			ATARI_MFP_XTAL, d * count);
 		const int diff = abs(f - frequency);
 
 		if (best >= 0 && diff >= best)
@@ -138,50 +138,48 @@ static bool timer_division(void)
 	return !timer_state.dividend++;
 }
 
-#define DEFINE_TIMER_EXCEPTION(name_, type_, ab_, ctrl_)		\
-	INTERRUPT void timer_##name_##_exception(void)			\
-	{								\
-		if (timer_state.type == SNDH_TIMER_##type_ &&		\
-		    timer_state.play && timer_division())		\
-			sndh_play(&file);				\
+#define DEFINE_TIMER_EXCEPTION(name_, type_, ab_)			\
+INTERRUPT void timer_##name_##_exception(void)				\
+{									\
+	if (timer_state.type == SNDH_TIMER_##type_ &&			\
+	    timer_state.play && timer_division())			\
+		sndh_play(&file);					\
 									\
-		barrier();						\
+	/* Some SNDH files mess with the counters, restore. */		\
+	if (mfp_rd_t##name_##cr().ctrl != timer_state.prescale.ctrl)	\
+		mfp_wrs_t##name_##cr({					\
+			.ctrl = timer_state.prescale.ctrl		\
+		});							\
+	if (mfp_rd_t##name_##dr().count != timer_state.prescale.count)	\
+		mfp_wrs_t##name_##dr({					\
+			.count = timer_state.prescale.count		\
+		});							\
 									\
-		/* Some SNDH files mess with the counters, restore. */	\
-		mfp_map()->ctrl_ = timer_state.prescale.ctrl;		\
-		mfp_map()->t##name_##dr.count = timer_state.prescale.count; \
+	/* Timer is now served. */					\
+	mfp_clrs_is##ab_({ .timer_##name_ = true });			\
+}									\
 									\
-		barrier();						\
+static bool install_sndh_timer_##name_(int frequency)			\
+{									\
+	if (!timer_prescale(&timer_state.prescale, frequency))		\
+		return false;						\
 									\
-		/* Timer is now served. */				\
-		mfp_map()->is##ab_.timer_##name_ = false;		\
+	mfp_wrs_t##name_##cr({ .ctrl = timer_state.prescale.ctrl });	\
+	mfp_wrs_t##name_##dr({ .count = timer_state.prescale.count });	\
+	mfp_sets_ie##ab_({ .timer_##name_ = true }); 			\
+	mfp_clrs_ip##ab_({ .timer_##name_ = true }); 			\
+	mfp_clrs_is##ab_({ .timer_##name_ = true }); 			\
+	mfp_sets_im##ab_({ .timer_##name_ = true }); 			\
 									\
-		barrier();						\
-	}								\
+	timer_state.type = SNDH_TIMER_##type_;				\
 									\
-	static bool install_sndh_timer_##name_(int frequency)		\
-	{								\
-		if (!timer_prescale(&timer_state.prescale, frequency))	\
-			return false;					\
-									\
-		mfp_map()->ctrl_ = timer_state.prescale.ctrl;		\
-		mfp_map()->t##name_##dr.count = timer_state.prescale.count; \
-		mfp_map()->ie##ab_.timer_##name_ = true;		\
-		mfp_map()->ip##ab_.timer_##name_ = false;		\
-		mfp_map()->is##ab_.timer_##name_ = false;		\
-		mfp_map()->im##ab_.timer_##name_ = true;		\
-									\
-		barrier();						\
-									\
-		timer_state.type = SNDH_TIMER_##type_;			\
-									\
-		return true;						\
-	}
+	return true;							\
+}
 
-DEFINE_TIMER_EXCEPTION(a, A, ra, tacr.ctrl)
-DEFINE_TIMER_EXCEPTION(b, B, ra, tbcr.ctrl)
-DEFINE_TIMER_EXCEPTION(c, C, rb, tcdcr.tc_ctrl)
-DEFINE_TIMER_EXCEPTION(d, D, rb, tcdcr.td_ctrl)
+DEFINE_TIMER_EXCEPTION(a, A, ra)
+DEFINE_TIMER_EXCEPTION(b, B, ra)
+DEFINE_TIMER_EXCEPTION(c, C, rb)
+DEFINE_TIMER_EXCEPTION(d, D, rb)
 
 static bool install_sndh_timer(const struct sndh_timer timer)
 {
