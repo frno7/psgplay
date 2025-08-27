@@ -65,19 +65,28 @@ struct test_wave_error test_wave_error(struct audio_format audio_format,
 }
 
 void report_wave_estimate(struct strbuf *sb, struct audio_format audio_format,
-	struct test_wave_deviation wave_deviation)
+	struct test_wave_deviation wave_deviation, double reference_frequency)
 {
+	const double wave_frequency = audio_frequency_from_period(
+		wave_deviation.wave.period, audio_format.frequency);
+	const double wave_error_total_count = audio_format.sample_count *
+		fabs(wave_frequency / reference_frequency - 1.0);
+	const double wave_error_total_time =
+		wave_error_total_count / audio_format.frequency;
+
 	sbprintf(sb,
 		"wave period %f samples\n"
 		"wave frequency %f Hz\n"
 		"wave phase %f samples\n"
+		"wave error total count %.3f samples\n"
+		"wave error total time %.3e s\n"
 		"wave zero crossing count %zu\n"
 		"wave zero crossing deviation max %f samples\n",
 		wave_deviation.wave.period,
-		audio_frequency_from_period(
-			wave_deviation.wave.period,
-			audio_format.frequency),
+		wave_frequency,
 		wave_deviation.wave.phase,
+		wave_error_total_count,
+		wave_error_total_time,
 		wave_deviation.deviation.count,
 		wave_deviation.deviation.maximum);
 }

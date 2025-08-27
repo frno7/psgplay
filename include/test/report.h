@@ -62,6 +62,6 @@ struct test_wave_error test_wave_error(struct audio_format audio_format,
 	struct test_wave_deviation wave_deviation, double reference_frequency);
 
 void report_wave_estimate(struct strbuf *sb, struct audio_format audio_format,
-	struct test_wave_deviation wave_deviation);
+	struct test_wave_deviation wave_deviation, double reference_frequency);
 
 #endif /* PSGPLAY_TEST_REPORT_H */

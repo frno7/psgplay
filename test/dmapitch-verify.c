@@ -48,7 +48,8 @@ void report(struct strbuf *sb, const struct audio *audio,
 		dma_sample_period(options),
 		dma_sample_frequency(options));
 
-	report_wave_estimate(sb, audio->format, wave_deviation);
+	report_wave_estimate(sb, audio->format, wave_deviation,
+		0.5 * dma_sound_frequency(options));
 
 	sbprintf(sb,
 		"wave error absolute frequency %f Hz\n"

@@ -34,7 +34,8 @@ void report(struct strbuf *sb, const struct audio *audio,
 
 	sbprintf(sb, "timer frequency %f Hz\n", timer_frequency);
 
-	report_wave_estimate(sb, audio->format, wave_deviation);
+	report_wave_estimate(sb, audio->format, wave_deviation,
+		0.5 * timer_frequency);
 
 	sbprintf(sb,
 		"interrupt frequency %f Hz\n"

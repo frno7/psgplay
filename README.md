@@ -419,15 +419,18 @@ title PSG square wave C1 double low C 33 Hz
 sample count 2686419 samples
 sample duration 60.9 s
 sample frequency 44100 Hz
-tone clock 2002653 / 16 Hz
+tone clock 8010613 / 4 / 16 Hz
 tone period 3793 cycles
-tone frequency 32.999160 Hz
-wave period 1336.397512 samples
-wave frequency 32.999163 Hz
-wave phase 45.000000 samples
-wave phase deviation max 1.124129 samples
-wave error absolute frequency 0.000004 Hz
-wave error relative frequency 1.17e-07
+tone frequency 32.999164 Hz
+wave period 1336.398010 samples
+wave frequency 32.999151 Hz
+wave phase 42.000000 samples
+wave error total count 1.022 samples
+wave error total time 2.317e-05 s
+wave zero crossing count 4021
+wave zero crossing deviation max 0.910448 samples
+wave error absolute frequency -0.000013 Hz
+wave error relative frequency 3.80e-07
 ```
 
 Set the `PSGPLAY_TEST` Makefile option to run the test suite with a command

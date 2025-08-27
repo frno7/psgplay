@@ -44,14 +44,15 @@ void report(struct strbuf *sb, const struct audio *audio,
 	sbprintf(sb,
 		"timer clock %d Hz\n"
 		"timer divisor %d cycles\n"
-		"timer count %d cycles\n",
+		"timer count %d cycles\n"
+		"timer frequency %f Hz\n",
 		ATARI_MFP_XTAL,
 		preset.divisor,
-		preset.count);
+		preset.count,
+		timer_frequency(options));
 
-	sbprintf(sb, "timer frequency %f Hz\n", timer_frequency(options));
-
-	report_wave_estimate(sb, audio->format, wave_deviation);
+	report_wave_estimate(sb, audio->format, wave_deviation,
+		0.5 * timer_frequency(options));
 
 	sbprintf(sb,
 		"interrupt frequency %f Hz\n"
