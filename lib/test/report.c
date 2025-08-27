@@ -71,11 +71,13 @@ void report_wave_estimate(struct strbuf *sb, struct audio_format audio_format,
 		"wave period %f samples\n"
 		"wave frequency %f Hz\n"
 		"wave phase %f samples\n"
-		"wave phase deviation max %f samples\n",
+		"wave zero crossing count %zu\n"
+		"wave zero crossing deviation max %f samples\n",
 		wave_deviation.wave.period,
 		audio_frequency_from_period(
 			wave_deviation.wave.period,
 			audio_format.frequency),
 		wave_deviation.wave.phase,
+		wave_deviation.deviation.count,
 		wave_deviation.deviation.maximum);
 }

@@ -214,6 +214,7 @@ static bool zcp_deviation(size_t i, bool neg_to_pos, void *arg)
 	struct zcp_deviation *zcpd = arg;
 	const double j = zcpd->wave.phase + zcpd->k * zcpd->wave.period;
 
+	zcpd->deviation.count++;
 	zcpd->deviation.maximum = max(zcpd->deviation.maximum, fabs(i - j));
 	zcpd->k += 0.5;
 

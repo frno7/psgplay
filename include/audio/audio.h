@@ -54,6 +54,7 @@ struct audio_zero_crossing_periodic {
 };
 
 struct audio_zero_crossing_periodic_deviation {
+	size_t count;
 	double maximum;
 };
 
