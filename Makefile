@@ -64,11 +64,17 @@ S_CFLAGS = -fsanitize=address -fsanitize=leak -fsanitize=undefined	\
 	  -fsanitize-address-use-after-scope
 endif
 
+# Suppress false array-bounds warning "array subscript 0 is outside
+# array bounds" and "source object is likely at address zero" for
+# the io{rd,wr}{8,16,32} family of functions. Confer
+# <https://gcc.gnu.org/bugzilla/show_bug.cgi?id=111035>.
+TARGET_CFLAGS_FIXES = --param=min-pagesize=0
+
 DEP_CFLAGS = -Wp,-MD,$(@D)/$(@F).d -MT $(@D)/$(@F)
 BASIC_CFLAGS = -O2 -Wall -D_GNU_SOURCE $(HAVE_CFLAGS) $(DEP_CFLAGS)
 BASIC_BUILD_CFLAGS = -Iinclude $(S_CFLAGS) $(BASIC_CFLAGS)
 BASIC_HOST_CFLAGS = -Iinclude $(S_CFLAGS) $(BASIC_CFLAGS)
-BASIC_TARGET_CFLAGS = -Iinclude $(BASIC_CFLAGS)
+BASIC_TARGET_CFLAGS = -Iinclude $(TARGET_CFLAGS_FIXES) $(BASIC_CFLAGS)
 
 .PHONY: all
 all:
