@@ -87,25 +87,25 @@ MFP_CTRL_DIV(MFP_CTRL_DIV_PRESCALE)
 	if (frequency < 1)
 		return false;
 
+	const u32 f = frequency;
+
 	for (size_t divisor = 1; divisor <= 8; divisor++)
 	for (size_t i = 0; i < ARRAY_SIZE(prescale_div); i++) {
 		const u32 d = prescale_div[i] * divisor;
-		if (frequency > U32_MAX / d)
+		if (f > U32_MAX / d)
 			continue;
 
 		/* FIXME: Report unobtainable frequencies. */
+		const u32 xtal = ATARI_MFP_XTAL;
 		const u32 count = clamp_t(u32,
-			DIV_ROUND_CLOSEST_U32(ATARI_MFP_XTAL,
-				d * (u32)frequency), 1, 256);
+			DIV_ROUND_CLOSEST_U32(xtal, d * f), 1, 255);
+		/* Prefer lower divisors over higher ones, all else equal. */
+		const u32 err = 10 * abs(d * count * f - xtal) + divisor;
 
-		const u32 f = DIV_ROUND_CLOSEST_U32(
-			ATARI_MFP_XTAL, d * count);
-		const int diff = abs(f - frequency);
-
-		if (best >= 0 && diff >= best)
+		if (best >= 0 && err >= best)
 			continue;
 
-		best = diff;
+		best = err;
 		valid = true;
 		*prescale = (struct timer_prescale) {
 			.ctrl = 1 + i,
@@ -119,15 +119,14 @@ MFP_CTRL_DIV(MFP_CTRL_DIV_PRESCALE)
 
 INTERRUPT void vbl_exception(void)
 {
-	if (timer_state.type == SNDH_TIMER_V)
+	if (timer_state.type == SNDH_TIMER_V &&
+	    timer_state.play)
 		sndh_play(&file);
 }
 
-static bool install_sndh_vbl(int frequency)
+static void install_sndh_vbl()
 {
 	timer_state.type = SNDH_TIMER_V;
-
-	return true;	/* The VBL frequency is constant. */
 }
 
 static bool timer_division(void)
@@ -159,11 +158,8 @@ INTERRUPT void timer_##name_##_exception(void)				\
 	mfp_clrs_is##ab_({ .timer_##name_ = true });			\
 }									\
 									\
-static bool install_sndh_timer_##name_(int frequency)			\
+static void install_sndh_timer_##name_()				\
 {									\
-	if (!timer_prescale(&timer_state.prescale, frequency))		\
-		return false;						\
-									\
 	mfp_wrs_t##name_##cr({ .ctrl = timer_state.prescale.ctrl });	\
 	mfp_wrs_t##name_##dr({ .count = timer_state.prescale.count });	\
 	mfp_sets_ie##ab_({ .timer_##name_ = true }); 			\
@@ -172,8 +168,6 @@ static bool install_sndh_timer_##name_(int frequency)			\
 	mfp_sets_im##ab_({ .timer_##name_ = true }); 			\
 									\
 	timer_state.type = SNDH_TIMER_##type_;				\
-									\
-	return true;							\
 }
 
 DEFINE_TIMER_EXCEPTION(a, A, ra)
@@ -181,16 +175,13 @@ DEFINE_TIMER_EXCEPTION(b, B, ra)
 DEFINE_TIMER_EXCEPTION(c, C, rb)
 DEFINE_TIMER_EXCEPTION(d, D, rb)
 
-static bool install_sndh_timer(const struct sndh_timer timer)
+static void install_sndh_timer(const struct sndh_timer timer)
 {
-	bool (* const install_sndh_timer)(int frequency) =
-		(timer.type == SNDH_TIMER_A ? install_sndh_timer_a :
-		 timer.type == SNDH_TIMER_B ? install_sndh_timer_b :
-		 timer.type == SNDH_TIMER_C ? install_sndh_timer_c :
-		 timer.type == SNDH_TIMER_D ? install_sndh_timer_d :
-					      install_sndh_vbl);
-
-	return install_sndh_timer(timer.frequency);
+	(timer.type == SNDH_TIMER_A ? install_sndh_timer_a :
+	 timer.type == SNDH_TIMER_B ? install_sndh_timer_b :
+	 timer.type == SNDH_TIMER_C ? install_sndh_timer_c :
+	 timer.type == SNDH_TIMER_D ? install_sndh_timer_d :
+				      install_sndh_vbl)();
 }
 
 static void play()
@@ -213,8 +204,10 @@ static void idle_indefinitely(void)
 		idle();
 }
 
-void start(size_t size, void *sndh, u32 track, u32 timer)
+void start(size_t size, void *sndh, u32 track, u32 timer_)
 {
+	const struct sndh_timer timer = u32_to_sndh_timer(timer_);
+
 	BUILD_BUG_ON(sizeof(struct system_variables) != 0x1b4);
 
 	file = (struct sndh_file) { .size = size, .sndh = sndh };
@@ -224,10 +217,16 @@ void start(size_t size, void *sndh, u32 track, u32 timer)
 	__system_variables->_vblqueue = vblqueue;
 	__system_variables->_p_cookies = cookie_jar;
 
+	if (timer.type && timer.type != SNDH_TIMER_V)
+		if (!timer_prescale(&timer_state.prescale, timer.frequency))
+			goto err;
+
 	sndh_init(track, &file);
 
-	if (install_sndh_timer(u32_to_sndh_timer(timer)))
-		play();		/* Play after SNDH init has completed. */
+	install_sndh_timer(timer);
 
+	play();
+
+err:
 	idle_indefinitely();
 }
