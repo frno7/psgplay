@@ -9,46 +9,32 @@
 test_value_names(double, tune_value_names);
 
 #define TIMER_SNDH_VERIFY_INIT						\
-	/*								\
-	 * One interrupt is half a period, so				\
-	 * multiply with 0.5 and 2.0 accordingly.			\
-	 */								\
 	const double timer_frequency = test_value(options);		\
 	const struct test_wave_deviation wave_deviation =		\
-		test_wave_deviation(audio);				\
-	const struct test_wave_error error = test_wave_error(		\
-		audio->format, wave_deviation,				\
-		0.5 * timer_frequency)
+		test_wave_deviation(audio)
 
 void report(struct strbuf *sb, const struct audio *audio,
 	const struct options *options)
 {
 	TIMER_SNDH_VERIFY_INIT;
 
-	const double interrupt_frequency = 2.0 *
-		audio_frequency_from_period(
-			wave_deviation.wave.period,
-			audio->format.frequency);
-
 	report_input(sb, audio, test_name(options), options);
 
 	sbprintf(sb, "timer frequency %f Hz\n", timer_frequency);
 
+	/* One interrupt is half a period, so multiply with 0.5 accordingly. */
 	report_wave_estimate(sb, audio->format, wave_deviation,
 		0.5 * timer_frequency);
-
-	sbprintf(sb,
-		"interrupt frequency %f Hz\n"
-		"interrupt error absolute frequency %f Hz\n"
-		"interrupt error relative frequency %.2e\n",
-		interrupt_frequency,
-		2.0 * error.absolute_frequency,
-		error.relative_frequency);
 }
 
 char *verify(const struct audio *audio, const struct options *options)
 {
 	TIMER_SNDH_VERIFY_INIT;
+
+	/* One interrupt is half a period, so multiply with 0.5 accordingly. */
+	const struct test_wave_error error = test_wave_error(
+		audio->format, wave_deviation,
+		0.5 * timer_frequency);
 
 	verify_assert (audio_duration(audio->format) >= 60.0)
 		return "sample duration";

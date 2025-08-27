@@ -22,40 +22,30 @@ static double tone_frequency(const struct options *options)
 		(ATARI_STE_SND_PSG_DIV * 16.0 * tone_period(options));
 }
 
-#define INIT								\
-	const struct test_wave_deviation wave_deviation =		\
-		test_wave_deviation(audio);				\
-	const struct test_wave_error error = test_wave_error(		\
-		audio->format, wave_deviation, tone_frequency(options))
-
 void report(struct strbuf *sb, const struct audio *audio,
 	const struct options *options)
 {
-	INIT;
+	const struct test_wave_deviation wave_deviation =
+		test_wave_deviation(audio);
 
 	report_input(sb, audio, test_name(options), options);
 
 	sbprintf(sb,
 		"tone clock %d / %d / 16 Hz\n"
-		"tone period %d cycles\n"
-		"tone frequency %f Hz\n",
+		"tone period %d cycles\n",
 		ATARI_STE_EXT_OSC, ATARI_STE_SND_PSG_DIV,
-		tone_period(options),
-		tone_frequency(options));
+		tone_period(options));
 
 	report_wave_estimate(sb, audio->format, wave_deviation,
 		tone_frequency(options));
-
-	sbprintf(sb,
-		"wave error absolute frequency %f Hz\n"
-		"wave error relative frequency %.2e\n",
-		error.absolute_frequency,
-		error.relative_frequency);
 }
 
 char *verify(const struct audio *audio, const struct options *options)
 {
-	INIT;
+	const struct test_wave_deviation wave_deviation =
+		test_wave_deviation(audio);
+	const struct test_wave_error error = test_wave_error(
+		audio->format, wave_deviation, tone_frequency(options));
 
 	verify_assert (audio_duration(audio->format) >= 60.0)
 		return "sample duration";

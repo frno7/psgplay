@@ -27,40 +27,30 @@ static double dma_sample_frequency(const struct options *options)
 	return dma_sound_frequency(options) / dma_sample_period(options);
 }
 
-#define INIT								\
-	const struct test_wave_deviation wave_deviation =		\
-		test_wave_deviation(audio);				\
-	const struct test_wave_error error = test_wave_error(		\
-		audio->format, wave_deviation, dma_sample_frequency(options))
-
 void report(struct strbuf *sb, const struct audio *audio,
 	const struct options *options)
 {
-	INIT;
+	const struct test_wave_deviation wave_deviation =
+		test_wave_deviation(audio);
 
 	report_input(sb, audio, test_name(options), options);
 
 	sbprintf(sb,
 		"dma sound frequency %f Hz\n"
-		"dma sample period %d samples\n"
-		"dma sample frequency %f Hz\n",
+		"dma sample period %d samples\n",
 		dma_sound_frequency(options),
-		dma_sample_period(options),
-		dma_sample_frequency(options));
+		dma_sample_period(options));
 
 	report_wave_estimate(sb, audio->format, wave_deviation,
-		0.5 * dma_sound_frequency(options));
-
-	sbprintf(sb,
-		"wave error absolute frequency %f Hz\n"
-		"wave error relative frequency %.2e\n",
-		error.absolute_frequency,
-		error.relative_frequency);
+		dma_sample_frequency(options));
 }
 
 char *verify(const struct audio *audio, const struct options *options)
 {
-	INIT;
+	const struct test_wave_deviation wave_deviation =
+		test_wave_deviation(audio);
+	const struct test_wave_error error = test_wave_error(
+		audio->format, wave_deviation, dma_sample_frequency(options));
 
 	verify_assert (audio_duration(audio->format) >= 60.0)
 		return "sample duration";

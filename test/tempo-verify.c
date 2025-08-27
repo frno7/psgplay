@@ -17,27 +17,12 @@ static double timer_frequency(const struct options *options)
 	return (double)ATARI_MFP_XTAL / (preset.divisor * preset.count);
 }
 
-#define INIT								\
-	/*								\
-	 * One interrupt is half a period, so				\
-	 * multiply with 0.5 and 2.0 accordingly.			\
-	 */								\
-	const struct test_wave_deviation wave_deviation =		\
-		test_wave_deviation(audio);				\
-	const struct test_wave_error error = test_wave_error(		\
-		audio->format, wave_deviation,				\
-		0.5 * timer_frequency(options))
-
 void report(struct strbuf *sb, const struct audio *audio,
 	const struct options *options)
 {
-	INIT;
-
 	const struct timer_preset preset = test_value(options);
-	const double interrupt_frequency = 2.0 *
-		audio_frequency_from_period(
-			wave_deviation.wave.period,
-			audio->format.frequency);
+	const struct test_wave_deviation wave_deviation =
+		test_wave_deviation(audio);
 
 	report_input(sb, audio, test_name(options), options);
 
@@ -51,21 +36,20 @@ void report(struct strbuf *sb, const struct audio *audio,
 		preset.count,
 		timer_frequency(options));
 
+	/* One interrupt is half a period, so multiply with 0.5 accordingly. */
 	report_wave_estimate(sb, audio->format, wave_deviation,
 		0.5 * timer_frequency(options));
-
-	sbprintf(sb,
-		"interrupt frequency %f Hz\n"
-		"interrupt error absolute frequency %f Hz\n"
-		"interrupt error relative frequency %.2e\n",
-		interrupt_frequency,
-		2.0 * error.absolute_frequency,
-		error.relative_frequency);
 }
 
 char *verify(const struct audio *audio, const struct options *options)
 {
-	INIT;
+	const struct test_wave_deviation wave_deviation =
+		test_wave_deviation(audio);
+
+	/* One interrupt is half a period, so multiply with 0.5 accordingly. */
+	const struct test_wave_error error = test_wave_error(
+		audio->format, wave_deviation,
+		0.5 * timer_frequency(options));
 
 	verify_assert (audio_duration(audio->format) >= 60.0)
 		return "sample duration";

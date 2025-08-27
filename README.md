@@ -421,16 +421,17 @@ sample duration 60.9 s
 sample frequency 44100 Hz
 tone clock 8010613 / 4 / 16 Hz
 tone period 3793 cycles
-tone frequency 32.999164 Hz
+wave reference frequency 32.999164 Hz
 wave period 1336.398010 samples
 wave frequency 32.999151 Hz
 wave phase 42.000000 samples
-wave error total count 1.022 samples
-wave error total time 2.317e-05 s
 wave zero crossing count 4021
 wave zero crossing deviation max 0.910448 samples
+wave error total count 1.022 samples
+wave error total time 2.317e-05 s
 wave error absolute frequency -0.000013 Hz
 wave error relative frequency 3.80e-07
+wave error relative margin 7.44e-07
 ```
 
 Set the `PSGPLAY_TEST` Makefile option to run the test suite with a command
