@@ -37,7 +37,7 @@ void sndh_init(int tune)
 
 	mfp_wrs_tacr({ .ctrl = preset.ctrl });
 	mfp_wrs_tadr({ .count = preset.count });
-	mfp_sets_ier({ .timer_a = true });
+	mfp_clrs_ier({ .timer_a = true });
 	mfp_clrs_ipr({ .timer_a = true });
 	mfp_clrs_isr({ .timer_a = true });
 	mfp_sets_imr({ .timer_a = true });
@@ -45,6 +45,8 @@ void sndh_init(int tune)
 
 void sndh_play()
 {
+	if (!mfp_rd_ier().timer_a)
+		mfp_sets_ier({ .timer_a = true });
 }
 
 void sndh_exit()
