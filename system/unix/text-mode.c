@@ -49,7 +49,7 @@ struct sample_buffer {
 
 	struct psgplay *pp;
 
-	const struct output *output;
+	const struct audio_writer *output;
 	void *output_arg;
 };
 
@@ -106,7 +106,7 @@ static struct psgplay *psgplay_init__(const void *data,
 static struct sample_buffer sample_buffer_init(
 	struct sample_mixer *sm, const void *data, size_t size,
 	const char *option_output, int track, int frequency,
-	const struct output *output)
+	const struct audio_writer *output)
 {
 	struct sample_buffer sb = {
 		.pp = psgplay_init__(data, size, track, frequency, sm),
@@ -341,7 +341,7 @@ static unicode_t nonspace_charset_atari_st_to_utf32(u8 c, void *arg)
 }
 
 void text_replay(const struct options *options, struct file file,
-	const struct output *output)
+	const struct audio_writer *output)
 {
 	DEFINE_FIFO(tty_in, 256);
 	DEFINE_FIFO(tty_out, 4096);

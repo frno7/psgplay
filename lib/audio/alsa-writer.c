@@ -181,7 +181,7 @@ static void *alsa_open(const char *output, int frequency, bool nonblocking)
 	snd_pcm_hw_params_alloca(&state->hwparams);
 
 	err = snd_pcm_open(&state->pcm_handle,
-		alsa_output_handle(output), SND_PCM_STREAM_PLAYBACK,
+		alsa_writer_handle(output), SND_PCM_STREAM_PLAYBACK,
 		nonblocking ? SND_PCM_NONBLOCK : 0);
 	if (err < 0)
 		pr_fatal_error("%s: ALSA snd_pcm_open failed: %s\n",
@@ -263,13 +263,13 @@ static void alsa_close(void *arg)
 
 #endif /* HAVE_ALSA */
 
-const char *alsa_output_handle(const char *output)
+const char *alsa_writer_handle(const char *output)
 {
 	return !output ? "default" :
 		strncmp(output, "alsa:", 5) == 0 ? &output[5] : NULL;
 }
 
-const struct output alsa_output = {
+const struct audio_writer alsa_writer = {
 #ifdef HAVE_ALSA
 	.open	= alsa_open,
 	.sample	= alsa_sample,

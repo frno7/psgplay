@@ -14,6 +14,6 @@
 #include "system/unix/option.h"
 
 void command_replay(const struct options *options, struct file file,
-	const struct output *output);
+	const struct audio_writer *output);
 
 #endif /* PSGPLAY_SYSTEM_UNIX_COMMAND_MODE_H */

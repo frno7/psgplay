@@ -221,7 +221,7 @@ error:
 
 #endif /* HAVE_PORTAUDIO */
 
-const struct output portaudio_output = {
+const struct audio_writer portaudio_output = {
 #ifdef HAVE_PORTAUDIO
 	.open	= portaudio_open,
 	.sample	= portaudio_sample,

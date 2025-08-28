@@ -5,6 +5,6 @@
 
 #include "audio/writer.h"
 
-extern const struct output portaudio_output;
+extern const struct audio_writer portaudio_output;
 
 #endif /* PSGPLAY_PORTAUDIO_WRITER_H */

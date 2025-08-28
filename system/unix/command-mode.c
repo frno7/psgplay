@@ -30,7 +30,7 @@ struct replay_state {
 	ssize_t sample_start;
 	ssize_t sample_stop;
 
-	const struct output *output;
+	const struct audio_writer *output;
 	void *output_arg;
 
 	ssize_t sample_count;
@@ -82,7 +82,7 @@ static ssize_t stop_or_length(ssize_t stop, ssize_t length)
 }
 
 void command_replay(const struct options *options, struct file file,
-	const struct output *output)
+	const struct audio_writer *output)
 {
 	const char *auto_stop = options->stop ? options->stop :
 		!options->stop && !options->length ? "auto" : NULL;

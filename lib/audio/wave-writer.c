@@ -186,7 +186,7 @@ static void wave_close(void *arg)
 	free(state);
 }
 
-const struct output wave_output = {
+const struct audio_writer wave_writer = {
 	.open	= wave_open,
 	.sample	= wave_sample,
 	.close	= wave_close,

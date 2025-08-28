@@ -30,7 +30,7 @@
 const char *progname = "psgplay";
 
 typedef void (*replay_f)(const struct options *options, struct file file,
-	const struct output *output);
+	const struct audio_writer *output);
 
 static void NORETURN info_exit(struct file file)
 {
@@ -90,16 +90,16 @@ static void select_subtune(int *track, struct file file)
 				file.path, *track, track_count);
 }
 
-static const struct output *select_output(const struct options *options)
+static const struct audio_writer *select_output(const struct options *options)
 {
 #ifdef HAVE_PORTAUDIO
 	if (!options->output)
 		return &portaudio_output;
 #endif /* HAVE_PORTAUDIO */
 
-	if (alsa_output_handle(options->output)) {
+	if (alsa_writer_handle(options->output)) {
 #ifdef HAVE_ALSA
-		return &alsa_output;
+		return &alsa_writer;
 #else
 		pr_fatal_error("ALSA was disabled during compilation\n");
 #endif /* HAVE_ALSA */
@@ -108,7 +108,7 @@ static const struct output *select_output(const struct options *options)
 	if (!options->output)
 		pr_fatal_error("missing output file\n");
 
-	return &wave_output;
+	return &wave_writer;
 }
 
 static replay_f select_replay(const struct options *options)

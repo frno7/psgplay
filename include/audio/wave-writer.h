@@ -5,6 +5,6 @@
 
 #include "audio/writer.h"
 
-extern const struct output wave_output;
+extern const struct audio_writer wave_writer;
 
 #endif /* PSGPLAY_WAVE_WRITER_H */
