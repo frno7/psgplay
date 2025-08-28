@@ -11,7 +11,7 @@
 #include "atari/bus.h"
 #include "atari/sample.h"
 
-#define PSG_FREQUENCY	(ATARI_STE_EXT_OSC / ATARI_STE_SND_PSG_DIV)
+#define PSG_FREQUENCY	(ATARI_STE_EXT_OSC / ATARI_STE_SND_PSG_CLK_DIV)
 
 extern const struct device psg_device;
 

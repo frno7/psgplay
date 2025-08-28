@@ -13,13 +13,13 @@ test_value_names(int, tune_value_names);
 static int tone_period(const struct options *options)
 {
 	return (int)round((double)ATARI_STE_EXT_OSC /
-		(ATARI_STE_SND_PSG_DIV * 16.0 * test_value(options)));
+		(ATARI_STE_SND_PSG_CLK_DIV * 16.0 * test_value(options)));
 }
 
 static double tone_frequency(const struct options *options)
 {
 	return (double)ATARI_STE_EXT_OSC /
-		(ATARI_STE_SND_PSG_DIV * 16.0 * tone_period(options));
+		(ATARI_STE_SND_PSG_CLK_DIV * 16.0 * tone_period(options));
 }
 
 void report(struct strbuf *sb, const struct audio *audio,
@@ -33,7 +33,7 @@ void report(struct strbuf *sb, const struct audio *audio,
 	sbprintf(sb,
 		"tone clock %d / %d / 16 Hz\n"
 		"tone period %d cycles\n",
-		ATARI_STE_EXT_OSC, ATARI_STE_SND_PSG_DIV,
+		ATARI_STE_EXT_OSC, ATARI_STE_SND_PSG_CLK_DIV,
 		tone_period(options));
 
 	report_wave_estimate(sb, audio->format, wave_deviation,

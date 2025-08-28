@@ -14,7 +14,7 @@ static double dma_sound_frequency(const struct options *options)
 {
 	const int d = 1 << (3 - test_value(options).frequency);
 
-	return ATARI_STE_EXT_OSC / (double)(ATARI_STE_SND_DMA_DIV * d);
+	return ATARI_STE_EXT_OSC / (double)(ATARI_STE_SND_DMA_CLK_DIV * d);
 }
 
 static int dma_sample_period(const struct options *options)
