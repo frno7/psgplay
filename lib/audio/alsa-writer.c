@@ -7,7 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "out/alsa.h"
+#include "audio/alsa-writer.h"
 
 #ifdef HAVE_ALSA
 

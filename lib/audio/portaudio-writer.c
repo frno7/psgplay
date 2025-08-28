@@ -8,7 +8,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "out/portaudio.h"
+#include "audio/portaudio-writer.h"
 
 #ifdef HAVE_PORTAUDIO
 

@@ -19,7 +19,7 @@
 
 #include "psgplay/version.h"
 
-#include "out/alsa.h"
+#include "audio/alsa-writer.h"
 
 #include "system/unix/file.h"
 #include "system/unix/option.h"

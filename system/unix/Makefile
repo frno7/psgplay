@@ -26,8 +26,8 @@ SYSTEM_UNIX_SRC += system/unix/disassemble.c
 endif
 
 PSGPLAY_SRC :=								\
+	$(AUDIO_SRC)							\
 	$(DISASSEMBLE_SRC) 						\
-	$(OUT_SRC)							\
 	$(SYSTEM_UNIX_SRC)						\
 	$(TEXT_SRC)							\
 	$(UNICODE_SRC)							\

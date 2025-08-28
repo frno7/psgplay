@@ -3,8 +3,8 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#ifndef PSGPLAY_OUTPUT_H
-#define PSGPLAY_OUTPUT_H
+#ifndef PSGPLAY_WRITER_H
+#define PSGPLAY_WRITER_H
 
 #include "internal/types.h"
 
@@ -18,4 +18,4 @@ struct output {
 	void (*close)(void *arg);
 };
 
-#endif /* PSGPLAY_OUTPUT_H */
+#endif /* PSGPLAY_WRITER_H */

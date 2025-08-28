@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0
 
-#ifndef PSGPLAY_OUTPUT_ALSA_H
-#define PSGPLAY_OUTPUT_ALSA_H
+#ifndef PSGPLAY_ALSA_WRITER_H
+#define PSGPLAY_ALSA_WRITER_H
 
-#include "out/output.h"
+#include "audio/writer.h"
 
 extern const struct output alsa_output;
 
@@ -18,4 +18,4 @@ extern const struct output alsa_output;
  */
 const char *alsa_output_handle(const char *output);
 
-#endif /* PSGPLAY_OUTPUT_ALSA_H */
+#endif /* PSGPLAY_ALSA_WRITER_H */

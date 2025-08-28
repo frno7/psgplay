@@ -8,7 +8,7 @@
 
 #include "internal/types.h"
 
-#include "out/output.h"
+#include "audio/writer.h"
 
 #include "system/unix/file.h"
 #include "system/unix/option.h"

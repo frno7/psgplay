@@ -14,9 +14,9 @@
 
 #include "psgplay/sndh.h"
 
-#include "out/alsa.h"
-#include "out/portaudio.h"
-#include "out/wave.h"
+#include "audio/alsa-writer.h"
+#include "audio/portaudio-writer.h"
+#include "audio/wave-writer.h"
 
 #include "system/unix/command-mode.h"
 #include "system/unix/diagnostic.h"

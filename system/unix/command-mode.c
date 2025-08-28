@@ -19,7 +19,7 @@
 #include "psgplay/psgplay.h"
 #include "psgplay/sndh.h"
 
-#include "out/output.h"
+#include "audio/writer.h"
 
 #include "system/unix/file.h"
 #include "system/unix/memory.h"

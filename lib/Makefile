@@ -22,7 +22,6 @@ include lib/example/Makefile
 
 include lib/audio/Makefile
 include lib/graph/Makefile
-include lib/out/Makefile
 include lib/vt/Makefile
 include lib/unicode/Makefile
 include lib/text/Makefile
