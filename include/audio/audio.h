@@ -101,4 +101,15 @@ static inline double audio_duration(const struct audio_format format)
 	return format.sample_count / (double)format.frequency;
 }
 
+static inline double audio_relative_tolerance(const struct audio_format format)
+{
+	/*
+	 * Max 1+1 sample error in first and last zero crossing,
+	 * with 10 % margin.
+	 */
+	const double max_sample_error = 2.0 * 1.1;
+
+	return max_sample_error / format.sample_count;
+}
+
 #endif /* PSGPLAY_AUDIO_H */

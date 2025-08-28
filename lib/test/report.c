@@ -75,10 +75,6 @@ void report_wave_estimate(struct strbuf *sb, struct audio_format audio_format,
 		wave_error_total_count / audio_format.frequency;
 	const struct test_wave_error error = test_wave_error(
 		audio_format, wave_deviation, reference_frequency);
-	/* Max 1+1 sample error in first and last zero crossing. */
-	const double max_sample_error = 2.0;
-	const double wave_error_relative_margin =
-		max_sample_error / audio_format.sample_count;
 
 	sbprintf(sb,
 		"wave reference frequency %f Hz\n"
@@ -91,7 +87,7 @@ void report_wave_estimate(struct strbuf *sb, struct audio_format audio_format,
 		"wave error total time %.3e s\n"
 		"wave error absolute frequency %f Hz\n"
 		"wave error relative frequency %.2e\n"
-		"wave error relative margin %.2e\n",
+		"wave error relative tolerance %.2e\n",
 		reference_frequency,
 		wave_deviation.wave.period,
 		wave_frequency,
@@ -102,5 +98,5 @@ void report_wave_estimate(struct strbuf *sb, struct audio_format audio_format,
 		wave_error_total_time,
 		error.absolute_frequency,
 		error.relative_frequency,
-		wave_error_relative_margin);
+		audio_relative_tolerance(audio_format));
 }

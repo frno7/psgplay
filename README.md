@@ -402,11 +402,11 @@ More specific tests can be compiled, verified and reported. For example
 Making audio graph and report files:
 
 - `make -j TARGET_COMPILE=m68k-elf- test/psgpitch-1.svg` compiles an SVG
-  graph file `test/psgpitch-1.svg`.
+  graph file.
 - `make -j TARGET_COMPILE=m68k-elf- test/psgpitch-1.png` compiles a PNG
-  graph file `test/psgpitch-1.png`.
+  graph file.
 - `make -j TARGET_COMPILE=m68k-elf- test/psgpitch-1.report` compiles a
-  report file `test/psgpitch-1.report`.
+  report file.
 
 Example report:
 
@@ -431,7 +431,7 @@ wave error total count 1.022 samples
 wave error total time 2.317e-05 s
 wave error absolute frequency -0.000013 Hz
 wave error relative frequency 3.80e-07
-wave error relative margin 7.44e-07
+wave error relative tolerance 7.44e-07
 ```
 
 Set the `PSGPLAY_TEST` Makefile option to run the test suite with a command
