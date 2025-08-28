@@ -11,8 +11,6 @@
 #include "atari/machine.h"
 #include "atari/device.h"
 
-#define BUS_FREQUENCY CPU_FREQUENCY
-
 u8 bus_error_rd_u8(const struct device *device, u32 address);
 u16 bus_error_rd_u16(const struct device *device, u32 address);
 void bus_error_wr_u8(const struct device *device, u32 address, u8 data);
