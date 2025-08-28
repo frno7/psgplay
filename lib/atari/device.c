@@ -72,7 +72,7 @@ const struct device *device_for_bus_address(u32 bus_address)
 struct device_cycle device_cycle(const struct device *device)
 {
 	return (struct device_cycle) {
-		.c = cycle_transform(device->frequency,
+		.c = cycle_transform(device->clk.frequency / device->clk.divisor,
 			CPU_FREQUENCY, machine_cycle())
 	};
 }
@@ -81,7 +81,7 @@ struct device_cycle device_from_machine_cycle(
 	const struct device *device, u64 machine_cycle)
 {
 	return (struct device_cycle) {
-		.c = cycle_transform(device->frequency,
+		.c = cycle_transform(device->clk.frequency / device->clk.divisor,
 			CPU_FREQUENCY, machine_cycle)
 	};
 }
@@ -90,7 +90,7 @@ static struct device_slice device_from_machine_slice(
 	const struct device *device, u64 machine_slice)
 {
 	return (struct device_slice) {
-		.s = cycle_transform(device->frequency,
+		.s = cycle_transform(device->clk.frequency / device->clk.divisor,
 			CPU_FREQUENCY, machine_slice)
 	};
 }
@@ -99,14 +99,14 @@ static u64 machine_from_device_cycle(const struct device *device,
 	const struct device_cycle device_cycle)
 {
 	return cycle_transform(CPU_FREQUENCY,
-			device->frequency, device_cycle.c);
+			device->clk.frequency / device->clk.divisor, device_cycle.c);
 }
 
 static u64 machine_from_device_slice(const struct device *device,
 	const struct device_slice device_slice)
 {
 	return cycle_transform(CPU_FREQUENCY,
-			device->frequency, device_slice.s);
+			device->clk.frequency / device->clk.divisor, device_slice.s);
 }
 
 void request_device_event(const struct device *device,

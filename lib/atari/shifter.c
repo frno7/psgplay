@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "toslibc/asm/machine.h"
+
 #include "atari/device.h"
 #include "atari/shifter.h"
 
@@ -67,7 +69,10 @@ static void shifter_reset(const struct device *device)
 
 const struct device shifter_device = {
 	.name = "shifter",
-	.frequency = 32000000,
+	.clk = {
+		.frequency = ATARI_STE_PAL_MCLK,
+		.divisor = 1
+	},
 	.bus = {
 		.address = 0xff8200,
 		.size = 512,

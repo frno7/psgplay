@@ -341,7 +341,10 @@ void sound_check(u32 bus_address)
 
 const struct device sound_device = {
 	.name = "snd",
-	.frequency = SOUND_FREQUENCY,
+	.clk = {
+		.frequency = SOUND_FREQUENCY,
+		.divisor = 1
+	},
 	.bus = {
 		.address = 0xff8900,
 		.size = 34,

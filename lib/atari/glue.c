@@ -110,7 +110,10 @@ int m68k_int_ack_callback(int level)
 
 const struct device glue_device = {
 	.name = "glue",
-	.frequency = 8000000,
+	.clk = {
+		.frequency = CPU_FREQUENCY,
+		.divisor = 1
+	},
 	.reset = glue_reset,
 	.event = glue_event,
 };

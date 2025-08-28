@@ -166,7 +166,10 @@ void psg_sample(psg_sample_f sample, void *sample_arg)
 
 const struct device psg_device = {
 	.name = "psg",
-	.frequency = PSG_FREQUENCY,
+	.clk = {
+		.frequency = PSG_FREQUENCY,
+		.divisor = 1
+	},
 	.bus = {
 		.address = 0xff8800,
 		.size = 256,

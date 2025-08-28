@@ -131,7 +131,10 @@ static void mfp_reset(const struct device *device)
 
 const struct device mfp_device = {
 	.name = "mfp",
-	.frequency = MFP_FREQUENCY,
+	.clk = {
+		.frequency = MFP_FREQUENCY,
+		.divisor = 1
+	},
 	.bus = {
 		.address = MFP_BUS_ADDRESS,
 		.size = 64,

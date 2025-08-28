@@ -5,6 +5,7 @@
 
 #include "atari/bus.h"
 #include "atari/device.h"
+#include "atari/machine.h"
 #include "atari/rom.h"
 
 #include "tos/tos.h"
@@ -22,7 +23,10 @@ static u16 rom_rd_u16(const struct device *device, u32 dev_address)
 
 const struct device rom_device = {
 	.name = "rom",
-	.frequency = 8000000,
+	.clk = {
+		.frequency = CPU_FREQUENCY,
+		.divisor = 1
+	},
 	.bus = {
 		.address = 0xe00000,
 		.size = 256 * 1024,

@@ -281,7 +281,10 @@ void mixer_sample(mixer_sample_f sample, void *sample_arg)
 
 const struct device mixer_device = {
 	.name = "mixer",
-	.frequency = MIXER_FREQUENCY,
+	.clk = {
+		.frequency = MIXER_FREQUENCY,
+		.divisor = 1
+	},
 	.bus = {
 		.address = 0xff8922,
 		.size = 4,

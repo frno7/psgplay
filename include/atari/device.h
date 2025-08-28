@@ -25,7 +25,10 @@ struct device {
 	const char *name;
 
 	bool main_bus;
-	u32 frequency;
+	struct {
+		u32 frequency;
+		u32 divisor;
+	} clk;
 
 	struct {
 		u32 address;

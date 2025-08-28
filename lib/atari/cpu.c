@@ -9,6 +9,7 @@
 
 #include "atari/cpu.h"
 #include "atari/device.h"
+#include "atari/machine.h"
 
 #include "m68k/m68k.h"
 #include "m68k/m68kcpu.h"
@@ -59,7 +60,10 @@ static void cpu_reset(const struct device *device)
 
 const struct device cpu_device = {
 	.name = "cpu",
-	.frequency = 8000000,
+	.clk = {
+		.frequency = CPU_FREQUENCY,
+		.divisor = 1
+	},
 	.run = cpu_run,
 	.reset = cpu_reset,
 };

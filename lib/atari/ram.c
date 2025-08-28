@@ -8,6 +8,7 @@
 
 #include "atari/device.h"
 #include "atari/exception-vector.h"
+#include "atari/machine.h"
 #include "atari/ram.h"
 #include "atari/sound.h"
 #include "atari/system-variable.h"
@@ -70,7 +71,10 @@ static size_t ram_id_u16(const struct device *device,
 
 const struct device ram_device = {
 	.name = "ram",
-	.frequency = 8000000,
+	.clk = {
+		.frequency = CPU_FREQUENCY,
+		.divisor = 1
+	},
 	.main_bus = true,
 	.bus = {
 		.address = 0,
