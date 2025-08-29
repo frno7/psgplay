@@ -69,8 +69,7 @@ void audio_free(struct audio *audio);
 
 struct audio *audio_read_wave(const char *path);
 
-struct audio *audio_range(const struct audio *audio,
-	size_t offset, size_t length);
+struct audio *audio_range(const struct audio *audio, size_t lo, size_t hi);
 
 struct audio_meter audio_meter(const struct audio *audio);
 
