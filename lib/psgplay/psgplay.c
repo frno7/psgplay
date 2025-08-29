@@ -285,8 +285,8 @@ static inline struct psgplay_stereo stereo_mix(struct mixer *m,
 	const int16_t sl, const int16_t sr, const struct psgplay_digital d)
 {
 	const float psg_mix = 0.65;
-	const int p = 256 * psg_mix;
-	const int q = 256 - p;
+	const int p = 255 * psg_mix;
+	const int q = 255 - p;
 
 	if (m->enable) {
 		mixer_for_sample(m, d);
