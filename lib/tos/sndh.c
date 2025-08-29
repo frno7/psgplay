@@ -144,16 +144,6 @@ INTERRUPT void timer_##name_##_exception(void)				\
 	    timer_state.play && timer_division())			\
 		sndh_play(&file);					\
 									\
-	/* Some SNDH files mess with the counters, restore. */		\
-	if (mfp_rd_t##name_##cr().ctrl != timer_state.prescale.ctrl)	\
-		mfp_wrs_t##name_##cr({					\
-			.ctrl = timer_state.prescale.ctrl		\
-		});							\
-	if (mfp_rd_t##name_##dr().count != timer_state.prescale.count)	\
-		mfp_wrs_t##name_##dr({					\
-			.count = timer_state.prescale.count		\
-		});							\
-									\
 	/* Timer is now served. */					\
 	mfp_clrs_is##ab_({ .timer_##name_ = true });			\
 }									\
