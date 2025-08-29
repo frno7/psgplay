@@ -45,7 +45,7 @@ OTHER_CLEAN += $(PSGPLAY_TEST_ELF) $(PSGPLAY_TEST_SNDH)			\
 ifdef TARGET_CC
 
 PSGPLAY_TEST = ./$(PSGPLAY)
-PSGPLAY_TEST_FLAGS = --start 1 --length 62
+PSGPLAY_TEST_FLAGS = --length 63
 
 PSGPLAY_TEST_sndh_tune ?= $(shell echo "$(1)" | sed 's/^.*-\([0-9]\+\).*$$/\1/')
 PSGPLAY_TEST_sndh_base ?= $(shell echo "$(1)" | sed 's/-[0-9]\+.*$$//')
