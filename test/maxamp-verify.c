@@ -25,9 +25,9 @@ static struct minmax minmax(const struct audio *audio)
 
 	for (size_t i = 1; i < audio->format.sample_count; i++) {
 		mm.minimum = min3(mm.minimum, audio->samples[i].left,
-						audio->samples[i].right);
+					      audio->samples[i].right);
 		mm.maximum = max3(mm.maximum, audio->samples[i].left,
-						audio->samples[i].right);
+					      audio->samples[i].right);
 	}
 
 	return mm;
@@ -51,10 +51,12 @@ char *verify(const struct audio *audio, const struct options *options)
 {
 	const struct minmax mm = minmax(audio);
 
-	verify_assert (mm.minimum < -32000)
+	verify_assert (mm.minimum < -32000 &&	/* Verify near numerical min */
+		       mm.minimum > -32760)	/* Verify margin to clipping */
 		return "sample minimum";
 
-	verify_assert (mm.maximum > 32000)
+	verify_assert (mm.maximum > 32000 &&	/* Verify near numerical max */
+		       mm.maximum < 32760)	/* Verify margin to clipping */
 		return "sample maximum";
 
 	return NULL;
