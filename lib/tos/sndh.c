@@ -8,6 +8,7 @@
 #include <asm/interrupt.h>
 #include <asm/io.h>
 #include <asm/machine.h>
+#include <asm/math.h>
 #include <asm/mfp.h>
 #include <tos/cookie.h>
 #include <tos/system-variable.h>
