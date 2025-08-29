@@ -77,7 +77,7 @@ static bool svg_encode_samples(const struct graph_encoder * const encoder,
 
 	for (size_t i = 0; i < audio->format.sample_count; i += 1) {
 		const double x = i * 4.0;
-		const double y = (100 * audio->samples[i].right) / 32768.0;
+		const double y = (95 * audio->samples[i].right) / 32768.0;
 		char bar[1024];
 
 		snprintf(bar, sizeof(bar),
