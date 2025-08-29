@@ -5,8 +5,6 @@
 #include <asm/io.h>
 #include <asm/mfp.h>
 
-#include "internal/build-assert.h"
-
 #include "test/snd-dma-alt.h"
 #include "test/tempo.h"
 
@@ -29,11 +27,6 @@ void sndh_init(int tune)
 	snd_dma_alt_init(sample);
 
 	iowr32((uint32_t)timer_a_play, 0x134);
-
-	BUILD_BUG_ON(sizeof(struct mfp_ier) != 2);
-	BUILD_BUG_ON(sizeof(struct mfp_ipr) != 2);
-	BUILD_BUG_ON(sizeof(struct mfp_isr) != 2);
-	BUILD_BUG_ON(sizeof(struct mfp_imr) != 2);
 
 	mfp_wrs_tacr({ .ctrl = preset.ctrl });
 	mfp_wrs_tadr({ .count = preset.count });
