@@ -23,6 +23,7 @@ SYSTEM_UNIX_SRC :=							\
 
 ifeq (1,$(HAVE_SSO))
 SYSTEM_UNIX_SRC += system/unix/disassemble.c
+system/unix/system-unix-disassemble.o: PSGPLAY_CFLAGS += -Ilib/toslibc/include
 endif
 
 PSGPLAY_SRC :=								\

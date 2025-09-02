@@ -6,11 +6,13 @@
 #ifndef ATARI_MACHINE_H
 #define ATARI_MACHINE_H
 
+#include "toslibc/asm/machine.h"
+
 #include "internal/types.h"
 
 #include "atari/sample.h"
 
-#define CPU_FREQUENCY 8000000
+#define CPU_FREQUENCY (ATARI_STF_PAL_MCLK / ATARI_STE_CPU_CLK_DIV)
 
 #define MACHINE_PROGRAM   0x40000	/* 256 KiB */
 #define MACHINE_RUN_SLICE   10000
