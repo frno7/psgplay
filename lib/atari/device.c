@@ -95,10 +95,10 @@ static struct device_slice device_from_machine_slice(
 	};
 }
 
-static u64 machine_from_device_cycle(const struct device *device,
+static u64 machine_from_device_cycle_align(const struct device *device,
 	const struct device_cycle device_cycle)
 {
-	return cycle_transform(CPU_FREQUENCY,
+	return cycle_transform_align(CPU_FREQUENCY,
 			device->clk.frequency / device->clk.divisor, device_cycle.c);
 }
 
@@ -112,7 +112,8 @@ static u64 machine_from_device_slice(const struct device *device,
 void request_device_event(const struct device *device,
 	struct device_cycle device_cycle)
 {
-	const u64 machine_cycle = machine_from_device_cycle(device, device_cycle);
+	const u64 machine_cycle =
+		machine_from_device_cycle_align(device, device_cycle);
 	struct machine_device *machine_device = NULL;
 
 	for (size_t i = 0; i < ARRAY_SIZE(list); i++)
