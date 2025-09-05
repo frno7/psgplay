@@ -42,21 +42,21 @@
 
 static u64 cycle;
 
-u64 cycle_transform(u64 to_frequency, u64 from_frequcy, u64 cycle)
+u64 cycle_transform(u64 to_frequency, u64 from_frequency, u64 cycle)
 {
-	const u64 q = cycle / from_frequcy;
-	const u64 r = cycle % from_frequcy;
+	const u64 q = cycle / from_frequency;
+	const u64 r = cycle % from_frequency;
 
-	return q * to_frequency + (r * to_frequency) / from_frequcy;
+	return q * to_frequency + (r * to_frequency) / from_frequency;
 }
 
-u64 cycle_transform_align(u64 to_frequency, u64 from_frequcy, u64 cycle)
+u64 cycle_transform_align(u64 to_frequency, u64 from_frequency, u64 cycle)
 {
-	const u64 q = cycle / from_frequcy;
-	const u64 r = cycle % from_frequcy;
+	const u64 q = cycle / from_frequency;
+	const u64 r = cycle % from_frequency;
 
 	return q * to_frequency +
-		(r * to_frequency + from_frequcy - 1) / from_frequcy;
+		(r * to_frequency + from_frequency - 1) / from_frequency;
 }
 
 u64 machine_cycle(void)

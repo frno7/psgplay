@@ -12,7 +12,7 @@
 
 #include "atari/sample.h"
 
-#define CPU_FREQUENCY (ATARI_STF_PAL_MCLK / ATARI_STE_CPU_CLK_DIV)
+#define CPU_FREQUENCY (ATARI_STE_PAL_MCLK / ATARI_STE_CPU_CLK_DIV)
 
 #define MACHINE_PROGRAM   0x40000	/* 256 KiB */
 #define MACHINE_RUN_SLICE   10000
@@ -36,9 +36,9 @@ struct machine {
 	bool (*run)(void);
 };
 
-u64 cycle_transform(u64 to_frequency, u64 from_frequcy, u64 cycle);
+u64 cycle_transform(u64 to_frequency, u64 from_frequency, u64 cycle);
 
-u64 cycle_transform_align(u64 to_frequency, u64 from_frequcy, u64 cycle);
+u64 cycle_transform_align(u64 to_frequency, u64 from_frequency, u64 cycle);
 
 u64 machine_cycle(void);
 
