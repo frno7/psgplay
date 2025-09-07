@@ -10,6 +10,7 @@
 #include "toslibc/asm/machine.h"
 
 #include "internal/assert.h"
+#include "internal/compare.h"
 #include "internal/macro.h"
 
 #include "atari/bus.h"
@@ -19,30 +20,17 @@
 #include "atari/machine.h"
 #include "atari/mfp.h"
 #include "atari/mmu.h"
+#include "atari/ram.h"
 #include "atari/sound.h"
+
+#include "cf300588/module/cf300588-sound.h"
 
 #define SOUND_FREQUENCY (ATARI_STE_EXT_OSC / 4)
 
 #define SOUND_EVENT_FREQUENCY 100		/* 10 ms */
 #define SOUND_EVENT_CYCLES (SOUND_FREQUENCY / SOUND_EVENT_FREQUENCY)
-#define DEVICE_SAMPLE_FREQUENCY 250000	/* 250 kHz */
-#define DEVICE_SAMPLE_CYCLES (SOUND_FREQUENCY / DEVICE_SAMPLE_FREQUENCY)
 
-struct {
-	u32 start;
-	u32 end;
-
-	union sound hold;
-	union sound regs;
-
-	struct sound_sample sample;
-
-	struct fifo {
-		uint8_t index;
-		uint8_t size;
-		int8_t b[8];
-	} fifo;
-} state;
+static struct cf300588_sound_module cf300588;
 
 static struct {
 	sound_sample_f sample;
@@ -54,195 +42,83 @@ static char *sound_register_name(u32 reg)
 	switch (reg) {
 #define SOUND_REG_NAME(register_, symbol_, label_, description_)	\
 	case register_: return #symbol_;
-SOUND_REGISTERS(SOUND_REG_NAME)
+CF300588_SOUND_REGS(SOUND_REG_NAME)
 	default:
 		return "";
 	}
 }
 
-static u32 sound_frequency(struct sound_mode mode)
+static void request_event(const struct device *device,
+	struct device_cycle sound_cycle, struct cf300588_sound_event event)
 {
-	switch (mode.sample_frequency)
-	{
-#define SOUND_SAMPLE_FREQUENCY_CASE(f)					\
-	case sound_sample_frequency_##f: return f;
-SOUND_SAMPLE_FREQUENCY(SOUND_SAMPLE_FREQUENCY_CASE)
-	default:
-		BUG();
-	}
-}
+	if (event.cycle.c)
+		request_device_event(device, (struct device_cycle) {
+			/* FIXME: Avoid max */
+			.c = max(event.cycle.c, sound_cycle.c + 1)
+		});
 
-static void sound_start(void)
-{
-	state.regs = state.hold;
-	state.start = (state.regs.starthi << 16) |
-		      (state.regs.startmi <<  8) |
-		       state.regs.startlo;
-	state.end = (state.regs.endhi << 16) |
-		    (state.regs.endmi <<  8) |
-		     state.regs.endlo;
+	request_device_event(device, (struct device_cycle) {
+			.c = sound_cycle.c + SOUND_EVENT_CYCLES
+		});
 
-	dma_sound_active(false);
-	dma_sound_active(true);
-}
-
-static void sound_stop(void)
-{
-	state.hold.ctrl.dma = 0;
-
-	state.regs = state.hold;
-	state.start = state.end = 0;
-
-	dma_sound_active(false);
-}
-
-static bool sound_sample_emit(const struct device_cycle sound_cycle)
-{
-	const u32 f = sound_frequency(state.regs.mode);
-	const u64 c = sound_cycle.c;
-
-	return cycle_transform(f, SOUND_FREQUENCY, c) !=
-	       cycle_transform(f, SOUND_FREQUENCY, c + DEVICE_SAMPLE_CYCLES);
-}
-
-static size_t fifo_free(struct fifo *fifo)
-{
-	return ARRAY_SIZE(fifo->b) - fifo->size;
-}
-
-static void wr_fifo(struct fifo *fifo, int8_t s)
-{
-	BUG_ON(fifo->size >= ARRAY_SIZE(fifo->b));
-
-	fifo->b[(fifo->index + fifo->size++) % ARRAY_SIZE(fifo->b)] = s;
-}
-
-static int8_t rd_fifo(struct fifo *fifo)
-{
-	BUG_ON(!fifo->size);
-
-	const int8_t s = fifo->b[fifo->index];
-
-	fifo->index = (fifo->index + 1) % ARRAY_SIZE(fifo->b);
-	fifo->size--;
-
-	return s;
-}
-
-static void fill_fifo(struct fifo *fifo)
-{
-	while (state.regs.ctrl.dma && fifo_free(fifo) >= 2) {
-		const uint16_t w = dma_read_memory_16(state.start);
-
-		wr_fifo(fifo, w >> 8);
-		wr_fifo(fifo, w);
-
-		state.start += 2;
-
-		if (state.start == state.end)
-			(state.regs.ctrl.loop ? sound_start : sound_stop)();
-	}
-}
-
-static struct sound_sample sound_sample_cycle(
-	const struct device_cycle sound_cycle)
-{
-	fill_fifo(&state.fifo);
-
-	if (state.fifo.size && sound_sample_emit(sound_cycle)) {
-		if (state.regs.mode.mono) {
-			const s8 mono = rd_fifo(&state.fifo);
-
-			state.sample.left  = 256 * mono;
-			state.sample.right = 256 * mono;
-		} else {
-			state.sample.left  = 256 * rd_fifo(&state.fifo);
-			state.sample.right = 256 * (state.fifo.size ?
-				rd_fifo(&state.fifo) : state.sample.left);
-		}
-	}
-
-	return state.sample;
-}
-
-static u64 sound_emit_latest_cycle;
-static void sound_emit(const struct device_cycle sound_cycle)
-{
-	struct sound_sample buffer[256];
-	size_t count = 0;
-
-	for (u64 c = ALIGN(sound_emit_latest_cycle, DEVICE_SAMPLE_CYCLES);
-	     c < sound_cycle.c;
-	     c += DEVICE_SAMPLE_CYCLES) {
-		buffer[count++] = sound_sample_cycle(
-			(struct device_cycle) { .c = c });
-
-		if (count >= ARRAY_SIZE(buffer)) {
-			if (output.sample)
-				output.sample(buffer, count, output.sample_arg);
-			count = 0;
-		}
-	}
-
-	if (count && output.sample)
-		output.sample(buffer, count, output.sample_arg);
-
-	state.regs.counthi = (state.start >> 16) & 0x3f;
-	state.regs.countmi = state.start >> 8;
-	state.regs.countlo = state.start & 0xfe;
-
-	sound_emit_latest_cycle = sound_cycle.c;
-}
-
-static u64 completion_cycles(const u32 sample_count)
-{
-	const u32 f = sound_frequency(state.regs.mode);
-	const u64 ds = cycle_transform_align(
-		DEVICE_SAMPLE_FREQUENCY, f, sample_count);
-	const u64 sc = cycle_transform_align(
-		SOUND_FREQUENCY, DEVICE_SAMPLE_FREQUENCY, ds);
-
-	return sc;
+	for (size_t i = 1; i < event.sint.count; i++)
+		dma_sound_active(event.sint.active ^ (i & 1));
+	dma_sound_active(event.sint.active);
 }
 
 static void sound_event(const struct device *device,
 	const struct device_cycle sound_cycle)
 {
-	sound_emit(sound_cycle);
+	struct cf300588_sound_cycle module_cycle =
+		cf300588_sound_cycle(sound_cycle.c, 1 /* FIXME */);
+	struct cf300588_sound_sample buffer8[1024];
 
-	if (state.regs.ctrl.dma) {
-		const size_t m = state.regs.mode.mono ? 1 : 2;
-		const size_t remaining = (state.end - state.start) / m;
-		const size_t margin = ARRAY_SIZE(state.fifo.b) / m;
+	const struct cf300588_sound_dma_region dma_region =
+		cf300588.port.dma(&cf300588);
+	const struct ram_map_ro ram_map =
+		ram_map_ro(dma_region.size, dma_region.addr);
+	const struct cf300588_sound_dma_map dma_map = {
+		.size = ram_map.size,
+		.addr = ram_map.addr,
+		.p = ram_map.p,
+	};
+	const struct cf300588_sound_samples samples8 = {
+		.size = ARRAY_SIZE(buffer8),
+		.sample = buffer8,
+	};
+	size_t n;
 
-		/*
-		 * Issue DMA completion event when the FIFO is expected
-		 * to read the last sample of this transmission.
-		 */
+	while ((n = cf300588.port.sample(&cf300588,
+			module_cycle, samples8, dma_map)))
+		if (output.sample) {
+			struct sound_sample buffer16[ARRAY_SIZE(buffer8)];
 
-		if (margin < remaining)
-			request_device_event(device, (struct device_cycle) {
-				.c = sound_cycle.c +
-					completion_cycles(remaining - margin)
-			});
-	}
+			for (size_t i = 0; i < n; i++)
+				buffer16[i] = (struct sound_sample) {
+					.left  = 256 * buffer8[i].left,
+					.right = 256 * buffer8[i].right
+				};
 
-	request_device_event(device, (struct device_cycle) {
-			.c = sound_cycle.c + SOUND_EVENT_CYCLES
-		});
+			output.sample(buffer16, n, output.sample_arg);
+		}
+
+	request_event(device, sound_cycle,
+		cf300588.port.event(&cf300588, module_cycle));
 }
 
 static u8 sound_rd_u8(const struct device *device, u32 dev_address)
 {
 	const struct device_cycle sound_cycle = device_cycle(device);
+	struct cf300588_sound_cycle module_cycle =
+		cf300588_sound_cycle(sound_cycle.c, 1 /* FIXME */);
 	const u32 reg = dev_address >> 1;
 
-	sound_emit(sound_cycle);
-
-	if ((dev_address & 1) == 0 || ARRAY_SIZE(state.regs.reg) <= reg)
+	if ((dev_address & 1) == 0)
 		return 0;
 
-	return state.regs.reg[reg];
+	sound_event(device, sound_cycle);
+
+	return cf300588.port.rd_da(&cf300588, module_cycle, reg);
 }
 
 static u16 sound_rd_u16(const struct device *device, u32 dev_address)
@@ -250,38 +126,20 @@ static u16 sound_rd_u16(const struct device *device, u32 dev_address)
 	return sound_rd_u8(device, dev_address + 1);
 }
 
-static void sound_hardwire(union sound *regs)
-{
-	regs->reg[SOUND_REG_CTRL]    &= 0x03;
-	regs->reg[SOUND_REG_STARTHI] &= 0x3f;
-	regs->reg[SOUND_REG_STARTLO] &= 0xfe;
-	regs->reg[SOUND_REG_ENDHI]   &= 0x3f;
-	regs->reg[SOUND_REG_ENDLO]   &= 0xfe;
-	regs->reg[SOUND_REG_MODE]    &= 0x83;
-
-	memset(regs->unused, 0, sizeof(regs->unused));
-}
-
-static void sound_wr_u8(const struct device *device, u32 dev_address, u8 data)
+static void sound_wr_u8(const struct device *device, u32 dev_address, u8 val)
 {
 	const struct device_cycle sound_cycle = device_cycle(device);
+	struct cf300588_sound_cycle module_cycle =
+		cf300588_sound_cycle(sound_cycle.c, 1 /* FIXME */);
 	const u32 reg = dev_address >> 1;
 
-	if ((dev_address & 1) == 0 || ARRAY_SIZE(state.regs.reg) <= reg)
+	if ((dev_address & 1) == 0)
 		return;
 
-	sound_emit(sound_cycle);
+	sound_event(device, sound_cycle);
 
-	state.hold.reg[reg] = data;
-	sound_hardwire(&state.hold);
-
-	const bool ctrl_dma = state.hold.ctrl.dma != state.regs.ctrl.dma;
-
-	if (ctrl_dma || !state.regs.ctrl.dma)
-		state.regs.reg[reg] = state.hold.reg[reg];
-
-	if (ctrl_dma)
-		(state.regs.ctrl.dma ? sound_start : sound_stop)();
+	request_event(device, sound_cycle,
+		cf300588.port.wr_da(&cf300588, module_cycle, reg, val));
 }
 
 static void sound_wr_u16(const struct device *device, u32 dev_address, u16 data)
@@ -294,7 +152,7 @@ static size_t sound_id_u8(const struct device *device,
 {
 	const u32 reg = dev_address >> 1;
 
-	if ((dev_address & 1) == 0 || ARRAY_SIZE(state.regs.reg) <= reg)
+	if ((dev_address & 1) == 0 || ARRAY_SIZE(cf300588.state.regs.reg) <= reg)
 		snprintf(buf, size, "%2u", dev_address);
 	else
 		snprintf(buf, size, "%s", sound_register_name(reg));
@@ -310,12 +168,14 @@ static size_t sound_id_u16(const struct device *device,
 
 static void sound_reset(const struct device *device)
 {
-	BUILD_BUG_ON(sizeof(state.regs) != 17);
+	const struct device_cycle sound_cycle = device_cycle(device);
 
-	memset(&state, 0, sizeof(state));
-	sound_emit_latest_cycle = 0;
+	struct cf300588_sound_cycle module_cycle =
+		cf300588_sound_cycle(sound_cycle.c, 1 /* FIXME */);
 
-	sound_event(device, device_cycle(device));
+	cf300588 = cf300588_sound_init(module_cycle);
+
+	request_event(device, sound_cycle, (struct cf300588_sound_event) { });
 }
 
 void sound_sample(sound_sample_f sample, void *sample_arg)
@@ -326,17 +186,13 @@ void sound_sample(sound_sample_f sample, void *sample_arg)
 
 void sound_check(u32 bus_address)
 {
-	/*
-	 * FIXME: Provisional check for Quartet files such as Spaz that
-	 * write to RAM during DMA playback.
-	 */
+	if (!cf300588.port.wr_ar(&cf300588, bus_address, 4 /* FIXME */))
+		return;
+
 	extern const struct device sound_device;
 	const struct device *device = &sound_device;
 
-	if (state.regs.ctrl.dma &&
-	    state.start <= bus_address &&
-	    bus_address <  state.end)
-		sound_emit(device_cycle(device));
+	sound_event(device, device_cycle(device));
 }
 
 const struct device sound_device = {

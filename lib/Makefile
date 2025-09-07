@@ -9,6 +9,7 @@ endif
 
 include lib/cf2149/module/Makefile
 include lib/cf68901/module/Makefile
+include lib/cf300588/module/Makefile
 
 include lib/version/Makefile
 include lib/tos/Makefile

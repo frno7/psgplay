@@ -159,13 +159,9 @@ void dma_sound_active(bool level)
 	const struct device_cycle mfp_cycle = device_cycle(&mfp_device);
 	const struct cf68901_clk clk = cf68901_clk_cycle(mfp_cycle.c);
 
-	/* FIXME: request_event(&mfp_device, ...) */
-	cf68901.port.tai(&cf68901, clk, level); /* FIXME: !level */
-	cf68901.port.wr_gpip(&cf68901, clk,
-		GPIP_MONITOR_DETECT, level ^ mono_monitor_detect()); /* FIXME: !level */
-
-	request_device_event(&mfp_device,
-		device_from_machine_cycle(&mfp_device, machine_cycle()));
+	request_event(&mfp_device, cf68901.port.tai(&cf68901, clk, level));
+	request_event(&mfp_device, cf68901.port.wr_gpip(&cf68901, clk,
+		GPIP_MONITOR_DETECT, level ^ mono_monitor_detect()));
 
 	prev_level = level;
 }

@@ -3,7 +3,8 @@
 LIBPSGPLAY_CFLAGS =							\
 	$(BASIC_HOST_CFLAGS) -fPIC					\
 	$(CF2149_CFLAGS)						\
-	$(CF68901_CFLAGS)
+	$(CF68901_CFLAGS)						\
+	$(CF300588_CFLAGS)
 
 LIBPSGPLAY_SRC :=							\
 	lib/psgplay/psgplay.c						\

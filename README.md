@@ -464,8 +464,8 @@ The five most complex parts emulated in software by PSG play are:
   [`lib/cf68901/module/cf68901.c`](https://github.com/frno7/cf68901/blob/main/module/cf68901.c).
 
 - the [DMA](https://en.wikipedia.org/wiki/Direct_memory_access) sound of the
-  [Atari STE](https://en.wikipedia.org/wiki/Atari_ST#STE)
-  in [`lib/atari/sound.c`](https://github.com/frno7/psgplay/tree/main/lib/atari/sound.c);
+  [Atari STE](https://en.wikipedia.org/wiki/Atari_ST#STE) in
+  [`lib/cf300588/module/cf300588-sound.c`](https://github.com/frno7/cf300588/blob/main/module/cf300588-sound.c);
 
 - the LMC1992 mixer of the [Atari STE](https://en.wikipedia.org/wiki/Atari_ST#STE_models)
   in [`lib/atari/mixer.c`](https://github.com/frno7/psgplay/tree/main/lib/atari/mixer.c);

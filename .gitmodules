@@ -1,9 +1,12 @@
 [submodule "toslibc"]
 	path = lib/toslibc
-	url = https://github.com/frno7/toslibc.git
+	url = ../toslibc
 [submodule "lib/cf2149"]
 	path = lib/cf2149
-	url = https://github.com/frno7/cf2149.git
+	url = ../cf2149
 [submodule "lib/cf68901"]
 	path = lib/cf68901
 	url = ../cf68901
+[submodule "lib/cf300588"]
+	path = lib/cf300588
+	url = ../cf300588

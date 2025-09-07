@@ -58,7 +58,8 @@ const char *verify(const struct audio *audio, const struct options *options)
 	verify_assert (wave_deviation.deviation.maximum <= 1.5)
 		return "wave deviation max";
 
-	verify_assert (error.relative_frequency <= 5e-5) // FIXME: Accuracy
+	verify_assert (error.relative_frequency <=
+			audio_relative_tolerance(audio->format))
 		return "wave error relative frequency";
 
 	return NULL;
