@@ -43,30 +43,30 @@ SM(7);
 void sndh_init(int tune)
 {
 	const struct dma_preset preset = sndh_tune_select_value(tune);
-	const int8_t *start = NULL;
+	const int8_t *base = NULL;
 
 	switch ((preset.channels << 8) | preset.halfperiod) {
-	case 0x101: start = &mono1[0].value;  break;
-	case 0x102: start = &mono2[0].value;  break;
-	case 0x103: start = &mono3[0].value;  break;
-	case 0x105: start = &mono5[0].value;  break;
-	case 0x107: start = &mono7[0].value;  break;
-	case 0x201: start = &stereo1[0].left; break;
-	case 0x202: start = &stereo2[0].left; break;
-	case 0x203: start = &stereo3[0].left; break;
-	case 0x205: start = &stereo5[0].left; break;
-	case 0x207: start = &stereo7[0].left; break;
+	case 0x101: base = &mono1[0].value;  break;
+	case 0x102: base = &mono2[0].value;  break;
+	case 0x103: base = &mono3[0].value;  break;
+	case 0x105: base = &mono5[0].value;  break;
+	case 0x107: base = &mono7[0].value;  break;
+	case 0x201: base = &stereo1[0].left; break;
+	case 0x202: base = &stereo2[0].left; break;
+	case 0x203: base = &stereo3[0].left; break;
+	case 0x205: base = &stereo5[0].left; break;
+	case 0x207: base = &stereo7[0].left; break;
 	}
 
-	const int8_t *end = &start[2 * preset.halfperiod * preset.channels];
+	const int8_t *end = &base[2 * preset.halfperiod * preset.channels];
 
-	snd_dma_wr_start(start);
+	snd_dma_wr_base(base);
 	snd_dma_wr_end(end);
 	snd_dma_wrs_mode({
-		.mode = preset.channels == 1 ?
-			SND_DMA_MODE_MONO8 :
-			SND_DMA_MODE_STEREO8,
-		.frequency = preset.frequency,
+		.format = preset.channels == 1 ?
+			SND_DMA_MODE_FORMAT_MONO8 :
+			SND_DMA_MODE_FORMAT_STEREO8,
+		.rate = preset.rate,
 	});
 }
 

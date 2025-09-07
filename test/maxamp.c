@@ -29,12 +29,12 @@ void sndh_init(int tune)
 	snd_psg_wr_level_b(SND_PSG_LEVEL_MAX);
 	snd_psg_wr_level_c(SND_PSG_LEVEL_MAX);
 
-	snd_dma_wr_start(&samples[0]);
+	snd_dma_wr_base(&samples[0]);
 	snd_dma_wr_end(&samples[ARRAY_SIZE(samples)]);
 
 	snd_dma_wrs_mode({
-		.mode = SND_DMA_MODE_MONO8,
-		.frequency = SND_DMA_FREQUENCY_6258
+		.format = SND_DMA_MODE_FORMAT_MONO8,
+		.rate = SND_DMA_MODE_FREQUENCY_6258
 	});
 }
 

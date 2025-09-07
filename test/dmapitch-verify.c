@@ -12,7 +12,7 @@ test_value_names(struct dma_preset, tune_value_names);
 
 static double dma_sound_frequency(const struct options *options)
 {
-	const int d = 1 << (3 - test_value(options).frequency);
+	const int d = 1 << (3 - test_value(options).rate);
 
 	return ATARI_STE_EXT_OSC / (double)(ATARI_STE_SND_DMA_CLK_DIV * d);
 }

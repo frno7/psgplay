@@ -9,10 +9,10 @@
 struct dma_preset {
 	int channels;
 	int halfperiod;
-	int frequency;
+	int rate;
 };
 
-#define D(c, hp, f) { .channels = (c), .halfperiod = (hp), .frequency = (f) }
+#define D(c, hp, r) { .channels = (c), .halfperiod = (hp), .rate = (r) }
 
 #define tune_value_names(t)						\
 	t(D(1, 1, 0), "DMA square wave mono halfperiod 1 at 6258 Hz")	\

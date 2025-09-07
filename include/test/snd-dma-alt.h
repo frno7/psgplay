@@ -22,12 +22,12 @@ struct snd_dma_alt_sample {
 
 static inline void snd_dma_alt_init(struct snd_dma_alt_sample *sample)
 {
-	snd_dma_wr_start(&sample[0]);
+	snd_dma_wr_base(&sample[0]);
 	snd_dma_wr_end(&sample[1]);
 
 	snd_dma_wrs_mode({
-		.mode = SND_DMA_MODE_STEREO8,
-		.frequency = SND_DMA_FREQUENCY_50066
+		.format = SND_DMA_MODE_FORMAT_STEREO8,
+		.rate = SND_DMA_MODE_FREQUENCY_50066
 	});
 }
 
