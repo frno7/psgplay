@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "internal/compare.h"
+
 #include "atari/device.h"
 #include "atari/exception-vector.h"
 #include "atari/machine.h"
@@ -16,6 +18,18 @@
 #include "tos/tos.h"
 
 static u8 ram[4 * 1024 * 1024];	/* 4 MiB of RAM */
+
+struct ram_map_ro ram_map_ro(uint32_t size, uint32_t addr)
+{
+	if (ARRAY_SIZE(ram) <= addr)
+		return (struct ram_map_ro) { };
+
+	return (struct ram_map_ro) {
+		.size = min_t(uint32_t, size, ARRAY_SIZE(ram) - addr),
+		.addr = addr,
+		.p = &ram[addr],
+	};
+}
 
 static void ram_reset(const struct device *device)
 {
