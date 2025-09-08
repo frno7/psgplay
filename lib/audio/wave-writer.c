@@ -34,6 +34,7 @@ struct wave_state {
 	int frequency;
 
 	size_t sample_count;
+	size_t sample_length;
 
 	size_t buffer_count;
 	struct {
@@ -70,12 +71,12 @@ struct wave_data {
 };
 
 static void wave_write_header(int fd, const char *output,
-	int frequency, size_t sample_count)
+	int frequency, size_t sample_length)
 {
 	const size_t total_size =
 		sizeof(struct wave_riff) +
 		sizeof(struct wave_chunk) +
-		sizeof(struct wave_data) + 4 * sample_count;
+		sizeof(struct wave_data) + 4 * sample_length;
 
 	const struct {
 		struct wave_riff riff;
@@ -104,10 +105,7 @@ static void wave_write_header(int fd, const char *output,
 	};
 
 	BUILD_BUG_ON(sizeof(wave_header) != 44);
-	BUG_ON((u32)total_size != total_size);
-
-	if (lseek(fd, 0, SEEK_SET) == -1)
-		pr_fatal_errno(output);
+	BUG_ON((uint32_t)total_size != total_size);
 
 	const ssize_t size = xwrite(fd, &wave_header, sizeof(wave_header));
 	if (size == -1)
@@ -139,6 +137,9 @@ static bool wave_sample(s16 left, s16 right, void *arg)
 {
 	struct wave_state *state = arg;
 
+	if (state->sample_count >= state->sample_length)
+		return true;	/* Ignore samples beyond given length */
+
 	state->sample_count++;
 
 	state->buffer[state->buffer_count].left  = WAVE_SAMPLE(left);
@@ -154,19 +155,23 @@ static bool wave_sample(s16 left, s16 right, void *arg)
 static void *wave_open(const char *output, int frequency,
 	bool nonblocking, size_t sample_length)
 {
+	if (!sample_length)
+		pr_fatal_error("%s: WAVE opened for writing without duration\n",
+			output);
+
 	struct wave_state *state = xmalloc(sizeof(struct wave_state));
 
 	*state = (struct wave_state) {
 		.output = output,
 		.fd = xopen(output, O_WRONLY | O_CREAT | O_TRUNC, 0644),
 		.frequency = frequency,
+		.sample_length = sample_length,
 	};
 
 	if (state->fd == -1)
 		pr_fatal_errno(output);
 
-	/* Provisional header to be updated on close. */
-	wave_write_header(state->fd, output, frequency, 0);
+	wave_write_header(state->fd, output, frequency, sample_length);
 
 	return state;
 }
@@ -175,11 +180,10 @@ static void wave_close(void *arg)
 {
 	struct wave_state *state = arg;
 
-	wave_sample_flush(state);
+	while (state->sample_count < state->sample_length)
+		wave_sample(0, 0, arg);    /* Pad until given sample length */
 
-	/* Final header. */
-	wave_write_header(state->fd, state->output,
-		state->frequency, state->sample_count);
+	wave_sample_flush(state);
 
 	if (xclose(state->fd) == -1)
 		pr_fatal_errno(state->output);
