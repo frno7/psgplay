@@ -11,7 +11,7 @@
 #include "test/maxamp.h"
 
 sndh_title("PSG and DMA maximum amplitude square waves");
-sndh_tune_value_names(int, tune_value_names);
+sndh_tune_value_time_names(int, tune_value_time_names);
 sndh_timer(SNDH_TIMER_A, 400);
 
 #define R8(x) x, x, x, x, x, x, x, x,

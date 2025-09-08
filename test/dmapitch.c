@@ -9,7 +9,7 @@
 #include "test/dmapitch.h"
 
 sndh_title("DMA pitch");
-sndh_tune_value_names(struct dma_preset, tune_value_names);
+sndh_tune_value_time_names(struct dma_preset, tune_value_time_names);
 
 #define R1(x)	x
 #define R2(x)	x, x

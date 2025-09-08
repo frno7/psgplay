@@ -9,7 +9,7 @@
 #include "test/tempo.h"
 
 sndh_title("Tempo");
-sndh_tune_value_names(struct timer_preset, tune_value_names);
+sndh_tune_value_time_names(struct timer_preset, tune_value_time_names);
 
 static struct snd_dma_alt_sample sample[1];
 

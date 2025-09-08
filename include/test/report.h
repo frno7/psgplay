@@ -12,23 +12,23 @@
 
 #include "test/option.h"
 
-#define TEST_DEFINE_VALUE(value, name)	value,
+#define TEST_DEFINE_VALUE(value, time, name) value,
 
-#define test_values(type, names)					\
+#define test_values(type, entries)					\
 	const type test_values_[] = {					\
-		names(TEST_DEFINE_VALUE)				\
+		entries(TEST_DEFINE_VALUE)				\
 	}
 
-#define TEST_DEFINE_NAME(value, name)	name,
+#define TEST_DEFINE_NAME(value, time, name) name,
 
-#define test_names(names)						\
+#define test_names(entries)						\
 	const char *test_names_[] = {					\
-		names(TEST_DEFINE_NAME)					\
+		entries(TEST_DEFINE_NAME)				\
 	}
 
-#define test_value_names(type, names)					\
-	test_values(type, names);					\
-	test_names(names);						\
+#define test_value_time_names(type, entries)				\
+	test_values(type, entries);					\
+	test_names(entries);						\
 									\
 	static inline type test_value(const struct options *options)	\
 	{								\

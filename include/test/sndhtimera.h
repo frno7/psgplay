@@ -10,7 +10,7 @@
 
 #define SNDH_TIMER_FREQUENCY 16
 
-#define tune_value_names(t)						\
-	t(SNDH_TIMER_FREQUENCY, "SNDH timer A " XSTR(SNDH_TIMER_FREQUENCY) " Hz")
+#define tune_value_time_names(t)					\
+	t(SNDH_TIMER_FREQUENCY, 63, "SNDH timer A " XSTR(SNDH_TIMER_FREQUENCY) " Hz")
 
 #endif /* PSGPLAY_TEST_SNDHTIMERA_H */

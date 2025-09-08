@@ -14,13 +14,13 @@ struct timer_preset {
 
 #define T(c, d, n) { .ctrl = (c), .divisor = (d), .count = (n) }
 
-#define tune_value_names(t)						\
-	t(T(7, 200, 11), "1117 Hz timer A")				\
-	t(T(6, 100, 17), "1445 Hz timer A")				\
-	t(T(5,  64, 19), "2021 Hz timer A")				\
-	t(T(4,  50, 23), "2137 Hz timer A")				\
-	t(T(3,  16, 47), "3268 Hz timer A")				\
-	t(T(2,  10, 53), "4636 Hz timer A")				\
-	t(T(1,   4, 73), "8416 Hz timer A")
+#define tune_value_time_names(t)					\
+	t(T(7, 200, 11), 63, "1117 Hz timer A")				\
+	t(T(6, 100, 17), 63, "1445 Hz timer A")				\
+	t(T(5,  64, 19), 63, "2021 Hz timer A")				\
+	t(T(4,  50, 23), 63, "2137 Hz timer A")				\
+	t(T(3,  16, 47), 63, "3268 Hz timer A")				\
+	t(T(2,  10, 53), 63, "4636 Hz timer A")				\
+	t(T(1,   4, 73), 63, "8416 Hz timer A")
 
 #endif /* PSGPLAY_TEST_TEMPO_H */

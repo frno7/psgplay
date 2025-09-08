@@ -6,7 +6,7 @@
 #include "test/psgpitch.h"
 
 sndh_title("PSG pitch");
-sndh_tune_value_names(int, tune_value_names);
+sndh_tune_value_time_names(int, tune_value_time_names);
 
 void sndh_init(int tune)
 {

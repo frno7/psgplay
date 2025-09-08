@@ -8,7 +8,7 @@
 #include "test/verify.h"
 #include "test/psgpitch.h"
 
-test_value_names(int, tune_value_names);
+test_value_time_names(int, tune_value_time_names);
 
 static int tone_period(const struct options *options)
 {

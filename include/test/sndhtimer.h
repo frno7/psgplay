@@ -6,7 +6,7 @@
 #ifndef PSGPLAY_TEST_TIMER_SNDH_H
 #define PSGPLAY_TEST_TIMER_SNDH_H
 
-sndh_tune_value_names(double, tune_value_names);
+sndh_tune_value_time_names(double, tune_value_time_names);
 
 #include "test/snd-dma-alt.h"
 

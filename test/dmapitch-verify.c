@@ -8,7 +8,7 @@
 #include "test/verify.h"
 #include "test/dmapitch.h"
 
-test_value_names(struct dma_preset, tune_value_names);
+test_value_time_names(struct dma_preset, tune_value_time_names);
 
 static double dma_sound_frequency(const struct options *options)
 {

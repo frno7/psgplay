@@ -6,7 +6,7 @@
 #include "test/verify.h"
 #include "test/maxamp.h"
 
-test_value_names(int, tune_value_names);
+test_value_time_names(int, tune_value_time_names);
 
 struct minmax {
 	int16_t minimum;

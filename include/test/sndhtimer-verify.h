@@ -6,7 +6,7 @@
 #ifndef PSGPLAY_TEST_TIMER_SNDH_VERIFY_H
 #define PSGPLAY_TEST_TIMER_SNDH_VERIFY_H
 
-test_value_names(double, tune_value_names);
+test_value_time_names(double, tune_value_time_names);
 
 #define TIMER_SNDH_VERIFY_INIT						\
 	const double timer_frequency = test_value(options);		\

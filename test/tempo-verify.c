@@ -8,7 +8,7 @@
 #include "test/verify.h"
 #include "test/tempo.h"
 
-test_value_names(struct timer_preset, tune_value_names);
+test_value_time_names(struct timer_preset, tune_value_time_names);
 
 static double timer_frequency(const struct options *options)
 {
