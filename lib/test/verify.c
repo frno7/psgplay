@@ -65,6 +65,11 @@ static void graph(struct strbuf *sb, const struct audio *audio,
 	audio_free(cut);
 }
 
+__attribute__((weak)) const char *flags(const struct options *options)
+{
+	return "";
+}
+
 int main(int argc, char *argv[])
 {
 	struct options *options = parse_options(argc, argv);

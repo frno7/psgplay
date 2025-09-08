@@ -59,8 +59,3 @@ const char *verify(const struct audio *audio, const struct options *options)
 
 	return NULL;
 }
-
-const char *flags(const struct options *options)
-{
-	return "--length 63";
-}
