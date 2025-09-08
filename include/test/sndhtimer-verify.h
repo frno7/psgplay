@@ -27,7 +27,7 @@ void report(struct strbuf *sb, const struct audio *audio,
 		0.5 * timer_frequency);
 }
 
-char *verify(const struct audio *audio, const struct options *options)
+const char *verify(const struct audio *audio, const struct options *options)
 {
 	TIMER_SNDH_VERIFY_INIT;
 

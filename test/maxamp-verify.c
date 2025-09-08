@@ -47,7 +47,7 @@ void report(struct strbuf *sb, const struct audio *audio,
 		mm.maximum);
 }
 
-char *verify(const struct audio *audio, const struct options *options)
+const char *verify(const struct audio *audio, const struct options *options)
 {
 	const struct minmax mm = minmax(audio);
 

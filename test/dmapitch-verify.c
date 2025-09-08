@@ -45,7 +45,7 @@ void report(struct strbuf *sb, const struct audio *audio,
 		dma_sample_frequency(options));
 }
 
-char *verify(const struct audio *audio, const struct options *options)
+const char *verify(const struct audio *audio, const struct options *options)
 {
 	const struct test_wave_deviation wave_deviation =
 		test_wave_deviation(audio);
