@@ -75,7 +75,7 @@ static u8 psg_rd_u8(const struct device *device, u32 dev_address)
 	case 0:
 	case 1:
 		cf2149.port.bdc(&cf2149, clk,
-			(union cf2149_bdc) { .u8 = CF2149_BDC_DTB });
+			(struct cf2149_bdc) { .u8 = CF2149_BDC_DTB });
 		return cf2149.port.rd_da(&cf2149, clk);
 	case 2:
 	case 3: return 0xff;
@@ -100,13 +100,13 @@ static void psg_wr_u8(const struct device *device, u32 dev_address, u8 data)
 	case 0:
 	case 1:
 		cf2149.port.bdc(&cf2149, clk,
-			(union cf2149_bdc) { .u8 = CF2149_BDC_BAR });
+			(struct cf2149_bdc) { .u8 = CF2149_BDC_BAR });
 		cf2149.port.wr_da(&cf2149, clk, data);
 		break;
 	case 2:
 	case 3:
 		cf2149.port.bdc(&cf2149, clk,
-			(union cf2149_bdc) { .u8 = CF2149_BDC_DWS });
+			(struct cf2149_bdc) { .u8 = CF2149_BDC_DWS });
 		cf2149.port.wr_da(&cf2149, clk, data);
 		break;
 	default:
@@ -130,7 +130,7 @@ static size_t psg_id_u8(const struct device *device,
 	case 2:
 	case 3:
 		snprintf(buf, size, "wr %s",
-			psg_register_name(cf2149.state.reg_address));
+			psg_register_name(cf2149.state.reg));
 		break;
 	default:
 		snprintf(buf, size, "%2u", dev_address);
