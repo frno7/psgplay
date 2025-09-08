@@ -92,7 +92,7 @@ void command_replay(const struct options *options, struct file file,
 	const float time_stop = stop_or_length(
 		parse_stop(auto_stop, options->track, file), length);
 	void *output_arg = output->open(
-		options->output, options->frequency, false);
+		options->output, options->frequency, false, 0);
 	struct psgplay *pp = psgplay_init(file.data, file.size,
 		options->track, options->frequency);
 	ssize_t sample_count = 0;

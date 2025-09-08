@@ -163,7 +163,8 @@ static void alsa_drop(void *arg)
 			state->output, snd_strerror(err));
 }
 
-static void *alsa_open(const char *output, int frequency, bool nonblocking)
+static void *alsa_open(const char *output, int frequency,
+	bool nonblocking, size_t sample_length)
 {
 	struct alsa_state *state = xmalloc(sizeof(struct alsa_state));
 	int err;

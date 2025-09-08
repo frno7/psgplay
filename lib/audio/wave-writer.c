@@ -151,7 +151,8 @@ static bool wave_sample(s16 left, s16 right, void *arg)
 	return wave_sample_flush(state);
 }
 
-static void *wave_open(const char *output, int frequency, bool nonblocking)
+static void *wave_open(const char *output, int frequency,
+	bool nonblocking, size_t sample_length)
 {
 	struct wave_state *state = xmalloc(sizeof(struct wave_state));
 

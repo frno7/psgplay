@@ -111,7 +111,7 @@ static struct sample_buffer sample_buffer_init(
 	struct sample_buffer sb = {
 		.pp = psgplay_init__(data, size, track, frequency, sm),
 		.output = output,
-		.output_arg = output->open(option_output, frequency, true),
+		.output_arg = output->open(option_output, frequency, true, 0),
 	};
 
 	return sb;

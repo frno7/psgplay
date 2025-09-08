@@ -9,7 +9,8 @@
 #include "internal/types.h"
 
 struct audio_writer {
-	void *(*open)(const char *output, int frequency, bool nonblocking);
+	void *(*open)(const char *output, int frequency,
+		bool nonblocking, size_t sample_length);
 	bool (*sample)(s16 left, s16 right, void *arg);
 	bool (*pause)(void *arg);
 	bool (*resume)(void *arg);

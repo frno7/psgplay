@@ -149,7 +149,8 @@ static void portaudio_drop(void *arg)
 			Pa_GetErrorText(err));
 }
 
-static void *portaudio_open(const char *output, int frequency, bool nonblocking)
+static void *portaudio_open(const char *output, int frequency,
+	bool nonblocking, size_t sample_length)
 {
 	PaStreamParameters params = { };
 	PaStream *stream;
