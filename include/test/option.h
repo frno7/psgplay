@@ -24,6 +24,10 @@ struct options {
 
 int option_verbosity(void);
 
+int track_from_path(const char *path);
+
+void name_from_input();
+
 struct options *parse_options(int argc, char **argv);
 
 #endif /* PSGPLAY_TEST_OPTION_H */

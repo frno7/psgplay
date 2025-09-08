@@ -48,7 +48,7 @@ static void NORETURN help_exit(int code)
 	exit(code);
 }
 
-static void name_from_input()
+void name_from_input()
 {
 	const char *path = option.input;
 	size_t j = 0;
@@ -70,7 +70,7 @@ static void name_from_input()
 		(int)min_t(size_t, len, ARRAY_SIZE(option.name) - 1), &path[j]);
 }
 
-static int track_from_path(const char *path)
+int track_from_path(const char *path)
 {
 	size_t k = 0;
 
@@ -155,22 +155,14 @@ opt_t:			option.track = atoi(optarg);
 out:
 	if (optind == argc)
 		help_exit(EXIT_FAILURE);
-	if (optind + 1 == argc)
-		pr_fatal_error("missing input WAVE file\n");
+
+	option.command = argv[optind];
+
+	if (optind + 2 == argc)
+		option.input = argv[optind + 1];
 	if (optind + 2 < argc)
 		pr_fatal_error("%s: too many input files\n",
 			argv[optind + 1]);
-
-	option.command = argv[optind];
-	option.input = argv[optind + 1];
-
-	name_from_input(&option);
-
-	if (!option.track)
-		option.track = track_from_path(option.input);
-	if (!option.track)
-		pr_fatal_error("%s: track not in file name and not given with --track\n",
-			option.input);
 
 	return &option;
 }

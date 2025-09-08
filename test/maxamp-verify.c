@@ -51,6 +51,9 @@ const char *verify(const struct audio *audio, const struct options *options)
 {
 	const struct minmax mm = minmax(audio);
 
+	verify_assert (audio_duration(audio->format) >= 1.0)
+		return "sample duration";
+
 	verify_assert (mm.minimum < -32000 &&	/* Verify near numerical min */
 		       mm.minimum > -32760)	/* Verify margin to clipping */
 		return "sample minimum";
@@ -60,4 +63,9 @@ const char *verify(const struct audio *audio, const struct options *options)
 		return "sample maximum";
 
 	return NULL;
+}
+
+const char *flags(const struct options *options)
+{
+	return "--length 4";
 }

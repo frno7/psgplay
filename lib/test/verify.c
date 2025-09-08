@@ -69,6 +69,23 @@ int main(int argc, char *argv[])
 {
 	struct options *options = parse_options(argc, argv);
 
+	if (strcmp(options->command, "flags") == 0) {
+		puts(flags(options));
+
+		return EXIT_SUCCESS;
+	}
+
+	if (!options->input)
+		pr_fatal_error("missing input WAVE file\n");
+
+	name_from_input(options);
+
+	if (!options->track)
+		options->track = track_from_path(options->input);
+	if (!options->track)
+		pr_fatal_error("%s: track not in file name and not given with --track\n",
+			options->input);
+
 	struct audio *audio = audio_read_wave(options->input);
 
 	/* FIXME: Avoid trimming first and last second with --no-fade option. */

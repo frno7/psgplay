@@ -44,7 +44,7 @@ OTHER_CLEAN += $(PSGPLAY_TEST_ELF) $(PSGPLAY_TEST_SNDH)			\
 	$(PSGPLAY_TEST_REPORT) $(PSGPLAY_TEST_VERIFY)
 
 PSGPLAY_TEST = ./$(PSGPLAY)
-PSGPLAY_TEST_FLAGS = --length 63
+PSGPLAY_TEST_FLAGS =
 
 ifdef TARGET_CC
 
@@ -52,9 +52,13 @@ PSGPLAY_TEST_sndh_tune ?= $(shell echo "$(1)" | sed 's/^.*-\([0-9]\+\).*$$/\1/')
 PSGPLAY_TEST_sndh_base ?= $(shell echo "$(1)" | sed 's/-[0-9]\+.*$$//')
 
 define PSGPLAY_TEST_target
+$(1).wave: $$(call PSGPLAY_TEST_sndh_base,$(1))-verify
 $(1).wave: $$(call PSGPLAY_TEST_sndh_base,$(1)).sndh $(PSGPLAY)
-	$$(QUIET_TEST)$$(PSGPLAY_TEST) -o $$@ $(PSGPLAY_TEST_FLAGS)	\
-		-t $$(call PSGPLAY_TEST_sndh_tune,$$@) $$<
+	$$(QUIET_TEST)$$(PSGPLAY_TEST) -o $$@				\
+		$$(shell $$(call PSGPLAY_TEST_sndh_base,$(1))-verify	\
+			flags -t $$(call PSGPLAY_TEST_sndh_tune,$$@)) \
+		-t $$(call PSGPLAY_TEST_sndh_tune,$$@)			\
+		$(PSGPLAY_TEST_FLAGS) $$<
 
 $(1).svg: $$(call PSGPLAY_TEST_sndh_base,$(1))-verify $(1).wave
 	$$(QUIET_GEN)$$< graph -t $$(call PSGPLAY_TEST_sndh_tune,$$@)	\

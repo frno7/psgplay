@@ -14,4 +14,6 @@
 
 const char *verify(const struct audio *audio, const struct options *options);
 
+const char *flags(const struct options *options);
+
 #endif /* PSGPLAY_TEST_VERIFY_H */
