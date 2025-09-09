@@ -4,6 +4,7 @@ PSGPLAY_test_dir := $(dir $(lastword $(MAKEFILE_LIST)))
 
 PSGPLAY_TESTS :=							\
 	dmapitch							\
+	dmasint								\
 	maxamp								\
 	psgpitch							\
 	sndhtimera							\
