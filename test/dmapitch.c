@@ -18,7 +18,7 @@ sndh_tune_value_time_names(struct dma_preset, tune_value_time_names);
 #define R7(x)	x, x, x, x, x, x, x
 
 struct mono {
-	int8_t value;
+	int8_t mono;
 };
 
 struct stereo {
@@ -27,10 +27,16 @@ struct stereo {
 };
 
 #define M(hp)								\
-static const struct mono mono##hp[2*hp] = { R##hp({127}), R##hp({-127}) }
+static const struct mono samples1_##hp[2*hp] = {			\
+	R##hp({ 127}),							\
+	R##hp({-127})							\
+}
 
 #define S(hp)								\
-static const struct stereo stereo##hp[2*hp] = { R##hp({R2(127)}), R##hp({R2(-127)}) }
+static const struct stereo samples2_##hp[2*hp] = {			\
+	R##hp({R2( 127)}),						\
+	R##hp({R2(-127)})						\
+}
 
 #define SM(hp) M(hp); S(hp)
 
@@ -45,17 +51,19 @@ void sndh_init(int tune)
 	const struct dma_preset preset = sndh_tune_select_value(tune);
 	const int8_t *base = NULL;
 
+#define CASE(c, hp, f) ((c) << 8) | (hp): base = &samples##c##_##hp[0].f
+
 	switch ((preset.channels << 8) | preset.halfperiod) {
-	case 0x101: base = &mono1[0].value;  break;
-	case 0x102: base = &mono2[0].value;  break;
-	case 0x103: base = &mono3[0].value;  break;
-	case 0x105: base = &mono5[0].value;  break;
-	case 0x107: base = &mono7[0].value;  break;
-	case 0x201: base = &stereo1[0].left; break;
-	case 0x202: base = &stereo2[0].left; break;
-	case 0x203: base = &stereo3[0].left; break;
-	case 0x205: base = &stereo5[0].left; break;
-	case 0x207: base = &stereo7[0].left; break;
+	case CASE(1, 1, mono); break;
+	case CASE(1, 2, mono); break;
+	case CASE(1, 3, mono); break;
+	case CASE(1, 5, mono); break;
+	case CASE(1, 7, mono); break;
+	case CASE(2, 1, left); break;
+	case CASE(2, 2, left); break;
+	case CASE(2, 3, left); break;
+	case CASE(2, 5, left); break;
+	case CASE(2, 7, left); break;
 	}
 
 	const int8_t *end = &base[2 * preset.halfperiod * preset.channels];
