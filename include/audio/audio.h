@@ -43,7 +43,8 @@ struct audio_zero_crossing {
 };
 
 struct audio_zero_crossing_cb {
-	bool (*f)(size_t index, bool neg_to_pos, void *arg);
+	bool (*f)(size_t index, struct audio_sample a,
+		struct audio_sample b, void *arg);
 	void *arg;
 };
 

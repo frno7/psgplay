@@ -160,23 +160,24 @@ bool audio_zero_crossing(const struct audio *audio,
 {
 	for (size_t i = 0; i + 1 < audio->format.sample_count; i++)
 		if (zero_crossing(audio->samples[i], audio->samples[i + 1])) {
-			if (!cb.f(i, true, cb.arg))
+			if (!cb.f(i, audio->samples[i], audio->samples[i + 1], cb.arg))
 				return false;
 		} else if (zero_crossing(audio->samples[i + 1], audio->samples[i])) {
-			if (!cb.f(i, false, cb.arg))
+			if (!cb.f(i, audio->samples[i], audio->samples[i + 1], cb.arg))
 				return false;
 		}
 
 	return true;
 }
 
-static bool zero_crossing_periodic(size_t i, bool neg_to_pos, void *arg)
+static bool zero_crossing_periodic(size_t i, struct audio_sample a,
+	struct audio_sample b, void *arg)
 {
 	struct audio_zero_crossing_periodic *zcp = arg;
 
 	zcp->last = (struct audio_zero_crossing) {
 		.index = i,
-		.neg_to_pos = neg_to_pos,
+		.neg_to_pos = a.left < b.left || a.right < b.right,
 	};
 
 	if (!zcp->count)
@@ -206,7 +207,8 @@ struct zcp_deviation {
 	double k;
 };
 
-static bool zcp_deviation(size_t i, bool neg_to_pos, void *arg)
+static bool zcp_deviation(size_t i, struct audio_sample a,
+	struct audio_sample b, void *arg)
 {
 	struct zcp_deviation *zcpd = arg;
 	const double j = zcpd->wave.phase + zcpd->k * zcpd->wave.period;
