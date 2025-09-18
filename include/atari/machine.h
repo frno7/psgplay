@@ -15,7 +15,7 @@
 #define CPU_FREQUENCY (ATARI_STE_PAL_MCLK / ATARI_STE_CPU_CLK_DIV)
 
 #define MACHINE_PROGRAM   0x40000	/* 256 KiB */
-#define MACHINE_RUN_SLICE   10000
+#define MACHINE_RUN_SLICE   100
 
 struct machine_registers {
 	u32 d[8];	/* Data registers */

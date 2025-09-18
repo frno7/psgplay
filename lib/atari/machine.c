@@ -59,9 +59,10 @@ u64 cycle_transform_align(u64 to_frequency, u64 from_frequency, u64 cycle)
 		(r * to_frequency + from_frequency - 1) / from_frequency;
 }
 
+bool machine_cycle_in_cpu;
 u64 machine_cycle(void)
 {
-	const int cycles_run = m68k_cycles_run();
+	const int cycles_run = machine_cycle_in_cpu ? m68k_cycles_run() : 0;
 
 	BUG_ON(cycles_run < 0);
 

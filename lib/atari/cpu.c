@@ -41,7 +41,11 @@ void cpu_instruction_callback(void (*cb)(uint32_t pc, void *arg), void *arg)
 static struct device_slice cpu_run(const struct device *device,
 	struct device_cycle device_cycle, struct device_slice device_slice)
 {
+	extern bool machine_cycle_in_cpu;
+
+	machine_cycle_in_cpu = true;
 	const int s = m68k_execute(device_slice.s);
+	machine_cycle_in_cpu = false;
 
 	BUG_ON(s < 0);
 
