@@ -11,6 +11,7 @@
 #include "internal/compare.h"
 #include "internal/macro.h"
 
+#include "atari/cpu.h"
 #include "atari/device.h"
 #include "atari/glue.h"
 #include "atari/machine.h"
@@ -61,11 +62,7 @@ u64 cycle_transform_align(u64 to_frequency, u64 from_frequency, u64 cycle)
 
 u64 machine_cycle(void)
 {
-	const int cycles_run = m68k_cycles_run();
-
-	BUG_ON(cycles_run < 0);
-
-	return cycle + cycles_run;
+	return cycle + cpu_cycles_run();
 }
 
 static void atari_st_init(const void *prg, size_t size, size_t offset,

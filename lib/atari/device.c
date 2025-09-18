@@ -21,6 +21,8 @@
 #include "atari/shifter.h"
 #include "atari/sound.h"
 
+#include "m68k/m68kcpu.h"
+
 static struct machine_device {
 	u64 machine_cycle_event;
 	const struct device *device;
@@ -36,6 +38,10 @@ static struct machine_device {
 	{ .device = &fdc_device     },
 	{ .device = &cpu_device     },
 };
+
+static struct device_run_cycle {
+	uint64_t machine_slice_end;
+} device_run_cycle;
 
 #define for_each_device(device_)					\
 	for (struct machine_device *machine_device_ = &list[0];		\
@@ -116,14 +122,16 @@ void request_device_event(const struct device *device,
 		machine_from_device_cycle_align(device, device_cycle);
 	struct machine_device *machine_device = NULL;
 
+	if (device_run_cycle.machine_slice_end &&
+	    device_run_cycle.machine_slice_end > machine_cycle)
+		m68k_end_timeslice();
+
 	for (size_t i = 0; i < ARRAY_SIZE(list); i++)
 		if (list[i].device == device) {
 			machine_device = &list[i];
 			break;
 		}
 	BUG_ON(!machine_device);
-
-	// FIXME: printf("%s %s %lu\n", __func__, device->name, machine_cycle);
 
 	if (!machine_device->machine_cycle_event ||
 	    machine_cycle < machine_device->machine_cycle_event)
@@ -145,9 +153,18 @@ static struct device_slice run(const struct device *device,
 	if (!device->run)
 		return (struct device_slice) { };
 
-	return device->run(device,
-		device_from_machine_cycle(device, machine_cycle),
-		device_from_machine_slice(device, machine_slice));
+	device_run_cycle = (struct device_run_cycle) {
+		.machine_slice_end = machine_cycle + machine_slice,
+	};
+
+	const struct device_slice slice =
+		device->run(device,
+			device_from_machine_cycle(device, machine_cycle),
+			device_from_machine_slice(device, machine_slice));
+
+	device_run_cycle = (struct device_run_cycle) { };
+
+	return slice;
 }
 
 u64 device_run(u64 machine_cycle, u64 machine_slice)

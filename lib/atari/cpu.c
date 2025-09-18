@@ -19,6 +19,8 @@ static struct {
 	void *arg;
 } instruction_callback;
 
+bool cpu_execute;
+
 void m68k_instruction_callback(int pc)
 {
 #if 0	/* FIXME */
@@ -38,10 +40,21 @@ void cpu_instruction_callback(void (*cb)(uint32_t pc, void *arg), void *arg)
 	instruction_callback.arg = arg;
 }
 
+u64 cpu_cycles_run(void)
+{
+	const int cycles_run = cpu_execute ? m68k_cycles_run() : 0;
+
+	BUG_ON(cycles_run < 0);
+
+	return cycles_run;
+}
+
 static struct device_slice cpu_run(const struct device *device,
 	struct device_cycle device_cycle, struct device_slice device_slice)
 {
+	cpu_execute = true;
 	const int s = m68k_execute(device_slice.s);
+	cpu_execute = false;
 
 	BUG_ON(s < 0);
 
