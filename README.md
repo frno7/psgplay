@@ -265,124 +265,9 @@ _play:
 	...
 ```
 
-Excerpt of disassembly with the `--disassemble-header` option:
-
-```
-init:
-	bra.w	_init
-exit:
-	bra.w	_exit
-play:
-	bra.w	_play
-sndh:
-	dc.b	$53,$4e,$44,$48,$43,$4f,$4d,$4d	; SNDHCOMM
-	dc.b	$4d,$61,$64,$20,$4d,$61,$78,$00	; Mad Max.
-	dc.b	$52,$49,$50,$50,$47,$72,$61,$7a	; RIPPGraz
-	dc.b	$65,$79,$20,$2f,$20,$50,$48,$46	; ey / PHF
-	dc.b	$00,$43,$4f,$4e,$56,$47,$72,$61	; .CONVGra
-	dc.b	$7a,$65,$79,$20,$2f,$20,$50,$48	; zey / PH
-	dc.b	$46,$00,$54,$49,$54,$4c,$57,$61	; F.TITLWa
-	dc.b	$72,$70,$00,$23,$23,$30,$38,$00	; rp.##08.
-	dc.b	$54,$43,$35,$30,$00,$00        	; TC50..
-_init:
-	dc.b	$41,$fa,$00,$46,$43,$fa,$00,$46
-	dc.b	$22,$88,$04,$40,$00,$01,$41,$fa
-	dc.b	$0a,$e8,$43,$fa,$00,$46,$22,$00
-	dc.b	$e7,$41,$24,$71,$10,$00,$5c,$41
-	dc.b	$30,$31,$10,$00,$41,$fa,$0a,$d2
-	dc.b	$d1,$ca,$43,$fa,$00,$6e,$23,$48
-	dc.b	$00,$38,$23,$48,$00,$6c,$42,$69
-	dc.b	$08,$38,$61,$00,$00,$5e,$41,$fa
-	dc.b	$00,$62,$43,$fa,$00,$08,$22,$88
-	dc.b	$4e,$75
-_exit:
-	dc.b	$4e,$75,$00,$00,$00,$00
-_play:
-	dc.b	$20,$7a,$ff,$fa,$4e,$90,$4e,$75
-	...
-```
-
-Excerpt of disassembly with the `--disassemble-header` and
-`--remake-header` options (having the missing `HDNS` tag automatically
-repaired from the previous excerpt):
-
-```
-init:
-	bra.w	_init
-exit:
-	bra.w	_exit
-play:
-	bra.w	_play
-sndh:
-	dc.b	'SNDH'
-	dc.b	'COMMMad Max',0
-	dc.b	'RIPPGrazey / PHF',0
-	dc.b	'CONVGrazey / PHF',0
-	dc.b	'TITLWarp',0
-	dc.b	'##08',0
-	dc.b	'TC50',0
-	even
-	dc.b	'HDNS'
-_init:
-	dc.b	$41,$fa,$00,$46,$43,$fa,$00,$46
-	dc.b	$22,$88,$04,$40,$00,$01,$41,$fa
-	dc.b	$0a,$e8,$43,$fa,$00,$46,$22,$00
-	dc.b	$e7,$41,$24,$71,$10,$00,$5c,$41
-	dc.b	$30,$31,$10,$00,$41,$fa,$0a,$d2
-	dc.b	$d1,$ca,$43,$fa,$00,$6e,$23,$48
-	dc.b	$00,$38,$23,$48,$00,$6c,$42,$69
-	dc.b	$08,$38,$61,$00,$00,$5e,$41,$fa
-	dc.b	$00,$62,$43,$fa,$00,$08,$22,$88
-	dc.b	$4e,$75
-_exit:
-	dc.b	$4e,$75,$00,$00,$00,$00
-_play:
-	dc.b	$20,$7a,$ff,$fa,$4e,$90,$4e,$75
-	...
-```
-
 Disassembly makes it possible to supply bug fixes and metadata updates
 in source [patch](https://en.wikipedia.org/wiki/Patch_%28Unix%29) form,
-for quick and easy review, application and SNDH file reassembly:
-
-```
---- sndh/Mad_Max/Games/Lethal_Xcess_(ST).S.orig	2020-05-22 14:56:20.495508523 +0200
-+++ sndh/Mad_Max/Games/Lethal_Xcess_(ST).S.new	2020-05-22 15:23:55.260509689 +0200
-@@ -6,13 +6,31 @@
- 	bra.w	_play
- sndh:
- 	dc.b	'SNDH'
--	dc.b	'TITLLethal Xcess (ST/Falc)',0
--	dc.b	'COMMMad Max',0
-+	dc.b	'TITLLethal Xcess (ST)',0
-+	dc.b	'COMMJochen Hippel',0
- 	dc.b	'RIPPGrazey / PHF',0
- 	dc.b	'CONVGrazey / PHF',0
-+	dc.b	'YEAR1991',0
- 	dc.b	'TC50',0
- 	dc.b	'##07',0
- 	even
-+.subtitles:
-+	dc.b	'!#SN'
-+	dc.w	.st1-.subtitles
-+	dc.w	.st2-.subtitles
-+	dc.w	.st3-.subtitles
-+	dc.w	.st4-.subtitles
-+	dc.w	.st5-.subtitles
-+	dc.w	.st6-.subtitles
-+	dc.w	.st7-.subtitles
-+.st1:	dc.b	'Main Menu',0
-+.st2:	dc.b	'Level 1: Ruins of Methallycha 1',0
-+.st3:	dc.b	'Level 1: Ruins of Methallycha 2',0
-+.st4:	dc.b	'Level 2: Desert of No Return',0
-+.st5:	dc.b	'Level 3: The Evil Garden',0
-+.st6:	dc.b	'Level 4: Volcanic Plateaus',0
-+.st7:	dc.b	'Level 5: Fortress of Methallycha',0
-+	even
- 	dc.b	'HDNS'
- _init:
- 	dc.b	$2f,$00,$41,$fa,$00,$6e,$4a,$50
-```
+for quick and easy review, application and SNDH file reassembly.
 
 # Test and verification
 
@@ -434,10 +319,14 @@ wave error relative frequency 3.80e-07
 wave error relative tolerance 7.44e-07
 ```
 
+Example graph:
+
+![PSG pitch graph](https://raw.githubusercontent.com/frno7/psgplay/main/doc/psgpitch.png)
+
 Set the `PSGPLAY_TEST` Makefile option to run the test suite with a command
 other than `psgplay`, for example a command using [Hatari](https://hatari-emu.org/)
-instead. Note that the last second is automatically cut from input WAVE
-files during testing, to avoid artifacts due to audio fading out, etc.
+instead. Note that the first and last seconds are automatically cut from input
+WAVE files during testing, to avoid artifacts due to audio fading, etc.
 
 Review the file
 [`INSTALL`](https://github.com/frno7/psgplay/blob/main/INSTALL)

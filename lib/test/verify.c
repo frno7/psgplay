@@ -32,7 +32,8 @@ static bool encode_file(const void *data, size_t size, void *arg)
 static void graph(struct strbuf *sb, const struct audio *audio,
 	const struct options *options)
 {
-	struct audio *norm = audio_normalise(audio, 0.8f);
+	struct audio *cut = audio_range(audio, 0, 250);
+	struct audio *norm = audio_normalise(cut, 0.8f);
 	const struct audio_meter meter = audio_meter(norm);
 	const struct audio_zero_crossing_periodic zcp =
 		audio_zero_crossing_periodic(norm);
@@ -51,23 +52,17 @@ static void graph(struct strbuf *sb, const struct audio *audio,
 		},
 		&svg_encoder);
 
-	const size_t margin = 10;
-	const size_t i = zcp.first.index >= margin ?
-		zcp.first.index - margin : 0;
-	struct audio *cut = audio_range(norm, i, i + 250);
-
 	encoder->module->header(encoder);
 	encoder->module->axes(encoder);
 	encoder->module->square_wave(encoder,
 		wave, meter.left.minimum, meter.left.maximum);
-	encoder->module->samples(encoder, cut);
+	encoder->module->samples(encoder, norm);
 	encoder->module->footer(encoder);
-
-	audio_free(cut);
 
 	graph_encoder_free(encoder);
 
 	audio_free(norm);
+	audio_free(cut);
 }
 
 __attribute__((weak)) const char *flags(const struct options *options)
