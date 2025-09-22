@@ -7,6 +7,7 @@ PSGPLAY_TESTS :=							\
 	dmasint								\
 	maxamp								\
 	psgpitch							\
+	sndhfrms							\
 	sndhtimera							\
 	sndhtimerb							\
 	sndhtimerc							\
