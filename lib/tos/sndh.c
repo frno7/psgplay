@@ -10,6 +10,7 @@
 #include <asm/machine.h>
 #include <asm/math.h>
 #include <asm/mfp.h>
+#include <asm/snd/dma.h>
 #include <tos/cookie.h>
 #include <tos/system-variable.h>
 
@@ -118,11 +119,25 @@ MFP_CTRL_DIV(MFP_CTRL_DIV_PRESCALE)
 	return valid;
 }
 
-INTERRUPT void vbl_exception(void)
+static void sndh_play_record()
+{
+	static bool record;
+
+	if (!record) {
+		ioor16(0x10, SND_DMA_ADDR_CTRL);
+		ioand16(~0x10, SND_DMA_ADDR_CTRL);
+
+		record = true;
+	}
+
+	sndh_play(&file);
+}
+
+INTERRUPT void vbl_exception()
 {
 	if (timer_state.type == SNDH_TIMER_V &&
 	    timer_state.play)
-		sndh_play(&file);
+		sndh_play_record();
 }
 
 static void install_sndh_vbl()
@@ -130,7 +145,7 @@ static void install_sndh_vbl()
 	timer_state.type = SNDH_TIMER_V;
 }
 
-static bool timer_division(void)
+static bool timer_division()
 {
 	if (timer_state.dividend >= timer_state.prescale.divisor)
 		timer_state.dividend = 0;
@@ -139,11 +154,11 @@ static bool timer_division(void)
 }
 
 #define DEFINE_TIMER_EXCEPTION(name_, type_, ab_)			\
-INTERRUPT void timer_##name_##_exception(void)				\
+INTERRUPT void timer_##name_##_exception()				\
 {									\
 	if (timer_state.type == SNDH_TIMER_##type_ &&			\
 	    timer_state.play && timer_division())			\
-		sndh_play(&file);					\
+		sndh_play_record();					\
 									\
 	/* Timer is now served. */					\
 	mfp_clrs_is##ab_({ .timer_##name_ = true });			\
@@ -184,12 +199,12 @@ static void play()
 	barrier();
 }
 
-static void idle(void)
+static void idle()
 {
 	__asm__ __volatile__ ("stop #0x2200" : : : "cc");
 }
 
-static void idle_indefinitely(void)
+static void idle_indefinitely()
 {
 	for (;;)
 		idle();

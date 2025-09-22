@@ -35,6 +35,9 @@ static struct cf300588_sound_module cf300588;
 static struct {
 	sound_sample_f sample;
 	void *sample_arg;
+
+	record_sample_f record;
+	void *record_arg;
 } output;
 
 static char *sound_register_name(u32 reg)
@@ -136,6 +139,9 @@ static void sound_wr_u8(const struct device *device, u32 dev_address, u8 val)
 	if ((dev_address & 1) == 0)
 		return;
 
+	if (reg == 0 && (val & 0x10))
+		output.record(sound_cycle.c / 8, output.record_arg);
+
 	sound_event(device, sound_cycle);
 
 	request_event(device, sound_cycle,
@@ -182,6 +188,12 @@ void sound_sample(sound_sample_f sample, void *sample_arg)
 {
 	output.sample = sample;
 	output.sample_arg = sample_arg;
+}
+
+void record_sample(record_sample_f record, void *record_arg)
+{
+	output.record = record;
+	output.record_arg = record_arg;
 }
 
 void sound_check(u32 bus_address)

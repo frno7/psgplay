@@ -25,6 +25,8 @@
 
 #define FADE_SAMPLES 2500	/* 10 ms with 250 kHz */
 
+#define RECORD_PLAY_DEFAULT ((10 * ATARI_STE_EXT_OSC) / 4 / 16)    /* 10 s */
+
 struct fir8 {
 	int16_t xn[8];
 	int k;
@@ -55,10 +57,17 @@ struct psgplay {
 	struct stereo_buffer stereo_buffer;
 	struct digital_buffer digital_buffer;
 
+	struct {
+		uint64_t psg;
+		uint64_t dma;
+		uint64_t mix;
+		uint64_t play;
+	} record;
+
 	struct psgplay_downsample {
 		int stereo_frequency;
-		u64 psg_cycle;
-		u64 downsample_sample_cycle;
+		uint64_t psg_cycle;
+		uint64_t downsample_sample_cycle;
 
 		struct {
 			struct fir8 left;
@@ -518,10 +527,26 @@ static void digital_to_stereo_downsample(struct psgplay *pp,
 	}
 }
 
+#define RECORD(type)							\
+({									\
+	if (pp->record.type + count <= pp->record.play) {		\
+		pp->record.type += count;				\
+		return;							\
+	}								\
+	if (pp->record.type < pp->record.play) {			\
+		const size_t offset = pp->record.play - pp->record.type; \
+		pp->record.type += count;				\
+		sample = &sample[offset];				\
+		count -= offset;					\
+	}								\
+})
+
 static void psg_digital(const struct cf2149_ac *sample,
 	size_t count, void *arg)
 {
 	struct psgplay *pp = arg;
+
+	RECORD(psg);
 
 	for (size_t i = 0; i < count; i++)
 		if (!pp->errno_)
@@ -534,6 +559,8 @@ static void sound_digital(const struct sound_sample *sample,
 {
 	struct psgplay *pp = arg;
 
+	RECORD(dma);
+
 	for (size_t i = 0; i < count; i++)
 		if (!pp->errno_)
 			pp->errno_ = buffer_digital_sound_sample(
@@ -545,10 +572,24 @@ static void mixer_digital(const struct mixer_sample *sample,
 {
 	struct psgplay *pp = arg;
 
+	RECORD(mix);
+
 	for (size_t i = 0; i < count; i++)
 		if (!pp->errno_)
 			pp->errno_ = buffer_digital_mixer_sample(
 				&sample[i], &pp->digital_buffer);
+}
+
+static void record_digital(uint64_t cycle, void *arg)
+{
+	struct psgplay *pp = arg;
+
+	BUG_ON(cycle < pp->record.psg);
+	BUG_ON(cycle < pp->record.dma);
+	BUG_ON(cycle < pp->record.mix);
+
+	if (cycle < pp->record.play)
+		pp->record.play = cycle;
 }
 
 static u32 parse_timer(const void *data, size_t size)
@@ -582,9 +623,11 @@ struct psgplay *psgplay_init(const void *data, size_t size,
 		.psg_sample = psg_digital,
 		.sound_sample = sound_digital,
 		.mixer_sample = mixer_digital,
+		.record_sample = record_digital,
 		.arg = pp
 	};
 
+	pp->record.play = RECORD_PLAY_DEFAULT;
 	pp->downsample.stereo_frequency = stereo_frequency;
 	pp->machine = &atari_st;
 	pp->machine->init(data, size, offset, &regs, &ports);

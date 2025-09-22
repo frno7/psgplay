@@ -37,4 +37,6 @@ struct mixer_sample {
 typedef void (*mixer_sample_f)(
 	const struct mixer_sample *sample, size_t count, void *arg);
 
+typedef void (*record_sample_f)(uint64_t cycle, void *arg);
+
 #endif /* ATARI_SAMPLE_H */

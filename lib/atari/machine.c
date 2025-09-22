@@ -90,6 +90,7 @@ static void atari_st_init(const void *prg, size_t size, size_t offset,
 	psg_sample(ports->psg_sample, ports->arg);
 	sound_sample(ports->sound_sample, ports->arg);
 	mixer_sample(ports->mixer_sample, ports->arg);
+	record_sample(ports->record_sample, ports->arg);
 }
 
 static bool atari_st_run(void)
