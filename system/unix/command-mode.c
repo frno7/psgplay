@@ -74,7 +74,7 @@ static float parse_length(const char *s, float start)
 	return !s ? OPTION_TIME_UNDEFINED : start + parse_time(s);
 }
 
-static ssize_t stop_or_length(ssize_t stop, ssize_t length)
+static float stop_or_length(float stop, float length)
 {
 	return   stop == OPTION_TIME_UNDEFINED ? length :
 	       length == OPTION_TIME_UNDEFINED ? stop   :
