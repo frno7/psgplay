@@ -94,12 +94,13 @@ int main(int argc, char *argv[])
 	struct audio *audio = audio_read_wave(options->input);
 
 	/* FIXME: Avoid trimming first and last second with --no-fade option. */
+	struct audio *trim = NULL;
 	if (audio->format.sample_count < 3 * audio->format.frequency)
-		pr_fatal_error("%s: too short: must be at least %d samples\n",
-			options->input, 2 * audio->format.frequency);
-	struct audio *trim = audio_range(audio,
-		audio->format.frequency,
-		audio->format.sample_count - audio->format.frequency);
+		trim = audio_range(audio, 0, audio->format.sample_count);
+	else
+		trim = audio_range(audio,
+			audio->format.frequency,
+			audio->format.sample_count - audio->format.frequency);
 
 	struct strbuf sb = { };
 
