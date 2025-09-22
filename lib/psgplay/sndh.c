@@ -253,6 +253,46 @@ static bool sndh_time(struct sndh_cursor *cursor)
 	return cursor->subtag.read(cursor);
 }
 
+static bool sndh_frames_subtag(struct sndh_cursor *cursor)
+{
+	const uint8_t *b = cursor->file.data;
+	const uint8_t *d = &b[cursor->offset];
+	const uint32_t t = (d[0] << 24) |
+			   (d[1] << 16) |
+			   (d[2] <<  8) |
+			    d[3];
+
+	snprintf(cursor->buffer, sizeof(cursor->buffer), "%u", t);
+	tag_update(cursor->buffer, t, cursor);
+
+	cursor->offset += 4;
+
+	return true;
+}
+
+static bool sndh_frames(struct sndh_cursor *cursor)
+{
+	if (!cursor->subtunes) {
+		diag_warn(cursor, "tag %s without any subtunes",
+			cursor->tag->name);
+
+		return true;
+	}
+
+	cursor->subtag.start = cursor->offset - strlen(cursor->tag->name);
+	cursor->subtag.bound = cursor->offset + cursor->subtunes * 4;
+
+	if (cursor->bound < cursor->subtag.bound) {
+		diag_error(cursor, "tag %s too short", cursor->tag->name);
+
+		return false;
+	}
+
+	cursor->subtag.read = sndh_frames_subtag;
+
+	return cursor->subtag.read(cursor);
+}
+
 static bool sndh_hdns(struct sndh_cursor *cursor)
 {
 	cursor->hdns = true;
@@ -335,6 +375,7 @@ static bool match_tag(struct sndh_cursor *cursor)
 		{ "!V",    sndh_integer     },
 		{ "##",    sndh_subtunes, 2 },
 		{ "TIME",  sndh_time        },
+		{ "FRMS",  sndh_frames      },
 		{ "FLAG~", sndh_string      },
 		{ "FLAG",  sndh_substrings  },
 		{ "HDNS",  sndh_hdns        },
