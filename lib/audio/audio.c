@@ -211,6 +211,11 @@ static bool zcp_deviation(size_t i, struct audio_sample a,
 	struct audio_sample b, void *arg)
 {
 	struct zcp_deviation *zcpd = arg;
+
+	const bool neg_to_pos = a.left < b.left || a.right < b.right;
+	if (!zcpd->deviation.count && !neg_to_pos)
+		zcpd->k += 0.5;
+
 	const double j = zcpd->wave.phase + zcpd->k * zcpd->wave.period;
 
 	zcpd->deviation.count++;
@@ -224,10 +229,7 @@ struct audio_zero_crossing_periodic_deviation
 	audio_zero_crossing_periodic_deviation(const struct audio *audio,
 		struct audio_wave wave)
 {
-	struct zcp_deviation zcpd = {
-		.wave = wave,
-		.k = wave.phase < 0.0 ? 0.5 : 0.0,
-	};
+	struct zcp_deviation zcpd = { .wave = wave };
 
 	audio_zero_crossing(audio, (struct audio_zero_crossing_cb) {
 			.f = zcp_deviation,
