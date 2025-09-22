@@ -12,14 +12,14 @@
 
 #include "test/option.h"
 
-#define TEST_DEFINE_VALUE(value, time, name) value,
+#define TEST_DEFINE_VALUE(value, _, name) value,
 
 #define test_values(type, entries)					\
 	const type test_values_[] = {					\
 		entries(TEST_DEFINE_VALUE)				\
 	}
 
-#define TEST_DEFINE_NAME(value, time, name) name,
+#define TEST_DEFINE_NAME(value, _, name) name,
 
 #define test_names(entries)						\
 	const char *test_names_[] = {					\
@@ -27,6 +27,20 @@
 	}
 
 #define test_value_time_names(type, entries)				\
+	test_values(type, entries);					\
+	test_names(entries);						\
+									\
+	static inline type test_value(const struct options *options)	\
+	{								\
+		return test_values_[options->track - 1];		\
+	}								\
+									\
+	static inline const char *test_name(const struct options *options) \
+	{								\
+		return test_names_[options->track - 1];			\
+	}
+
+#define test_value_frames_names(type, entries)				\
 	test_values(type, entries);					\
 	test_names(entries);						\
 									\
