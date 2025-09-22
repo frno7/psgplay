@@ -12,6 +12,10 @@
 
 #include "psgplay/sndh.h"
 
+#if defined(__m68k__)
+#include "toslibc/asm/math.h"
+#endif
+
 #define diag_warn(cursor, ...)						\
 	(cursor)->diag.warn((cursor)->diag.arg, __VA_ARGS__)
 
@@ -527,7 +531,7 @@ bool sndh_tag_default_subtune(int *default_subtune,
 	return false;
 }
 
-bool sndh_tag_subtune_time(float *duration, int subtune,
+static bool sndh_tag_subtune_time__(float *duration, int subtune,
 	const void *data, const size_t size)
 {
 	int st = 0;
@@ -540,6 +544,39 @@ bool sndh_tag_subtune_time(float *duration, int subtune,
 		}
 
 	return false;
+}
+
+static bool sndh_tag_subtune_frames(float *duration, int subtune,
+	const void *data, const size_t size)
+{
+	int st = 0;
+
+	sndh_for_each_tag (data, size)
+		if (strcmp(sndh_tag_name, "FRMS") == 0 && ++st == subtune) {
+			struct sndh_timer timer = { };
+
+			if (!sndh_tag_timer(&timer, data, size) ||
+			    !timer.frequency)
+				timer.frequency = 50;
+
+#if defined(__m68k__)
+			*duration = DIV_ROUND_CLOSEST_U32(
+				sndh_tag_integer, timer.frequency);
+#else
+			*duration = sndh_tag_integer / (float)timer.frequency;
+#endif
+
+			return true;
+		}
+
+	return false;
+}
+
+bool sndh_tag_subtune_time(float *duration, int subtune,
+	const void *data, const size_t size)
+{
+	return sndh_tag_subtune_frames(duration, subtune, data, size) ||
+	       sndh_tag_subtune_time__(duration, subtune, data, size);
 }
 
 bool sndh_tag_timer(struct sndh_timer *timer,
