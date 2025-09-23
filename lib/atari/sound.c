@@ -51,6 +51,12 @@ CF300588_SOUND_REGS(SOUND_REG_NAME)
 	}
 }
 
+static inline struct cf300588_sound_cycle cf300588_sound_cycle_from_device(
+	struct device_cycle cycle)
+{
+	return cf300588_sound_cycle_cd(cycle.c, 1 /* FIXME */);
+}
+
 static void request_event(const struct device *device,
 	struct device_cycle sound_cycle, struct cf300588_sound_event event)
 {
@@ -73,7 +79,7 @@ static void sound_event(const struct device *device,
 	const struct device_cycle sound_cycle)
 {
 	struct cf300588_sound_cycle module_cycle =
-		cf300588_sound_cycle(sound_cycle.c, 1 /* FIXME */);
+		cf300588_sound_cycle_from_device(sound_cycle);
 	struct cf300588_sound_sample buffer8[1024];
 
 	const struct cf300588_sound_dma_region dma_region =
@@ -113,7 +119,7 @@ static u8 sound_rd_u8(const struct device *device, u32 dev_address)
 {
 	const struct device_cycle sound_cycle = device_cycle(device);
 	struct cf300588_sound_cycle module_cycle =
-		cf300588_sound_cycle(sound_cycle.c, 1 /* FIXME */);
+		cf300588_sound_cycle_from_device(sound_cycle);
 	const u32 reg = dev_address >> 1;
 
 	if ((dev_address & 1) == 0)
@@ -133,7 +139,7 @@ static void sound_wr_u8(const struct device *device, u32 dev_address, u8 val)
 {
 	const struct device_cycle sound_cycle = device_cycle(device);
 	struct cf300588_sound_cycle module_cycle =
-		cf300588_sound_cycle(sound_cycle.c, 1 /* FIXME */);
+		cf300588_sound_cycle_from_device(sound_cycle);
 	const u32 reg = dev_address >> 1;
 
 	if ((dev_address & 1) == 0)
@@ -177,7 +183,7 @@ static void sound_reset(const struct device *device)
 	const struct device_cycle sound_cycle = device_cycle(device);
 
 	struct cf300588_sound_cycle module_cycle =
-		cf300588_sound_cycle(sound_cycle.c, 1 /* FIXME */);
+		cf300588_sound_cycle_from_device(sound_cycle);
 
 	cf300588 = cf300588_sound_init(module_cycle);
 
