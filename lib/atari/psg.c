@@ -42,12 +42,12 @@ CF2149_REGISTERS(PSG_REG_NAME)
 
 static void psg_emit(const struct device_cycle psg_cycle)
 {
-	const struct cf2149_clk clk = cf2149_clk_cycle(psg_cycle.c);
+	const struct cf2149_cycle cycle = cf2149_cycle_c(psg_cycle.c);
 	struct cf2149_ac buffer[256];
 
 	for (;;) {
 		const size_t n = cf2149.port.rd_ac(&cf2149,
-			clk, &buffer[0], ARRAY_SIZE(buffer));
+			cycle, &buffer[0], ARRAY_SIZE(buffer));
 
 		if (!n)
 			return;
@@ -69,14 +69,14 @@ static void psg_event(const struct device *device,
 static u8 psg_rd_u8(const struct device *device, u32 dev_address)
 {
 	const struct device_cycle psg_cycle = device_cycle(device);
-	const struct cf2149_clk clk = cf2149_clk_cycle(psg_cycle.c);
+	const struct cf2149_cycle cycle = cf2149_cycle_c(psg_cycle.c);
 
 	switch (dev_address) {
 	case 0:
 	case 1:
-		cf2149.port.bdc(&cf2149, clk,
+		cf2149.port.bdc(&cf2149, cycle,
 			(struct cf2149_bdc) { .u8 = CF2149_BDC_DTB });
-		return cf2149.port.rd_da(&cf2149, clk);
+		return cf2149.port.rd_da(&cf2149, cycle);
 	case 2:
 	case 3: return 0xff;
 	default:
@@ -92,22 +92,22 @@ static u16 psg_rd_u16(const struct device *device, u32 dev_address)
 static void psg_wr_u8(const struct device *device, u32 dev_address, u8 data)
 {
 	const struct device_cycle psg_cycle = device_cycle(device);
-	const struct cf2149_clk clk = cf2149_clk_cycle(psg_cycle.c);
+	const struct cf2149_cycle cycle = cf2149_cycle_c(psg_cycle.c);
 
 	psg_emit(psg_cycle);
 
 	switch (dev_address % 4) {
 	case 0:
 	case 1:
-		cf2149.port.bdc(&cf2149, clk,
+		cf2149.port.bdc(&cf2149, cycle,
 			(struct cf2149_bdc) { .u8 = CF2149_BDC_BAR });
-		cf2149.port.wr_da(&cf2149, clk, data);
+		cf2149.port.wr_da(&cf2149, cycle, data);
 		break;
 	case 2:
 	case 3:
-		cf2149.port.bdc(&cf2149, clk,
+		cf2149.port.bdc(&cf2149, cycle,
 			(struct cf2149_bdc) { .u8 = CF2149_BDC_DWS });
-		cf2149.port.wr_da(&cf2149, clk, data);
+		cf2149.port.wr_da(&cf2149, cycle, data);
 		break;
 	default:
 		BUG();
@@ -149,11 +149,11 @@ static size_t psg_id_u16(const struct device *device,
 static void psg_reset(const struct device *device)
 {
 	const struct device_cycle psg_cycle = device_cycle(device);
-	const struct cf2149_clk clk = cf2149_clk_cycle(psg_cycle.c);
+	const struct cf2149_cycle cycle = cf2149_cycle_c(psg_cycle.c);
 
 	cf2149 = cf2149_init();
 
-	cf2149.port.select_l(&cf2149, clk, CF2149_SELECT_MODE_CLKDIV8);
+	cf2149.port.select_l(&cf2149, cycle, CF2149_SELECT_MODE_CLKDIV8);
 
 	psg_event(device, device_cycle(device));
 }
