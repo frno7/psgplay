@@ -11,6 +11,7 @@
 #include "internal/macro.h"
 
 #define tune_value_frames_names(t)					\
-	t(0, 1, "FRMS")
+	t(0, 1, "FRMS 1 frame")						\
+	t(0, 1, "FRMS 1 frame indefinite init")
 
 #endif /* PSGPLAY_TEST_SNDHFRMS_H */
