@@ -40,9 +40,15 @@ CF2149_REGISTERS(PSG_REG_NAME)
 	}
 }
 
+static inline struct cf2149_cycle cf2149_cycle_from_device(
+	struct device_cycle cycle)
+{
+	return cf2149_cycle_cd(cycle.c, 1 /* FIXME */);
+}
+
 static void psg_emit(const struct device_cycle psg_cycle)
 {
-	const struct cf2149_cycle cycle = cf2149_cycle_c(psg_cycle.c);
+	const struct cf2149_cycle cycle = cf2149_cycle_from_device(psg_cycle);
 	struct cf2149_ac buffer[256];
 
 	for (;;) {
@@ -69,7 +75,7 @@ static void psg_event(const struct device *device,
 static u8 psg_rd_u8(const struct device *device, u32 dev_address)
 {
 	const struct device_cycle psg_cycle = device_cycle(device);
-	const struct cf2149_cycle cycle = cf2149_cycle_c(psg_cycle.c);
+	const struct cf2149_cycle cycle = cf2149_cycle_from_device(psg_cycle);
 
 	switch (dev_address) {
 	case 0:
@@ -92,7 +98,7 @@ static u16 psg_rd_u16(const struct device *device, u32 dev_address)
 static void psg_wr_u8(const struct device *device, u32 dev_address, u8 data)
 {
 	const struct device_cycle psg_cycle = device_cycle(device);
-	const struct cf2149_cycle cycle = cf2149_cycle_c(psg_cycle.c);
+	const struct cf2149_cycle cycle = cf2149_cycle_from_device(psg_cycle);
 
 	psg_emit(psg_cycle);
 
@@ -149,7 +155,7 @@ static size_t psg_id_u16(const struct device *device,
 static void psg_reset(const struct device *device)
 {
 	const struct device_cycle psg_cycle = device_cycle(device);
-	const struct cf2149_cycle cycle = cf2149_cycle_c(psg_cycle.c);
+	const struct cf2149_cycle cycle = cf2149_cycle_from_device(psg_cycle);
 
 	cf2149 = cf2149_init();
 
