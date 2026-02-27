@@ -37,7 +37,7 @@ static void main_data(struct vt_buffer *vtb, const struct text_sndh *sndh)
 {
 	int title_count = 0;
 	int time_count = 0;
-	int time_total = 0;
+	int frame_total = 0;
 
 	sndh_for_each_tag (sndh->data, sndh->size)
 		if (strcmp(sndh_tag_name, "COMM") == 0) {
@@ -57,34 +57,41 @@ static void main_data(struct vt_buffer *vtb, const struct text_sndh *sndh)
 
 	vt_printf(vtb, 2, 0, vt_attr_normal, "%s", sndh->title);
 
+	struct sndh_timer timer = { };
+	if (!sndh_tag_timer(&timer, sndh->data, sndh->size) ||
+	    !timer.frequency)
+		timer.frequency = 50;
+
 	sndh_for_each_tag (sndh->data, sndh->size)
-		if (strcmp(sndh_tag_name, "TIME") == 0) {
+		if (strcmp(sndh_tag_name, "FRMS") == 0) {
 			time_count++;
 
 			char *end = NULL;
 			const long v = strtol(sndh_tag_value, &end, 10);
 			if (*end != '\0')
 				continue;
-			const int t = v;
+			const int t = v / timer.frequency;
 
 			if (!t) {
 				vt_printf(vtb, 3 + time_count, 34,
 					vt_attr_normal, " --:--");
 
-				time_total = -1;
+				frame_total = -1;
 			} else
 				vt_printf(vtb, 3 + time_count, 34,
 					vt_attr_normal, " %02d:%02d",
 					t / 60, t % 60);
 
-			if (time_total >= 0)
-				time_total += t;
+			if (frame_total >= 0)
+				frame_total += v;
 		}
 
-	if (time_total > 0)
+	if (frame_total > 0) {
+		const int time_total = frame_total / timer.frequency;
+
 		vt_printf(vtb, 24, 35, vt_attr_reverse, "%02d:%02d",
 			time_total / 60, time_total % 60);
-	else if (time_total < 0)
+	} else if (frame_total < 0)
 		vt_printf(vtb, 24, 35, vt_attr_reverse, "--:--");
 }
 
