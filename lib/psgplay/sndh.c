@@ -551,14 +551,12 @@ static bool sndh_tag_subtune_frames(float *duration, int subtune,
 {
 	int st = 0;
 
+	struct sndh_timer timer = { };
+	if (!sndh_tag_timer(&timer, data, size) || !timer.frequency)
+		timer.frequency = 50;
+
 	sndh_for_each_tag (data, size)
 		if (strcmp(sndh_tag_name, "FRMS") == 0 && ++st == subtune) {
-			struct sndh_timer timer = { };
-
-			if (!sndh_tag_timer(&timer, data, size) ||
-			    !timer.frequency)
-				timer.frequency = 50;
-
 #if defined(__m68k__)
 			*duration = DIV_ROUND_CLOSEST_U32(
 				sndh_tag_integer, timer.frequency);
