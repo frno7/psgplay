@@ -167,6 +167,27 @@ or with PortAudio for Linux or Mac OS, or the options `-o`, `--output`, `--start
 `--stop`, `--length`, `--disassemble` or `--trace` are given. Atari ST
 does not support _command mode_.
 
+## How to improve performance
+
+Most modern processors made during the last 20 years or so will easily
+play in real-time, often using less than 10 % of processor resources.
+However, they may struggle if other processes demand a lot of the system
+at the same time.
+
+Increasing the size of the ALSA buffer is the most effective method to
+improve performance. _Interactive text mode_ uses a very small buffer,
+0.1 seconds, to remain responsive when using the keyboard. _Command mode_
+uses the default ALSA buffer size of the system, which may (or may not)
+be significantly larger. Since _command mode_ is noninteractive, audio
+latency is not a problem when the size of the buffer increases. One
+approach is to double the duration of the system ALSA buffer until
+performance problems disappear. Starting with, say, 5 seconds,
+then 10 seconds, then 20 seconds, and so on. Try to configure the ALSA
+parameter `buffer_time` (set in microseconds).
+
+The [`nice`](https://en.wikipedia.org/wiki/Nice_(Unix)) command can also
+be used to improve scheduling priority for PSG play.
+
 ## Library form
 
 PSG play is compiled into the static library
