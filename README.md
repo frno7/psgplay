@@ -32,7 +32,8 @@ This repository has Git [submodules](https://git-scm.com/docs/git-submodule)
 so clone it with the `--recurse-submodules` option, or do
 `git submodule update --init --recursive`.
 
-For Linux and Mac OS, do `make psgplay` to compile `psgplay`. To use
+For Linux and Mac OS, do `make psgplay` to compile `psgplay`.
+For BSD systems, such as FreeBSD, replace `make` with `gmake`. To use
 [Advanced Linux Sound Architecture](https://en.wikipedia.org/wiki/Advanced_Linux_Sound_Architecture)
 (ALSA) and _interactive text mode_, do `make ALSA=1 psgplay`. To use
 [PortAudio](https://en.wikipedia.org/wiki/PortAudio) and
