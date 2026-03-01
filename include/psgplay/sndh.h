@@ -282,7 +282,7 @@ static inline uint32_t sndh_timer_to_u32(const struct sndh_timer timer)
 static inline struct sndh_timer u32_to_sndh_timer(const uint32_t timer)
 {
 	return (struct sndh_timer) {
-		.type = timer & 0xff,
+		.type = (enum sndh_timer_type)(timer & 0xff),
 		.frequency = timer >> 8,
 	};
 }
