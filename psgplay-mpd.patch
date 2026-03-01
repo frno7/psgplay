@@ -1,0 +1,480 @@
+From 2fbad456648e71a6bb7cc2ee6aeb8b2d0eebabd5 Mon Sep 17 00:00:00 2001
+From: Fredrik Noring <noring@nocrew.org>
+Date: Sun, 1 Mar 2026 11:59:25 +0100
+Subject: [PATCH] decoder/psgplay: Support Atari SNDH files via PSG play
+ library
+
+---
+ .github/workflows/build.yml                  |   1 +
+ doc/plugins.rst                              |  12 +
+ meson_options.txt                            |   1 +
+ src/decoder/DecoderList.cxx                  |   4 +
+ src/decoder/plugins/PsgplayDecoderPlugin.cxx | 344 +++++++++++++++++++
+ src/decoder/plugins/PsgplayDecoderPlugin.hxx |   9 +
+ src/decoder/plugins/meson.build              |   7 +
+ 7 files changed, 378 insertions(+)
+ create mode 100644 src/decoder/plugins/PsgplayDecoderPlugin.cxx
+ create mode 100644 src/decoder/plugins/PsgplayDecoderPlugin.hxx
+
+diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
+index e1e64341b..adae02acb 100644
+--- a/.github/workflows/build.yml
++++ b/.github/workflows/build.yml
+@@ -320,6 +320,7 @@ jobs:
+             -Dnfs=disabled \
+             -Dnlohmann_json=enabled \
+             -Dsidplay=disabled \
++            -Dpsgplay=disabled \
+             -Dudisks=disabled \
+             -Dupnp=disabled \
+             -Dwavpack=disabled \
+diff --git a/doc/plugins.rst b/doc/plugins.rst
+index 0a24494c5..ed96adf58 100644
+--- a/doc/plugins.rst
++++ b/doc/plugins.rst
+@@ -604,6 +604,18 @@ C64 SID decoder based on `libsidplayfp <https://sourceforge.net/projects/sidplay
+    * - **basic**
+      - Only libsidplayfp. Absolute path to basic rom image file.
+ 
++psgplay
++-------
++
++Decodes Atari SNDH files using `psgplay <https://github.com/frno7/psgplay>`_.
++
++   * - Setting
++     - Description
++   * - **default_songlength SECONDS**
++     - This is the default playing time in seconds for songs not in the songlength database, or in case you're not using a database. A value of 0 means play indefinitely.
++   * - **default_genre GENRE**
++     - Optional default genre for SID songs.
++
+ sndfile
+ -------
+ 
+diff --git a/meson_options.txt b/meson_options.txt
+index cb7d4da9d..6065d70d6 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -143,6 +143,7 @@ option('mpcdec', type: 'feature', description: 'Musepack decoder plugin')
+ option('mpg123', type: 'feature', description: 'MP3 decoder using libmpg123')
+ option('opus', type: 'feature', description: 'Opus decoder plugin')
+ option('sidplay', type: 'feature', description: 'C64 SID support via libsidplayfp or libsidplay2')
++option('psgplay', type: 'feature', description: 'Atari SNDH support via PSG play')
+ option('sndfile', type: 'feature', description: 'libsndfile decoder plugin')
+ option('tremor', type: 'feature', description: 'Fixed-point vorbis decoder plugin')
+ option('vgmstream', type: 'feature', description: 'vgmstream decoder plugin')
+diff --git a/src/decoder/DecoderList.cxx b/src/decoder/DecoderList.cxx
+index e2906db98..39cf8327b 100644
+--- a/src/decoder/DecoderList.cxx
++++ b/src/decoder/DecoderList.cxx
+@@ -34,6 +34,7 @@
+ #include "plugins/MpcdecDecoderPlugin.hxx"
+ #include "plugins/FluidsynthDecoderPlugin.hxx"
+ #include "plugins/SidplayDecoderPlugin.hxx"
++#include "plugins/PsgplayDecoderPlugin.hxx"
+ #include "Log.hxx"
+ #include "PluginUnavailable.hxx"
+ 
+@@ -84,6 +85,9 @@ constinit const struct DecoderPlugin *const decoder_plugins[] = {
+ #ifdef ENABLE_SIDPLAY
+ 	&sidplay_decoder_plugin,
+ #endif
++#ifdef ENABLE_PSGPLAY
++	&psgplay_decoder_plugin,
++#endif
+ #ifdef ENABLE_WILDMIDI
+ 	&wildmidi_decoder_plugin,
+ #endif
+diff --git a/src/decoder/plugins/PsgplayDecoderPlugin.cxx b/src/decoder/plugins/PsgplayDecoderPlugin.cxx
+new file mode 100644
+index 000000000..7866a54f4
+--- /dev/null
++++ b/src/decoder/plugins/PsgplayDecoderPlugin.cxx
+@@ -0,0 +1,344 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++// Copyright The Music Player Daemon Project
++
++#include "PsgplayDecoderPlugin.hxx"
++#include "decoder/Features.h"
++#include "../DecoderAPI.hxx"
++#include "tag/Handler.hxx"
++#include "tag/Builder.hxx"
++#include "song/DetachedSong.hxx"
++#include "fs/NarrowPath.hxx"
++#include "fs/Path.hxx"
++#include "fs/AllocatedPath.hxx"
++#include "lib/fmt/PathFormatter.hxx"
++#include "lib/fmt/RuntimeError.hxx"
++#include "lib/icu/Converter.hxx"
++#include "io/FileReader.hxx"
++#include "util/AllocatedString.hxx"
++#include "util/ByteOrder.hxx"
++#include "util/CharUtil.hxx"
++#include "util/Domain.hxx"
++#include "util/ScopeExit.hxx"
++#include "Log.hxx"
++
++extern "C" {
++#include <psgplay/psgplay.h>
++#include <psgplay/sndh.h>
++#include <psgplay/stereo.h>
++}
++
++#include <fmt/format.h>
++
++#include <fstream>
++#include <iterator>
++#include <memory>
++#include <vector>
++
++#include <string.h>
++
++#define SUBTUNE_PREFIX "tune_"
++
++static constexpr Domain psgplay_domain("psgplay");
++
++struct PsgplayGlobal {
++	bool all_files_are_containers;
++	unsigned default_songlength;
++	std::string default_genre;
++
++	explicit PsgplayGlobal(const ConfigBlock &block);
++};
++
++static PsgplayGlobal *psgplay_global;
++
++inline
++PsgplayGlobal::PsgplayGlobal(const ConfigBlock &block)
++{
++	default_songlength = block.GetPositiveValue("default_songlength", 0U);
++
++	default_genre = block.GetBlockValue("default_genre", "");
++
++	all_files_are_containers =
++		block.GetBlockValue("all_files_are_containers", true);
++}
++
++static bool
++psgplay_init(const ConfigBlock &block)
++{
++	psgplay_global = new PsgplayGlobal(block);
++	return true;
++}
++
++static void
++psgplay_finish() noexcept
++{
++	delete psgplay_global;
++}
++
++struct PsgplayContainerPath {
++	AllocatedPath path;
++	unsigned track;
++};
++
++static std::vector<uint8_t>
++psgplay_read_file(const Path &path_fs)
++{
++	std::ifstream stream(NarrowPath(path_fs).c_str(),
++			     std::ios::in | std::ios::binary);
++
++	if (!stream)
++		return { };
++
++	return std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)),
++				    std::istreambuf_iterator<char>());
++}
++
++[[gnu::pure]]
++static unsigned
++psgplay_subtune_track(const char *base) noexcept
++{
++	if (memcmp(base, SUBTUNE_PREFIX, sizeof(SUBTUNE_PREFIX) - 1) != 0)
++		return 0;
++
++	base += sizeof(SUBTUNE_PREFIX) - 1;
++
++	char *endptr;
++	auto track = strtoul(base, &endptr, 10);
++	if (endptr == base || *endptr != '.')
++		return 0;
++
++	return track;
++}
++
++/**
++ * returns the file path stripped of any /tune_xxx.* subtune suffix
++ * and the track number (or 1 if no "tune_xxx" suffix is present).
++ */
++static PsgplayContainerPath
++psgplay_container_from_path(Path path_fs) noexcept
++{
++	const NarrowPath base = NarrowPath(path_fs.GetBase());
++	unsigned track;
++	if (!base || (track = psgplay_subtune_track(base)) < 1)
++		return { AllocatedPath(path_fs), 1 };
++
++	return { path_fs.GetDirectoryName(), track };
++}
++
++static SongTime
++psgplay_subtune_duration(int subtune, const std::vector<uint8_t> &tune) noexcept
++{
++	float duration;
++
++	if (sndh_tag_subtune_time(&duration, subtune, tune.data(), tune.size()))
++		return SongTime::FromS(duration);
++
++	return SongTime::FromS(0.0f);
++}
++
++static void
++psgplay_file_decode(DecoderClient &client, Path path_fs)
++{
++	const auto container = psgplay_container_from_path(path_fs);
++
++	const AudioFormat audio_format(44100, SampleFormat::S16, 2);
++	assert(audio_format.IsValid());
++
++	const std::vector<uint8_t> tune = psgplay_read_file(container.path);
++	if (tune.empty())
++		return;
++
++	SongTime duration = psgplay_subtune_duration(container.track, tune);
++	if (duration.IsZero() && psgplay_global->default_songlength > 0)
++		duration = SongTime::FromS(psgplay_global->default_songlength);
++
++	struct psgplay *pp = psgplay_init(tune.data(), tune.size(),
++					  container.track,
++					  audio_format.sample_rate);
++	psgplay_stop_at_time(pp, duration.ToDoubleS());
++
++	AtScopeExit(pp) { psgplay_free(pp); };
++
++	client.Ready(audio_format, true, duration);
++
++	size_t t_samples = 0;
++	DecoderCommand cmd;
++
++	do {
++		enum { N = 4096 };
++		struct psgplay_stereo buffer[N];
++
++		/* psgplay_read_stereo returns the number of samples */
++		const ssize_t n_samples = psgplay_read_stereo(pp, buffer, N);
++		if (n_samples <= 0)
++			break;
++
++		cmd = client.SubmitAudio(nullptr,
++					 std::span{buffer, (size_t)n_samples},
++					 0);
++		t_samples += n_samples;
++
++		if (cmd == DecoderCommand::SEEK) {
++			const uint64_t s_samples = client.GetSeekFrame();
++
++			if (s_samples < t_samples) {
++				psgplay_free(pp);
++
++				pp = psgplay_init(tune.data(), tune.size(),
++						  container.track,
++						  audio_format.sample_rate);
++				psgplay_stop_at_time(pp, duration.ToDoubleS());
++
++				t_samples = 0;
++			}
++
++			const ssize_t k_samples =
++				psgplay_read_stereo(pp, nullptr,
++						    s_samples - t_samples);
++			if (k_samples <= 0)
++				break;
++			t_samples += k_samples;
++
++			if (t_samples != s_samples)
++				client.SeekError(std::make_exception_ptr(FmtRuntimeError("psgplay: Seek failed")));
++
++			client.CommandFinished();
++		}
++	} while (cmd != DecoderCommand::STOP);
++}
++
++static AllocatedString
++utf8_from_cp437(const char *s) noexcept
++{
++#ifdef HAVE_ICU_CONVERTER
++	try {
++		/* Code page 437 is close to the Atari ST character set. */
++		return IcuConverter::Create("cp437")->ToUTF8(s);
++	} catch (...) { }
++#endif
++
++	/*
++	 * Fallback to not transcoding windows-1252 to utf-8, that may result
++	 * in invalid utf-8 unless nonprintable characters are replaced.
++	 */
++	AllocatedString t(s);
++
++	for (size_t i = 0; t[i] != AllocatedString::SENTINEL; i++)
++		if (!IsPrintableASCII(t[i]))
++			t[i] = '?';
++
++	return t;
++}
++
++[[gnu::pure]]
++static AllocatedString
++psgplay_tag(const std::string &field,
++	      const std::vector<uint8_t> &tune) noexcept
++{
++	sndh_for_each_tag (tune.data(), tune.size())
++		if (field == sndh_tag_name)
++			return utf8_from_cp437(sndh_tag_value);
++
++	return AllocatedString("");
++}
++
++static int
++psgplay_tracks(const std::vector<uint8_t> &tune) noexcept
++{
++	int n_tracks;
++
++	if (sndh_tag_subtune_count(&n_tracks, tune.data(), tune.size()))
++		return n_tracks;
++
++	return 1;
++}
++
++static void
++psgplay_on_tag(unsigned track, unsigned n_tracks, TagHandler &th,
++		const std::vector<uint8_t> &tune) noexcept
++{
++	const auto album = psgplay_tag("TITL", tune);
++	if (!album.empty())
++		th.OnTag(TAG_ALBUM, album.c_str());
++
++	if (n_tracks > 1) {
++		const auto tag_title =
++			fmt::format("{} ({}/{})",
++				    album.c_str(), track, n_tracks);
++		th.OnTag(TAG_TITLE, tag_title.c_str());
++	} else
++		th.OnTag(TAG_TITLE, album.c_str());
++
++	const auto artist = psgplay_tag("COMM", tune);
++	if (!artist.empty())
++		th.OnTag(TAG_ARTIST, artist.c_str());
++
++	if (!psgplay_global->default_genre.empty())
++		th.OnTag(TAG_GENRE,
++			      psgplay_global->default_genre.c_str());
++
++	const auto date = psgplay_tag("YEAR", tune);
++	if (!date.empty())
++		th.OnTag(TAG_DATE, date.c_str());
++
++	const SongTime duration = psgplay_subtune_duration(track, tune);
++	if (!duration.IsZero())
++		th.OnDuration(duration);
++
++	th.OnTag(TAG_TRACK, fmt::format_int{track}.c_str());
++}
++
++static bool
++psgplay_scan_file(Path path_fs, TagHandler &th) noexcept
++{
++	const auto container = psgplay_container_from_path(path_fs);
++
++	const std::vector<uint8_t> tune = psgplay_read_file(container.path);
++	if (tune.empty())
++		return false;
++
++	psgplay_on_tag(container.track, psgplay_tracks(tune), th, tune);
++
++	return true;
++}
++
++static std::forward_list<DetachedSong>
++psgplay_container_scan(Path path_fs)
++{
++	std::forward_list<DetachedSong> list;
++
++	const std::vector<uint8_t> tune = psgplay_read_file(path_fs);
++
++	const int n_tracks = psgplay_tracks(tune);
++
++	/* Don't treat sids containing a single tune as containers. */
++	if (!psgplay_global->all_files_are_containers && n_tracks < 2)
++		return list;
++
++	TagBuilder tag_builder;
++
++	auto tail = list.before_begin();
++	for (int i = 1; i <= n_tracks; ++i) {
++		AddTagHandler th(tag_builder);
++
++		psgplay_on_tag(i, n_tracks, th, tune);
++
++		/* Construct container/tune path names, eg.
++		   Delta.sndh/tune_001.sndh */
++		tail = list.emplace_after(tail,
++					  fmt::format(SUBTUNE_PREFIX "{:03}.sndh", i),
++					  tag_builder.Commit());
++	}
++
++	return list;
++}
++
++static const char *const psgplay_suffixes[] = {
++	"sndh",
++	nullptr
++};
++
++constexpr DecoderPlugin psgplay_decoder_plugin =
++	DecoderPlugin("psgplay", psgplay_file_decode, psgplay_scan_file)
++	.WithInit(psgplay_init, psgplay_finish)
++	.WithContainer(psgplay_container_scan)
++	.WithSuffixes(psgplay_suffixes);
+diff --git a/src/decoder/plugins/PsgplayDecoderPlugin.hxx b/src/decoder/plugins/PsgplayDecoderPlugin.hxx
+new file mode 100644
+index 000000000..7f74d1aa9
+--- /dev/null
++++ b/src/decoder/plugins/PsgplayDecoderPlugin.hxx
+@@ -0,0 +1,9 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++// Copyright The Music Player Daemon Project
++
++#ifndef MPD_DECODER_PSGPLAY_HXX
++#define MPD_DECODER_PSGPLAY_HXX
++
++extern const struct DecoderPlugin psgplay_decoder_plugin;
++
++#endif
+diff --git a/src/decoder/plugins/meson.build b/src/decoder/plugins/meson.build
+index 38c8e00a6..d79a97d16 100644
+--- a/src/decoder/plugins/meson.build
++++ b/src/decoder/plugins/meson.build
+@@ -170,6 +170,12 @@ if libsidplay_dep.found()
+   decoder_plugins_sources += 'SidplayDecoderPlugin.cxx'
+ endif
+ 
++libpsgplay_dep = dependency('libpsgplay', version: '>= 0.8', required: get_option('psgplay'))
++decoder_features.set('ENABLE_PSGPLAY', libpsgplay_dep.found())
++if libpsgplay_dep.found()
++  decoder_plugins_sources += 'PsgplayDecoderPlugin.cxx'
++endif
++
+ decoder_plugins = static_library(
+   'decoder_plugins',
+   decoder_plugins_sources,
+@@ -192,6 +198,7 @@ decoder_plugins = static_library(
+     libmpg123_dep,
+     libopus_dep,
+     libsidplay_dep,
++    libpsgplay_dep,
+     libsndfile_dep,
+     vorbis_dep,
+     ogg_dep,
+-- 
+2.51.0
+
