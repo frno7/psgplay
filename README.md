@@ -9,6 +9,33 @@ PSG play is a music player and emulator for the
 [YM2149](https://en.wikipedia.org/wiki/General_Instrument_AY-3-8910)
 and files in the [SNDH archive](http://sndh.atari.org/).
 
+# What to play
+
+The [SNDH archive](http://sndh.atari.org/) is a large repository of more than
+5,900 SNDH music files by more than 600 composers. Each file often has several
+tracks, bringing the grand total to more than 11,000 tracks, available for
+[download](https://sndh.atari.org/download.php) in a convenient zip.
+
+# How to play
+
+SNDH music files can be played with PSG play in several ways:
+
+- This repository has a `psgplay` program which can play SNDH files with
+  a simple command and text interface. It’s intended as a demonstration,
+  for Linux, Mac and BSD operating systems. The main intent is rather to
+  link the PSG play library with other music players, described in the
+  following.
+- A PSG play plugin for the
+  [Music Player Daemon](https://en.wikipedia.org/wiki/Music_Player_Daemon) (MPD)
+  is being prepared in issue [#16](https://github.com/frno7/psgplay/issues/16).
+  A [`psgplay-mpd.patch`](https://github.com/frno7/psgplay/blob/mpd/psgplay-mpd.patch)
+  is available for testing. MPD is a popular choice for playing music in
+  general, with playlists and many other features.
+- [Cowbell](https://github.com/demozoo/cowbell) is a web player for
+  [Demozoo](https://demozoo.org/).
+  [Example](https://demozoo.org/music/114756/). Cowbell is also used
+  for the [SNDH archive](http://sndh.atari.org/).
+
 # How to download
 
 - [Gentoo Linux](https://en.wikipedia.org/wiki/Gentoo_Linux) has a
