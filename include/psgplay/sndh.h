@@ -240,7 +240,7 @@ struct sndh_cursor {
 
 	int integer;
 	const char *value;
-	char buffer[32];
+	char buffer[64];
 
 	int subtunes;
 
