@@ -392,21 +392,17 @@ The five most complex parts emulated in software by PSG play are:
 - the [Motorola 68000](https://en.wikipedia.org/wiki/Motorola_68000)
   processor, via the [Musashi](https://github.com/kstenerud/Musashi) library
   in [`lib/m68k`](https://github.com/frno7/psgplay/tree/main/lib/m68k);
-
 - the [Programmable Sound Generator](https://en.wikipedia.org/wiki/Programmable_sound_generator)
   (PSG) [YM2149](https://en.wikipedia.org/wiki/General_Instrument_AY-3-8910)
   in [`lib/cf2149/module/cf2149.c`](https://github.com/frno7/cf2149/blob/main/module/cf2149.c);
-
 - the [MC68901](https://archive.org/details/Motorola_MC68901_MFP_undated)
   multifunction peripheral (MFP) timer and interrupt controller in
-  [`lib/cf68901/module/cf68901.c`](https://github.com/frno7/cf68901/blob/main/module/cf68901.c).
-
+  [`lib/cf68901/module/cf68901.c`](https://github.com/frno7/cf68901/blob/main/module/cf68901.c);
 - the [DMA](https://en.wikipedia.org/wiki/Direct_memory_access) sound of the
   [Atari STE](https://en.wikipedia.org/wiki/Atari_ST#STE) in
   [`lib/cf300588/module/cf300588-sound.c`](https://github.com/frno7/cf300588/blob/main/module/cf300588-sound.c);
-
 - the LMC1992 mixer of the [Atari STE](https://en.wikipedia.org/wiki/Atari_ST#STE_models)
-  in [`lib/atari/mixer.c`](https://github.com/frno7/psgplay/tree/main/lib/atari/mixer.c);
+  in [`lib/atari/mixer.c`](https://github.com/frno7/psgplay/tree/main/lib/atari/mixer.c).
 
 The digital emulation is currently fairly accurate, aiming to be within the
 variation of the compatible models of original Atari hardware. The analogue
