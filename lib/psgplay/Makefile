@@ -17,6 +17,7 @@ LIBPSGPLAY_PUBLIC_SRC :=						\
 
 LIBPSGPLAY_HIDDEN_SRC :=						\
 	$(INTERNAL_SRC)							\
+	$(UNICODE_SRC)							\
 	$(ATARI_SRC)							\
 	$(M68K_SRC)
 

@@ -17,6 +17,7 @@ include lib/ice/Makefile
 include lib/internal/Makefile
 include lib/m68k/Makefile
 include lib/atari/Makefile
+include lib/unicode/Makefile
 
 include lib/psgplay/Makefile
 
@@ -25,6 +26,5 @@ include lib/example/Makefile
 include lib/audio/Makefile
 include lib/graph/Makefile
 include lib/vt/Makefile
-include lib/unicode/Makefile
 include lib/text/Makefile
 include lib/test/Makefile
