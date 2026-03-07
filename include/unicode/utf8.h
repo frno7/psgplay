@@ -20,12 +20,6 @@ ssize_t charset_to_utf8_string_length(const u8 *s, size_t length,
 
 ssize_t utf8_to_charset_string_length(const u8 *u, size_t length);
 
-u8 *charset_to_utf8_string(const u8 *s, size_t length,
-	 unicode_t (*charset_to_utf32)(u8 c, void *arg), void *arg);
-
-u8 *utf8_to_charset_string(const u8 *u, size_t length,
-	 u8 (*utf32_to_charset)(unicode_t u, void *arg), void *arg);
-
 bool utf8_valid_in_charset_string(const u8 *u, size_t length,
 	 unicode_t (*charset_to_utf32)(u8 c, void *arg),
 	 u8 (*utf32_to_charset)(unicode_t u, void *arg), void *arg);

@@ -139,40 +139,6 @@ ssize_t charset_to_utf8_string_length(const u8 *s, size_t length,
 	return size;
 }
 
-u8 *charset_to_utf8_string(const u8 *s, size_t length,
-	 unicode_t (*charset_to_utf32)(u8 c, void *arg), void *arg)
-{
-	const ssize_t size = charset_to_utf8_string_length(s, length,
-			charset_to_utf32, arg);
-
-	if (size == -1)
-		return NULL;
-
-	u8 *u = malloc(size + 1);
-	if (!s)
-		return NULL;
-
-	size_t n = 0;
-
-	for (size_t i = 0; s[i] && i < length; i++) {
-		const int r = utf32_to_utf8_with_replacement(
-				charset_to_utf32(s[i], arg), &u[n], size - n);
-
-		if (r == -1) {
-			free(u);
-			return NULL;
-		}
-
-		n += r;
-	}
-
-	BUG_ON(n != size);
-
-	u[n] = '\0';
-
-	return u;
-}
-
 ssize_t utf8_to_charset_string_length(const u8 *u, size_t length)
 {
 	ssize_t size = 0;
@@ -189,42 +155,6 @@ ssize_t utf8_to_charset_string_length(const u8 *u, size_t length)
 	}
 
 	return size;
-}
-
-u8 *utf8_to_charset_string(const u8 *u, size_t length,
-	 u8 (*utf32_to_charset)(unicode_t u, void *arg), void *arg)
-{
-	const ssize_t size = utf8_to_charset_string_length(u, length);
-
-	if (size == -1)
-		return NULL;
-
-	u8 *s = malloc(size + 1);
-	if (!s)
-		return NULL;
-
-	size_t n = 0;
-	size_t i = 0;
-
-	while (u[i] && i < length) {
-		unicode_t c = 0;
-
-		int r = utf8_to_utf32(&c, &u[i], length - i);
-
-		if (r == -1) {
-			i++;
-			continue;
-		}
-
-		s[n++] = utf32_to_charset(c, arg);
-		i += r;
-	}
-
-	BUG_ON(n != size);
-
-	s[n] = '\0';
-
-	return s;
 }
 
 bool utf8_valid_in_charset_string(const u8 *u, size_t length,
