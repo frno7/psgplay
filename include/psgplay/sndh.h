@@ -95,7 +95,7 @@ bool sndh_tag_timer(struct sndh_timer *timer,
 
 /**
  * sndh_tag_title - get SNDH title
- * @title: SNDH title result, if determined
+ * @title: SNDH title result, UTF-8 encoded, if determined
  * @length: maximum length of title buffer including NUL
  * @data: SNDH data
  * @size: size in bytes of SNDH data

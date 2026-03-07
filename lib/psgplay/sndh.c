@@ -633,7 +633,7 @@ bool sndh_tag_title(char *title, size_t length,
 
 	sndh_for_each_tag (data, size)
 		if (strcmp(sndh_tag_name, "TITL") == 0) {
-			strncpy(title, sndh_tag_value, length - 1);
+			strncpy(title, sndh_tag_text, length - 1);
 			title[length - 1] = '\0';
 
 			return true;
