@@ -42,15 +42,9 @@ void sndh_print(struct file file)
 
 	sndh_for_each_tag_with_header_size (file.data, file.size, &header_size) {
 		const char *name = sndh_tag_name;
-		const char *value = sndh_tag_value;
-		const size_t length = strlen(value);
+		const char *text = sndh_tag_text;
 
-		u8 *u = charset_to_utf8_string((const u8 *)value, length,
-				charset_atari_st_to_utf32, NULL);
-		if (!u)
-			continue;
-
-		char *v = strrep((const char *)u, "\n", "\n\t");
+		char *v = strrep(text, "\n", "\n\t");
 
 		if (strcmp(name, "TIME") == 0) {
 			printf("tag field %s %d %s\n",
@@ -73,7 +67,6 @@ void sndh_print(struct file file)
 				name, name[0] != '\0' ? " " : "", v);
 
 		free(v);
-		free(u);
 	}
 
 	printf("header size %zu\n", header_size);
