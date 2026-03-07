@@ -74,6 +74,7 @@ bool sndh_tag_default_subtune(int *default_subtune,
 /**
  * sndh_tag_subtune_time - get SNDH subtune duration time
  * @duration: result of SNDH subtune duration in seconds, if determined
+ * @subtune: subtune number, starting from 1
  * @data: SNDH data
  * @size: size in bytes of SNDH data
  *
@@ -128,6 +129,19 @@ bool sndh_tag_composer(char *composer, size_t length,
  */
 bool sndh_tag_year(char *year, size_t length,
 	const void *data, const size_t size);
+
+/**
+ * sndh_tag_title - get SNDH subtune title
+ * @title: SNDH subtune title result, UTF-8 encoded, if determined
+ * @length: maximum length of title buffer including NUL
+ * @subtune: subtune number, starting from 1
+ * @data: SNDH data
+ * @size: size in bytes of SNDH data
+ *
+ * Return: %true on success, otherwise %false
+ */
+bool sndh_tag_subtune_title(char *title, size_t length,
+	int subtune, const void *data, const size_t size);
 
 /**
  * sndh_init_address - SNDH init address relative start of data

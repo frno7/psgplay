@@ -660,6 +660,28 @@ bool sndh_tag_year(char *year, size_t length,
 	return sndh_tag_text_copy(year, length, "YEAR", data, size);
 }
 
+bool sndh_tag_subtune_title(char *title, size_t length,
+	int subtune, const void *data, const size_t size)
+{
+	int subtune_count = 0;
+
+	if (!length)
+		return false;
+
+	sndh_for_each_tag (data, size)
+		if (strcmp(sndh_tag_name, "!#SN") == 0) {
+			if (subtune != ++subtune_count)
+				continue;
+
+			strncpy(title, sndh_tag_text, length - 1);
+			title[length - 1] = '\0';
+
+			return true;
+		}
+
+	return false;
+}
+
 size_t sndh_init_address(const void *data, const size_t size)
 {
 	return size >= 4 ? branch_address(0, data, 4) : 0;
