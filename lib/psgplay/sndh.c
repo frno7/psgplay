@@ -285,7 +285,8 @@ static bool sndh_frames_subtag(struct sndh_cursor *cursor)
 			   (d[2] <<  8) |
 			    d[3];
 
-	snprintf(cursor->buffer, sizeof(cursor->buffer), "%u", t);
+	snprintf(cursor->buffer, sizeof(cursor->buffer), "%lu",
+			(long unsigned int)t);
 	tag_update(cursor->buffer, t, cursor);
 
 	cursor->offset += 4;
