@@ -135,7 +135,10 @@ size_t sndh_play_address(const void *data, const size_t size);
 /** sndh_tag_name - SNDH tag name */
 #define sndh_tag_name (sndh_cursor__.tag->name)
 
-/** sndh_tag_value - SNDH tag string representation */
+/** sndh_tag_text - SNDH tag UTF-8 text representation */
+#define sndh_tag_text (sndh_cursor__.text)
+
+/** sndh_tag_value - SNDH tag raw string representation */
 #define sndh_tag_value (sndh_cursor__.value)
 
 /** sndh_tag_integer - SNDH tag integer representation */
@@ -241,6 +244,7 @@ struct sndh_cursor {
 	int integer;
 	const char *value;
 	char buffer[64];
+	char text[64];
 
 	int subtunes;
 

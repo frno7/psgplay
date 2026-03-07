@@ -12,6 +12,9 @@
 
 #include "psgplay/sndh.h"
 
+#include "unicode/atari.h"
+#include "unicode/utf8.h"
+
 #if defined(__m68k__)
 #include "toslibc/asm/math.h"
 #endif
@@ -60,9 +63,25 @@ static bool sndh_tag(const char *name, struct sndh_cursor *cursor)
 static void tag_update(const char *value, const int integer,
 	struct sndh_cursor *cursor)
 {
-	cursor->value = value;
+	const size_t size = ARRAY_SIZE(cursor->text);
+	uint8_t *u8 = (uint8_t *)cursor->text;
+	size_t n = 0;
 
+	cursor->value   = value;
 	cursor->integer = integer;
+
+	for (size_t i = 0; value[i]; i++) {
+		const int r = utf32_to_utf8_with_replacement(
+				charset_atari_st_to_utf32(value[i], NULL),
+				&u8[n], size - 1 - n);
+
+		if (r == -1)
+			break;
+
+		n += r;
+	}
+
+	cursor->text[n] = '\0';
 }
 
 static bool sndh_nul(struct sndh_cursor *cursor)
