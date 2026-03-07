@@ -118,6 +118,18 @@ bool sndh_tag_composer(char *composer, size_t length,
 	const void *data, const size_t size);
 
 /**
+ * sndh_tag_year - get SNDH year
+ * @year: SNDH year result, typically an integer string, if determined
+ * @length: maximum length of year buffer including NUL
+ * @data: SNDH data
+ * @size: size in bytes of SNDH data
+ *
+ * Return: %true on success, otherwise %false
+ */
+bool sndh_tag_year(char *year, size_t length,
+	const void *data, const size_t size);
+
+/**
  * sndh_init_address - SNDH init address relative start of data
  * @data: SNDH data
  * @size: size in bytes of SNDH data

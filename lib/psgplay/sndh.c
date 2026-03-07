@@ -654,6 +654,12 @@ bool sndh_tag_composer(char *composer, size_t length,
 	return sndh_tag_text_copy(composer, length, "COMM", data, size);
 }
 
+bool sndh_tag_year(char *year, size_t length,
+	const void *data, const size_t size)
+{
+	return sndh_tag_text_copy(year, length, "YEAR", data, size);
+}
+
 size_t sndh_init_address(const void *data, const size_t size)
 {
 	return size >= 4 ? branch_address(0, data, 4) : 0;
