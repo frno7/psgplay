@@ -103,7 +103,7 @@ int utf32_to_utf8(unicode_t u, u8 *s, size_t outmax)
 	return -1;
 }
 
-static int utf32_to_utf8_with_replacement(unicode_t u, u8 *s, size_t outmax)
+int utf32_to_utf8_with_replacement(unicode_t u, u8 *s, size_t outmax)
 {
 	const int r = utf32_to_utf8(u, s, outmax);
 
