@@ -106,6 +106,18 @@ bool sndh_tag_title(char *title, size_t length,
 	const void *data, const size_t size);
 
 /**
+ * sndh_tag_composer - get SNDH composer
+ * @composer: SNDH composer result, UTF-8 encoded, if determined
+ * @length: maximum length of composer buffer including NUL
+ * @data: SNDH data
+ * @size: size in bytes of SNDH data
+ *
+ * Return: %true on success, otherwise %false
+ */
+bool sndh_tag_composer(char *composer, size_t length,
+	const void *data, const size_t size);
+
+/**
  * sndh_init_address - SNDH init address relative start of data
  * @data: SNDH data
  * @size: size in bytes of SNDH data

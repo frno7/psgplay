@@ -625,21 +625,33 @@ bool sndh_tag_timer(struct sndh_timer *timer,
 	return false;
 }
 
-bool sndh_tag_title(char *title, size_t length,
-	const void *data, const size_t size)
+static bool sndh_tag_text_copy(char *text, size_t length,
+	const char *tag, const void *data, const size_t size)
 {
 	if (!length)
 		return false;
 
 	sndh_for_each_tag (data, size)
-		if (strcmp(sndh_tag_name, "TITL") == 0) {
-			strncpy(title, sndh_tag_text, length - 1);
-			title[length - 1] = '\0';
+		if (strcmp(sndh_tag_name, tag) == 0) {
+			strncpy(text, sndh_tag_text, length - 1);
+			text[length - 1] = '\0';
 
 			return true;
 		}
 
 	return false;
+}
+
+bool sndh_tag_title(char *title, size_t length,
+	const void *data, const size_t size)
+{
+	return sndh_tag_text_copy(title, length, "TITL", data, size);
+}
+
+bool sndh_tag_composer(char *composer, size_t length,
+	const void *data, const size_t size)
+{
+	return sndh_tag_text_copy(composer, length, "COMM", data, size);
 }
 
 size_t sndh_init_address(const void *data, const size_t size)
