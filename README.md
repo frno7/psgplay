@@ -220,7 +220,7 @@ be used to improve scheduling priority for PSG play.
 ## Library form
 
 PSG play is compiled into the static library
-`lib/psgplay/psgplay.a` and the shared library `lib/psgplay/psgplay.so`. The
+`lib/psgplay/libpsgplay.a` and the shared library `lib/psgplay/libpsgplay.so`. The
 [application programming interface](https://en.wikipedia.org/wiki/Application_programming_interface)
 (API) is documented in
 [`include/psgplay/psgplay.h`](https://github.com/frno7/psgplay/blob/main/include/psgplay/psgplay.h),
