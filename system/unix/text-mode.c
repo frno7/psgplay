@@ -22,7 +22,7 @@
 #include "text/mode.h"
 #include "text/mvc.h"
 
-#include "unicode/atari.h"
+#include "toslibc/unicode/atari.h"
 
 #include "system/unix/clock.h"
 #include "system/unix/poll-fifo.h"

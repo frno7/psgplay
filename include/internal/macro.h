@@ -15,7 +15,8 @@
 #define CONCAT__(a, b) a ## b
 #define CONCATENATE(a, b) CONCAT__(a, b)
 
-#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
+#define __ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
+#define ARRAY_SIZE(arr) __ARRAY_SIZE(arr)
 
 /* This counts to 32. Any more, it will return the 33rd argument. */
 #define __COUNT_ARGS__(							\

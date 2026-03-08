@@ -11,7 +11,7 @@
 #include "internal/compare.h"
 #include "internal/fifo.h"
 
-#include "unicode/utf8.h"
+#include "toslibc/unicode/utf8.h"
 
 #include "vt-cmd.h"
 

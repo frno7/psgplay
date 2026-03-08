@@ -13,6 +13,7 @@ PSGPLAY_TOS := PSGPLAY.TOS
 PSGPLAY_PRG_OBJ := system/atari/PSGPLAY.PRG.o
 
 SYSTEM_ATARI_SRC :=							\
+	$(UNICODE_SRC)							\
 	lib/internal/fifo.c						\
 	lib/internal/string.c						\
 	lib/ice/ice.c							\
@@ -20,8 +21,6 @@ SYSTEM_ATARI_SRC :=							\
 	lib/text/load.c							\
 	lib/text/main.c							\
 	lib/text/mode.c							\
-	lib/unicode/atari.c						\
-	lib/unicode/utf8.c						\
 	lib/vt/vt52.c							\
 	lib/vt/vt.c							\
 	system/atari/clock.c						\

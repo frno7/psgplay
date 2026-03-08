@@ -8,7 +8,7 @@
 
 #include "psgplay/sndh.h"
 
-#include "unicode/utf8.h"
+#include "toslibc/unicode/utf8.h"
 
 #include "text/mode.h"
 

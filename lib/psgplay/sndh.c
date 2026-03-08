@@ -12,8 +12,8 @@
 
 #include "psgplay/sndh.h"
 
-#include "unicode/atari.h"
-#include "unicode/utf8.h"
+#include "toslibc/unicode/atari.h"
+#include "toslibc/unicode/utf8.h"
 
 #if defined(__m68k__)
 #include "toslibc/asm/math.h"

@@ -12,7 +12,7 @@
 #include "internal/build-assert.h"
 #include "internal/types.h"
 
-#include "unicode/utf8.h"
+#include "toslibc/unicode/utf8.h"
 
 #include "vt/vt.h"
 

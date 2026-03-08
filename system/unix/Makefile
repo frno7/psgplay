@@ -44,6 +44,8 @@ endef
 
 $(foreach f,$(PSGPLAY_SRC),$(eval $(call PSGPLAY_target,$(f))))
 
+$(PSGPLAY_OBJ): PSGPLAY_CFLAGS += -Ilib/toslibc/include
+
 ALL_OBJ += $(PSGPLAY_OBJ) system/unix/system-unix-disassemble.o
 
 ifeq (Darwin,$(BUILD_SYSTEM))

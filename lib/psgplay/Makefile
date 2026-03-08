@@ -10,6 +10,10 @@ LIBPSGPLAY_SRC :=							\
 	lib/psgplay/psgplay.c						\
 	lib/psgplay/sndh.c
 
+UNICODE_SRC :=								\
+	lib/toslibc/lib/unicode-atari.c					\
+	lib/toslibc/lib/unicode-utf8.c
+
 LIBPSGPLAY_PUBLIC_SRC :=						\
 	$(ICE_SRC)							\
 	$(VERSION_SRC)							\

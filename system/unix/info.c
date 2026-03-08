@@ -11,8 +11,6 @@
 
 #include "psgplay/sndh.h"
 
-#include "unicode/atari.h"
-
 #include "system/unix/file.h"
 #include "system/unix/info.h"
 #include "system/unix/string.h"

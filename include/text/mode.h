@@ -12,7 +12,7 @@
 
 #include "text/mvc.h"
 
-#include "unicode/utf8.h"
+#include "toslibc/unicode/utf8.h"
 
 #include "vt/vt.h"
 
