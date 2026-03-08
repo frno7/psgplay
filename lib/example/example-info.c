@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 			pr_fatal_errno(path);
 
 		sndh_for_each_tag (f.data, f.size)
-			printf("%s %s\n", sndh_tag_name, sndh_tag_value);
+			printf("%s %s\n", sndh_tag_name, sndh_tag_text);
 
 		file_free(f);
 	}
