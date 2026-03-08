@@ -24,7 +24,7 @@ unicode_t fifo_utf32(struct fifo_utf32 *ffu)
 	if (!fifo_read(&ffu->fifo, &c, sizeof(c)))
 		return 0;
 
-	return utf8_to_utf32_first(&ffu->uua, c);
+	return utf8_to_utf32_char(&ffu->uua, c);
 }
 
 struct text_sndh text_sndh_init(const char *title,

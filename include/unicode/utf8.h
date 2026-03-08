@@ -31,7 +31,7 @@ struct utf8_to_utf32_adapter {
 	uint8_t s[6];		/* Longest UTF-8 sequence */
 };
 
-unicode_t utf8_to_utf32_first(struct utf8_to_utf32_adapter *uua, char c);
+unicode_t utf8_to_utf32_char(struct utf8_to_utf32_adapter *uua, char c);
 
 unicode_t utf8_to_utf32_next(struct utf8_to_utf32_adapter *uua);
 
