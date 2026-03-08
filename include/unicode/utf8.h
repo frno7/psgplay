@@ -33,9 +33,4 @@ unicode_t utf8_to_utf32_first(struct utf8_to_utf32_adapter *uua, char c);
 
 unicode_t utf8_to_utf32_next(struct utf8_to_utf32_adapter *uua);
 
-#define for_each_utf8_to_utf32(symbol, uua, c)				\
-	for (symbol = utf8_to_unicode_first(uua, c);			\
-	     symbol;							\
-	     symbol = utf8_to_utf32_next(uua))
-
 #endif /* PSGPLAY_UNICODE_H */
