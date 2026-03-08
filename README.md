@@ -28,7 +28,7 @@ SNDH music files can be played with PSG play in several ways:
 - A PSG play plugin for the
   [Music Player Daemon](https://en.wikipedia.org/wiki/Music_Player_Daemon) (MPD)
   is being prepared in issue [#16](https://github.com/frno7/psgplay/issues/16).
-  A [`psgplay-mpd.patch`](https://github.com/frno7/psgplay/blob/mpd/psgplay-mpd.patch)
+  An [MPD pull request](https://github.com/MusicPlayerDaemon/MPD/pull/2444)
   is available for testing. MPD is a popular choice for playing music in
   general, with playlists and many other features.
 - [Cowbell](https://github.com/demozoo/cowbell) is a web player for
