@@ -1,22 +1,18 @@
 // SPDX-License-Identifier: GPL-2.0
 
-#define _POSIX_C_SOURCE 200809L
-
-#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "internal/assert.h"
-#include "internal/types.h"
 
 #include "unicode/utf8.h"
 
 struct utf8_table {
-	u32 cmask;
-	u32 cval;
-	u32 shift;
-	u32 lmask;
-	u32 lval;
+	uint32_t cmask;
+	uint32_t cval;
+	uint32_t shift;
+	uint32_t lmask;
+	uint32_t lval;
 };
 
 static const struct utf8_table utf8_table[] =
@@ -40,13 +36,13 @@ static const struct utf8_table utf8_table[] =
 
 #define UNICODE_REPLACEMENT_CHARACTER 0xfffd
 
-int utf8_to_utf32(unicode_t *u, const u8 *s, size_t insize)
+int utf8_to_utf32(unicode_t *u, const uint8_t *s, size_t insize)
 {
 	if (!insize)
 		return 0;
 
-	const u32 c0 = *s;
-	u32 code = c0;
+	const uint32_t c0 = *s;
+	uint32_t code = c0;
 	int length = 0;
 	for (const struct utf8_table *t = utf8_table; t->cmask; t++) {
 		length++;
@@ -66,7 +62,7 @@ int utf8_to_utf32(unicode_t *u, const u8 *s, size_t insize)
 
 		s++;
 
-		const u32 c = (*s ^ 0x80) & 0xff;
+		const uint32_t c = (*s ^ 0x80) & 0xff;
 		if (c & 0xc0)
 			return -1;
 		code = (code << 6) | c;
@@ -75,7 +71,7 @@ int utf8_to_utf32(unicode_t *u, const u8 *s, size_t insize)
 	return -1;
 }
 
-int utf32_to_utf8(unicode_t u, u8 *s, size_t outmax)
+int utf32_to_utf8(unicode_t u, uint8_t *s, size_t outmax)
 {
 	const struct utf8_table *t;
 	int length = 0;
@@ -89,11 +85,11 @@ int utf32_to_utf8(unicode_t u, u8 *s, size_t outmax)
 		if (u <= t->lmask) {
 			int c = t->shift;
 
-			*s = (u8)(t->cval | (u >> c));
+			*s = (uint8_t)(t->cval | (u >> c));
 
 			while (c > 0) {
 				c -= 6;
-				*++s = (u8)(0x80 | ((u >> c) & 0x3f));
+				*++s = (uint8_t)(0x80 | ((u >> c) & 0x3f));
 			}
 
 			return length;
@@ -103,7 +99,7 @@ int utf32_to_utf8(unicode_t u, u8 *s, size_t outmax)
 	return -1;
 }
 
-int utf32_to_utf8_with_replacement(unicode_t u, u8 *s, size_t outmax)
+int utf32_to_utf8_with_replacement(unicode_t u, uint8_t *s, size_t outmax)
 {
 	const int r = utf32_to_utf8(u, s, outmax);
 
@@ -114,13 +110,13 @@ int utf32_to_utf8_with_replacement(unicode_t u, u8 *s, size_t outmax)
 
 int utf32_to_utf8_length(unicode_t u)
 {
-	u8 s[8];
+	uint8_t s[8];
 
 	return utf32_to_utf8(u, s, sizeof(s));
 }
 
-ssize_t charset_to_utf8_string_length(const u8 *s, size_t length,
-	 unicode_t (*charset_to_utf32)(u8 c, void *arg), void *arg)
+ssize_t charset_to_utf8_string_length(const uint8_t *s, size_t length,
+	 unicode_t (*charset_to_utf32)(uint8_t c, void *arg), void *arg)
 {
 	ssize_t size = 0;
 
@@ -139,7 +135,7 @@ ssize_t charset_to_utf8_string_length(const u8 *s, size_t length,
 	return size;
 }
 
-ssize_t utf8_to_charset_string_length(const u8 *u, size_t length)
+ssize_t utf8_to_charset_string_length(const uint8_t *u, size_t length)
 {
 	ssize_t size = 0;
 	size_t i = 0;
@@ -157,9 +153,9 @@ ssize_t utf8_to_charset_string_length(const u8 *u, size_t length)
 	return size;
 }
 
-bool utf8_valid_in_charset_string(const u8 *u, size_t length,
-	 unicode_t (*charset_to_utf32)(u8 c, void *arg),
-	 u8 (*utf32_to_charset)(unicode_t u, void *arg), void *arg)
+bool utf8_valid_in_charset_string(const uint8_t *u, size_t length,
+	 unicode_t (*charset_to_utf32)(uint8_t c, void *arg),
+	 uint8_t (*utf32_to_charset)(unicode_t u, void *arg), void *arg)
 {
 	size_t i = 0;
 
@@ -182,7 +178,7 @@ unicode_t utf8_to_utf32_first(struct utf8_to_utf32_adapter *uua, char c)
 	unicode_t u;
 
 	if (c)
-		uua->s[uua->length++] = (u8)c;
+		uua->s[uua->length++] = (uint8_t)c;
 
 	const int r = utf8_to_utf32(&u, uua->s, uua->length);
 

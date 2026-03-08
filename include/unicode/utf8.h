@@ -3,30 +3,32 @@
 #ifndef PSGPLAY_UNICODE_H
 #define PSGPLAY_UNICODE_H
 
-#include "internal/types.h"
+#include <stddef.h>
+#include <stdint.h>
+#include <sys/types.h>
 
-typedef u32 unicode_t;
+typedef uint32_t unicode_t;
 
-int utf8_to_utf32(unicode_t *u, const u8 *s, size_t insize);
+int utf8_to_utf32(unicode_t *u, const uint8_t *s, size_t insize);
 
-int utf32_to_utf8(unicode_t u, u8 *s, size_t maxout);
+int utf32_to_utf8(unicode_t u, uint8_t *s, size_t maxout);
 
 int utf32_to_utf8_length(unicode_t u);
 
-int utf32_to_utf8_with_replacement(unicode_t u, u8 *s, size_t outmax);
+int utf32_to_utf8_with_replacement(unicode_t u, uint8_t *s, size_t outmax);
 
-ssize_t charset_to_utf8_string_length(const u8 *s, size_t length,
-	 unicode_t (*charset_to_utf32)(u8 c, void *arg), void *arg);
+ssize_t charset_to_utf8_string_length(const uint8_t *s, size_t length,
+	 unicode_t (*charset_to_utf32)(uint8_t c, void *arg), void *arg);
 
-ssize_t utf8_to_charset_string_length(const u8 *u, size_t length);
+ssize_t utf8_to_charset_string_length(const uint8_t *u, size_t length);
 
-bool utf8_valid_in_charset_string(const u8 *u, size_t length,
-	 unicode_t (*charset_to_utf32)(u8 c, void *arg),
-	 u8 (*utf32_to_charset)(unicode_t u, void *arg), void *arg);
+bool utf8_valid_in_charset_string(const uint8_t *u, size_t length,
+	 unicode_t (*charset_to_utf32)(uint8_t c, void *arg),
+	 uint8_t (*utf32_to_charset)(unicode_t u, void *arg), void *arg);
 
 struct utf8_to_utf32_adapter {
 	size_t length;
-	u8 s[6];		/* Longest UTF-8 sequence */
+	uint8_t s[6];		/* Longest UTF-8 sequence */
 };
 
 unicode_t utf8_to_utf32_first(struct utf8_to_utf32_adapter *uua, char c);

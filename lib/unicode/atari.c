@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0
 
-#include "internal/macro.h"
-
 #include "unicode/atari.h"
 #include "unicode/utf8.h"
+
+#include "internal/macro.h"
 
 static const unicode_t atari_st_charset[256] = {
 	0x0000,	// <NUL>	NULL
@@ -264,12 +264,12 @@ static const unicode_t atari_st_charset[256] = {
 	0x00af	// ¯		MACRON
 };
 
-unicode_t charset_atari_st_to_utf32(u8 c, void *arg)
+unicode_t charset_atari_st_to_utf32(uint8_t c, void *arg)
 {
 	return atari_st_charset[c];
 }
 
-u8 utf32_to_charset_atari_st(unicode_t u, void *arg)
+uint8_t utf32_to_charset_atari_st(unicode_t u, void *arg)
 {
 	for (int c = 0; c < ARRAY_SIZE(atari_st_charset); c++)
 		if (u == atari_st_charset[c])
@@ -278,7 +278,7 @@ u8 utf32_to_charset_atari_st(unicode_t u, void *arg)
 	return '?';
 }
 
-bool utf8_valid_in_atari_st(const u8 *u, size_t length)
+bool utf8_valid_in_atari_st(const uint8_t *u, size_t length)
 {
 	return utf8_valid_in_charset_string(u, length,
 			charset_atari_st_to_utf32,
