@@ -10,9 +10,8 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-#include "digital.h"
-
 struct psgplay;		/* PSG play object */
+struct psgplay_digital;	/* PSG play digital sample */
 
 /**
  * struct psgplay_stereo - PSG play stereo sample

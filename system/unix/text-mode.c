@@ -16,6 +16,7 @@
 #include "vt/vt.h"
 
 #include "psgplay/psgplay.h"
+#include "psgplay/digital.h"
 #include "psgplay/sndh.h"
 
 #include "text/main.h"
