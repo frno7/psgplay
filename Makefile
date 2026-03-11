@@ -25,12 +25,14 @@ BUILD_CC = $(CC)
 endif
 
 ifdef HOST_COMPILE
-HOST_CC = $(HOST_COMPILE)gcc
-HOST_LD = $(HOST_COMPILE)gcc
-HOST_AR = $(HOST_COMPILE)ar
+HOST_CC  = $(HOST_COMPILE)gcc
+HOST_CXX = $(HOST_COMPILE)g++
+HOST_LD  = $(HOST_COMPILE)gcc
+HOST_AR  = $(HOST_COMPILE)ar
 else
-HOST_CC = $(CC)
-HOST_LD = $(LD)
+HOST_CC  = $(CC)
+HOST_CXX = $(CXX)
+HOST_LD  = $(LD)
 ifeq (Darwin,$(BUILD_SYSTEM))
 HOST_AR = libtool
 else
@@ -98,7 +100,7 @@ endif
 install: install-psgplay install-man install-lib
 
 .PHONY: test
-test: test-m68kdt
+test: test-m68kdt $(PSGPLAY_TEST_CPLUSPLUS)
 ifdef TARGET_CC
 test: test-svg
 endif
@@ -121,6 +123,7 @@ Q             = $(V:1=)
 QUIET_AR      = $(Q:@=@echo    '  AR      '$@;)
 QUIET_AS      = $(Q:@=@echo    '  AS      '$@;)
 QUIET_CC      = $(Q:@=@echo    '  CC      '$@;)
+QUIET_CXX     = $(Q:@=@echo    '  C++     '$@;)
 QUIET_GEN     = $(Q:@=@echo    '  GEN     '$@;)
 QUIET_LINK    = $(Q:@=@echo    '  LD      '$@;)
 QUIET_RM      = $(Q:@=@echo    '  RM      '$@;)
