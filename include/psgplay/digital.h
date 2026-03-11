@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <sys/types.h>
 
 struct psgplay;		/* PSG play object */
 
