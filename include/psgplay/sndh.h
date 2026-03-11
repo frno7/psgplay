@@ -170,6 +170,8 @@ size_t sndh_exit_address(const void *data, const size_t size);
  */
 size_t sndh_play_address(const void *data, const size_t size);
 
+#if !defined(__cplusplus) /* Advanced SNDH tag API is not yet ready for C++. */
+
 /** sndh_tag_name - SNDH tag name */
 #define sndh_tag_name (sndh_cursor__.tag->name)
 
@@ -328,6 +330,8 @@ static inline struct sndh_timer u32_to_sndh_timer(const uint32_t timer)
 		.frequency = (int)(timer >> 8),
 	};
 }
+
+#endif /* !defined(__cplusplus) */
 
 #if defined(__m68k__)
 
