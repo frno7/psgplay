@@ -18,6 +18,8 @@
 #include "atari/psg.h"
 
 #include "psgplay/psgplay.h"
+#include "psgplay/stereo.h"
+#include "psgplay/digital.h"
 #include "psgplay/sndh.h"
 
 #include "cf2149/module/cf2149.h"

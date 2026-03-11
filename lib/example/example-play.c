@@ -16,6 +16,7 @@
 #include "internal/print.h"
 
 #include "psgplay/psgplay.h"
+#include "psgplay/stereo.h"
 
 #include "system/unix/file.h"
 #include "system/unix/sndh.h"

@@ -9,9 +9,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "digital.h"
-#include "stereo.h"
-
 /**
  * psgplay_init - initialise PSG play
  * @data: SNDH data, must not be in compressed form
