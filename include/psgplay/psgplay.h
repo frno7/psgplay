@@ -28,6 +28,8 @@ struct psgplay *psgplay_init(const void *data, size_t size,
 /**
  * psgplay_free - free a PSG play object previously initialised
  * @pp: PSG play object to free
+ *
+ * Note: If @pp is %NULL, no operation is performed.
  */
 void psgplay_free(struct psgplay *pp);
 
