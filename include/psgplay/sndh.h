@@ -292,6 +292,7 @@ struct sndh_cursor {
 		bool (*read)(struct sndh_cursor *cursor);
 		size_t start;
 		size_t bound;
+		size_t max_e;
 	} subtag;
 
 	bool hdns;

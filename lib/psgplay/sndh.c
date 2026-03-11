@@ -168,12 +168,16 @@ static bool sndh_substrings_subtag(struct sndh_cursor  *cursor)
 	if (!e)
 		return false;
 
+	/* keep track of the biggest string-end seen */
+	if (e > cursor->subtag.max_e)
+		cursor->subtag.max_e = e;
+
 	tag_update(&c[o], 0, cursor);
 
 	cursor->offset += 2;
 
 	if (cursor->offset == cursor->subtag.bound)
-		cursor->offset = cursor->subtag.bound = e;
+		cursor->offset = cursor->subtag.bound = cursor->subtag.max_e;
 
 	return true;
 }
@@ -189,6 +193,7 @@ static bool sndh_substrings(struct sndh_cursor  *cursor)
 
 	cursor->subtag.start = cursor->offset - strlen(cursor->tag->name);
 	cursor->subtag.bound = cursor->offset + cursor->subtunes * 2;
+	cursor->subtag.max_e = 0;
 
 	if (cursor->bound < cursor->subtag.bound) {
 		diag_error(cursor, "tag %s too short", cursor->tag->name);
