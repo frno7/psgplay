@@ -3,7 +3,7 @@ Makefile targets:
   all             - compile PSG play, libraries and examples (default)
   install         - install PSG play, libraries and manual page
   psgplay         - compile PSG play for Linux or Mac OS
-  PSGPLAY.TOS     - compile PSG play for the Atari ST
+  PSGPLAY.TOS     - compile PSG play for the Atari ST (requires TARGET_COMPILE)
   web             - compile for Javascript and Webassembly
   example         - compile examples using the PSG play library
   gtags           - make tags for the GNU Global source code tagging system
