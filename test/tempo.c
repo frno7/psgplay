@@ -13,7 +13,7 @@ sndh_tune_value_time_names(struct timer_preset, tune_value_time_names);
 
 static struct snd_dma_alt_sample sample[1];
 
-static INTERRUPT void timer_a_play()
+static INTERRUPT void timer_a_play(void)
 {
 	snd_dma_alt_play(sample);
 
@@ -36,13 +36,13 @@ void sndh_init(int tune)
 	mfp_sets_imr({ .timer_a = true });
 }
 
-void sndh_play()
+void sndh_play(void)
 {
 	if (!mfp_rd_ier().timer_a)
 		mfp_sets_ier({ .timer_a = true });
 }
 
-void sndh_exit()
+void sndh_exit(void)
 {
 	snd_dma_alt_exit(sample);
 

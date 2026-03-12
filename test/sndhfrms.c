@@ -9,12 +9,12 @@ sndh_title("FRMS");
 sndh_tune_value_frames_names(int, tune_value_frames_names);
 sndh_timer(SNDH_TIMER_C, 200);
 
-static void idle()
+static void idle(void)
 {
 	__asm__ __volatile__ ("stop #0x2200" : : : "cc");
 }
 
-static void idle_indefinitely()
+static void idle_indefinitely(void)
 {
 	for (;;)
 		idle();
@@ -30,12 +30,12 @@ void sndh_init(int tune)
 	snd_psg_wr_level_a(SND_PSG_LEVEL_MAX);
 }
 
-void sndh_play()
+void sndh_play(void)
 {
 	snd_psg_wr_iomix(SND_PSG_IOMIX_TONE_A);
 }
 
-void sndh_exit()
+void sndh_exit(void)
 {
 	snd_psg_wr_iomix(SND_PSG_IOMIX_OFF);
 }

@@ -70,12 +70,12 @@ struct frame *frame = &frames[0];
 
 #define ZERO_ENDING 2
 
-static INTERRUPT void play_timer_a_end()
+static INTERRUPT void play_timer_a_end(void)
 {
 	mfp_clrs_isr({ .timer_a = true });
 }
 
-static INTERRUPT void play_timer_a_2()
+static INTERRUPT void play_timer_a_2(void)
 {
 	mfp_clrs_isr({ .timer_a = true });
 
@@ -88,7 +88,7 @@ static INTERRUPT void play_timer_a_2()
 	snd_dma_wr_end(frame->end + ZERO_ENDING);
 }
 
-static INTERRUPT void play_timer_a_1()
+static INTERRUPT void play_timer_a_1(void)
 {
 	mfp_clrs_isr({ .timer_a = true });
 
@@ -112,7 +112,7 @@ static INTERRUPT void play_timer_a_1()
 	}
 }
 
-static INTERRUPT void play_timer_a_0()
+static INTERRUPT void play_timer_a_0(void)
 {
 	mfp_clrs_isr({ .timer_a = true });
 
@@ -128,12 +128,12 @@ static INTERRUPT void play_timer_a_0()
 	frame++;
 }
 
-static INTERRUPT void play_gpip7_end()
+static INTERRUPT void play_gpip7_end(void)
 {
 	mfp_clrs_isr({ .gpip7 = true });
 }
 
-static INTERRUPT void play_gpip7_2()
+static INTERRUPT void play_gpip7_2(void)
 {
 	mfp_clrs_isr({ .gpip7 = true });
 
@@ -147,7 +147,7 @@ static INTERRUPT void play_gpip7_2()
 	snd_dma_wr_end(frame->end + ZERO_ENDING);
 }
 
-static INTERRUPT void play_gpip7_1()
+static INTERRUPT void play_gpip7_1(void)
 {
 	mfp_clrs_isr({ .gpip7 = true });
 
@@ -171,7 +171,7 @@ static INTERRUPT void play_gpip7_1()
 	}
 }
 
-static INTERRUPT void play_gpip7_0()
+static INTERRUPT void play_gpip7_0(void)
 {
 	mfp_clrs_isr({ .gpip7 = true });
 
@@ -252,7 +252,7 @@ void sndh_init(int tune)
 	});
 }
 
-static void play_timer_a()
+static void play_timer_a(void)
 {
 	if (frame->count == 1) {
 		iowr32((uint32_t)play_timer_a_1, 0x134);
@@ -282,7 +282,7 @@ static void play_timer_a()
 	}
 }
 
-static void play_gpip7()
+static void play_gpip7(void)
 {
 	if (frame->count == 1) {
 		iowr32((uint32_t)play_gpip7_1, 0x13c);
@@ -300,7 +300,7 @@ static void play_gpip7()
 	}
 }
 
-void sndh_play()
+void sndh_play(void)
 {
 	static int n = 0;
 
@@ -315,7 +315,7 @@ void sndh_play()
 	(preset.timer_a ? play_timer_a : play_gpip7)();
 }
 
-void sndh_exit()
+void sndh_exit(void)
 {
 	snd_dma_wrs_ctrl({ .play = false });
 }

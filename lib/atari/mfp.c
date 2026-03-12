@@ -26,7 +26,7 @@
 
 static struct cf68901_module cf68901;
 
-static bool mono_monitor_detect()
+static bool mono_monitor_detect(void)
 {
 	return true;	/* FIXME: Only color monitor as of now */
 }

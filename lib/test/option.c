@@ -48,7 +48,7 @@ static void NORETURN help_exit(int code)
 	exit(code);
 }
 
-void name_from_input()
+void name_from_input(void)
 {
 	const char *path = option.input;
 	size_t j = 0;

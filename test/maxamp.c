@@ -38,7 +38,7 @@ void sndh_init(int tune)
 	});
 }
 
-void sndh_play()
+void sndh_play(void)
 {
 	snd_psg_wr_iomix(SND_PSG_IOMIX_TONE_A &
 			 SND_PSG_IOMIX_TONE_B &
@@ -47,7 +47,7 @@ void sndh_play()
 	snd_dma_wrs_ctrl({ .play_repeat = true, .play = true });
 }
 
-void sndh_exit()
+void sndh_exit(void)
 {
 	snd_psg_wr_iomix(SND_PSG_IOMIX_OFF);
 
