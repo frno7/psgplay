@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 	if (!options->input)
 		pr_fatal_error("missing input WAVE file\n");
 
-	name_from_input(options);
+	name_from_input();
 
 	if (!options->track)
 		options->track = track_from_path(options->input);
