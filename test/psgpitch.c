@@ -8,7 +8,7 @@
 sndh_title("PSG pitch");
 sndh_tune_value_time_names(int, tune_value_time_names);
 
-void sndh_init(int tune)
+void sndh_init(int32_t tune)
 {
 	const int pitch = sndh_tune_select_value(tune);
 

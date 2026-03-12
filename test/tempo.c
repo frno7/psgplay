@@ -20,7 +20,7 @@ static INTERRUPT void timer_a_play()
 	mfp_clrs_isra({ .timer_a = true });
 }
 
-void sndh_init(int tune)
+void sndh_init(int32_t tune)
 {
 	const struct timer_preset preset = sndh_tune_select_value(tune);
 

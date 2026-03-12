@@ -12,7 +12,7 @@ sndh_tune_value_time_names(double, tune_value_time_names);
 
 static struct snd_dma_alt_sample sample[1];
 
-void sndh_init(int tune)
+void sndh_init(int32_t tune)
 {
 	snd_dma_alt_init(sample);
 }

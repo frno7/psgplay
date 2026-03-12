@@ -186,7 +186,7 @@ static INTERRUPT void play_gpip7_0()
 	iowr32((uint32_t)play_gpip7_1, 0x13c);
 }
 
-void sndh_init(int tune)
+void sndh_init(int32_t tune)
 {
 	preset = sndh_tune_select_value(tune);
 	const int8_t *base = NULL;

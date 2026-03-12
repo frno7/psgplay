@@ -46,7 +46,7 @@ SM(3);
 SM(5);
 SM(7);
 
-void sndh_init(int tune)
+void sndh_init(int32_t tune)
 {
 	const struct dma_preset preset = sndh_tune_select_value(tune);
 	const int8_t *base = NULL;

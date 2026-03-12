@@ -20,7 +20,7 @@ static void idle_indefinitely()
 		idle();
 }
 
-void sndh_init(int tune)
+void sndh_init(int32_t tune)
 {
 	if (tune == 2)
 		idle_indefinitely();

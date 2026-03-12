@@ -19,7 +19,7 @@ sndh_timer(SNDH_TIMER_A, 400);
 
 static const int8_t samples[] = { R64(+127) R64(-128) };
 
-void sndh_init(int tune)
+void sndh_init(int32_t tune)
 {
 	snd_psg_wr_iomix(SND_PSG_IOMIX_OFF);
 	snd_psg_wr_period_a(73);
