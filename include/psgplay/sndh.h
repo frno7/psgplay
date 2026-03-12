@@ -131,16 +131,16 @@ bool sndh_tag_year(char *year, size_t length,
 	const void *data, const size_t size);
 
 /**
- * sndh_tag_title - get SNDH subtune title
- * @title: SNDH subtune title result, UTF-8 encoded, if determined
- * @length: maximum length of title buffer including NUL
+ * sndh_tag_subtune_name - get SNDH subtune name
+ * @name: SNDH subtune name result, UTF-8 encoded, if determined
+ * @length: maximum length of name buffer including NUL
  * @subtune: subtune number, starting from 1
  * @data: SNDH data
  * @size: size in bytes of SNDH data
  *
  * Return: %true on success, otherwise %false
  */
-bool sndh_tag_subtune_title(char *title, size_t length,
+bool sndh_tag_subtune_name(char *name, size_t length,
 	int subtune, const void *data, const size_t size);
 
 /**

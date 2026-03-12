@@ -664,7 +664,7 @@ bool sndh_tag_year(char *year, size_t length,
 	return sndh_tag_text_copy(year, length, "YEAR", data, size);
 }
 
-bool sndh_tag_subtune_title(char *title, size_t length,
+bool sndh_tag_subtune_name(char *name, size_t length,
 	int subtune, const void *data, const size_t size)
 {
 	int subtune_count = 0;
@@ -677,8 +677,8 @@ bool sndh_tag_subtune_title(char *title, size_t length,
 			if (subtune != ++subtune_count)
 				continue;
 
-			strncpy(title, sndh_tag_text, length - 1);
-			title[length - 1] = '\0';
+			strncpy(name, sndh_tag_text, length - 1);
+			name[length - 1] = '\0';
 
 			return true;
 		}
