@@ -78,13 +78,13 @@ void sndh_init(int32_t tune)
 	});
 }
 
-void sndh_play()
+void sndh_play(void)
 {
 	if (!snd_dma_rd_ctrl().play)
 		snd_dma_wrs_ctrl({ .play_repeat = true, .play = true });
 }
 
-void sndh_exit()
+void sndh_exit(void)
 {
 	snd_dma_wrs_ctrl({ .play = false });
 }

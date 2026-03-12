@@ -17,12 +17,12 @@ void sndh_init(int32_t tune)
 	snd_dma_alt_init(sample);
 }
 
-void sndh_play()
+void sndh_play(void)
 {
 	snd_dma_alt_play(sample);
 }
 
-void sndh_exit()
+void sndh_exit(void)
 {
 	snd_dma_alt_exit(sample);
 }

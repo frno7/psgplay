@@ -67,7 +67,7 @@ static const double MAXVOL = 65119.0;	/* Normal mode maximum value in table. */
 static const double FOURTH2 = 1.19;	/* Fourth root of two from YM2149. */
 static const double WARP = 5.0 / 3.0;	/* Measured as 1.65932 from 46602. */
 
-static struct conductance generate_conductance()
+static struct conductance generate_conductance(void)
 {
 	struct conductance c = { .lvl[0] = 1.0e-8 /* Avoid divide by zero */ };
 
@@ -135,7 +135,7 @@ static void generate_dac(struct cf2149_dac *dac)
 	 */
 }
 
-const struct cf2149_dac *cf2149_atari_st_dac()
+const struct cf2149_dac *cf2149_atari_st_dac(void)
 {
 	static bool init = false;
 	static struct cf2149_dac dac;

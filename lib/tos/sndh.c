@@ -31,7 +31,7 @@ struct timer_prescale {
 
 struct system_variables *__system_variables = (struct system_variables *)0x400;
 
-static void (*vblqueue[4])();
+static void (*vblqueue[4])(void);
 
 static struct cookie cookie_jar[16] = {
 	{ .uid = COOKIE__CPU, .value = COOKIE__CPU_68000 },
@@ -72,7 +72,7 @@ u32 gemdos_trap(u8 *sp)
 	return 0;
 }
 
-u32 xbios_trap()
+u32 xbios_trap(void)
 {
 	return 0;
 }
@@ -119,7 +119,7 @@ MFP_CTRL_DIV(MFP_CTRL_DIV_PRESCALE)
 	return valid;
 }
 
-static void sndh_play_record()
+static void sndh_play_record(void)
 {
 	static bool record;
 
@@ -133,19 +133,19 @@ static void sndh_play_record()
 	sndh_play(&file);
 }
 
-INTERRUPT void vbl_exception()
+INTERRUPT void vbl_exception(void)
 {
 	if (timer_state.type == SNDH_TIMER_V &&
 	    timer_state.play)
 		sndh_play_record();
 }
 
-static void install_sndh_vbl()
+static void install_sndh_vbl(void)
 {
 	timer_state.type = SNDH_TIMER_V;
 }
 
-static bool timer_division()
+static bool timer_division(void)
 {
 	if (timer_state.dividend >= timer_state.prescale.divisor)
 		timer_state.dividend = 0;
@@ -154,7 +154,7 @@ static bool timer_division()
 }
 
 #define DEFINE_TIMER_EXCEPTION(name_, type_, ab_)			\
-INTERRUPT void timer_##name_##_exception()				\
+INTERRUPT void timer_##name_##_exception(void)				\
 {									\
 	if (timer_state.type == SNDH_TIMER_##type_ &&			\
 	    timer_state.play && timer_division())			\
@@ -164,7 +164,7 @@ INTERRUPT void timer_##name_##_exception()				\
 	mfp_clrs_is##ab_({ .timer_##name_ = true });			\
 }									\
 									\
-static void install_sndh_timer_##name_()				\
+static void install_sndh_timer_##name_(void)				\
 {									\
 	mfp_wrs_t##name_##cr({ .ctrl = timer_state.prescale.ctrl });	\
 	mfp_wrs_t##name_##dr({ .count = timer_state.prescale.count });	\
@@ -190,7 +190,7 @@ static void install_sndh_timer(const struct sndh_timer timer)
 				      install_sndh_vbl)();
 }
 
-static void play()
+static void play(void)
 {
 	barrier();
 
@@ -199,12 +199,12 @@ static void play()
 	barrier();
 }
 
-static void idle()
+static void idle(void)
 {
 	__asm__ __volatile__ ("stop #0x2200" : : : "cc");
 }
 
-static void idle_indefinitely()
+static void idle_indefinitely(void)
 {
 	for (;;)
 		idle();

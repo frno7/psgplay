@@ -9,6 +9,6 @@ struct cf2149_dac {
 	uint16_t lvl[32][32][32];
 };
 
-const struct cf2149_dac *cf2149_atari_st_dac();
+const struct cf2149_dac *cf2149_atari_st_dac(void);
 
 #endif /* ATARI_DAC_H */
