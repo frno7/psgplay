@@ -3,6 +3,11 @@
 #ifndef INTERNAL_MACRO_H
 #define INTERNAL_MACRO_H
 
+#include <stdint.h>
+#ifndef INTPTR_MAX /* m68k-elf-gcc (atari-st) does not define the optional intptr_t and friends */
+# define intptr_t long
+#endif
+
 /* Macro definitions from the Linux kernel. */
 
 #define __ALIGN__MASK(x, mask) (((x) + (mask)) & ~(mask))
@@ -40,7 +45,8 @@
  * Glory to Martin Uecker <Martin.Uecker@med.uni-goettingen.de>
  */
 #define __is_constexpr(x) \
-	(sizeof(int) == sizeof(*(8 ? ((void *)((long)(x) * 0l)) : (int *)8)))
+	(sizeof(int) == sizeof(*(8 ? ((void *)((intptr_t)(x) * 0)) : (int *)8)))
+
 
 #define __no_side_effects(x, y) \
 		(__is_constexpr(x) && __is_constexpr(y))
