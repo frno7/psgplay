@@ -133,7 +133,7 @@ ssize_t psgplay_read_digital(struct psgplay *pp,
  * Note: psgplay_read_digital() will permanently return zero to indicate that
  * it has finished and there are no more samples to be read.
  *
- * See also psgplay_stop() and psgplay_stop_at_time().
+ * See also psgplay_stop(), psgplay_unstop() and psgplay_stop_at_time().
  *
  * The cut-off noise is due to the YM2149 PSG unipolar signal being
  * transformed into a bipolar signal for stereo sample mixing. PSG play

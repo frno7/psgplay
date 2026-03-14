@@ -47,13 +47,26 @@ void psgplay_free(struct psgplay *pp);
  * after which it will permanently return zero to indicate that it has finished
  * fading out and there are no more samples to be read.
  *
- * See also psgplay_stop_at_time() and psgplay_stop_digital_at_sample().
+ * See also psgplay_stop_at_time(), psgplay_stop_digital_at_sample() and
+ * psgplay_unstop().
  *
  * The cut-off noise is due to the YM2149 PSG unipolar signal being
  * transformed into a bipolar signal for stereo sample mixing. PSG play
  * automatically fade in stereo samples for the first 10 ms.
  */
 void psgplay_stop(struct psgplay *pp);
+
+/**
+ * psgplay_unstop - cancel any previous stop to PSG play
+ * @pp: PSG play object to unstop
+ *
+ * psgplay_unstop() cancels any previous calls to psgplay_stop(),
+ * psgplay_stop_at_time() or psgplay_stop_digital_at_sample().
+ *
+ * psgplay_unstop() is mostly intended for interactive use, where one might
+ * change one's mind on stopping.
+ */
+void psgplay_unstop(struct psgplay *pp);
 
 /**
  * psgplay_stop_at_time - stop PSG play after a given time
@@ -67,7 +80,8 @@ void psgplay_stop(struct psgplay *pp);
  * Note: psgplay_read_stereo() will permanently return zero to indicate that
  * it has finished fading out and there are no more samples to be read.
  *
- * See also psgplay_stop() and psgplay_stop_digital_at_sample().
+ * See also psgplay_stop(), psgplay_unstop() and
+ * psgplay_stop_digital_at_sample().
  *
  * The cut-off noise is due to the YM2149 PSG unipolar signal being
  * transformed into a bipolar signal for stereo sample mixing. PSG play

@@ -794,6 +794,11 @@ void psgplay_stop(struct psgplay *pp)
 	psgplay_stop_at_time(pp, 0);
 }
 
+void psgplay_unstop(struct psgplay *pp)
+{
+	pp->digital_buffer.stop = 0;
+}
+
 void psgplay_instruction_callback(struct psgplay *pp,
 	void (*cb)(uint32_t pc, void *arg), void *arg)
 {
