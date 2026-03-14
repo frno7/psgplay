@@ -56,6 +56,17 @@ void psgplay_free(struct psgplay *pp);
 void psgplay_stop(struct psgplay *pp);
 
 /**
+ * psgplay_nostop - cancels a previous stop call
+ * @pp: PSG play object to stop
+ *
+ * Calling psgplay_nostop() cancels previous call given to psgplay_stop(),
+ * psgplay_stop_at_time() or psgplay_stop_digital_at_sample()
+ *
+ * Usefull for interactive applications where the user has changed its mind.
+ */
+void psgplay_nostop(struct psgplay *pp);
+
+/**
  * psgplay_stop_at_time - stop PSG play after a given time
  * @pp: PSG play object to stop
  * @time: time in seconds, from the start of the SNDH tune, to stop at
