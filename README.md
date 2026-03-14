@@ -130,13 +130,17 @@ Play options:
                            empiric (default) mixes the three PSG channels
                            as measured on Atari ST hardware, having a lofi,
                            crunchy, zesty quality; linear sums the channels
-                           to produce a cleaner, somewhat insipid sound
+                           to produce a cleaner, somewhat insipid sound. See
+                           Notes below on combining filters
     --psg-balance=<A:B:C>  set balance between -1 (left) and +1 (right) for
                            PSG channels A, B and C. For example -0.4:0:+0.4
-                           for stereo effect. Default is 0:0:0 for mono
+                           for stereo effect. Default is 0:0:0 for mono. A
+                           linear mix of PSG channels is forced. See Notes
+                           below on combining filters
     --psg-volume=<A:B:C>   set volume between 0 (off) and +1 (max) for
                            PSG channels A, B and C. For example 0:0:1 to
-                           play channel C only. Default is 1:1:1
+                           play channel C only. Default is 1:1:1. See Notes
+                           below on combining filters
 
 Disassembly options:
 
@@ -151,6 +155,14 @@ Trace options:
 
     --trace=<device>,...   trace device operations of SNDH file and exit:
                            all cpu reg
+
+Notes:
+
+PSG play does not yet completely emulate the Atari STE LMC1992 tone (bass and
+treble) hardware.
+
+Multiple filters using the --psg-mix, --psg-balance, or --psg-volume options
+cannot be combined. The last option given replaces any previous ones.
 ```
 
 ## Interactive text mode
