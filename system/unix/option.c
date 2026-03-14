@@ -280,6 +280,15 @@ void *psg_mix_arg(void)
 	return NULL;
 }
 
+static void set_psg_mix(const char *psg_mix)
+{
+	if (option.psg_mix && strcmp(option.psg_mix, psg_mix) != 0)
+		pr_warn("PSG filter \"%s\" replaces \"%s\"\n",
+			psg_mix, option.psg_mix);
+
+	option.psg_mix = psg_mix;
+}
+
 struct options *parse_options(int argc, char **argv)
 {
 	static const struct option options[] = {
@@ -320,7 +329,7 @@ struct options *parse_options(int argc, char **argv)
 
 	option.track = -1;
 	option.frequency = 44100;
-	option.psg_mix = "empiric";
+	option.psg_mix = NULL;
 
 	for (;;) {
 		int index = 0;
@@ -362,14 +371,14 @@ struct options *parse_options(int argc, char **argv)
 			else if (OPT("frequency"))
 				goto opt_f;
 			else if (OPT("psg-mix"))
-				option.psg_mix = optarg;
+				set_psg_mix(optarg);
 			else if (OPT("psg-balance")) {
 				option.psg_balance = psg_balance_option(optarg);
-				option.psg_mix = "balance";
+				set_psg_mix("balance");
 			}
 			else if (OPT("psg-volume")) {
 				option.psg_volume = psg_volume_option(optarg);
-				option.psg_mix = "volume";
+				set_psg_mix("volume");
 			}
 
 			else if (OPT("trace"))
@@ -418,6 +427,8 @@ opt_f:			option.frequency = atoi(optarg);
 
 #undef OPT
 out:
+	if (!option.psg_mix)
+		set_psg_mix("empiric");
 
 	if (optind == argc)
 		pr_fatal_error("missing input SNDH file\n");
