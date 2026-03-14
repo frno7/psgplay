@@ -25,6 +25,8 @@ LIBPSGPLAY_HIDDEN_SRC :=						\
 	$(ATARI_SRC)							\
 	$(M68K_SRC)
 
+$(LIBPSGPLAY_PUBLIC_SRC): $(VERSION_H)
+
 LIBPSGPLAY_object = $(addprefix lib/psgplay/,$(notdir $(1:%.c=%.o)))
 
 LIBPSGPLAY_PUBLIC_OBJ = $(call LIBPSGPLAY_object,$(LIBPSGPLAY_PUBLIC_SRC))

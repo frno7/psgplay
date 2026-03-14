@@ -63,6 +63,8 @@ M68KDT := lib/m68k/m68kdt
 M68KDA_SRC := lib/m68k/m68kds.c lib/m68k/m68kda.c
 M68KDT_SRC := lib/m68k/m68kdt.c
 
+$(M68KDT_SRC): $(VERSION_H)
+
 M68KDA_OBJ := $(M68KDA_SRC:%.c=%.o)
 M68KDT_OBJ := $(M68KDT_SRC:%.c=%.o)
 

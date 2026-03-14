@@ -34,6 +34,8 @@ PSGPLAY_SRC :=								\
 	$(UNICODE_SRC)							\
 	$(VT_SRC)
 
+$(PSGPLAY_SRC): $(VERSION_H)
+
 PSGPLAY_object = $(addprefix system/unix/,$(subst /,-,$(1:%.c=%.o)))
 
 define PSGPLAY_target

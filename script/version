@@ -27,22 +27,44 @@ then
 	shift
 fi
 
-[ $# = 1 ]
-f="$1"
+for f in "$@"
+do
+	case "$f" in
+		*.h) src=$(echo "// SPDX-License-Identifier: GPL-2.0
 
-src=$(echo "#include "'"'"psgplay/version.h"'"'"
+#ifndef PSGPLAY_VERSION_H
+#define PSGPLAY_VERSION_H
+
+#define PSGPLAY_VERSION_MAJOR $(echo "$ver" | sed 's/^\([^.]\+\).*$/\1/')
+#define PSGPLAY_VERSION_MINOR $(echo "$ver" | sed 's/^[^.]\+\.\([^-]\+\).*$/\1/')
+
+/**
+ * psgplay_version - return PSG play version
+ *
+ * Return: version string of the PSG play library
+ */
+const char *psgplay_version(void);
+
+#endif /* PSGPLAY_VERSION_H */")
+			;;
+		*.c) src=$(echo "// SPDX-License-Identifier: GPL-2.0
+
+#include "'"'"psgplay/version.h"'"'"
 
 const char *psgplay_version(void) { return "'"'"$ver"'"'"; }")
+			;;
+	esac
 
-if [ ! -f "$f" ] || ! echo "$src" | cmp --quiet - "$f"
-then
-	if [ x"$check" = x1 ]
+	if [ ! -f "$f" ] || ! echo "$src" | cmp --quiet - "$f"
 	then
-		echo "$f"
+		if [ x"$check" = x1 ]
+		then
+			echo "$f"
+		else
+			echo "$src" >"$f".tmp
+			mv "$f".tmp "$f"
+		fi
 	else
-		echo "$src" >"$f".tmp
-		mv "$f".tmp "$f"
+		:
 	fi
-else
-	:
-fi
+done
