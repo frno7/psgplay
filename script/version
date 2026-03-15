@@ -37,21 +37,19 @@ do
 
 #define PSGPLAY_VERSION_MAJOR $(echo "$ver" | sed 's/^\([^.]\+\).*$/\1/')
 #define PSGPLAY_VERSION_MINOR $(echo "$ver" | sed 's/^[^.]\+\.\([^-]\+\).*$/\1/')
+#define PSGPLAY_VERSION "'"'"$ver"'"'"
 
 /**
  * psgplay_version - return PSG play version
  *
  * Return: version string of the PSG play library
  */
-const char *psgplay_version(void);
+static inline const char *psgplay_version(void) { return PSGPLAY_VERSION; }
 
 #endif /* PSGPLAY_VERSION_H */")
 			;;
-		*.c) src=$(echo "// SPDX-License-Identifier: GPL-2.0
-
-#include "'"'"psgplay/version.h"'"'"
-
-const char *psgplay_version(void) { return "'"'"$ver"'"'"; }")
+		*) echo "version: error: Unknown file: $f" >&2
+		   exit 1
 			;;
 	esac
 

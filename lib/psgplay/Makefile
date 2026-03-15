@@ -16,7 +16,6 @@ UNICODE_SRC :=								\
 
 LIBPSGPLAY_PUBLIC_SRC :=						\
 	$(ICE_SRC)							\
-	$(VERSION_SRC)							\
 	$(LIBPSGPLAY_SRC)
 
 LIBPSGPLAY_HIDDEN_SRC :=						\
@@ -24,8 +23,6 @@ LIBPSGPLAY_HIDDEN_SRC :=						\
 	$(UNICODE_SRC)							\
 	$(ATARI_SRC)							\
 	$(M68K_SRC)
-
-$(LIBPSGPLAY_PUBLIC_SRC): $(VERSION_H)
 
 LIBPSGPLAY_object = $(addprefix lib/psgplay/,$(notdir $(1:%.c=%.o)))
 
@@ -123,13 +120,13 @@ LIBPSGPLAY_HEADERS =							\
 	include/psgplay/psgplay.h					\
 	include/psgplay/sndh.h						\
 	include/psgplay/stereo.h					\
-	include/psgplay/version.h
+	$(VERSION_H)
 
 .PHONY: install-lib
 install-lib: install-include install-lib-static install-lib-shared install-pkg-config
 
 .PHONY: install-include
-install-include:
+install-include: $(VERSION_H)
 	$(INSTALL) -d -m 755 $(DESTDIR)$(includedir)/psgplay
 	$(INSTALL) -m 644 $(LIBPSGPLAY_HEADERS) $(DESTDIR)$(includedir)/psgplay
 

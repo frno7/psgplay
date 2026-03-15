@@ -6,11 +6,10 @@ PSGPLAY_VERSION_MINOR := $(shell echo '$(PSGPLAY_VERSION)' | sed 's/-.*$$//')
 
 export PSGPLAY_VERSION_MINOR PSGPLAY_VERSION_MAJOR
 
-VERSION_H   = include/psgplay/version.h
-VERSION_SRC = lib/version/version.c
+VERSION_H = include/psgplay/version.h
 
-.PHONY: $(shell script/version --check $(VERSION_H) $(VERSION_SRC))
-$(VERSION_H) $(VERSION_SRC):
+.PHONY: $(shell script/version --check $(VERSION_H))
+$(VERSION_H):
 	$(QUIET_GEN)script/version $@
 
-OTHER_CLEAN += $(VERSION_H) $(VERSION_SRC)
+OTHER_CLEAN += $(VERSION_H)

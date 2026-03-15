@@ -21,6 +21,8 @@ SYSTEM_UNIX_SRC :=							\
 	system/unix/text-mode.c						\
 	system/unix/tty.c
 
+$(SYSTEM_UNIX_SRC): $(VERSION_H)
+
 ifeq (1,$(HAVE_SSO))
 SYSTEM_UNIX_SRC += system/unix/disassemble.c
 system/unix/system-unix-disassemble.o: PSGPLAY_CFLAGS += -Ilib/toslibc/include
@@ -33,8 +35,6 @@ PSGPLAY_SRC :=								\
 	$(TEXT_SRC)							\
 	$(UNICODE_SRC)							\
 	$(VT_SRC)
-
-$(PSGPLAY_SRC): $(VERSION_H)
 
 PSGPLAY_object = $(addprefix system/unix/,$(subst /,-,$(1:%.c=%.o)))
 

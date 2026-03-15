@@ -40,8 +40,7 @@ M68KDG_LINK_SRC :=							\
 	lib/internal/bit.c						\
 	lib/internal/fifo.c						\
 	lib/internal/print.c						\
-	lib/internal/string.c						\
-	lib/version/version.c
+	lib/internal/string.c
 
 define M68KDG_LINK_target
 M68KDG_LINK_OBJ += lib/m68k/$(basename $(subst /,-,$(1))).o
