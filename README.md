@@ -239,7 +239,7 @@ PSG play is compiled into the static library
 [`include/psgplay/stereo.h`](https://github.com/frno7/psgplay/blob/main/include/psgplay/stereo.h),
 [`include/psgplay/sndh.h`](https://github.com/frno7/psgplay/blob/main/include/psgplay/sndh.h).
 
-The library also supplies an unaltered 250 kHz digital form for custom
+The library also supplies an unaltered 250.332 kHz digital form for custom
 analogue filters and mixers. This digital interface is documented in
 [`include/psgplay/digital.h`](https://github.com/frno7/psgplay/blob/main/include/psgplay/digital.h).
 

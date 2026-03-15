@@ -110,7 +110,7 @@ struct psgplay_digital {
 };
 
 /**
- * psgplay_read_digital - read 250 kHz PSG play digital samples
+ * psgplay_read_digital - read 250.332 kHz PSG play digital samples
  * @pp: PSG play object
  * @buffer: buffer to read into, can be %NULL to ignore
  * @count: number of digital samples to read

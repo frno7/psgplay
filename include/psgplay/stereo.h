@@ -126,7 +126,7 @@ void psgplay_digital_to_stereo_callback(struct psgplay *pp,
 /**
  * psgplay_stereo_downsample_cb - callback type to downsample stereo samples
  * @resample: downsampled stereo samples
- * @stereo: 250 kHz stereo samples
+ * @stereo: 250.332 kHz stereo samples
  * @count: number of stereo samples to downsample
  * @arg: argument supplied to psgplay_stereo_downsample_callback()
  *

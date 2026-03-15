@@ -22,7 +22,7 @@
 #define MIXER_FREQUENCY 1000000		/* FIXME: What device frequency? */
 #define MIXER_EVENT_FREQUENCY 100		/* 10 ms */
 #define MIXER_EVENT_CYCLES (MIXER_FREQUENCY / MIXER_EVENT_FREQUENCY)
-#define MIXER_SAMPLE_CYCLES 4			/* 250 kHz */
+#define MIXER_SAMPLE_CYCLES 4			/* 250.332 kHz */
 
 static struct {
 	struct {

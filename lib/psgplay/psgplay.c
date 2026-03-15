@@ -786,7 +786,11 @@ void psgplay_stop_digital_at_sample(struct psgplay *pp, size_t index)
 
 void psgplay_stop_at_time(struct psgplay *pp, float time)
 {
-	psgplay_stop_digital_at_sample(pp, max(0.0, 250e3 * time));
+	const float f = ATARI_STE_EXT_OSC /
+		(float)(ATARI_STE_SND_PSG_CLK_DIV *
+			ATARI_STE_SND_PSG_MODE8_DIV);
+
+	psgplay_stop_digital_at_sample(pp, max(0.0f, f * time));
 }
 
 void psgplay_stop(struct psgplay *pp)
