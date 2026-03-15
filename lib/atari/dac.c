@@ -135,15 +135,10 @@ static void generate_dac(struct cf2149_dac *dac)
 	 */
 }
 
-const struct cf2149_dac *cf2149_atari_st_dac(void)
+void cf2149_atari_st_dac(struct cf2149_dac *dac)
 {
-	static bool init = false;
-	static struct cf2149_dac dac;
+	if (dac->lvl[31][31][31])
+		return;
 
-	if (!init) {
-		generate_dac(&dac);
-		init = true;
-	}
-
-	return &dac;
+	generate_dac(dac);
 }

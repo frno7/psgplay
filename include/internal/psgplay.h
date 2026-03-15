@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#include "atari/dac.h"
 #include "atari/machine.h"
 
 #include "psgplay/stereo.h"
@@ -60,6 +61,8 @@ struct psgplay {
 			struct fir8 right;
 		} lowpass;
 	} downsample;
+
+	struct cf2149_dac dac;
 
 	struct {
 		psgplay_digital_to_stereo_cb cb;

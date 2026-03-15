@@ -329,14 +329,15 @@ void psgplay_digital_to_stereo_empiric(struct psgplay *pp,
 	struct psgplay_stereo *stereo, const struct psgplay_digital *digital,
 	size_t count, void *arg)
 {
-	const struct cf2149_dac *dac = cf2149_atari_st_dac();
 	struct mixer m = mixer_init(digital, count);
+
+	cf2149_atari_st_dac(&pp->dac);
 
 	for (size_t i = 0; i < count; i++) {
 		const int16_t s = digital->mixer.mix ?
-			dac->lvl[digital[i].psg.lvc.u5]
-				[digital[i].psg.lvb.u5]
-				[digital[i].psg.lva.u5] - 0x8000 : 0;
+			pp->dac.lvl[digital[i].psg.lvc.u5]
+				   [digital[i].psg.lvb.u5]
+				   [digital[i].psg.lva.u5] - 0x8000 : 0;
 
 		stereo[i] = stereo_mix(&m, s, s, digital[i]);
 	}
