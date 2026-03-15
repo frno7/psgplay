@@ -564,8 +564,11 @@ struct psgplay *psgplay_init(const void *data, size_t size,
 
 	pp->record.play = RECORD_PLAY_DEFAULT;
 	pp->downsample.stereo_frequency = stereo_frequency;
-	pp->machine = &atari_st;
-	pp->machine->init(data, size, offset, &regs, &ports);
+	pp->machine = (struct machine) {
+		.init = atari_st_init,
+		.run = atari_st_run,
+	};
+	pp->machine.init(data, size, offset, &regs, &ports);
 
 	psgplay_digital_to_stereo_callback(pp,
 		psgplay_digital_to_stereo_empiric, NULL);
@@ -626,7 +629,7 @@ static ssize_t psgplay_read_digital__(struct psgplay *pp,
 				if (pp->errno_) {
 					errno = pp->errno_;
 					return -1;
-				} else if (!pp->machine->run()) {
+				} else if (!pp->machine.run()) {
 					errno = -EIO;
 					return -1;
 				}

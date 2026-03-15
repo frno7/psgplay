@@ -65,7 +65,7 @@ u64 machine_cycle(void)
 	return cycle + cpu_cycles_run();
 }
 
-static void atari_st_init(const void *prg, size_t size, size_t offset,
+void atari_st_init(const void *prg, size_t size, size_t offset,
 	const struct machine_registers *regs,
 	const struct machine_ports *ports)
 {
@@ -93,14 +93,9 @@ static void atari_st_init(const void *prg, size_t size, size_t offset,
 	record_sample(ports->record_sample, ports->arg);
 }
 
-static bool atari_st_run(void)
+bool atari_st_run(void)
 {
 	cycle += device_run(cycle, MACHINE_RUN_SLICE);
 
 	return true;
 }
-
-const struct machine atari_st = {
-	.init = atari_st_init,
-	.run = atari_st_run,
-};

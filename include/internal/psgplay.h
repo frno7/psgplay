@@ -9,6 +9,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#include "atari/machine.h"
+
 #include "psgplay/stereo.h"
 
 struct fir8 {
@@ -69,7 +71,7 @@ struct psgplay {
 		void *arg;
 	} stereo_downsample_callback;
 
-	const struct machine *machine;
+	struct machine machine;
 
 	struct {
 		void (*cb)(uint32_t pc, void *arg);
