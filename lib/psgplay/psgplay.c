@@ -254,8 +254,9 @@ static int16_t psg_dac(const union psgplay_digital_level level)
 	return dac[level.u5];
 }
 
-void psgplay_digital_to_stereo_linear(struct psgplay_stereo *stereo,
-	const struct psgplay_digital *digital, size_t count, void *arg)
+void psgplay_digital_to_stereo_linear(struct psgplay *pp,
+	struct psgplay_stereo *stereo, const struct psgplay_digital *digital,
+	size_t count, void *arg)
 {
 	struct mixer m = mixer_init(digital, count);
 
@@ -271,8 +272,9 @@ void psgplay_digital_to_stereo_linear(struct psgplay_stereo *stereo,
 	}
 }
 
-void psgplay_digital_to_stereo_balance(struct psgplay_stereo *stereo,
-	const struct psgplay_digital *digital, size_t count, void *arg)
+void psgplay_digital_to_stereo_balance(struct psgplay *pp,
+	struct psgplay_stereo *stereo, const struct psgplay_digital *digital,
+	size_t count, void *arg)
 {
 	struct psgplay_psg_stereo_balance *w = arg;
 	struct mixer m = mixer_init(digital, count);
@@ -298,8 +300,9 @@ void psgplay_digital_to_stereo_balance(struct psgplay_stereo *stereo,
 	}
 }
 
-void psgplay_digital_to_stereo_volume(struct psgplay_stereo *stereo,
-	const struct psgplay_digital *digital, size_t count, void *arg)
+void psgplay_digital_to_stereo_volume(struct psgplay *pp,
+	struct psgplay_stereo *stereo, const struct psgplay_digital *digital,
+	size_t count, void *arg)
 {
 	struct psgplay_psg_stereo_volume *w = arg;
 	struct mixer m = mixer_init(digital, count);
@@ -322,8 +325,9 @@ void psgplay_digital_to_stereo_volume(struct psgplay_stereo *stereo,
 	}
 }
 
-void psgplay_digital_to_stereo_empiric(struct psgplay_stereo *stereo,
-	const struct psgplay_digital *digital, size_t count, void *arg)
+void psgplay_digital_to_stereo_empiric(struct psgplay *pp,
+	struct psgplay_stereo *stereo, const struct psgplay_digital *digital,
+	size_t count, void *arg)
 {
 	const struct cf2149_dac *dac = cf2149_atari_st_dac();
 	struct mixer m = mixer_init(digital, count);
@@ -446,7 +450,7 @@ static void digital_to_stereo_downsample(struct psgplay *pp,
 	while (i < count && !pp->errno_) {
 		const size_t n = min(count - i, ARRAY_SIZE(stereo));
 
-		pp->digital_to_stereo_callback.cb(stereo, &digital[i], n,
+		pp->digital_to_stereo_callback.cb(pp, stereo, &digital[i], n,
 			pp->digital_to_stereo_callback.arg);
 
 		stereo_fade(stereo, n,
