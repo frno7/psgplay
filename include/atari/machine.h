@@ -43,8 +43,6 @@ u64 cycle_transform_align(u64 to_frequency, u64 from_frequency, u64 cycle);
 
 u64 machine_cycle(void);
 
-void machine_execute(void);
-
 extern const struct machine atari_st;
 
 #endif /* ATARI_MACHINE_H */
