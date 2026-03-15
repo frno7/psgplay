@@ -5,11 +5,13 @@
  * Copyright 1998-2001 Karl Stenerud.  All rights reserved.
  */
 
+struct m68k_module;
+
 extern void m68040_fpu_op0(void);
 extern void m68040_fpu_op1(void);
 extern void m68881_mmu_ops(void);
 extern unsigned char m68ki_cycles[][0x10000];
-extern void (*m68ki_instruction_jump_table[0x10000])(void); /* opcode handler jump table */
+extern void (*m68ki_instruction_jump_table[0x10000])(struct m68k_module *module); /* opcode handler jump table */
 extern void m68ki_build_opcode_table(void);
 
 #include "m68k/m68kops.h"
@@ -18,6 +20,8 @@ extern void m68ki_build_opcode_table(void);
 /* ======================================================================== */
 /* ================================= DATA ================================= */
 /* ======================================================================== */
+
+struct m68k_module musashi_module;
 
 int  m68ki_initial_cycles;
 int  m68ki_remaining_cycles = 0;                     /* Number of clocks remaining */
@@ -38,9 +42,6 @@ const char *const m68ki_cpu_names[] =
 	"M68020"
 };
 #endif /* M68K_LOG_ENABLE */
-
-/* The CPU core */
-m68ki_cpu_core m68ki_cpu = {0};
 
 #if M68K_EMULATE_ADDRESS_ERROR
 #ifdef _BSD_SETJMP_H
@@ -497,7 +498,7 @@ const uint8 m68ki_ea_idx_cycle_table[64] =
 
 /* Interrupt acknowledge */
 static int default_int_ack_callback_data;
-static int default_int_ack_callback(int int_level)
+static int default_int_ack_callback(struct m68k_module *module, int int_level)
 {
 	default_int_ack_callback_data = int_level;
 	CPU_INT_LEVEL = 0;
@@ -506,36 +507,36 @@ static int default_int_ack_callback(int int_level)
 
 /* Breakpoint acknowledge */
 static unsigned int default_bkpt_ack_callback_data;
-static void default_bkpt_ack_callback(unsigned int data)
+static void default_bkpt_ack_callback(struct m68k_module *module, unsigned int data)
 {
 	default_bkpt_ack_callback_data = data;
 }
 
 /* Called when a reset instruction is executed */
-static void default_reset_instr_callback(void)
+static void default_reset_instr_callback(struct m68k_module *module)
 {
 }
 
 /* Called when a cmpi.l #v, dn instruction is executed */
-static void default_cmpild_instr_callback(unsigned int val, int reg)
+static void default_cmpild_instr_callback(struct m68k_module *module, unsigned int val, int reg)
 {
 	(void)val;
 	(void)reg;
 }
 
 /* Called when a rte instruction is executed */
-static void default_rte_instr_callback(void)
+static void default_rte_instr_callback(struct m68k_module *module)
 {
 }
 
 /* Called when a tas instruction is executed */
-static int default_tas_instr_callback(void)
+static int default_tas_instr_callback(struct m68k_module *module)
 {
 	return 1; // allow writeback
 }
 
 /* Called when an illegal instruction is encountered */
-static int default_illg_instr_callback(int opcode)
+static int default_illg_instr_callback(struct m68k_module *module, int opcode)
 {
 	(void)opcode;
 	return 0; // not handled : exception will occur
@@ -543,20 +544,20 @@ static int default_illg_instr_callback(int opcode)
 
 /* Called when the program counter changed by a large value */
 static unsigned int default_pc_changed_callback_data;
-static void default_pc_changed_callback(unsigned int new_pc)
+static void default_pc_changed_callback(struct m68k_module *module, unsigned int new_pc)
 {
 	default_pc_changed_callback_data = new_pc;
 }
 
 /* Called every time there's bus activity (read/write to/from memory */
 static unsigned int default_set_fc_callback_data;
-static void default_set_fc_callback(unsigned int new_fc)
+static void default_set_fc_callback(struct m68k_module *module, unsigned int new_fc)
 {
 	default_set_fc_callback_data = new_fc;
 }
 
 /* Called every instruction cycle prior to execution */
-static void default_instr_hook_callback(unsigned int pc)
+static void default_instr_hook_callback(struct m68k_module *module, unsigned int pc)
 {
 	(void)pc;
 }
@@ -576,9 +577,9 @@ sigjmp_buf m68ki_aerr_trap;
 /* ======================================================================== */
 
 /* Access the internals of the CPU */
-unsigned int m68k_get_reg(void* context, m68k_register_t regnum)
+unsigned int m68k_get_reg(struct m68k_module *module, void* context, m68k_register_t regnum)
 {
-	m68ki_cpu_core* cpu = context != NULL ?(m68ki_cpu_core*)context : &m68ki_cpu;
+	m68ki_cpu_core* cpu = context != NULL ?(m68ki_cpu_core*)context : &module->m68ki_cpu;
 
 	switch(regnum)
 	{
@@ -637,7 +638,7 @@ unsigned int m68k_get_reg(void* context, m68k_register_t regnum)
 	return 0;
 }
 
-void m68k_set_reg(m68k_register_t regnum, unsigned int value)
+void m68k_set_reg(struct m68k_module *module, m68k_register_t regnum, unsigned int value)
 {
 	switch(regnum)
 	{
@@ -657,8 +658,8 @@ void m68k_set_reg(m68k_register_t regnum, unsigned int value)
 		case M68K_REG_A5:	REG_A[5] = MASK_OUT_ABOVE_32(value); return;
 		case M68K_REG_A6:	REG_A[6] = MASK_OUT_ABOVE_32(value); return;
 		case M68K_REG_A7:	REG_A[7] = MASK_OUT_ABOVE_32(value); return;
-		case M68K_REG_PC:	m68ki_jump(MASK_OUT_ABOVE_32(value)); return;
-		case M68K_REG_SR:	m68ki_set_sr_noint_nosp(value); return;
+		case M68K_REG_PC:	m68ki_jump(module, MASK_OUT_ABOVE_32(value)); return;
+		case M68K_REG_SR:	m68ki_set_sr_noint_nosp(module, value); return;
 		case M68K_REG_SP:	REG_SP = MASK_OUT_ABOVE_32(value); return;
 		case M68K_REG_USP:	if(FLAG_S)
 								REG_USP = MASK_OUT_ABOVE_32(value);
@@ -682,64 +683,64 @@ void m68k_set_reg(m68k_register_t regnum, unsigned int value)
 		case M68K_REG_CAAR:	REG_CAAR = MASK_OUT_ABOVE_32(value); return;
 		case M68K_REG_PPC:	REG_PPC = MASK_OUT_ABOVE_32(value); return;
 		case M68K_REG_IR:	REG_IR = MASK_OUT_ABOVE_16(value); return;
-		case M68K_REG_CPU_TYPE: m68k_set_cpu_type(value); return;
+		case M68K_REG_CPU_TYPE: m68k_set_cpu_type(module, value); return;
 		default:			return;
 	}
 }
 
 /* Set the callbacks */
-void m68k_set_int_ack_callback(int  (*callback)(int int_level))
+void m68k_set_int_ack_callback(struct m68k_module *module, int (*callback)(struct m68k_module *module, int int_level))
 {
 	CALLBACK_INT_ACK = callback ? callback : default_int_ack_callback;
 }
 
-void m68k_set_bkpt_ack_callback(void  (*callback)(unsigned int data))
+void m68k_set_bkpt_ack_callback(struct m68k_module *module, void (*callback)(struct m68k_module *module, unsigned int data))
 {
 	CALLBACK_BKPT_ACK = callback ? callback : default_bkpt_ack_callback;
 }
 
-void m68k_set_reset_instr_callback(void  (*callback)(void))
+void m68k_set_reset_instr_callback(struct m68k_module *module, void (*callback)(struct m68k_module *module))
 {
 	CALLBACK_RESET_INSTR = callback ? callback : default_reset_instr_callback;
 }
 
-void m68k_set_cmpild_instr_callback(void  (*callback)(unsigned int, int))
+void m68k_set_cmpild_instr_callback(struct m68k_module *module, void (*callback)(struct m68k_module *module, unsigned int, int))
 {
 	CALLBACK_CMPILD_INSTR = callback ? callback : default_cmpild_instr_callback;
 }
 
-void m68k_set_rte_instr_callback(void  (*callback)(void))
+void m68k_set_rte_instr_callback(struct m68k_module *module, void (*callback)(struct m68k_module *module))
 {
 	CALLBACK_RTE_INSTR = callback ? callback : default_rte_instr_callback;
 }
 
-void m68k_set_tas_instr_callback(int  (*callback)(void))
+void m68k_set_tas_instr_callback(struct m68k_module *module, int (*callback)(struct m68k_module *module))
 {
 	CALLBACK_TAS_INSTR = callback ? callback : default_tas_instr_callback;
 }
 
-void m68k_set_illg_instr_callback(int  (*callback)(int))
+void m68k_set_illg_instr_callback(struct m68k_module *module, int (*callback)(struct m68k_module *module, int))
 {
 	CALLBACK_ILLG_INSTR = callback ? callback : default_illg_instr_callback;
 }
 
-void m68k_set_pc_changed_callback(void  (*callback)(unsigned int new_pc))
+void m68k_set_pc_changed_callback(struct m68k_module *module, void (*callback)(struct m68k_module *module, unsigned int new_pc))
 {
 	CALLBACK_PC_CHANGED = callback ? callback : default_pc_changed_callback;
 }
 
-void m68k_set_fc_callback(void  (*callback)(unsigned int new_fc))
+void m68k_set_fc_callback(struct m68k_module *module, void (*callback)(struct m68k_module *module, unsigned int new_fc))
 {
 	CALLBACK_SET_FC = callback ? callback : default_set_fc_callback;
 }
 
-void m68k_set_instr_hook_callback(void  (*callback)(unsigned int pc))
+void m68k_set_instr_hook_callback(struct m68k_module *module, void (*callback)(struct m68k_module *module, unsigned int pc))
 {
 	CALLBACK_INSTR_HOOK = callback ? callback : default_instr_hook_callback;
 }
 
 /* Set the CPU type. */
-void m68k_set_cpu_type(unsigned int cpu_type)
+void m68k_set_cpu_type(struct m68k_module *module, unsigned int cpu_type)
 {
 	switch(cpu_type)
 	{
@@ -761,7 +762,7 @@ void m68k_set_cpu_type(unsigned int cpu_type)
 			HAS_PMMU	 = 0;
 			return;
 		case M68K_CPU_TYPE_SCC68070:
-			m68k_set_cpu_type(M68K_CPU_TYPE_68010);
+			m68k_set_cpu_type(module, M68K_CPU_TYPE_68010);
 			CPU_ADDRESS_MASK = 0xffffffff;
 			CPU_TYPE         = CPU_TYPE_SCC070;
 			return;
@@ -886,18 +887,18 @@ void m68k_set_cpu_type(unsigned int cpu_type)
 			return;
 		case M68K_CPU_TYPE_68LC040:
 			CPU_TYPE         = CPU_TYPE_LC040;
-			m68ki_cpu.sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
-			m68ki_cpu.cyc_instruction  = m68ki_cycles[4];
-			m68ki_cpu.cyc_exception    = m68ki_exception_cycle_table[4];
-			m68ki_cpu.cyc_bcc_notake_b = -2;
-			m68ki_cpu.cyc_bcc_notake_w = 0;
-			m68ki_cpu.cyc_dbcc_f_noexp = 0;
-			m68ki_cpu.cyc_dbcc_f_exp   = 4;
-			m68ki_cpu.cyc_scc_r_true   = 0;
-			m68ki_cpu.cyc_movem_w      = 2;
-			m68ki_cpu.cyc_movem_l      = 2;
-			m68ki_cpu.cyc_shift        = 0;
-			m68ki_cpu.cyc_reset        = 518;
+			module->m68ki_cpu.sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
+			module->m68ki_cpu.cyc_instruction  = m68ki_cycles[4];
+			module->m68ki_cpu.cyc_exception    = m68ki_exception_cycle_table[4];
+			module->m68ki_cpu.cyc_bcc_notake_b = -2;
+			module->m68ki_cpu.cyc_bcc_notake_w = 0;
+			module->m68ki_cpu.cyc_dbcc_f_noexp = 0;
+			module->m68ki_cpu.cyc_dbcc_f_exp   = 4;
+			module->m68ki_cpu.cyc_scc_r_true   = 0;
+			module->m68ki_cpu.cyc_movem_w      = 2;
+			module->m68ki_cpu.cyc_movem_l      = 2;
+			module->m68ki_cpu.cyc_shift        = 0;
+			module->m68ki_cpu.cyc_reset        = 518;
 			HAS_PMMU	       = 1;
 			return;
 	}
@@ -905,7 +906,7 @@ void m68k_set_cpu_type(unsigned int cpu_type)
 
 /* Execute some instructions until we use up num_cycles clock cycles */
 /* ASG: removed per-instruction interrupt checks */
-int m68k_execute(int num_cycles)
+int m68k_execute(struct m68k_module *module, int num_cycles)
 {
 	/* eat up any reset cycles */
 	if (RESET_CYCLES) {
@@ -921,7 +922,7 @@ int m68k_execute(int num_cycles)
 	m68ki_initial_cycles = num_cycles;
 
 	/* See if interrupts came in */
-	m68ki_check_interrupts();
+	m68ki_check_interrupts(module);
 
 	/* Make sure we're not stopped */
 	if(!CPU_STOPPED)
@@ -953,8 +954,8 @@ int m68k_execute(int num_cycles)
 			}
 
 			/* Read an instruction and call its handler */
-			REG_IR = m68ki_read_imm_16();
-			m68ki_instruction_jump_table[REG_IR]();
+			REG_IR = m68ki_read_imm_16(module);
+			m68ki_instruction_jump_table[REG_IR](module);
 			USE_CYCLES(CYC_INSTRUCTION[REG_IR]);
 
 			/* Trace m68k_exception, if necessary */
@@ -1006,7 +1007,7 @@ void m68k_clear_timeslice(void)
 /* KS: Modified so that IPL* bits match with mask positions in the SR
  *     and cleaned out remenants of the interrupt controller.
  */
-void m68k_set_irq(unsigned int int_level)
+void m68k_set_irq(struct m68k_module *module, unsigned int int_level)
 {
 	uint old_level = CPU_INT_LEVEL;
 	CPU_INT_LEVEL = int_level << 8;
@@ -1014,65 +1015,60 @@ void m68k_set_irq(unsigned int int_level)
 	/* A transition from < 7 to 7 always interrupts (NMI) */
 	/* Note: Level 7 can also level trigger like a normal IRQ */
 	if(old_level != 0x0700 && CPU_INT_LEVEL == 0x0700)
-		m68ki_cpu.nmi_pending = TRUE;
+		module->m68ki_cpu.nmi_pending = TRUE;
 }
 
-void m68k_set_virq(unsigned int level, unsigned int active)
+void m68k_set_virq(struct m68k_module *module, unsigned int level, unsigned int active)
 {
-	uint state = m68ki_cpu.virq_state;
+	uint state = module->m68ki_cpu.virq_state;
 	uint blevel;
 
 	if(active)
 		state |= 1 << level;
 	else
 		state &= ~(1 << level);
-	m68ki_cpu.virq_state = state;
+	module->m68ki_cpu.virq_state = state;
 
 	for(blevel = 7; blevel > 0; blevel--)
 		if(state & (1 << blevel))
 			break;
-	m68k_set_irq(blevel);
+	m68k_set_irq(module, blevel);
 }
 
-unsigned int m68k_get_virq(unsigned int level)
+unsigned int m68k_get_virq(struct m68k_module *module, unsigned int level)
 {
-	return (m68ki_cpu.virq_state & (1 << level)) ? 1 : 0;
+	return (module->m68ki_cpu.virq_state & (1 << level)) ? 1 : 0;
 }
 
-void m68k_init(void)
+void m68k_init(struct m68k_module *module)
 {
-	static uint emulation_initialized = 0;
+	*module = (struct m68k_module) { };
 
-	/* The first call to this function initializes the opcode handler jump table */
-	if(!emulation_initialized)
-		{
-		m68ki_build_opcode_table();
-		emulation_initialized = 1;
-	}
+	m68ki_build_opcode_table();
 
-	m68k_set_int_ack_callback(NULL);
-	m68k_set_bkpt_ack_callback(NULL);
-	m68k_set_reset_instr_callback(NULL);
-	m68k_set_cmpild_instr_callback(NULL);
-	m68k_set_rte_instr_callback(NULL);
-	m68k_set_tas_instr_callback(NULL);
-	m68k_set_illg_instr_callback(NULL);
-	m68k_set_pc_changed_callback(NULL);
-	m68k_set_fc_callback(NULL);
-	m68k_set_instr_hook_callback(NULL);
+	m68k_set_int_ack_callback(module, NULL);
+	m68k_set_bkpt_ack_callback(module, NULL);
+	m68k_set_reset_instr_callback(module, NULL);
+	m68k_set_cmpild_instr_callback(module, NULL);
+	m68k_set_rte_instr_callback(module, NULL);
+	m68k_set_tas_instr_callback(module, NULL);
+	m68k_set_illg_instr_callback(module, NULL);
+	m68k_set_pc_changed_callback(module, NULL);
+	m68k_set_fc_callback(module, NULL);
+	m68k_set_instr_hook_callback(module, NULL);
 }
 
 /* Trigger a Bus Error exception */
-void m68k_pulse_bus_error(void)
+void m68k_pulse_bus_error(struct m68k_module *module)
 {
-	m68ki_exception_bus_error();
+	m68ki_exception_bus_error(module);
 }
 
 /* Pulse the RESET line on the CPU */
-void m68k_pulse_reset(void)
+void m68k_pulse_reset(struct m68k_module *module)
 {
 	/* Disable the PMMU on reset */
-	m68ki_cpu.pmmu_enabled = 0;
+	module->m68ki_cpu.pmmu_enabled = 0;
 
 	/* Clear all stop levels and eat up all remaining cycles */
 	CPU_STOPPED = 0;
@@ -1087,11 +1083,11 @@ void m68k_pulse_reset(void)
 	/* Interrupt mask to level 7 */
 	FLAG_INT_MASK = 0x0700;
 	CPU_INT_LEVEL = 0;
-	m68ki_cpu.virq_state = 0;
+	module->m68ki_cpu.virq_state = 0;
 	/* Reset VBR */
 	REG_VBR = 0;
 	/* Go to supervisor mode */
-	m68ki_set_sm_flag(SFLAG_SET | MFLAG_CLEAR);
+	m68ki_set_sm_flag(module, SFLAG_SET | MFLAG_CLEAR);
 
 	/* Invalidate the prefetch queue */
 #if M68K_EMULATE_PREFETCH
@@ -1100,10 +1096,10 @@ void m68k_pulse_reset(void)
 #endif /* M68K_EMULATE_PREFETCH */
 
 	/* Read the initial stack pointer and program counter */
-	m68ki_jump(0);
-	REG_SP = m68ki_read_imm_32();
-	REG_PC = m68ki_read_imm_32();
-	m68ki_jump(REG_PC);
+	m68ki_jump(module, 0);
+	REG_SP = m68ki_read_imm_32(module);
+	REG_PC = m68ki_read_imm_32(module);
+	m68ki_jump(module, REG_PC);
 
 	CPU_RUN_MODE = RUN_MODE_NORMAL;
 
@@ -1111,7 +1107,7 @@ void m68k_pulse_reset(void)
 }
 
 /* Pulse the HALT line on the CPU */
-void m68k_pulse_halt(void)
+void m68k_pulse_halt(struct m68k_module *module)
 {
 	CPU_STOPPED |= STOP_LEVEL_HALT;
 }
@@ -1123,15 +1119,15 @@ unsigned int m68k_context_size(void)
 	return sizeof(m68ki_cpu_core);
 }
 
-unsigned int m68k_get_context(void* dst)
+unsigned int m68k_get_context(struct m68k_module *module, void* dst)
 {
-	if(dst) *(m68ki_cpu_core*)dst = m68ki_cpu;
+	if(dst) *(m68ki_cpu_core*)dst = module->m68ki_cpu;
 	return sizeof(m68ki_cpu_core);
 }
 
-void m68k_set_context(void* src)
+void m68k_set_context(struct m68k_module *module, void* src)
 {
-	if(src) m68ki_cpu = *(m68ki_cpu_core*)src;
+	if(src) module->m68ki_cpu = *(m68ki_cpu_core*)src;
 }
 
 /* ======================================================================== */
@@ -1146,19 +1142,19 @@ static struct {
 	UINT8 halted;
 } m68k_substate;
 
-static void m68k_prepare_substate(void)
+static void m68k_prepare_substate(struct m68k_module *module)
 {
 	m68k_substate.sr = m68ki_get_sr();
 	m68k_substate.stopped = (CPU_STOPPED & STOP_LEVEL_STOP) != 0;
 	m68k_substate.halted  = (CPU_STOPPED & STOP_LEVEL_HALT) != 0;
 }
 
-static void m68k_post_load(void)
+static void m68k_post_load(struct m68k_module *module)
 {
 	m68ki_set_sr_noint_nosp(m68k_substate.sr);
 	CPU_STOPPED = m68k_substate.stopped ? STOP_LEVEL_STOP : 0
 		        | m68k_substate.halted  ? STOP_LEVEL_HALT : 0;
-	m68ki_jump(REG_PC);
+	m68ki_jump(module, REG_PC);
 }
 
 void m68k_state_register(const char *type, int index)

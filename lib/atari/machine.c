@@ -81,7 +81,7 @@ void atari_st_init(const void *prg, size_t size, size_t offset,
 	device_reset();
 
 #define MACHINE_REGISTER_SET(index_, field_, label_)			\
-	m68k_set_reg(M68K_REG_##label_##index_, regs->field_[index_]);
+	m68k_set_reg(&musashi_module, M68K_REG_##label_##index_, regs->field_[index_]);
 	MACHINE_REGISTERS(MACHINE_REGISTER_SET)
 
 	for (size_t i = 0; i < size; i++)

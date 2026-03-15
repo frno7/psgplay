@@ -85,11 +85,12 @@ M68KMAKE_PROTOTYPE_HEADER
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 M68KMAKE_PROTOTYPE_FOOTER
 
+struct m68k_module;
 
 /* Build the opcode handler table */
 void m68ki_build_opcode_table(void);
 
-extern void (*m68ki_instruction_jump_table[0x10000])(void); /* opcode handler jump table */
+extern void (*m68ki_instruction_jump_table[0x10000])(struct m68k_module *module); /* opcode handler jump table */
 extern unsigned char m68ki_cycles[][0x10000];
 
 
@@ -113,13 +114,13 @@ M68KMAKE_TABLE_HEADER
 
 #define NUM_CPU_TYPES 5
 
-void  (*m68ki_instruction_jump_table[0x10000])(void); /* opcode handler jump table */
+void  (*m68ki_instruction_jump_table[0x10000])(struct m68k_module *module); /* opcode handler jump table */
 unsigned char m68ki_cycles[NUM_CPU_TYPES][0x10000]; /* Cycles used by CPU type */
 
 /* This is used to generate the opcode handler jump table */
 typedef struct
 {
-	void (*opcode_handler)(void);        /* handler function */
+	void (*opcode_handler)(struct m68k_module *module);        /* handler function */
 	unsigned int  mask;                  /* mask on opcode */
 	unsigned int  match;                 /* what to match after masking */
 	unsigned char cycles[NUM_CPU_TYPES]; /* cycles each cpu type takes */
@@ -784,13 +785,13 @@ M68KMAKE_OPCODE_HANDLER_BODY
 
 M68KMAKE_OP(1010, 0, ., .)
 {
-	m68ki_exception_1010();
+	m68ki_exception_1010(module);
 }
 
 
 M68KMAKE_OP(1111, 0, ., .)
 {
-	m68ki_exception_1111();
+	m68ki_exception_1111(module);
 }
 
 
@@ -822,9 +823,9 @@ M68KMAKE_OP(abcd, 8, rr, .)
 
 M68KMAKE_OP(abcd, 8, mm, ax7)
 {
-	uint src = OPER_AY_PD_8();
-	uint ea  = EA_A7_PD_8();
-	uint dst = m68ki_read_8(ea);
+	uint src = OPER_AY_PD_8(module);
+	uint ea  = EA_A7_PD_8(module);
+	uint dst = m68ki_read_8(module, ea);
 	uint res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_AS_1();
 
 	FLAG_V = ~res; /* Undefined V behavior */
@@ -842,15 +843,15 @@ M68KMAKE_OP(abcd, 8, mm, ax7)
 	res = MASK_OUT_ABOVE_8(res);
 	FLAG_Z |= res;
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 }
 
 
 M68KMAKE_OP(abcd, 8, mm, ay7)
 {
-	uint src = OPER_A7_PD_8();
-	uint ea  = EA_AX_PD_8();
-	uint dst = m68ki_read_8(ea);
+	uint src = OPER_A7_PD_8(module);
+	uint ea  = EA_AX_PD_8(module);
+	uint dst = m68ki_read_8(module, ea);
 	uint res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_AS_1();
 
 	FLAG_V = ~res; /* Undefined V behavior */
@@ -868,15 +869,15 @@ M68KMAKE_OP(abcd, 8, mm, ay7)
 	res = MASK_OUT_ABOVE_8(res);
 	FLAG_Z |= res;
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 }
 
 
 M68KMAKE_OP(abcd, 8, mm, axy7)
 {
-	uint src = OPER_A7_PD_8();
-	uint ea  = EA_A7_PD_8();
-	uint dst = m68ki_read_8(ea);
+	uint src = OPER_A7_PD_8(module);
+	uint ea  = EA_A7_PD_8(module);
+	uint dst = m68ki_read_8(module, ea);
 	uint res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_AS_1();
 
 	FLAG_V = ~res; /* Undefined V behavior */
@@ -894,15 +895,15 @@ M68KMAKE_OP(abcd, 8, mm, axy7)
 	res = MASK_OUT_ABOVE_8(res);
 	FLAG_Z |= res;
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 }
 
 
 M68KMAKE_OP(abcd, 8, mm, .)
 {
-	uint src = OPER_AY_PD_8();
-	uint ea  = EA_AX_PD_8();
-	uint dst = m68ki_read_8(ea);
+	uint src = OPER_AY_PD_8(module);
+	uint ea  = EA_AX_PD_8(module);
+	uint dst = m68ki_read_8(module, ea);
 	uint res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_AS_1();
 
 	FLAG_V = ~res; /* Undefined V behavior */
@@ -920,7 +921,7 @@ M68KMAKE_OP(abcd, 8, mm, .)
 	res = MASK_OUT_ABOVE_8(res);
 	FLAG_Z |= res;
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 }
 
 
@@ -1056,7 +1057,7 @@ M68KMAKE_OP(add, 8, re, .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_8;
 	uint src = MASK_OUT_ABOVE_8(DX);
-	uint dst = m68ki_read_8(ea);
+	uint dst = m68ki_read_8(module, ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -1064,7 +1065,7 @@ M68KMAKE_OP(add, 8, re, .)
 	FLAG_X = FLAG_C = CFLAG_8(res);
 	FLAG_Z = MASK_OUT_ABOVE_8(res);
 
-	m68ki_write_8(ea, FLAG_Z);
+	m68ki_write_8(module, ea, FLAG_Z);
 }
 
 
@@ -1072,7 +1073,7 @@ M68KMAKE_OP(add, 16, re, .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_16;
 	uint src = MASK_OUT_ABOVE_16(DX);
-	uint dst = m68ki_read_16(ea);
+	uint dst = m68ki_read_16(module, ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_16(res);
@@ -1080,7 +1081,7 @@ M68KMAKE_OP(add, 16, re, .)
 	FLAG_X = FLAG_C = CFLAG_16(res);
 	FLAG_Z = MASK_OUT_ABOVE_16(res);
 
-	m68ki_write_16(ea, FLAG_Z);
+	m68ki_write_16(module, ea, FLAG_Z);
 }
 
 
@@ -1088,7 +1089,7 @@ M68KMAKE_OP(add, 32, re, .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_32;
 	uint src = DX;
-	uint dst = m68ki_read_32(ea);
+	uint dst = m68ki_read_32(module, ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_32(res);
@@ -1096,7 +1097,7 @@ M68KMAKE_OP(add, 32, re, .)
 	FLAG_X = FLAG_C = CFLAG_ADD_32(src, dst, res);
 	FLAG_Z = MASK_OUT_ABOVE_32(res);
 
-	m68ki_write_32(ea, FLAG_Z);
+	m68ki_write_32(module, ea, FLAG_Z);
 }
 
 
@@ -1153,7 +1154,7 @@ M68KMAKE_OP(adda, 32, ., .)
 M68KMAKE_OP(addi, 8, ., d)
 {
 	uint* r_dst = &DY;
-	uint src = OPER_I_8();
+	uint src = OPER_I_8(module);
 	uint dst = MASK_OUT_ABOVE_8(*r_dst);
 	uint res = src + dst;
 
@@ -1168,9 +1169,9 @@ M68KMAKE_OP(addi, 8, ., d)
 
 M68KMAKE_OP(addi, 8, ., .)
 {
-	uint src = OPER_I_8();
+	uint src = OPER_I_8(module);
 	uint ea = M68KMAKE_GET_EA_AY_8;
-	uint dst = m68ki_read_8(ea);
+	uint dst = m68ki_read_8(module, ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -1178,14 +1179,14 @@ M68KMAKE_OP(addi, 8, ., .)
 	FLAG_X = FLAG_C = CFLAG_8(res);
 	FLAG_Z = MASK_OUT_ABOVE_8(res);
 
-	m68ki_write_8(ea, FLAG_Z);
+	m68ki_write_8(module, ea, FLAG_Z);
 }
 
 
 M68KMAKE_OP(addi, 16, ., d)
 {
 	uint* r_dst = &DY;
-	uint src = OPER_I_16();
+	uint src = OPER_I_16(module);
 	uint dst = MASK_OUT_ABOVE_16(*r_dst);
 	uint res = src + dst;
 
@@ -1200,9 +1201,9 @@ M68KMAKE_OP(addi, 16, ., d)
 
 M68KMAKE_OP(addi, 16, ., .)
 {
-	uint src = OPER_I_16();
+	uint src = OPER_I_16(module);
 	uint ea = M68KMAKE_GET_EA_AY_16;
-	uint dst = m68ki_read_16(ea);
+	uint dst = m68ki_read_16(module, ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_16(res);
@@ -1210,14 +1211,14 @@ M68KMAKE_OP(addi, 16, ., .)
 	FLAG_X = FLAG_C = CFLAG_16(res);
 	FLAG_Z = MASK_OUT_ABOVE_16(res);
 
-	m68ki_write_16(ea, FLAG_Z);
+	m68ki_write_16(module, ea, FLAG_Z);
 }
 
 
 M68KMAKE_OP(addi, 32, ., d)
 {
 	uint* r_dst = &DY;
-	uint src = OPER_I_32();
+	uint src = OPER_I_32(module);
 	uint dst = *r_dst;
 	uint res = src + dst;
 
@@ -1232,9 +1233,9 @@ M68KMAKE_OP(addi, 32, ., d)
 
 M68KMAKE_OP(addi, 32, ., .)
 {
-	uint src = OPER_I_32();
+	uint src = OPER_I_32(module);
 	uint ea = M68KMAKE_GET_EA_AY_32;
-	uint dst = m68ki_read_32(ea);
+	uint dst = m68ki_read_32(module, ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_32(res);
@@ -1242,7 +1243,7 @@ M68KMAKE_OP(addi, 32, ., .)
 	FLAG_X = FLAG_C = CFLAG_ADD_32(src, dst, res);
 	FLAG_Z = MASK_OUT_ABOVE_32(res);
 
-	m68ki_write_32(ea, FLAG_Z);
+	m68ki_write_32(module, ea, FLAG_Z);
 }
 
 
@@ -1266,7 +1267,7 @@ M68KMAKE_OP(addq, 8, ., .)
 {
 	uint src = (((REG_IR >> 9) - 1) & 7) + 1;
 	uint ea = M68KMAKE_GET_EA_AY_8;
-	uint dst = m68ki_read_8(ea);
+	uint dst = m68ki_read_8(module, ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_8(res);
@@ -1274,7 +1275,7 @@ M68KMAKE_OP(addq, 8, ., .)
 	FLAG_X = FLAG_C = CFLAG_8(res);
 	FLAG_Z = MASK_OUT_ABOVE_8(res);
 
-	m68ki_write_8(ea, FLAG_Z);
+	m68ki_write_8(module, ea, FLAG_Z);
 }
 
 
@@ -1306,7 +1307,7 @@ M68KMAKE_OP(addq, 16, ., .)
 {
 	uint src = (((REG_IR >> 9) - 1) & 7) + 1;
 	uint ea = M68KMAKE_GET_EA_AY_16;
-	uint dst = m68ki_read_16(ea);
+	uint dst = m68ki_read_16(module, ea);
 	uint res = src + dst;
 
 	FLAG_N = NFLAG_16(res);
@@ -1314,7 +1315,7 @@ M68KMAKE_OP(addq, 16, ., .)
 	FLAG_X = FLAG_C = CFLAG_16(res);
 	FLAG_Z = MASK_OUT_ABOVE_16(res);
 
-	m68ki_write_16(ea, FLAG_Z);
+	m68ki_write_16(module, ea, FLAG_Z);
 }
 
 
@@ -1346,7 +1347,7 @@ M68KMAKE_OP(addq, 32, ., .)
 {
 	uint src = (((REG_IR >> 9) - 1) & 7) + 1;
 	uint ea = M68KMAKE_GET_EA_AY_32;
-	uint dst = m68ki_read_32(ea);
+	uint dst = m68ki_read_32(module, ea);
 	uint res = src + dst;
 
 
@@ -1355,7 +1356,7 @@ M68KMAKE_OP(addq, 32, ., .)
 	FLAG_X = FLAG_C = CFLAG_ADD_32(src, dst, res);
 	FLAG_Z = MASK_OUT_ABOVE_32(res);
 
-	m68ki_write_32(ea, FLAG_Z);
+	m68ki_write_32(module, ea, FLAG_Z);
 }
 
 
@@ -1415,9 +1416,9 @@ M68KMAKE_OP(addx, 32, rr, .)
 
 M68KMAKE_OP(addx, 8, mm, ax7)
 {
-	uint src = OPER_AY_PD_8();
-	uint ea  = EA_A7_PD_8();
-	uint dst = m68ki_read_8(ea);
+	uint src = OPER_AY_PD_8(module);
+	uint ea  = EA_A7_PD_8(module);
+	uint dst = m68ki_read_8(module, ea);
 	uint res = src + dst + XFLAG_AS_1();
 
 	FLAG_N = NFLAG_8(res);
@@ -1427,15 +1428,15 @@ M68KMAKE_OP(addx, 8, mm, ax7)
 	res = MASK_OUT_ABOVE_8(res);
 	FLAG_Z |= res;
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 }
 
 
 M68KMAKE_OP(addx, 8, mm, ay7)
 {
-	uint src = OPER_A7_PD_8();
-	uint ea  = EA_AX_PD_8();
-	uint dst = m68ki_read_8(ea);
+	uint src = OPER_A7_PD_8(module);
+	uint ea  = EA_AX_PD_8(module);
+	uint dst = m68ki_read_8(module, ea);
 	uint res = src + dst + XFLAG_AS_1();
 
 	FLAG_N = NFLAG_8(res);
@@ -1445,15 +1446,15 @@ M68KMAKE_OP(addx, 8, mm, ay7)
 	res = MASK_OUT_ABOVE_8(res);
 	FLAG_Z |= res;
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 }
 
 
 M68KMAKE_OP(addx, 8, mm, axy7)
 {
-	uint src = OPER_A7_PD_8();
-	uint ea  = EA_A7_PD_8();
-	uint dst = m68ki_read_8(ea);
+	uint src = OPER_A7_PD_8(module);
+	uint ea  = EA_A7_PD_8(module);
+	uint dst = m68ki_read_8(module, ea);
 	uint res = src + dst + XFLAG_AS_1();
 
 	FLAG_N = NFLAG_8(res);
@@ -1463,15 +1464,15 @@ M68KMAKE_OP(addx, 8, mm, axy7)
 	res = MASK_OUT_ABOVE_8(res);
 	FLAG_Z |= res;
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 }
 
 
 M68KMAKE_OP(addx, 8, mm, .)
 {
-	uint src = OPER_AY_PD_8();
-	uint ea  = EA_AX_PD_8();
-	uint dst = m68ki_read_8(ea);
+	uint src = OPER_AY_PD_8(module);
+	uint ea  = EA_AX_PD_8(module);
+	uint dst = m68ki_read_8(module, ea);
 	uint res = src + dst + XFLAG_AS_1();
 
 	FLAG_N = NFLAG_8(res);
@@ -1481,15 +1482,15 @@ M68KMAKE_OP(addx, 8, mm, .)
 	res = MASK_OUT_ABOVE_8(res);
 	FLAG_Z |= res;
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 }
 
 
 M68KMAKE_OP(addx, 16, mm, .)
 {
-	uint src = OPER_AY_PD_16();
-	uint ea  = EA_AX_PD_16();
-	uint dst = m68ki_read_16(ea);
+	uint src = OPER_AY_PD_16(module);
+	uint ea  = EA_AX_PD_16(module);
+	uint dst = m68ki_read_16(module, ea);
 	uint res = src + dst + XFLAG_AS_1();
 
 	FLAG_N = NFLAG_16(res);
@@ -1499,15 +1500,15 @@ M68KMAKE_OP(addx, 16, mm, .)
 	res = MASK_OUT_ABOVE_16(res);
 	FLAG_Z |= res;
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 }
 
 
 M68KMAKE_OP(addx, 32, mm, .)
 {
-	uint src = OPER_AY_PD_32();
-	uint ea  = EA_AX_PD_32();
-	uint dst = m68ki_read_32(ea);
+	uint src = OPER_AY_PD_32(module);
+	uint ea  = EA_AX_PD_32(module);
+	uint dst = m68ki_read_32(module, ea);
 	uint res = src + dst + XFLAG_AS_1();
 
 	FLAG_N = NFLAG_32(res);
@@ -1517,7 +1518,7 @@ M68KMAKE_OP(addx, 32, mm, .)
 	res = MASK_OUT_ABOVE_32(res);
 	FLAG_Z |= res;
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 }
 
 
@@ -1584,48 +1585,48 @@ M68KMAKE_OP(and, 32, er, .)
 M68KMAKE_OP(and, 8, re, .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_8;
-	uint res = DX & m68ki_read_8(ea);
+	uint res = DX & m68ki_read_8(module, ea);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_C = CFLAG_CLEAR;
 	FLAG_V = VFLAG_CLEAR;
 	FLAG_Z = MASK_OUT_ABOVE_8(res);
 
-	m68ki_write_8(ea, FLAG_Z);
+	m68ki_write_8(module, ea, FLAG_Z);
 }
 
 
 M68KMAKE_OP(and, 16, re, .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_16;
-	uint res = DX & m68ki_read_16(ea);
+	uint res = DX & m68ki_read_16(module, ea);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_C = CFLAG_CLEAR;
 	FLAG_V = VFLAG_CLEAR;
 	FLAG_Z = MASK_OUT_ABOVE_16(res);
 
-	m68ki_write_16(ea, FLAG_Z);
+	m68ki_write_16(module, ea, FLAG_Z);
 }
 
 
 M68KMAKE_OP(and, 32, re, .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_32;
-	uint res = DX & m68ki_read_32(ea);
+	uint res = DX & m68ki_read_32(module, ea);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
 	FLAG_C = CFLAG_CLEAR;
 	FLAG_V = VFLAG_CLEAR;
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 }
 
 
 M68KMAKE_OP(andi, 8, ., d)
 {
-	FLAG_Z = MASK_OUT_ABOVE_8(DY &= (OPER_I_8() | 0xffffff00));
+	FLAG_Z = MASK_OUT_ABOVE_8(DY &= (OPER_I_8(module) | 0xffffff00));
 
 	FLAG_N = NFLAG_8(FLAG_Z);
 	FLAG_C = CFLAG_CLEAR;
@@ -1635,22 +1636,22 @@ M68KMAKE_OP(andi, 8, ., d)
 
 M68KMAKE_OP(andi, 8, ., .)
 {
-	uint src = OPER_I_8();
+	uint src = OPER_I_8(module);
 	uint ea = M68KMAKE_GET_EA_AY_8;
-	uint res = src & m68ki_read_8(ea);
+	uint res = src & m68ki_read_8(module, ea);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
 	FLAG_C = CFLAG_CLEAR;
 	FLAG_V = VFLAG_CLEAR;
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 }
 
 
 M68KMAKE_OP(andi, 16, ., d)
 {
-	FLAG_Z = MASK_OUT_ABOVE_16(DY &= (OPER_I_16() | 0xffff0000));
+	FLAG_Z = MASK_OUT_ABOVE_16(DY &= (OPER_I_16(module) | 0xffff0000));
 
 	FLAG_N = NFLAG_16(FLAG_Z);
 	FLAG_C = CFLAG_CLEAR;
@@ -1660,22 +1661,22 @@ M68KMAKE_OP(andi, 16, ., d)
 
 M68KMAKE_OP(andi, 16, ., .)
 {
-	uint src = OPER_I_16();
+	uint src = OPER_I_16(module);
 	uint ea = M68KMAKE_GET_EA_AY_16;
-	uint res = src & m68ki_read_16(ea);
+	uint res = src & m68ki_read_16(module, ea);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
 	FLAG_C = CFLAG_CLEAR;
 	FLAG_V = VFLAG_CLEAR;
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 }
 
 
 M68KMAKE_OP(andi, 32, ., d)
 {
-	FLAG_Z = DY &= (OPER_I_32());
+	FLAG_Z = DY &= (OPER_I_32(module));
 
 	FLAG_N = NFLAG_32(FLAG_Z);
 	FLAG_C = CFLAG_CLEAR;
@@ -1685,22 +1686,22 @@ M68KMAKE_OP(andi, 32, ., d)
 
 M68KMAKE_OP(andi, 32, ., .)
 {
-	uint src = OPER_I_32();
+	uint src = OPER_I_32(module);
 	uint ea = M68KMAKE_GET_EA_AY_32;
-	uint res = src & m68ki_read_32(ea);
+	uint res = src & m68ki_read_32(module, ea);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
 	FLAG_C = CFLAG_CLEAR;
 	FLAG_V = VFLAG_CLEAR;
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 }
 
 
 M68KMAKE_OP(andi, 16, toc, .)
 {
-	m68ki_set_ccr(m68ki_get_ccr() & OPER_I_8());
+	m68ki_set_ccr(module, m68ki_get_ccr() & OPER_I_8(module));
 }
 
 
@@ -1708,12 +1709,12 @@ M68KMAKE_OP(andi, 16, tos, .)
 {
 	if(FLAG_S)
 	{
-		uint src = OPER_I_16();
+		uint src = OPER_I_16(module);
 		m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-		m68ki_set_sr(m68ki_get_sr() & src);
+		m68ki_set_sr(module, m68ki_get_sr() & src);
 		return;
 	}
-	m68ki_exception_privilege_violation();
+	m68ki_exception_privilege_violation(module);
 }
 
 
@@ -1942,13 +1943,13 @@ M68KMAKE_OP(asr, 32, r, .)
 M68KMAKE_OP(asr, 16, ., .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_16;
-	uint src = m68ki_read_16(ea);
+	uint src = m68ki_read_16(module, ea);
 	uint res = src >> 1;
 
 	if(GET_MSB_16(src))
 		res |= 0x8000;
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -2131,10 +2132,10 @@ M68KMAKE_OP(asl, 32, r, .)
 M68KMAKE_OP(asl, 16, ., .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_16;
-	uint src = m68ki_read_16(ea);
+	uint src = m68ki_read_16(module, ea);
 	uint res = MASK_OUT_ABOVE_16(src << 1);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -2149,7 +2150,7 @@ M68KMAKE_OP(bcc, 8, ., .)
 	if(M68KMAKE_CC)
 	{
 		m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-		m68ki_branch_8(MASK_OUT_ABOVE_8(REG_IR));
+		m68ki_branch_8(module, MASK_OUT_ABOVE_8(REG_IR));
 		return;
 	}
 	USE_CYCLES(CYC_BCC_NOTAKE_B);
@@ -2160,10 +2161,10 @@ M68KMAKE_OP(bcc, 16, ., .)
 {
 	if(M68KMAKE_CC)
 	{
-		uint offset = OPER_I_16();
+		uint offset = OPER_I_16(module);
 		REG_PC -= 2;
 		m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-		m68ki_branch_16(offset);
+		m68ki_branch_16(module, offset);
 		return;
 	}
 	REG_PC += 2;
@@ -2177,10 +2178,10 @@ M68KMAKE_OP(bcc, 32, ., .)
 	{
 		if(M68KMAKE_CC)
 		{
-			uint offset = OPER_I_32();
+			uint offset = OPER_I_32(module);
 			REG_PC -= 4;
 			m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-			m68ki_branch_32(offset);
+			m68ki_branch_32(module, offset);
 			return;
 		}
 		REG_PC += 4;
@@ -2191,7 +2192,7 @@ M68KMAKE_OP(bcc, 32, ., .)
 		if(M68KMAKE_CC)
 		{
 			m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-			m68ki_branch_8(MASK_OUT_ABOVE_8(REG_IR));
+			m68ki_branch_8(module, MASK_OUT_ABOVE_8(REG_IR));
 			return;
 		}
 		USE_CYCLES(CYC_BCC_NOTAKE_B);
@@ -2212,18 +2213,18 @@ M68KMAKE_OP(bchg, 32, r, d)
 M68KMAKE_OP(bchg, 8, r, .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_8;
-	uint src = m68ki_read_8(ea);
+	uint src = m68ki_read_8(module, ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
-	m68ki_write_8(ea, src ^ mask);
+	m68ki_write_8(module, ea, src ^ mask);
 }
 
 
 M68KMAKE_OP(bchg, 32, s, d)
 {
 	uint* r_dst = &DY;
-	uint mask = 1 << (OPER_I_8() & 0x1f);
+	uint mask = 1 << (OPER_I_8(module) & 0x1f);
 
 	FLAG_Z = *r_dst & mask;
 	*r_dst ^= mask;
@@ -2232,12 +2233,12 @@ M68KMAKE_OP(bchg, 32, s, d)
 
 M68KMAKE_OP(bchg, 8, s, .)
 {
-	uint mask = 1 << (OPER_I_8() & 7);
+	uint mask = 1 << (OPER_I_8(module) & 7);
 	uint ea = M68KMAKE_GET_EA_AY_8;
-	uint src = m68ki_read_8(ea);
+	uint src = m68ki_read_8(module, ea);
 
 	FLAG_Z = src & mask;
-	m68ki_write_8(ea, src ^ mask);
+	m68ki_write_8(module, ea, src ^ mask);
 }
 
 
@@ -2254,18 +2255,18 @@ M68KMAKE_OP(bclr, 32, r, d)
 M68KMAKE_OP(bclr, 8, r, .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_8;
-	uint src = m68ki_read_8(ea);
+	uint src = m68ki_read_8(module, ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
-	m68ki_write_8(ea, src & ~mask);
+	m68ki_write_8(module, ea, src & ~mask);
 }
 
 
 M68KMAKE_OP(bclr, 32, s, d)
 {
 	uint* r_dst = &DY;
-	uint mask = 1 << (OPER_I_8() & 0x1f);
+	uint mask = 1 << (OPER_I_8(module) & 0x1f);
 
 	FLAG_Z = *r_dst & mask;
 	*r_dst &= ~mask;
@@ -2274,19 +2275,19 @@ M68KMAKE_OP(bclr, 32, s, d)
 
 M68KMAKE_OP(bclr, 8, s, .)
 {
-	uint mask = 1 << (OPER_I_8() & 7);
+	uint mask = 1 << (OPER_I_8(module) & 7);
 	uint ea = M68KMAKE_GET_EA_AY_8;
-	uint src = m68ki_read_8(ea);
+	uint src = m68ki_read_8(module, ea);
 
 	FLAG_Z = src & mask;
-	m68ki_write_8(ea, src & ~mask);
+	m68ki_write_8(module, ea, src & ~mask);
 }
 
 
 M68KMAKE_OP(bra, 8, ., .)
 {
 	m68ki_trace_t0();				   /* auto-disable (see m68kcpu.h) */
-	m68ki_branch_8(MASK_OUT_ABOVE_8(REG_IR));
+	m68ki_branch_8(module, MASK_OUT_ABOVE_8(REG_IR));
 	if(REG_PC == REG_PPC)
 		USE_ALL_CYCLES();
 }
@@ -2294,10 +2295,10 @@ M68KMAKE_OP(bra, 8, ., .)
 
 M68KMAKE_OP(bra, 16, ., .)
 {
-	uint offset = OPER_I_16();
+	uint offset = OPER_I_16(module);
 	REG_PC -= 2;
 	m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-	m68ki_branch_16(offset);
+	m68ki_branch_16(module, offset);
 	if(REG_PC == REG_PPC)
 		USE_ALL_CYCLES();
 }
@@ -2307,10 +2308,10 @@ M68KMAKE_OP(bra, 32, ., .)
 {
 	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
 	{
-		uint offset = OPER_I_32();
+		uint offset = OPER_I_32(module);
 		REG_PC -= 4;
 		m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-		m68ki_branch_32(offset);
+		m68ki_branch_32(module, offset);
 		if(REG_PC == REG_PPC)
 			USE_ALL_CYCLES();
 		return;
@@ -2318,7 +2319,7 @@ M68KMAKE_OP(bra, 32, ., .)
 	else
 	{
 		m68ki_trace_t0();				   /* auto-disable (see m68kcpu.h) */
-		m68ki_branch_8(MASK_OUT_ABOVE_8(REG_IR));
+		m68ki_branch_8(module, MASK_OUT_ABOVE_8(REG_IR));
 		if(REG_PC == REG_PPC)
 			USE_ALL_CYCLES();
 	}
@@ -2338,18 +2339,18 @@ M68KMAKE_OP(bset, 32, r, d)
 M68KMAKE_OP(bset, 8, r, .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_8;
-	uint src = m68ki_read_8(ea);
+	uint src = m68ki_read_8(module, ea);
 	uint mask = 1 << (DX & 7);
 
 	FLAG_Z = src & mask;
-	m68ki_write_8(ea, src | mask);
+	m68ki_write_8(module, ea, src | mask);
 }
 
 
 M68KMAKE_OP(bset, 32, s, d)
 {
 	uint* r_dst = &DY;
-	uint mask = 1 << (OPER_I_8() & 0x1f);
+	uint mask = 1 << (OPER_I_8(module) & 0x1f);
 
 	FLAG_Z = *r_dst & mask;
 	*r_dst |= mask;
@@ -2358,30 +2359,30 @@ M68KMAKE_OP(bset, 32, s, d)
 
 M68KMAKE_OP(bset, 8, s, .)
 {
-	uint mask = 1 << (OPER_I_8() & 7);
+	uint mask = 1 << (OPER_I_8(module) & 7);
 	uint ea = M68KMAKE_GET_EA_AY_8;
-	uint src = m68ki_read_8(ea);
+	uint src = m68ki_read_8(module, ea);
 
 	FLAG_Z = src & mask;
-	m68ki_write_8(ea, src | mask);
+	m68ki_write_8(module, ea, src | mask);
 }
 
 
 M68KMAKE_OP(bsr, 8, ., .)
 {
 	m68ki_trace_t0();				   /* auto-disable (see m68kcpu.h) */
-	m68ki_push_32(REG_PC);
-	m68ki_branch_8(MASK_OUT_ABOVE_8(REG_IR));
+	m68ki_push_32(module, REG_PC);
+	m68ki_branch_8(module, MASK_OUT_ABOVE_8(REG_IR));
 }
 
 
 M68KMAKE_OP(bsr, 16, ., .)
 {
-	uint offset = OPER_I_16();
+	uint offset = OPER_I_16(module);
 	m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-	m68ki_push_32(REG_PC);
+	m68ki_push_32(module, REG_PC);
 	REG_PC -= 2;
-	m68ki_branch_16(offset);
+	m68ki_branch_16(module, offset);
 }
 
 
@@ -2389,18 +2390,18 @@ M68KMAKE_OP(bsr, 32, ., .)
 {
 	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
 	{
-		uint offset = OPER_I_32();
+		uint offset = OPER_I_32(module);
 		m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-		m68ki_push_32(REG_PC);
+		m68ki_push_32(module, REG_PC);
 		REG_PC -= 4;
-		m68ki_branch_32(offset);
+		m68ki_branch_32(module, offset);
 		return;
 	}
 	else
 	{
 		m68ki_trace_t0();				   /* auto-disable (see m68kcpu.h) */
-		m68ki_push_32(REG_PC);
-		m68ki_branch_8(MASK_OUT_ABOVE_8(REG_IR));
+		m68ki_push_32(module, REG_PC);
+		m68ki_branch_8(module, MASK_OUT_ABOVE_8(REG_IR));
 	}
 }
 
@@ -2419,13 +2420,13 @@ M68KMAKE_OP(btst, 8, r, .)
 
 M68KMAKE_OP(btst, 32, s, d)
 {
-	FLAG_Z = DY & (1 << (OPER_I_8() & 0x1f));
+	FLAG_Z = DY & (1 << (OPER_I_8(module) & 0x1f));
 }
 
 
 M68KMAKE_OP(btst, 8, s, .)
 {
-	uint bit = OPER_I_8() & 7;
+	uint bit = OPER_I_8(module) & 7;
 
 	FLAG_Z = M68KMAKE_GET_OPER_AY_8 & (1 << bit);
 }
@@ -2445,7 +2446,7 @@ M68KMAKE_OP(chk, 16, ., d)
 		return;
 	}
 	FLAG_N = (src < 0)<<7;
-	m68ki_exception_trap(EXCEPTION_CHK);
+	m68ki_exception_trap(module, EXCEPTION_CHK);
 }
 
 
@@ -2463,7 +2464,7 @@ M68KMAKE_OP(chk, 16, ., .)
 		return;
 	}
 	FLAG_N = (src < 0)<<7;
-	m68ki_exception_trap(EXCEPTION_CHK);
+	m68ki_exception_trap(module, EXCEPTION_CHK);
 }
 
 
@@ -2480,7 +2481,7 @@ M68KMAKE_OP(clr, 8, ., d)
 
 M68KMAKE_OP(clr, 8, ., .)
 {
-	m68ki_write_8(M68KMAKE_GET_EA_AY_8, 0);
+	m68ki_write_8(module, M68KMAKE_GET_EA_AY_8, 0);
 
 	FLAG_N = NFLAG_CLEAR;
 	FLAG_V = VFLAG_CLEAR;
@@ -2502,7 +2503,7 @@ M68KMAKE_OP(clr, 16, ., d)
 
 M68KMAKE_OP(clr, 16, ., .)
 {
-	m68ki_write_16(M68KMAKE_GET_EA_AY_16, 0);
+	m68ki_write_16(module, M68KMAKE_GET_EA_AY_16, 0);
 
 	FLAG_N = NFLAG_CLEAR;
 	FLAG_V = VFLAG_CLEAR;
@@ -2524,7 +2525,7 @@ M68KMAKE_OP(clr, 32, ., d)
 
 M68KMAKE_OP(clr, 32, ., .)
 {
-	m68ki_write_32(M68KMAKE_GET_EA_AY_32, 0);
+	m68ki_write_32(module, M68KMAKE_GET_EA_AY_32, 0);
 
 	FLAG_N = NFLAG_CLEAR;
 	FLAG_V = VFLAG_CLEAR;
@@ -2717,7 +2718,7 @@ M68KMAKE_OP(cmpa, 32, ., .)
 
 M68KMAKE_OP(cmpi, 8, ., d)
 {
-	uint src = OPER_I_8();
+	uint src = OPER_I_8(module);
 	uint dst = MASK_OUT_ABOVE_8(DY);
 	uint res = dst - src;
 
@@ -2730,7 +2731,7 @@ M68KMAKE_OP(cmpi, 8, ., d)
 
 M68KMAKE_OP(cmpi, 8, ., .)
 {
-	uint src = OPER_I_8();
+	uint src = OPER_I_8(module);
 	uint dst = M68KMAKE_GET_OPER_AY_8;
 	uint res = dst - src;
 
@@ -2743,7 +2744,7 @@ M68KMAKE_OP(cmpi, 8, ., .)
 
 M68KMAKE_OP(cmpi, 16, ., d)
 {
-	uint src = OPER_I_16();
+	uint src = OPER_I_16(module);
 	uint dst = MASK_OUT_ABOVE_16(DY);
 	uint res = dst - src;
 
@@ -2756,7 +2757,7 @@ M68KMAKE_OP(cmpi, 16, ., d)
 
 M68KMAKE_OP(cmpi, 16, ., .)
 {
-	uint src = OPER_I_16();
+	uint src = OPER_I_16(module);
 	uint dst = M68KMAKE_GET_OPER_AY_16;
 	uint res = dst - src;
 
@@ -2769,7 +2770,7 @@ M68KMAKE_OP(cmpi, 16, ., .)
 
 M68KMAKE_OP(cmpi, 32, ., d)
 {
-	uint src = OPER_I_32();
+	uint src = OPER_I_32(module);
 	uint dst = DY;
 	uint res = dst - src;
 
@@ -2783,7 +2784,7 @@ M68KMAKE_OP(cmpi, 32, ., d)
 
 M68KMAKE_OP(cmpi, 32, ., .)
 {
-	uint src = OPER_I_32();
+	uint src = OPER_I_32(module);
 	uint dst = M68KMAKE_GET_OPER_AY_32;
 	uint res = dst - src;
 
@@ -2796,8 +2797,8 @@ M68KMAKE_OP(cmpi, 32, ., .)
 
 M68KMAKE_OP(cmpm, 8, ., ax7)
 {
-	uint src = OPER_AY_PI_8();
-	uint dst = OPER_A7_PI_8();
+	uint src = OPER_AY_PI_8(module);
+	uint dst = OPER_A7_PI_8(module);
 	uint res = dst - src;
 
 	FLAG_N = NFLAG_8(res);
@@ -2809,8 +2810,8 @@ M68KMAKE_OP(cmpm, 8, ., ax7)
 
 M68KMAKE_OP(cmpm, 8, ., ay7)
 {
-	uint src = OPER_A7_PI_8();
-	uint dst = OPER_AX_PI_8();
+	uint src = OPER_A7_PI_8(module);
+	uint dst = OPER_AX_PI_8(module);
 	uint res = dst - src;
 
 	FLAG_N = NFLAG_8(res);
@@ -2822,8 +2823,8 @@ M68KMAKE_OP(cmpm, 8, ., ay7)
 
 M68KMAKE_OP(cmpm, 8, ., axy7)
 {
-	uint src = OPER_A7_PI_8();
-	uint dst = OPER_A7_PI_8();
+	uint src = OPER_A7_PI_8(module);
+	uint dst = OPER_A7_PI_8(module);
 	uint res = dst - src;
 
 	FLAG_N = NFLAG_8(res);
@@ -2835,8 +2836,8 @@ M68KMAKE_OP(cmpm, 8, ., axy7)
 
 M68KMAKE_OP(cmpm, 8, ., .)
 {
-	uint src = OPER_AY_PI_8();
-	uint dst = OPER_AX_PI_8();
+	uint src = OPER_AY_PI_8(module);
+	uint dst = OPER_AX_PI_8(module);
 	uint res = dst - src;
 
 	FLAG_N = NFLAG_8(res);
@@ -2848,8 +2849,8 @@ M68KMAKE_OP(cmpm, 8, ., .)
 
 M68KMAKE_OP(cmpm, 16, ., .)
 {
-	uint src = OPER_AY_PI_16();
-	uint dst = OPER_AX_PI_16();
+	uint src = OPER_AY_PI_16(module);
+	uint dst = OPER_AX_PI_16(module);
 	uint res = dst - src;
 
 	FLAG_N = NFLAG_16(res);
@@ -2861,8 +2862,8 @@ M68KMAKE_OP(cmpm, 16, ., .)
 
 M68KMAKE_OP(cmpm, 32, ., .)
 {
-	uint src = OPER_AY_PI_32();
-	uint dst = OPER_AX_PI_32();
+	uint src = OPER_AY_PI_32(module);
+	uint dst = OPER_AX_PI_32(module);
 	uint res = dst - src;
 
 	FLAG_N = NFLAG_32(res);
@@ -2886,10 +2887,10 @@ M68KMAKE_OP(dbf, 16, ., .)
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
 	if(res != 0xffff)
 	{
-		uint offset = OPER_I_16();
+		uint offset = OPER_I_16(module);
 		REG_PC -= 2;
 		m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-		m68ki_branch_16(offset);
+		m68ki_branch_16(module, offset);
 		USE_CYCLES(CYC_DBCC_F_NOEXP);
 		return;
 	}
@@ -2908,10 +2909,10 @@ M68KMAKE_OP(dbcc, 16, ., .)
 		*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
 		if(res != 0xffff)
 		{
-			uint offset = OPER_I_16();
+			uint offset = OPER_I_16(module);
 			REG_PC -= 2;
 			m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-			m68ki_branch_16(offset);
+			m68ki_branch_16(module, offset);
 			USE_CYCLES(CYC_DBCC_F_NOEXP);
 			return;
 		}
@@ -2957,7 +2958,7 @@ M68KMAKE_OP(divs, 16, ., d)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(module, EXCEPTION_ZERO_DIVIDE);
 }
 
 
@@ -2995,7 +2996,7 @@ M68KMAKE_OP(divs, 16, ., .)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(module, EXCEPTION_ZERO_DIVIDE);
 }
 
 
@@ -3021,7 +3022,7 @@ M68KMAKE_OP(divu, 16, ., d)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(module, EXCEPTION_ZERO_DIVIDE);
 }
 
 
@@ -3047,7 +3048,7 @@ M68KMAKE_OP(divu, 16, ., .)
 		FLAG_V = VFLAG_SET;
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	m68ki_exception_trap(module, EXCEPTION_ZERO_DIVIDE);
 }
 
 
@@ -3065,9 +3066,9 @@ M68KMAKE_OP(eor, 8, ., d)
 M68KMAKE_OP(eor, 8, ., .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_8;
-	uint res = MASK_OUT_ABOVE_8(DX ^ m68ki_read_8(ea));
+	uint res = MASK_OUT_ABOVE_8(DX ^ m68ki_read_8(module, ea));
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3090,9 +3091,9 @@ M68KMAKE_OP(eor, 16, ., d)
 M68KMAKE_OP(eor, 16, ., .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_16;
-	uint res = MASK_OUT_ABOVE_16(DX ^ m68ki_read_16(ea));
+	uint res = MASK_OUT_ABOVE_16(DX ^ m68ki_read_16(module, ea));
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -3115,9 +3116,9 @@ M68KMAKE_OP(eor, 32, ., d)
 M68KMAKE_OP(eor, 32, ., .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_32;
-	uint res = DX ^ m68ki_read_32(ea);
+	uint res = DX ^ m68ki_read_32(module, ea);
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -3128,7 +3129,7 @@ M68KMAKE_OP(eor, 32, ., .)
 
 M68KMAKE_OP(eori, 8, ., d)
 {
-	uint res = MASK_OUT_ABOVE_8(DY ^= OPER_I_8());
+	uint res = MASK_OUT_ABOVE_8(DY ^= OPER_I_8(module));
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3139,11 +3140,11 @@ M68KMAKE_OP(eori, 8, ., d)
 
 M68KMAKE_OP(eori, 8, ., .)
 {
-	uint src = OPER_I_8();
+	uint src = OPER_I_8(module);
 	uint ea = M68KMAKE_GET_EA_AY_8;
-	uint res = src ^ m68ki_read_8(ea);
+	uint res = src ^ m68ki_read_8(module, ea);
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3154,7 +3155,7 @@ M68KMAKE_OP(eori, 8, ., .)
 
 M68KMAKE_OP(eori, 16, ., d)
 {
-	uint res = MASK_OUT_ABOVE_16(DY ^= OPER_I_16());
+	uint res = MASK_OUT_ABOVE_16(DY ^= OPER_I_16(module));
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -3165,11 +3166,11 @@ M68KMAKE_OP(eori, 16, ., d)
 
 M68KMAKE_OP(eori, 16, ., .)
 {
-	uint src = OPER_I_16();
+	uint src = OPER_I_16(module);
 	uint ea = M68KMAKE_GET_EA_AY_16;
-	uint res = src ^ m68ki_read_16(ea);
+	uint res = src ^ m68ki_read_16(module, ea);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -3180,7 +3181,7 @@ M68KMAKE_OP(eori, 16, ., .)
 
 M68KMAKE_OP(eori, 32, ., d)
 {
-	uint res = DY ^= OPER_I_32();
+	uint res = DY ^= OPER_I_32(module);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -3191,11 +3192,11 @@ M68KMAKE_OP(eori, 32, ., d)
 
 M68KMAKE_OP(eori, 32, ., .)
 {
-	uint src = OPER_I_32();
+	uint src = OPER_I_32(module);
 	uint ea = M68KMAKE_GET_EA_AY_32;
-	uint res = src ^ m68ki_read_32(ea);
+	uint res = src ^ m68ki_read_32(module, ea);
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -3206,7 +3207,7 @@ M68KMAKE_OP(eori, 32, ., .)
 
 M68KMAKE_OP(eori, 16, toc, .)
 {
-	m68ki_set_ccr(m68ki_get_ccr() ^ OPER_I_8());
+	m68ki_set_ccr(module, m68ki_get_ccr() ^ OPER_I_8(module));
 }
 
 
@@ -3214,12 +3215,12 @@ M68KMAKE_OP(eori, 16, tos, .)
 {
 	if(FLAG_S)
 	{
-		uint src = OPER_I_16();
+		uint src = OPER_I_16(module);
 		m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-		m68ki_set_sr(m68ki_get_sr() ^ src);
+		m68ki_set_sr(module, m68ki_get_sr() ^ src);
 		return;
 	}
-	m68ki_exception_privilege_violation();
+	m68ki_exception_privilege_violation(module);
 }
 
 
@@ -3281,12 +3282,12 @@ M68KMAKE_OP(ext, 32, ., .)
 
 M68KMAKE_OP(illegal, 0, ., .)
 {
-	m68ki_exception_illegal();
+	m68ki_exception_illegal(module);
 }
 
 M68KMAKE_OP(jmp, 32, ., .)
 {
-	m68ki_jump(M68KMAKE_GET_EA_AY_32);
+	m68ki_jump(module, M68KMAKE_GET_EA_AY_32);
 	m68ki_trace_t0();				   /* auto-disable (see m68kcpu.h) */
 	if(REG_PC == REG_PPC)
 		USE_ALL_CYCLES();
@@ -3297,8 +3298,8 @@ M68KMAKE_OP(jsr, 32, ., .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_32;
 	m68ki_trace_t0();				   /* auto-disable (see m68kcpu.h) */
-	m68ki_push_32(REG_PC);
-	m68ki_jump(ea);
+	m68ki_push_32(module, REG_PC);
+	m68ki_jump(module, ea);
 }
 
 
@@ -3311,8 +3312,8 @@ M68KMAKE_OP(lea, 32, ., .)
 M68KMAKE_OP(link, 16, ., a7)
 {
 	REG_A[7] -= 4;
-	m68ki_write_32(REG_A[7], REG_A[7]);
-	REG_A[7] = MASK_OUT_ABOVE_32(REG_A[7] + MAKE_INT_16(OPER_I_16()));
+	m68ki_write_32(module, REG_A[7], REG_A[7]);
+	REG_A[7] = MASK_OUT_ABOVE_32(REG_A[7] + MAKE_INT_16(OPER_I_16(module)));
 }
 
 
@@ -3320,9 +3321,9 @@ M68KMAKE_OP(link, 16, ., .)
 {
 	uint* r_dst = &AY;
 
-	m68ki_push_32(*r_dst);
+	m68ki_push_32(module, *r_dst);
 	*r_dst = REG_A[7];
-	REG_A[7] = MASK_OUT_ABOVE_32(REG_A[7] + MAKE_INT_16(OPER_I_16()));
+	REG_A[7] = MASK_OUT_ABOVE_32(REG_A[7] + MAKE_INT_16(OPER_I_16(module)));
 }
 
 
@@ -3496,10 +3497,10 @@ M68KMAKE_OP(lsr, 32, r, .)
 M68KMAKE_OP(lsr, 16, ., .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_16;
-	uint src = m68ki_read_16(ea);
+	uint src = m68ki_read_16(module, ea);
 	uint res = src >> 1;
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_CLEAR;
 	FLAG_Z = res;
@@ -3678,10 +3679,10 @@ M68KMAKE_OP(lsl, 32, r, .)
 M68KMAKE_OP(lsl, 16, ., .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_16;
-	uint src = m68ki_read_16(ea);
+	uint src = m68ki_read_16(module, ea);
 	uint res = MASK_OUT_ABOVE_16(src << 1);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -3721,9 +3722,9 @@ M68KMAKE_OP(move, 8, d, .)
 M68KMAKE_OP(move, 8, ai, d)
 {
 	uint res = MASK_OUT_ABOVE_8(DY);
-	uint ea = EA_AX_AI_8();
+	uint ea = EA_AX_AI_8(module);
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3735,9 +3736,9 @@ M68KMAKE_OP(move, 8, ai, d)
 M68KMAKE_OP(move, 8, ai, .)
 {
 	uint res = M68KMAKE_GET_OPER_AY_8;
-	uint ea = EA_AX_AI_8();
+	uint ea = EA_AX_AI_8(module);
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3749,9 +3750,9 @@ M68KMAKE_OP(move, 8, ai, .)
 M68KMAKE_OP(move, 8, pi7, d)
 {
 	uint res = MASK_OUT_ABOVE_8(DY);
-	uint ea = EA_A7_PI_8();
+	uint ea = EA_A7_PI_8(module);
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3763,9 +3764,9 @@ M68KMAKE_OP(move, 8, pi7, d)
 M68KMAKE_OP(move, 8, pi, d)
 {
 	uint res = MASK_OUT_ABOVE_8(DY);
-	uint ea = EA_AX_PI_8();
+	uint ea = EA_AX_PI_8(module);
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3777,9 +3778,9 @@ M68KMAKE_OP(move, 8, pi, d)
 M68KMAKE_OP(move, 8, pi7, .)
 {
 	uint res = M68KMAKE_GET_OPER_AY_8;
-	uint ea = EA_A7_PI_8();
+	uint ea = EA_A7_PI_8(module);
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3791,9 +3792,9 @@ M68KMAKE_OP(move, 8, pi7, .)
 M68KMAKE_OP(move, 8, pi, .)
 {
 	uint res = M68KMAKE_GET_OPER_AY_8;
-	uint ea = EA_AX_PI_8();
+	uint ea = EA_AX_PI_8(module);
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3805,9 +3806,9 @@ M68KMAKE_OP(move, 8, pi, .)
 M68KMAKE_OP(move, 8, pd7, d)
 {
 	uint res = MASK_OUT_ABOVE_8(DY);
-	uint ea = EA_A7_PD_8();
+	uint ea = EA_A7_PD_8(module);
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3819,9 +3820,9 @@ M68KMAKE_OP(move, 8, pd7, d)
 M68KMAKE_OP(move, 8, pd, d)
 {
 	uint res = MASK_OUT_ABOVE_8(DY);
-	uint ea = EA_AX_PD_8();
+	uint ea = EA_AX_PD_8(module);
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3833,9 +3834,9 @@ M68KMAKE_OP(move, 8, pd, d)
 M68KMAKE_OP(move, 8, pd7, .)
 {
 	uint res = M68KMAKE_GET_OPER_AY_8;
-	uint ea = EA_A7_PD_8();
+	uint ea = EA_A7_PD_8(module);
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3847,9 +3848,9 @@ M68KMAKE_OP(move, 8, pd7, .)
 M68KMAKE_OP(move, 8, pd, .)
 {
 	uint res = M68KMAKE_GET_OPER_AY_8;
-	uint ea = EA_AX_PD_8();
+	uint ea = EA_AX_PD_8(module);
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3861,9 +3862,9 @@ M68KMAKE_OP(move, 8, pd, .)
 M68KMAKE_OP(move, 8, di, d)
 {
 	uint res = MASK_OUT_ABOVE_8(DY);
-	uint ea = EA_AX_DI_8();
+	uint ea = EA_AX_DI_8(module);
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3875,9 +3876,9 @@ M68KMAKE_OP(move, 8, di, d)
 M68KMAKE_OP(move, 8, di, .)
 {
 	uint res = M68KMAKE_GET_OPER_AY_8;
-	uint ea = EA_AX_DI_8();
+	uint ea = EA_AX_DI_8(module);
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3889,9 +3890,9 @@ M68KMAKE_OP(move, 8, di, .)
 M68KMAKE_OP(move, 8, ix, d)
 {
 	uint res = MASK_OUT_ABOVE_8(DY);
-	uint ea = EA_AX_IX_8();
+	uint ea = EA_AX_IX_8(module);
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3903,9 +3904,9 @@ M68KMAKE_OP(move, 8, ix, d)
 M68KMAKE_OP(move, 8, ix, .)
 {
 	uint res = M68KMAKE_GET_OPER_AY_8;
-	uint ea = EA_AX_IX_8();
+	uint ea = EA_AX_IX_8(module);
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3917,9 +3918,9 @@ M68KMAKE_OP(move, 8, ix, .)
 M68KMAKE_OP(move, 8, aw, d)
 {
 	uint res = MASK_OUT_ABOVE_8(DY);
-	uint ea = EA_AW_8();
+	uint ea = EA_AW_8(module);
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3931,9 +3932,9 @@ M68KMAKE_OP(move, 8, aw, d)
 M68KMAKE_OP(move, 8, aw, .)
 {
 	uint res = M68KMAKE_GET_OPER_AY_8;
-	uint ea = EA_AW_8();
+	uint ea = EA_AW_8(module);
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3945,9 +3946,9 @@ M68KMAKE_OP(move, 8, aw, .)
 M68KMAKE_OP(move, 8, al, d)
 {
 	uint res = MASK_OUT_ABOVE_8(DY);
-	uint ea = EA_AL_8();
+	uint ea = EA_AL_8(module);
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -3959,9 +3960,9 @@ M68KMAKE_OP(move, 8, al, d)
 M68KMAKE_OP(move, 8, al, .)
 {
 	uint res = M68KMAKE_GET_OPER_AY_8;
-	uint ea = EA_AL_8();
+	uint ea = EA_AL_8(module);
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -4015,9 +4016,9 @@ M68KMAKE_OP(move, 16, d, .)
 M68KMAKE_OP(move, 16, ai, d)
 {
 	uint res = MASK_OUT_ABOVE_16(DY);
-	uint ea = EA_AX_AI_16();
+	uint ea = EA_AX_AI_16(module);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -4029,9 +4030,9 @@ M68KMAKE_OP(move, 16, ai, d)
 M68KMAKE_OP(move, 16, ai, a)
 {
 	uint res = MASK_OUT_ABOVE_16(AY);
-	uint ea = EA_AX_AI_16();
+	uint ea = EA_AX_AI_16(module);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -4043,9 +4044,9 @@ M68KMAKE_OP(move, 16, ai, a)
 M68KMAKE_OP(move, 16, ai, .)
 {
 	uint res = M68KMAKE_GET_OPER_AY_16;
-	uint ea = EA_AX_AI_16();
+	uint ea = EA_AX_AI_16(module);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -4057,9 +4058,9 @@ M68KMAKE_OP(move, 16, ai, .)
 M68KMAKE_OP(move, 16, pi, d)
 {
 	uint res = MASK_OUT_ABOVE_16(DY);
-	uint ea = EA_AX_PI_16();
+	uint ea = EA_AX_PI_16(module);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -4071,9 +4072,9 @@ M68KMAKE_OP(move, 16, pi, d)
 M68KMAKE_OP(move, 16, pi, a)
 {
 	uint res = MASK_OUT_ABOVE_16(AY);
-	uint ea = EA_AX_PI_16();
+	uint ea = EA_AX_PI_16(module);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -4085,9 +4086,9 @@ M68KMAKE_OP(move, 16, pi, a)
 M68KMAKE_OP(move, 16, pi, .)
 {
 	uint res = M68KMAKE_GET_OPER_AY_16;
-	uint ea = EA_AX_PI_16();
+	uint ea = EA_AX_PI_16(module);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -4099,9 +4100,9 @@ M68KMAKE_OP(move, 16, pi, .)
 M68KMAKE_OP(move, 16, pd, d)
 {
 	uint res = MASK_OUT_ABOVE_16(DY);
-	uint ea = EA_AX_PD_16();
+	uint ea = EA_AX_PD_16(module);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -4113,9 +4114,9 @@ M68KMAKE_OP(move, 16, pd, d)
 M68KMAKE_OP(move, 16, pd, a)
 {
 	uint res = MASK_OUT_ABOVE_16(AY);
-	uint ea = EA_AX_PD_16();
+	uint ea = EA_AX_PD_16(module);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -4127,9 +4128,9 @@ M68KMAKE_OP(move, 16, pd, a)
 M68KMAKE_OP(move, 16, pd, .)
 {
 	uint res = M68KMAKE_GET_OPER_AY_16;
-	uint ea = EA_AX_PD_16();
+	uint ea = EA_AX_PD_16(module);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -4141,9 +4142,9 @@ M68KMAKE_OP(move, 16, pd, .)
 M68KMAKE_OP(move, 16, di, d)
 {
 	uint res = MASK_OUT_ABOVE_16(DY);
-	uint ea = EA_AX_DI_16();
+	uint ea = EA_AX_DI_16(module);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -4155,9 +4156,9 @@ M68KMAKE_OP(move, 16, di, d)
 M68KMAKE_OP(move, 16, di, a)
 {
 	uint res = MASK_OUT_ABOVE_16(AY);
-	uint ea = EA_AX_DI_16();
+	uint ea = EA_AX_DI_16(module);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -4169,9 +4170,9 @@ M68KMAKE_OP(move, 16, di, a)
 M68KMAKE_OP(move, 16, di, .)
 {
 	uint res = M68KMAKE_GET_OPER_AY_16;
-	uint ea = EA_AX_DI_16();
+	uint ea = EA_AX_DI_16(module);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -4183,9 +4184,9 @@ M68KMAKE_OP(move, 16, di, .)
 M68KMAKE_OP(move, 16, ix, d)
 {
 	uint res = MASK_OUT_ABOVE_16(DY);
-	uint ea = EA_AX_IX_16();
+	uint ea = EA_AX_IX_16(module);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -4197,9 +4198,9 @@ M68KMAKE_OP(move, 16, ix, d)
 M68KMAKE_OP(move, 16, ix, a)
 {
 	uint res = MASK_OUT_ABOVE_16(AY);
-	uint ea = EA_AX_IX_16();
+	uint ea = EA_AX_IX_16(module);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -4211,9 +4212,9 @@ M68KMAKE_OP(move, 16, ix, a)
 M68KMAKE_OP(move, 16, ix, .)
 {
 	uint res = M68KMAKE_GET_OPER_AY_16;
-	uint ea = EA_AX_IX_16();
+	uint ea = EA_AX_IX_16(module);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -4225,9 +4226,9 @@ M68KMAKE_OP(move, 16, ix, .)
 M68KMAKE_OP(move, 16, aw, d)
 {
 	uint res = MASK_OUT_ABOVE_16(DY);
-	uint ea = EA_AW_16();
+	uint ea = EA_AW_16(module);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -4239,9 +4240,9 @@ M68KMAKE_OP(move, 16, aw, d)
 M68KMAKE_OP(move, 16, aw, a)
 {
 	uint res = MASK_OUT_ABOVE_16(AY);
-	uint ea = EA_AW_16();
+	uint ea = EA_AW_16(module);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -4253,9 +4254,9 @@ M68KMAKE_OP(move, 16, aw, a)
 M68KMAKE_OP(move, 16, aw, .)
 {
 	uint res = M68KMAKE_GET_OPER_AY_16;
-	uint ea = EA_AW_16();
+	uint ea = EA_AW_16(module);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -4267,9 +4268,9 @@ M68KMAKE_OP(move, 16, aw, .)
 M68KMAKE_OP(move, 16, al, d)
 {
 	uint res = MASK_OUT_ABOVE_16(DY);
-	uint ea = EA_AL_16();
+	uint ea = EA_AL_16(module);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -4281,9 +4282,9 @@ M68KMAKE_OP(move, 16, al, d)
 M68KMAKE_OP(move, 16, al, a)
 {
 	uint res = MASK_OUT_ABOVE_16(AY);
-	uint ea = EA_AL_16();
+	uint ea = EA_AL_16(module);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -4295,9 +4296,9 @@ M68KMAKE_OP(move, 16, al, a)
 M68KMAKE_OP(move, 16, al, .)
 {
 	uint res = M68KMAKE_GET_OPER_AY_16;
-	uint ea = EA_AL_16();
+	uint ea = EA_AL_16(module);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -4351,9 +4352,9 @@ M68KMAKE_OP(move, 32, d, .)
 M68KMAKE_OP(move, 32, ai, d)
 {
 	uint res = DY;
-	uint ea = EA_AX_AI_32();
+	uint ea = EA_AX_AI_32(module);
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -4365,9 +4366,9 @@ M68KMAKE_OP(move, 32, ai, d)
 M68KMAKE_OP(move, 32, ai, a)
 {
 	uint res = AY;
-	uint ea = EA_AX_AI_32();
+	uint ea = EA_AX_AI_32(module);
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -4379,9 +4380,9 @@ M68KMAKE_OP(move, 32, ai, a)
 M68KMAKE_OP(move, 32, ai, .)
 {
 	uint res = M68KMAKE_GET_OPER_AY_32;
-	uint ea = EA_AX_AI_32();
+	uint ea = EA_AX_AI_32(module);
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -4393,9 +4394,9 @@ M68KMAKE_OP(move, 32, ai, .)
 M68KMAKE_OP(move, 32, pi, d)
 {
 	uint res = DY;
-	uint ea = EA_AX_PI_32();
+	uint ea = EA_AX_PI_32(module);
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -4407,9 +4408,9 @@ M68KMAKE_OP(move, 32, pi, d)
 M68KMAKE_OP(move, 32, pi, a)
 {
 	uint res = AY;
-	uint ea = EA_AX_PI_32();
+	uint ea = EA_AX_PI_32(module);
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -4421,9 +4422,9 @@ M68KMAKE_OP(move, 32, pi, a)
 M68KMAKE_OP(move, 32, pi, .)
 {
 	uint res = M68KMAKE_GET_OPER_AY_32;
-	uint ea = EA_AX_PI_32();
+	uint ea = EA_AX_PI_32(module);
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -4435,10 +4436,10 @@ M68KMAKE_OP(move, 32, pi, .)
 M68KMAKE_OP(move, 32, pd, d)
 {
 	uint res = DY;
-	uint ea = EA_AX_PD_32();
+	uint ea = EA_AX_PD_32(module);
 
-	m68ki_write_16(ea+2, res & 0xFFFF );
-	m68ki_write_16(ea, (res >> 16) & 0xFFFF );
+	m68ki_write_16(module, ea+2, res & 0xFFFF );
+	m68ki_write_16(module, ea, (res >> 16) & 0xFFFF );
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -4450,10 +4451,10 @@ M68KMAKE_OP(move, 32, pd, d)
 M68KMAKE_OP(move, 32, pd, a)
 {
 	uint res = AY;
-	uint ea = EA_AX_PD_32();
+	uint ea = EA_AX_PD_32(module);
 
-	m68ki_write_16(ea+2, res & 0xFFFF );
-	m68ki_write_16(ea, (res >> 16) & 0xFFFF );
+	m68ki_write_16(module, ea+2, res & 0xFFFF );
+	m68ki_write_16(module, ea, (res >> 16) & 0xFFFF );
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -4465,10 +4466,10 @@ M68KMAKE_OP(move, 32, pd, a)
 M68KMAKE_OP(move, 32, pd, .)
 {
 	uint res = M68KMAKE_GET_OPER_AY_32;
-	uint ea = EA_AX_PD_32();
+	uint ea = EA_AX_PD_32(module);
 
-	m68ki_write_16(ea+2, res & 0xFFFF );
-	m68ki_write_16(ea, (res >> 16) & 0xFFFF );
+	m68ki_write_16(module, ea+2, res & 0xFFFF );
+	m68ki_write_16(module, ea, (res >> 16) & 0xFFFF );
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -4480,9 +4481,9 @@ M68KMAKE_OP(move, 32, pd, .)
 M68KMAKE_OP(move, 32, di, d)
 {
 	uint res = DY;
-	uint ea = EA_AX_DI_32();
+	uint ea = EA_AX_DI_32(module);
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -4494,9 +4495,9 @@ M68KMAKE_OP(move, 32, di, d)
 M68KMAKE_OP(move, 32, di, a)
 {
 	uint res = AY;
-	uint ea = EA_AX_DI_32();
+	uint ea = EA_AX_DI_32(module);
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -4508,9 +4509,9 @@ M68KMAKE_OP(move, 32, di, a)
 M68KMAKE_OP(move, 32, di, .)
 {
 	uint res = M68KMAKE_GET_OPER_AY_32;
-	uint ea = EA_AX_DI_32();
+	uint ea = EA_AX_DI_32(module);
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -4522,9 +4523,9 @@ M68KMAKE_OP(move, 32, di, .)
 M68KMAKE_OP(move, 32, ix, d)
 {
 	uint res = DY;
-	uint ea = EA_AX_IX_32();
+	uint ea = EA_AX_IX_32(module);
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -4536,9 +4537,9 @@ M68KMAKE_OP(move, 32, ix, d)
 M68KMAKE_OP(move, 32, ix, a)
 {
 	uint res = AY;
-	uint ea = EA_AX_IX_32();
+	uint ea = EA_AX_IX_32(module);
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -4550,9 +4551,9 @@ M68KMAKE_OP(move, 32, ix, a)
 M68KMAKE_OP(move, 32, ix, .)
 {
 	uint res = M68KMAKE_GET_OPER_AY_32;
-	uint ea = EA_AX_IX_32();
+	uint ea = EA_AX_IX_32(module);
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -4564,9 +4565,9 @@ M68KMAKE_OP(move, 32, ix, .)
 M68KMAKE_OP(move, 32, aw, d)
 {
 	uint res = DY;
-	uint ea = EA_AW_32();
+	uint ea = EA_AW_32(module);
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -4578,9 +4579,9 @@ M68KMAKE_OP(move, 32, aw, d)
 M68KMAKE_OP(move, 32, aw, a)
 {
 	uint res = AY;
-	uint ea = EA_AW_32();
+	uint ea = EA_AW_32(module);
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -4592,9 +4593,9 @@ M68KMAKE_OP(move, 32, aw, a)
 M68KMAKE_OP(move, 32, aw, .)
 {
 	uint res = M68KMAKE_GET_OPER_AY_32;
-	uint ea = EA_AW_32();
+	uint ea = EA_AW_32(module);
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -4606,9 +4607,9 @@ M68KMAKE_OP(move, 32, aw, .)
 M68KMAKE_OP(move, 32, al, d)
 {
 	uint res = DY;
-	uint ea = EA_AL_32();
+	uint ea = EA_AL_32(module);
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -4620,9 +4621,9 @@ M68KMAKE_OP(move, 32, al, d)
 M68KMAKE_OP(move, 32, al, a)
 {
 	uint res = AY;
-	uint ea = EA_AL_32();
+	uint ea = EA_AL_32(module);
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -4634,9 +4635,9 @@ M68KMAKE_OP(move, 32, al, a)
 M68KMAKE_OP(move, 32, al, .)
 {
 	uint res = M68KMAKE_GET_OPER_AY_32;
-	uint ea = EA_AL_32();
+	uint ea = EA_AL_32(module);
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -4683,13 +4684,13 @@ M68KMAKE_OP(movea, 32, ., .)
 
 M68KMAKE_OP(move, 16, toc, d)
 {
-	m68ki_set_ccr(DY);
+	m68ki_set_ccr(module, DY);
 }
 
 
 M68KMAKE_OP(move, 16, toc, .)
 {
-	m68ki_set_ccr(M68KMAKE_GET_OPER_AY_16);
+	m68ki_set_ccr(module, M68KMAKE_GET_OPER_AY_16);
 }
 
 
@@ -4700,7 +4701,7 @@ M68KMAKE_OP(move, 16, frs, d)
 		DY = MASK_OUT_BELOW_16(DY) | m68ki_get_sr();
 		return;
 	}
-	m68ki_exception_privilege_violation();
+	m68ki_exception_privilege_violation(module);
 }
 
 
@@ -4709,10 +4710,10 @@ M68KMAKE_OP(move, 16, frs, .)
 	if(CPU_TYPE_IS_000(CPU_TYPE) || FLAG_S)	/* NS990408 */
 	{
 		uint ea = M68KMAKE_GET_EA_AY_16;
-		m68ki_write_16(ea, m68ki_get_sr());
+		m68ki_write_16(module, ea, m68ki_get_sr());
 		return;
 	}
-	m68ki_exception_privilege_violation();
+	m68ki_exception_privilege_violation(module);
 }
 
 
@@ -4720,10 +4721,10 @@ M68KMAKE_OP(move, 16, tos, d)
 {
 	if(FLAG_S)
 	{
-		m68ki_set_sr(DY);
+		m68ki_set_sr(module, DY);
 		return;
 	}
-	m68ki_exception_privilege_violation();
+	m68ki_exception_privilege_violation(module);
 }
 
 
@@ -4733,10 +4734,10 @@ M68KMAKE_OP(move, 16, tos, .)
 	{
 		uint new_sr = M68KMAKE_GET_OPER_AY_16;
 		m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-		m68ki_set_sr(new_sr);
+		m68ki_set_sr(module, new_sr);
 		return;
 	}
-	m68ki_exception_privilege_violation();
+	m68ki_exception_privilege_violation(module);
 }
 
 
@@ -4747,7 +4748,7 @@ M68KMAKE_OP(move, 32, fru, .)
 		AY = REG_USP;
 		return;
 	}
-	m68ki_exception_privilege_violation();
+	m68ki_exception_privilege_violation(module);
 }
 
 
@@ -4759,14 +4760,14 @@ M68KMAKE_OP(move, 32, tou, .)
 		REG_USP = AY;
 		return;
 	}
-	m68ki_exception_privilege_violation();
+	m68ki_exception_privilege_violation(module);
 }
 
 
 M68KMAKE_OP(movem, 16, re, pd)
 {
 	uint i = 0;
-	uint register_list = OPER_I_16();
+	uint register_list = OPER_I_16(module);
 	uint ea = AY;
 	uint count = 0;
 
@@ -4774,7 +4775,7 @@ M68KMAKE_OP(movem, 16, re, pd)
 		if(register_list & (1 << i))
 		{
 			ea -= 2;
-			m68ki_write_16(ea, MASK_OUT_ABOVE_16(REG_DA[15-i]));
+			m68ki_write_16(module, ea, MASK_OUT_ABOVE_16(REG_DA[15-i]));
 			count++;
 		}
 	AY = ea;
@@ -4786,14 +4787,14 @@ M68KMAKE_OP(movem, 16, re, pd)
 M68KMAKE_OP(movem, 16, re, .)
 {
 	uint i = 0;
-	uint register_list = OPER_I_16();
+	uint register_list = OPER_I_16(module);
 	uint ea = M68KMAKE_GET_EA_AY_16;
 	uint count = 0;
 
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
 		{
-			m68ki_write_16(ea, MASK_OUT_ABOVE_16(REG_DA[i]));
+			m68ki_write_16(module, ea, MASK_OUT_ABOVE_16(REG_DA[i]));
 			ea += 2;
 			count++;
 		}
@@ -4805,7 +4806,7 @@ M68KMAKE_OP(movem, 16, re, .)
 M68KMAKE_OP(movem, 32, re, pd)
 {
 	uint i = 0;
-	uint register_list = OPER_I_16();
+	uint register_list = OPER_I_16(module);
 	uint ea = AY;
 	uint count = 0;
 
@@ -4813,8 +4814,8 @@ M68KMAKE_OP(movem, 32, re, pd)
 		if(register_list & (1 << i))
 		{
 			ea -= 4;
-			m68ki_write_16(ea+2, REG_DA[15-i] & 0xFFFF );
-			m68ki_write_16(ea, (REG_DA[15-i] >> 16) & 0xFFFF );
+			m68ki_write_16(module, ea+2, REG_DA[15-i] & 0xFFFF );
+			m68ki_write_16(module, ea, (REG_DA[15-i] >> 16) & 0xFFFF );
 			count++;
 		}
 	AY = ea;
@@ -4826,14 +4827,14 @@ M68KMAKE_OP(movem, 32, re, pd)
 M68KMAKE_OP(movem, 32, re, .)
 {
 	uint i = 0;
-	uint register_list = OPER_I_16();
+	uint register_list = OPER_I_16(module);
 	uint ea = M68KMAKE_GET_EA_AY_32;
 	uint count = 0;
 
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
 		{
-			m68ki_write_32(ea, REG_DA[i]);
+			m68ki_write_32(module, ea, REG_DA[i]);
 			ea += 4;
 			count++;
 		}
@@ -4845,14 +4846,14 @@ M68KMAKE_OP(movem, 32, re, .)
 M68KMAKE_OP(movem, 16, er, pi)
 {
 	uint i = 0;
-	uint register_list = OPER_I_16();
+	uint register_list = OPER_I_16(module);
 	uint ea = AY;
 	uint count = 0;
 
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
 		{
-			REG_DA[i] = MAKE_INT_16(MASK_OUT_ABOVE_16(m68ki_read_16(ea)));
+			REG_DA[i] = MAKE_INT_16(MASK_OUT_ABOVE_16(m68ki_read_16(module, ea)));
 			ea += 2;
 			count++;
 		}
@@ -4865,14 +4866,14 @@ M68KMAKE_OP(movem, 16, er, pi)
 M68KMAKE_OP(movem, 16, er, pcdi)
 {
 	uint i = 0;
-	uint register_list = OPER_I_16();
-	uint ea = EA_PCDI_16();
+	uint register_list = OPER_I_16(module);
+	uint ea = EA_PCDI_16(module);
 	uint count = 0;
 
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
 		{
-			REG_DA[i] = MAKE_INT_16(MASK_OUT_ABOVE_16(m68ki_read_pcrel_16(ea)));
+			REG_DA[i] = MAKE_INT_16(MASK_OUT_ABOVE_16(m68ki_read_pcrel_16(module, ea)));
 			ea += 2;
 			count++;
 		}
@@ -4884,14 +4885,14 @@ M68KMAKE_OP(movem, 16, er, pcdi)
 M68KMAKE_OP(movem, 16, er, pcix)
 {
 	uint i = 0;
-	uint register_list = OPER_I_16();
-	uint ea = EA_PCIX_16();
+	uint register_list = OPER_I_16(module);
+	uint ea = EA_PCIX_16(module);
 	uint count = 0;
 
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
 		{
-			REG_DA[i] = MAKE_INT_16(MASK_OUT_ABOVE_16(m68ki_read_pcrel_16(ea)));
+			REG_DA[i] = MAKE_INT_16(MASK_OUT_ABOVE_16(m68ki_read_pcrel_16(module, ea)));
 			ea += 2;
 			count++;
 		}
@@ -4903,14 +4904,14 @@ M68KMAKE_OP(movem, 16, er, pcix)
 M68KMAKE_OP(movem, 16, er, .)
 {
 	uint i = 0;
-	uint register_list = OPER_I_16();
+	uint register_list = OPER_I_16(module);
 	uint ea = M68KMAKE_GET_EA_AY_16;
 	uint count = 0;
 
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
 		{
-			REG_DA[i] = MAKE_INT_16(MASK_OUT_ABOVE_16(m68ki_read_16(ea)));
+			REG_DA[i] = MAKE_INT_16(MASK_OUT_ABOVE_16(m68ki_read_16(module, ea)));
 			ea += 2;
 			count++;
 		}
@@ -4922,14 +4923,14 @@ M68KMAKE_OP(movem, 16, er, .)
 M68KMAKE_OP(movem, 32, er, pi)
 {
 	uint i = 0;
-	uint register_list = OPER_I_16();
+	uint register_list = OPER_I_16(module);
 	uint ea = AY;
 	uint count = 0;
 
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
 		{
-			REG_DA[i] = m68ki_read_32(ea);
+			REG_DA[i] = m68ki_read_32(module, ea);
 			ea += 4;
 			count++;
 		}
@@ -4942,14 +4943,14 @@ M68KMAKE_OP(movem, 32, er, pi)
 M68KMAKE_OP(movem, 32, er, pcdi)
 {
 	uint i = 0;
-	uint register_list = OPER_I_16();
-	uint ea = EA_PCDI_32();
+	uint register_list = OPER_I_16(module);
+	uint ea = EA_PCDI_32(module);
 	uint count = 0;
 
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
 		{
-			REG_DA[i] = m68ki_read_pcrel_32(ea);
+			REG_DA[i] = m68ki_read_pcrel_32(module, ea);
 			ea += 4;
 			count++;
 		}
@@ -4961,14 +4962,14 @@ M68KMAKE_OP(movem, 32, er, pcdi)
 M68KMAKE_OP(movem, 32, er, pcix)
 {
 	uint i = 0;
-	uint register_list = OPER_I_16();
-	uint ea = EA_PCIX_32();
+	uint register_list = OPER_I_16(module);
+	uint ea = EA_PCIX_32(module);
 	uint count = 0;
 
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
 		{
-			REG_DA[i] = m68ki_read_pcrel_32(ea);
+			REG_DA[i] = m68ki_read_pcrel_32(module, ea);
 			ea += 4;
 			count++;
 		}
@@ -4980,14 +4981,14 @@ M68KMAKE_OP(movem, 32, er, pcix)
 M68KMAKE_OP(movem, 32, er, .)
 {
 	uint i = 0;
-	uint register_list = OPER_I_16();
+	uint register_list = OPER_I_16(module);
 	uint ea = M68KMAKE_GET_EA_AY_32;
 	uint count = 0;
 
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
 		{
-			REG_DA[i] = m68ki_read_32(ea);
+			REG_DA[i] = m68ki_read_32(module, ea);
 			ea += 4;
 			count++;
 		}
@@ -4998,41 +4999,41 @@ M68KMAKE_OP(movem, 32, er, .)
 
 M68KMAKE_OP(movep, 16, re, .)
 {
-	uint ea = EA_AY_DI_16();
+	uint ea = EA_AY_DI_16(module);
 	uint src = DX;
 
-	m68ki_write_8(ea, MASK_OUT_ABOVE_8(src >> 8));
-	m68ki_write_8(ea += 2, MASK_OUT_ABOVE_8(src));
+	m68ki_write_8(module, ea, MASK_OUT_ABOVE_8(src >> 8));
+	m68ki_write_8(module, ea += 2, MASK_OUT_ABOVE_8(src));
 }
 
 
 M68KMAKE_OP(movep, 32, re, .)
 {
-	uint ea = EA_AY_DI_32();
+	uint ea = EA_AY_DI_32(module);
 	uint src = DX;
 
-	m68ki_write_8(ea, MASK_OUT_ABOVE_8(src >> 24));
-	m68ki_write_8(ea += 2, MASK_OUT_ABOVE_8(src >> 16));
-	m68ki_write_8(ea += 2, MASK_OUT_ABOVE_8(src >> 8));
-	m68ki_write_8(ea += 2, MASK_OUT_ABOVE_8(src));
+	m68ki_write_8(module, ea, MASK_OUT_ABOVE_8(src >> 24));
+	m68ki_write_8(module, ea += 2, MASK_OUT_ABOVE_8(src >> 16));
+	m68ki_write_8(module, ea += 2, MASK_OUT_ABOVE_8(src >> 8));
+	m68ki_write_8(module, ea += 2, MASK_OUT_ABOVE_8(src));
 }
 
 
 M68KMAKE_OP(movep, 16, er, .)
 {
-	uint ea = EA_AY_DI_16();
+	uint ea = EA_AY_DI_16(module);
 	uint* r_dst = &DX;
 
-	*r_dst = MASK_OUT_BELOW_16(*r_dst) | ((m68ki_read_8(ea) << 8) + m68ki_read_8(ea + 2));
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | ((m68ki_read_8(module, ea) << 8) + m68ki_read_8(module, ea + 2));
 }
 
 
 M68KMAKE_OP(movep, 32, er, .)
 {
-	uint ea = EA_AY_DI_32();
+	uint ea = EA_AY_DI_32(module);
 
-	DX = (m68ki_read_8(ea) << 24) + (m68ki_read_8(ea + 2) << 16)
-		+ (m68ki_read_8(ea + 4) << 8) + m68ki_read_8(ea + 6);
+	DX = (m68ki_read_8(module, ea) << 24) + (m68ki_read_8(module, ea + 2) << 16)
+		+ (m68ki_read_8(module, ea + 4) << 8) + m68ki_read_8(module, ea + 6);
 }
 
 
@@ -5139,7 +5140,7 @@ M68KMAKE_OP(nbcd, 8, ., d)
 M68KMAKE_OP(nbcd, 8, ., .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_8;
-	uint dst = m68ki_read_8(ea);
+	uint dst = m68ki_read_8(module, ea);
 	uint res = MASK_OUT_ABOVE_8(0x9a - dst - XFLAG_AS_1());
 
 	if(res != 0x9a)
@@ -5153,7 +5154,7 @@ M68KMAKE_OP(nbcd, 8, ., .)
 
 		FLAG_V &= res; /* Undefined V behavior part II */
 
-		m68ki_write_8(ea, MASK_OUT_ABOVE_8(res));
+		m68ki_write_8(module, ea, MASK_OUT_ABOVE_8(res));
 
 		FLAG_Z |= res;
 		FLAG_C = CFLAG_SET;
@@ -5186,7 +5187,7 @@ M68KMAKE_OP(neg, 8, ., d)
 M68KMAKE_OP(neg, 8, ., .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_8;
-	uint src = m68ki_read_8(ea);
+	uint src = m68ki_read_8(module, ea);
 	uint res = 0 - src;
 
 	FLAG_N = NFLAG_8(res);
@@ -5194,7 +5195,7 @@ M68KMAKE_OP(neg, 8, ., .)
 	FLAG_V = src & res;
 	FLAG_Z = MASK_OUT_ABOVE_8(res);
 
-	m68ki_write_8(ea, FLAG_Z);
+	m68ki_write_8(module, ea, FLAG_Z);
 }
 
 
@@ -5215,7 +5216,7 @@ M68KMAKE_OP(neg, 16, ., d)
 M68KMAKE_OP(neg, 16, ., .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_16;
-	uint src = m68ki_read_16(ea);
+	uint src = m68ki_read_16(module, ea);
 	uint res = 0 - src;
 
 	FLAG_N = NFLAG_16(res);
@@ -5223,7 +5224,7 @@ M68KMAKE_OP(neg, 16, ., .)
 	FLAG_V = (src & res)>>8;
 	FLAG_Z = MASK_OUT_ABOVE_16(res);
 
-	m68ki_write_16(ea, FLAG_Z);
+	m68ki_write_16(module, ea, FLAG_Z);
 }
 
 
@@ -5244,7 +5245,7 @@ M68KMAKE_OP(neg, 32, ., d)
 M68KMAKE_OP(neg, 32, ., .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_32;
-	uint src = m68ki_read_32(ea);
+	uint src = m68ki_read_32(module, ea);
 	uint res = 0 - src;
 
 	FLAG_N = NFLAG_32(res);
@@ -5252,7 +5253,7 @@ M68KMAKE_OP(neg, 32, ., .)
 	FLAG_V = (src & res)>>24;
 	FLAG_Z = MASK_OUT_ABOVE_32(res);
 
-	m68ki_write_32(ea, FLAG_Z);
+	m68ki_write_32(module, ea, FLAG_Z);
 }
 
 
@@ -5275,7 +5276,7 @@ M68KMAKE_OP(negx, 8, ., d)
 M68KMAKE_OP(negx, 8, ., .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_8;
-	uint src = m68ki_read_8(ea);
+	uint src = m68ki_read_8(module, ea);
 	uint res = 0 - src - XFLAG_AS_1();
 
 	FLAG_N = NFLAG_8(res);
@@ -5285,7 +5286,7 @@ M68KMAKE_OP(negx, 8, ., .)
 	res = MASK_OUT_ABOVE_8(res);
 	FLAG_Z |= res;
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 }
 
 
@@ -5308,7 +5309,7 @@ M68KMAKE_OP(negx, 16, ., d)
 M68KMAKE_OP(negx, 16, ., .)
 {
 	uint ea  = M68KMAKE_GET_EA_AY_16;
-	uint src = m68ki_read_16(ea);
+	uint src = m68ki_read_16(module, ea);
 	uint res = 0 - MASK_OUT_ABOVE_16(src) - XFLAG_AS_1();
 
 	FLAG_N = NFLAG_16(res);
@@ -5318,7 +5319,7 @@ M68KMAKE_OP(negx, 16, ., .)
 	res = MASK_OUT_ABOVE_16(res);
 	FLAG_Z |= res;
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 }
 
 
@@ -5341,7 +5342,7 @@ M68KMAKE_OP(negx, 32, ., d)
 M68KMAKE_OP(negx, 32, ., .)
 {
 	uint ea  = M68KMAKE_GET_EA_AY_32;
-	uint src = m68ki_read_32(ea);
+	uint src = m68ki_read_32(module, ea);
 	uint res = 0 - MASK_OUT_ABOVE_32(src) - XFLAG_AS_1();
 
 	FLAG_N = NFLAG_32(res);
@@ -5351,7 +5352,7 @@ M68KMAKE_OP(negx, 32, ., .)
 	res = MASK_OUT_ABOVE_32(res);
 	FLAG_Z |= res;
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 }
 
 
@@ -5378,9 +5379,9 @@ M68KMAKE_OP(not, 8, ., d)
 M68KMAKE_OP(not, 8, ., .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_8;
-	uint res = MASK_OUT_ABOVE_8(~m68ki_read_8(ea));
+	uint res = MASK_OUT_ABOVE_8(~m68ki_read_8(module, ea));
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -5406,9 +5407,9 @@ M68KMAKE_OP(not, 16, ., d)
 M68KMAKE_OP(not, 16, ., .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_16;
-	uint res = MASK_OUT_ABOVE_16(~m68ki_read_16(ea));
+	uint res = MASK_OUT_ABOVE_16(~m68ki_read_16(module, ea));
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -5432,9 +5433,9 @@ M68KMAKE_OP(not, 32, ., d)
 M68KMAKE_OP(not, 32, ., .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_32;
-	uint res = MASK_OUT_ABOVE_32(~m68ki_read_32(ea));
+	uint res = MASK_OUT_ABOVE_32(~m68ki_read_32(module, ea));
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -5512,9 +5513,9 @@ M68KMAKE_OP(or, 32, er, .)
 M68KMAKE_OP(or, 8, re, .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_8;
-	uint res = MASK_OUT_ABOVE_8(DX | m68ki_read_8(ea));
+	uint res = MASK_OUT_ABOVE_8(DX | m68ki_read_8(module, ea));
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -5526,9 +5527,9 @@ M68KMAKE_OP(or, 8, re, .)
 M68KMAKE_OP(or, 16, re, .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_16;
-	uint res = MASK_OUT_ABOVE_16(DX | m68ki_read_16(ea));
+	uint res = MASK_OUT_ABOVE_16(DX | m68ki_read_16(module, ea));
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -5540,9 +5541,9 @@ M68KMAKE_OP(or, 16, re, .)
 M68KMAKE_OP(or, 32, re, .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_32;
-	uint res = DX | m68ki_read_32(ea);
+	uint res = DX | m68ki_read_32(module, ea);
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -5553,7 +5554,7 @@ M68KMAKE_OP(or, 32, re, .)
 
 M68KMAKE_OP(ori, 8, ., d)
 {
-	uint res = MASK_OUT_ABOVE_8((DY |= OPER_I_8()));
+	uint res = MASK_OUT_ABOVE_8((DY |= OPER_I_8(module)));
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -5564,11 +5565,11 @@ M68KMAKE_OP(ori, 8, ., d)
 
 M68KMAKE_OP(ori, 8, ., .)
 {
-	uint src = OPER_I_8();
+	uint src = OPER_I_8(module);
 	uint ea = M68KMAKE_GET_EA_AY_8;
-	uint res = MASK_OUT_ABOVE_8(src | m68ki_read_8(ea));
+	uint res = MASK_OUT_ABOVE_8(src | m68ki_read_8(module, ea));
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 
 	FLAG_N = NFLAG_8(res);
 	FLAG_Z = res;
@@ -5579,7 +5580,7 @@ M68KMAKE_OP(ori, 8, ., .)
 
 M68KMAKE_OP(ori, 16, ., d)
 {
-	uint res = MASK_OUT_ABOVE_16(DY |= OPER_I_16());
+	uint res = MASK_OUT_ABOVE_16(DY |= OPER_I_16(module));
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -5590,11 +5591,11 @@ M68KMAKE_OP(ori, 16, ., d)
 
 M68KMAKE_OP(ori, 16, ., .)
 {
-	uint src = OPER_I_16();
+	uint src = OPER_I_16(module);
 	uint ea = M68KMAKE_GET_EA_AY_16;
-	uint res = MASK_OUT_ABOVE_16(src | m68ki_read_16(ea));
+	uint res = MASK_OUT_ABOVE_16(src | m68ki_read_16(module, ea));
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -5605,7 +5606,7 @@ M68KMAKE_OP(ori, 16, ., .)
 
 M68KMAKE_OP(ori, 32, ., d)
 {
-	uint res = DY |= OPER_I_32();
+	uint res = DY |= OPER_I_32(module);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -5616,11 +5617,11 @@ M68KMAKE_OP(ori, 32, ., d)
 
 M68KMAKE_OP(ori, 32, ., .)
 {
-	uint src = OPER_I_32();
+	uint src = OPER_I_32(module);
 	uint ea = M68KMAKE_GET_EA_AY_32;
-	uint res = src | m68ki_read_32(ea);
+	uint res = src | m68ki_read_32(module, ea);
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = res;
@@ -5631,7 +5632,7 @@ M68KMAKE_OP(ori, 32, ., .)
 
 M68KMAKE_OP(ori, 16, toc, .)
 {
-	m68ki_set_ccr(m68ki_get_ccr() | OPER_I_8());
+	m68ki_set_ccr(module, m68ki_get_ccr() | OPER_I_8(module));
 }
 
 
@@ -5639,12 +5640,12 @@ M68KMAKE_OP(ori, 16, tos, .)
 {
 	if(FLAG_S)
 	{
-		uint src = OPER_I_16();
+		uint src = OPER_I_16(module);
 		m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-		m68ki_set_sr(m68ki_get_sr() | src);
+		m68ki_set_sr(module, m68ki_get_sr() | src);
 		return;
 	}
-	m68ki_exception_privilege_violation();
+	m68ki_exception_privilege_violation(module);
 }
 
 
@@ -5652,7 +5653,7 @@ M68KMAKE_OP(pea, 32, ., .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_32;
 
-	m68ki_push_32(ea);
+	m68ki_push_32(module, ea);
 }
 
 M68KMAKE_OP(reset, 0, ., .)
@@ -5663,7 +5664,7 @@ M68KMAKE_OP(reset, 0, ., .)
 		USE_CYCLES(CYC_RESET);
 		return;
 	}
-	m68ki_exception_privilege_violation();
+	m68ki_exception_privilege_violation(module);
 }
 
 
@@ -5809,10 +5810,10 @@ M68KMAKE_OP(ror, 32, r, .)
 M68KMAKE_OP(ror, 16, ., .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_16;
-	uint src = m68ki_read_16(ea);
+	uint src = m68ki_read_16(module, ea);
 	uint res = ROR_16(src, 1);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -5980,10 +5981,10 @@ M68KMAKE_OP(rol, 32, r, .)
 M68KMAKE_OP(rol, 16, ., .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_16;
-	uint src = m68ki_read_16(ea);
+	uint src = m68ki_read_16(module, ea);
 	uint res = MASK_OUT_ABOVE_16(ROL_16(src, 1));
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -6202,13 +6203,13 @@ M68KMAKE_OP(roxr, 32, r, .)
 M68KMAKE_OP(roxr, 16, ., .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_16;
-	uint src = m68ki_read_16(ea);
+	uint src = m68ki_read_16(module, ea);
 	uint res = ROR_17(src | (XFLAG_AS_1() << 16), 1);
 
 	FLAG_C = FLAG_X = res >> 8;
 	res = MASK_OUT_ABOVE_16(res);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -6427,13 +6428,13 @@ M68KMAKE_OP(roxl, 32, r, .)
 M68KMAKE_OP(roxl, 16, ., .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_16;
-	uint src = m68ki_read_16(ea);
+	uint src = m68ki_read_16(module, ea);
 	uint res = ROL_17(src | (XFLAG_AS_1() << 16), 1);
 
 	FLAG_C = FLAG_X = res >> 8;
 	res = MASK_OUT_ABOVE_16(res);
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 
 	FLAG_N = NFLAG_16(res);
 	FLAG_Z = res;
@@ -6454,10 +6455,10 @@ M68KMAKE_OP(rte, 32, ., .)
 
 		if(CPU_TYPE_IS_000(CPU_TYPE))
 		{
-			new_sr = m68ki_pull_16();
-			new_pc = m68ki_pull_32();
-			m68ki_jump(new_pc);
-			m68ki_set_sr(new_sr);
+			new_sr = m68ki_pull_16(module);
+			new_pc = m68ki_pull_32(module);
+			m68ki_jump(module, new_pc);
+			m68ki_set_sr(module, new_sr);
 
 			CPU_INSTR_MODE = INSTRUCTION_YES;
 			CPU_RUN_MODE = RUN_MODE_NORMAL;
@@ -6467,40 +6468,40 @@ M68KMAKE_OP(rte, 32, ., .)
 
 		if(CPU_TYPE_IS_010(CPU_TYPE))
 		{
-			format_word = m68ki_read_16(REG_A[7]+6) >> 12;
+			format_word = m68ki_read_16(module, REG_A[7]+6) >> 12;
 			if(format_word == 0)
 			{
-				new_sr = m68ki_pull_16();
-				new_pc = m68ki_pull_32();
-				m68ki_fake_pull_16();	/* format word */
-				m68ki_jump(new_pc);
-				m68ki_set_sr(new_sr);
+				new_sr = m68ki_pull_16(module);
+				new_pc = m68ki_pull_32(module);
+				m68ki_fake_pull_16(module);	/* format word */
+				m68ki_jump(module, new_pc);
+				m68ki_set_sr(module, new_sr);
 				CPU_INSTR_MODE = INSTRUCTION_YES;
 				CPU_RUN_MODE = RUN_MODE_NORMAL;
 				return;
 			} else if (format_word == 8) {
 				/* Format 8 stack frame -- 68010 only. 29 word bus/address error */
-				new_sr = m68ki_pull_16();
-				new_pc = m68ki_pull_32();
-				m68ki_fake_pull_16();	/* format word */
-				m68ki_fake_pull_16();	/* special status word */
-				m68ki_fake_pull_32();	/* fault address */
-				m68ki_fake_pull_16();	/* unused/reserved */
-				m68ki_fake_pull_16();	/* data output buffer */
-				m68ki_fake_pull_16();	/* unused/reserved */
-				m68ki_fake_pull_16();	/* data input buffer */
-				m68ki_fake_pull_16();	/* unused/reserved */
-				m68ki_fake_pull_16();	/* instruction input buffer */
-				m68ki_fake_pull_32();	/* internal information, 16 words */
-				m68ki_fake_pull_32();	/* (actually, we use 8 DWORDs) */
-				m68ki_fake_pull_32();
-				m68ki_fake_pull_32();
-				m68ki_fake_pull_32();
-				m68ki_fake_pull_32();
-				m68ki_fake_pull_32();
-				m68ki_fake_pull_32();
-				m68ki_jump(new_pc);
-				m68ki_set_sr(new_sr);
+				new_sr = m68ki_pull_16(module);
+				new_pc = m68ki_pull_32(module);
+				m68ki_fake_pull_16(module);	/* format word */
+				m68ki_fake_pull_16(module);	/* special status word */
+				m68ki_fake_pull_32(module);	/* fault address */
+				m68ki_fake_pull_16(module);	/* unused/reserved */
+				m68ki_fake_pull_16(module);	/* data output buffer */
+				m68ki_fake_pull_16(module);	/* unused/reserved */
+				m68ki_fake_pull_16(module);	/* data input buffer */
+				m68ki_fake_pull_16(module);	/* unused/reserved */
+				m68ki_fake_pull_16(module);	/* instruction input buffer */
+				m68ki_fake_pull_32(module);	/* internal information, 16 words */
+				m68ki_fake_pull_32(module);	/* (actually, we use 8 DWORDs) */
+				m68ki_fake_pull_32(module);
+				m68ki_fake_pull_32(module);
+				m68ki_fake_pull_32(module);
+				m68ki_fake_pull_32(module);
+				m68ki_fake_pull_32(module);
+				m68ki_fake_pull_32(module);
+				m68ki_jump(module, new_pc);
+				m68ki_set_sr(module, new_sr);
 				CPU_INSTR_MODE = INSTRUCTION_YES;
 				CPU_RUN_MODE = RUN_MODE_NORMAL;
 				return;
@@ -6508,37 +6509,37 @@ M68KMAKE_OP(rte, 32, ., .)
 			CPU_INSTR_MODE = INSTRUCTION_YES;
 			CPU_RUN_MODE = RUN_MODE_NORMAL;
 			/* Not handling other exception types (9) */
-			m68ki_exception_format_error();
+			m68ki_exception_format_error(module);
 			return;
 		}
 
 		/* Otherwise it's 020 */
 rte_loop:
-		format_word = m68ki_read_16(REG_A[7]+6) >> 12;
+		format_word = m68ki_read_16(module, REG_A[7]+6) >> 12;
 		switch(format_word)
 		{
 			case 0: /* Normal */
-				new_sr = m68ki_pull_16();
-				new_pc = m68ki_pull_32();
-				m68ki_fake_pull_16();	/* format word */
-				m68ki_jump(new_pc);
-				m68ki_set_sr(new_sr);
+				new_sr = m68ki_pull_16(module);
+				new_pc = m68ki_pull_32(module);
+				m68ki_fake_pull_16(module);	/* format word */
+				m68ki_jump(module, new_pc);
+				m68ki_set_sr(module, new_sr);
 				CPU_INSTR_MODE = INSTRUCTION_YES;
 				CPU_RUN_MODE = RUN_MODE_NORMAL;
 				return;
 			case 1: /* Throwaway */
-				new_sr = m68ki_pull_16();
-				m68ki_fake_pull_32();	/* program counter */
-				m68ki_fake_pull_16();	/* format word */
-				m68ki_set_sr_noint(new_sr);
+				new_sr = m68ki_pull_16(module);
+				m68ki_fake_pull_32(module);	/* program counter */
+				m68ki_fake_pull_16(module);	/* format word */
+				m68ki_set_sr_noint(module, new_sr);
 				goto rte_loop;
 			case 2: /* Trap */
-				new_sr = m68ki_pull_16();
-				new_pc = m68ki_pull_32();
-				m68ki_fake_pull_16();	/* format word */
-				m68ki_fake_pull_32();	/* address */
-				m68ki_jump(new_pc);
-				m68ki_set_sr(new_sr);
+				new_sr = m68ki_pull_16(module);
+				new_pc = m68ki_pull_32(module);
+				m68ki_fake_pull_16(module);	/* format word */
+				m68ki_fake_pull_32(module);	/* address */
+				m68ki_jump(module, new_pc);
+				m68ki_set_sr(module, new_sr);
 				CPU_INSTR_MODE = INSTRUCTION_YES;
 				CPU_RUN_MODE = RUN_MODE_NORMAL;
 				return;
@@ -6546,25 +6547,25 @@ rte_loop:
 		/* Not handling long or short bus fault */
 		CPU_INSTR_MODE = INSTRUCTION_YES;
 		CPU_RUN_MODE = RUN_MODE_NORMAL;
-		m68ki_exception_format_error();
+		m68ki_exception_format_error(module);
 		return;
 	}
-	m68ki_exception_privilege_violation();
+	m68ki_exception_privilege_violation(module);
 }
 
 
 M68KMAKE_OP(rtr, 32, ., .)
 {
 	m68ki_trace_t0();				   /* auto-disable (see m68kcpu.h) */
-	m68ki_set_ccr(m68ki_pull_16());
-	m68ki_jump(m68ki_pull_32());
+	m68ki_set_ccr(module, m68ki_pull_16(module));
+	m68ki_jump(module, m68ki_pull_32(module));
 }
 
 
 M68KMAKE_OP(rts, 32, ., .)
 {
 	m68ki_trace_t0();				   /* auto-disable (see m68kcpu.h) */
-	m68ki_jump(m68ki_pull_32());
+	m68ki_jump(module, m68ki_pull_32(module));
 }
 
 
@@ -6596,9 +6597,9 @@ M68KMAKE_OP(sbcd, 8, rr, .)
 
 M68KMAKE_OP(sbcd, 8, mm, ax7)
 {
-	uint src = OPER_AY_PD_8();
-	uint ea  = EA_A7_PD_8();
-	uint dst = m68ki_read_8(ea);
+	uint src = OPER_AY_PD_8(module);
+	uint ea  = EA_A7_PD_8(module);
+	uint dst = m68ki_read_8(module, ea);
 	uint res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_AS_1();
 
 	FLAG_V = ~res; /* Undefined V behavior */
@@ -6616,15 +6617,15 @@ M68KMAKE_OP(sbcd, 8, mm, ax7)
 	FLAG_N = NFLAG_8(res); /* Undefined N behavior */
 	FLAG_Z |= res;
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 }
 
 
 M68KMAKE_OP(sbcd, 8, mm, ay7)
 {
-	uint src = OPER_A7_PD_8();
-	uint ea  = EA_AX_PD_8();
-	uint dst = m68ki_read_8(ea);
+	uint src = OPER_A7_PD_8(module);
+	uint ea  = EA_AX_PD_8(module);
+	uint dst = m68ki_read_8(module, ea);
 	uint res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_AS_1();
 
 	FLAG_V = ~res; /* Undefined V behavior */
@@ -6642,15 +6643,15 @@ M68KMAKE_OP(sbcd, 8, mm, ay7)
 	FLAG_N = NFLAG_8(res); /* Undefined N behavior */
 	FLAG_Z |= res;
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 }
 
 
 M68KMAKE_OP(sbcd, 8, mm, axy7)
 {
-	uint src = OPER_A7_PD_8();
-	uint ea  = EA_A7_PD_8();
-	uint dst = m68ki_read_8(ea);
+	uint src = OPER_A7_PD_8(module);
+	uint ea  = EA_A7_PD_8(module);
+	uint dst = m68ki_read_8(module, ea);
 	uint res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_AS_1();
 
 	FLAG_V = ~res; /* Undefined V behavior */
@@ -6668,15 +6669,15 @@ M68KMAKE_OP(sbcd, 8, mm, axy7)
 	FLAG_N = NFLAG_8(res); /* Undefined N behavior */
 	FLAG_Z |= res;
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 }
 
 
 M68KMAKE_OP(sbcd, 8, mm, .)
 {
-	uint src = OPER_AY_PD_8();
-	uint ea  = EA_AX_PD_8();
-	uint dst = m68ki_read_8(ea);
+	uint src = OPER_AY_PD_8(module);
+	uint ea  = EA_AX_PD_8(module);
+	uint dst = m68ki_read_8(module, ea);
 	uint res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_AS_1();
 
 	FLAG_V = ~res; /* Undefined V behavior */
@@ -6694,7 +6695,7 @@ M68KMAKE_OP(sbcd, 8, mm, .)
 	FLAG_N = NFLAG_8(res); /* Undefined N behavior */
 	FLAG_Z |= res;
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 }
 
 
@@ -6706,7 +6707,7 @@ M68KMAKE_OP(st, 8, ., d)
 
 M68KMAKE_OP(st, 8, ., .)
 {
-	m68ki_write_8(M68KMAKE_GET_EA_AY_8, 0xff);
+	m68ki_write_8(module, M68KMAKE_GET_EA_AY_8, 0xff);
 }
 
 
@@ -6718,7 +6719,7 @@ M68KMAKE_OP(sf, 8, ., d)
 
 M68KMAKE_OP(sf, 8, ., .)
 {
-	m68ki_write_8(M68KMAKE_GET_EA_AY_8, 0);
+	m68ki_write_8(module, M68KMAKE_GET_EA_AY_8, 0);
 }
 
 
@@ -6736,7 +6737,7 @@ M68KMAKE_OP(scc, 8, ., d)
 
 M68KMAKE_OP(scc, 8, ., .)
 {
-	m68ki_write_8(M68KMAKE_GET_EA_AY_8, M68KMAKE_CC ? 0xff : 0);
+	m68ki_write_8(module, M68KMAKE_GET_EA_AY_8, M68KMAKE_CC ? 0xff : 0);
 }
 
 
@@ -6744,17 +6745,17 @@ M68KMAKE_OP(stop, 0, ., .)
 {
 	if(FLAG_S)
 	{
-		uint new_sr = OPER_I_16();
+		uint new_sr = OPER_I_16(module);
 		m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
 		CPU_STOPPED |= STOP_LEVEL_STOP;
-		m68ki_set_sr(new_sr);
+		m68ki_set_sr(module, new_sr);
 		if(m68ki_remaining_cycles >= CYC_INSTRUCTION[REG_IR])
 			m68ki_remaining_cycles = CYC_INSTRUCTION[REG_IR];
 		else
 			USE_ALL_CYCLES();
 		return;
 	}
-	m68ki_exception_privilege_violation();
+	m68ki_exception_privilege_violation(module);
 }
 
 
@@ -6890,7 +6891,7 @@ M68KMAKE_OP(sub, 8, re, .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_8;
 	uint src = MASK_OUT_ABOVE_8(DX);
-	uint dst = m68ki_read_8(ea);
+	uint dst = m68ki_read_8(module, ea);
 	uint res = dst - src;
 
 	FLAG_N = NFLAG_8(res);
@@ -6898,7 +6899,7 @@ M68KMAKE_OP(sub, 8, re, .)
 	FLAG_X = FLAG_C = CFLAG_8(res);
 	FLAG_V = VFLAG_SUB_8(src, dst, res);
 
-	m68ki_write_8(ea, FLAG_Z);
+	m68ki_write_8(module, ea, FLAG_Z);
 }
 
 
@@ -6906,7 +6907,7 @@ M68KMAKE_OP(sub, 16, re, .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_16;
 	uint src = MASK_OUT_ABOVE_16(DX);
-	uint dst = m68ki_read_16(ea);
+	uint dst = m68ki_read_16(module, ea);
 	uint res = dst - src;
 
 	FLAG_N = NFLAG_16(res);
@@ -6914,7 +6915,7 @@ M68KMAKE_OP(sub, 16, re, .)
 	FLAG_X = FLAG_C = CFLAG_16(res);
 	FLAG_V = VFLAG_SUB_16(src, dst, res);
 
-	m68ki_write_16(ea, FLAG_Z);
+	m68ki_write_16(module, ea, FLAG_Z);
 }
 
 
@@ -6922,7 +6923,7 @@ M68KMAKE_OP(sub, 32, re, .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_32;
 	uint src = DX;
-	uint dst = m68ki_read_32(ea);
+	uint dst = m68ki_read_32(module, ea);
 	uint res = dst - src;
 
 	FLAG_N = NFLAG_32(res);
@@ -6930,7 +6931,7 @@ M68KMAKE_OP(sub, 32, re, .)
 	FLAG_X = FLAG_C = CFLAG_SUB_32(src, dst, res);
 	FLAG_V = VFLAG_SUB_32(src, dst, res);
 
-	m68ki_write_32(ea, FLAG_Z);
+	m68ki_write_32(module, ea, FLAG_Z);
 }
 
 
@@ -6987,7 +6988,7 @@ M68KMAKE_OP(suba, 32, ., .)
 M68KMAKE_OP(subi, 8, ., d)
 {
 	uint* r_dst = &DY;
-	uint src = OPER_I_8();
+	uint src = OPER_I_8(module);
 	uint dst = MASK_OUT_ABOVE_8(*r_dst);
 	uint res = dst - src;
 
@@ -7002,9 +7003,9 @@ M68KMAKE_OP(subi, 8, ., d)
 
 M68KMAKE_OP(subi, 8, ., .)
 {
-	uint src = OPER_I_8();
+	uint src = OPER_I_8(module);
 	uint ea = M68KMAKE_GET_EA_AY_8;
-	uint dst = m68ki_read_8(ea);
+	uint dst = m68ki_read_8(module, ea);
 	uint res = dst - src;
 
 	FLAG_N = NFLAG_8(res);
@@ -7012,14 +7013,14 @@ M68KMAKE_OP(subi, 8, ., .)
 	FLAG_X = FLAG_C = CFLAG_8(res);
 	FLAG_V = VFLAG_SUB_8(src, dst, res);
 
-	m68ki_write_8(ea, FLAG_Z);
+	m68ki_write_8(module, ea, FLAG_Z);
 }
 
 
 M68KMAKE_OP(subi, 16, ., d)
 {
 	uint* r_dst = &DY;
-	uint src = OPER_I_16();
+	uint src = OPER_I_16(module);
 	uint dst = MASK_OUT_ABOVE_16(*r_dst);
 	uint res = dst - src;
 
@@ -7034,9 +7035,9 @@ M68KMAKE_OP(subi, 16, ., d)
 
 M68KMAKE_OP(subi, 16, ., .)
 {
-	uint src = OPER_I_16();
+	uint src = OPER_I_16(module);
 	uint ea = M68KMAKE_GET_EA_AY_16;
-	uint dst = m68ki_read_16(ea);
+	uint dst = m68ki_read_16(module, ea);
 	uint res = dst - src;
 
 	FLAG_N = NFLAG_16(res);
@@ -7044,14 +7045,14 @@ M68KMAKE_OP(subi, 16, ., .)
 	FLAG_X = FLAG_C = CFLAG_16(res);
 	FLAG_V = VFLAG_SUB_16(src, dst, res);
 
-	m68ki_write_16(ea, FLAG_Z);
+	m68ki_write_16(module, ea, FLAG_Z);
 }
 
 
 M68KMAKE_OP(subi, 32, ., d)
 {
 	uint* r_dst = &DY;
-	uint src = OPER_I_32();
+	uint src = OPER_I_32(module);
 	uint dst = *r_dst;
 	uint res = dst - src;
 
@@ -7066,9 +7067,9 @@ M68KMAKE_OP(subi, 32, ., d)
 
 M68KMAKE_OP(subi, 32, ., .)
 {
-	uint src = OPER_I_32();
+	uint src = OPER_I_32(module);
 	uint ea = M68KMAKE_GET_EA_AY_32;
-	uint dst = m68ki_read_32(ea);
+	uint dst = m68ki_read_32(module, ea);
 	uint res = dst - src;
 
 	FLAG_N = NFLAG_32(res);
@@ -7076,7 +7077,7 @@ M68KMAKE_OP(subi, 32, ., .)
 	FLAG_X = FLAG_C = CFLAG_SUB_32(src, dst, res);
 	FLAG_V = VFLAG_SUB_32(src, dst, res);
 
-	m68ki_write_32(ea, FLAG_Z);
+	m68ki_write_32(module, ea, FLAG_Z);
 }
 
 
@@ -7100,7 +7101,7 @@ M68KMAKE_OP(subq, 8, ., .)
 {
 	uint src = (((REG_IR >> 9) - 1) & 7) + 1;
 	uint ea = M68KMAKE_GET_EA_AY_8;
-	uint dst = m68ki_read_8(ea);
+	uint dst = m68ki_read_8(module, ea);
 	uint res = dst - src;
 
 	FLAG_N = NFLAG_8(res);
@@ -7108,7 +7109,7 @@ M68KMAKE_OP(subq, 8, ., .)
 	FLAG_X = FLAG_C = CFLAG_8(res);
 	FLAG_V = VFLAG_SUB_8(src, dst, res);
 
-	m68ki_write_8(ea, FLAG_Z);
+	m68ki_write_8(module, ea, FLAG_Z);
 }
 
 
@@ -7140,7 +7141,7 @@ M68KMAKE_OP(subq, 16, ., .)
 {
 	uint src = (((REG_IR >> 9) - 1) & 7) + 1;
 	uint ea = M68KMAKE_GET_EA_AY_16;
-	uint dst = m68ki_read_16(ea);
+	uint dst = m68ki_read_16(module, ea);
 	uint res = dst - src;
 
 	FLAG_N = NFLAG_16(res);
@@ -7148,7 +7149,7 @@ M68KMAKE_OP(subq, 16, ., .)
 	FLAG_X = FLAG_C = CFLAG_16(res);
 	FLAG_V = VFLAG_SUB_16(src, dst, res);
 
-	m68ki_write_16(ea, FLAG_Z);
+	m68ki_write_16(module, ea, FLAG_Z);
 }
 
 
@@ -7180,7 +7181,7 @@ M68KMAKE_OP(subq, 32, ., .)
 {
 	uint src = (((REG_IR >> 9) - 1) & 7) + 1;
 	uint ea = M68KMAKE_GET_EA_AY_32;
-	uint dst = m68ki_read_32(ea);
+	uint dst = m68ki_read_32(module, ea);
 	uint res = dst - src;
 
 	FLAG_N = NFLAG_32(res);
@@ -7188,7 +7189,7 @@ M68KMAKE_OP(subq, 32, ., .)
 	FLAG_X = FLAG_C = CFLAG_SUB_32(src, dst, res);
 	FLAG_V = VFLAG_SUB_32(src, dst, res);
 
-	m68ki_write_32(ea, FLAG_Z);
+	m68ki_write_32(module, ea, FLAG_Z);
 }
 
 
@@ -7248,9 +7249,9 @@ M68KMAKE_OP(subx, 32, rr, .)
 
 M68KMAKE_OP(subx, 8, mm, ax7)
 {
-	uint src = OPER_AY_PD_8();
-	uint ea  = EA_A7_PD_8();
-	uint dst = m68ki_read_8(ea);
+	uint src = OPER_AY_PD_8(module);
+	uint ea  = EA_A7_PD_8(module);
+	uint dst = m68ki_read_8(module, ea);
 	uint res = dst - src - XFLAG_AS_1();
 
 	FLAG_N = NFLAG_8(res);
@@ -7260,15 +7261,15 @@ M68KMAKE_OP(subx, 8, mm, ax7)
 	res = MASK_OUT_ABOVE_8(res);
 	FLAG_Z |= res;
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 }
 
 
 M68KMAKE_OP(subx, 8, mm, ay7)
 {
-	uint src = OPER_A7_PD_8();
-	uint ea  = EA_AX_PD_8();
-	uint dst = m68ki_read_8(ea);
+	uint src = OPER_A7_PD_8(module);
+	uint ea  = EA_AX_PD_8(module);
+	uint dst = m68ki_read_8(module, ea);
 	uint res = dst - src - XFLAG_AS_1();
 
 	FLAG_N = NFLAG_8(res);
@@ -7278,15 +7279,15 @@ M68KMAKE_OP(subx, 8, mm, ay7)
 	res = MASK_OUT_ABOVE_8(res);
 	FLAG_Z |= res;
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 }
 
 
 M68KMAKE_OP(subx, 8, mm, axy7)
 {
-	uint src = OPER_A7_PD_8();
-	uint ea  = EA_A7_PD_8();
-	uint dst = m68ki_read_8(ea);
+	uint src = OPER_A7_PD_8(module);
+	uint ea  = EA_A7_PD_8(module);
+	uint dst = m68ki_read_8(module, ea);
 	uint res = dst - src - XFLAG_AS_1();
 
 	FLAG_N = NFLAG_8(res);
@@ -7296,15 +7297,15 @@ M68KMAKE_OP(subx, 8, mm, axy7)
 	res = MASK_OUT_ABOVE_8(res);
 	FLAG_Z |= res;
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 }
 
 
 M68KMAKE_OP(subx, 8, mm, .)
 {
-	uint src = OPER_AY_PD_8();
-	uint ea  = EA_AX_PD_8();
-	uint dst = m68ki_read_8(ea);
+	uint src = OPER_AY_PD_8(module);
+	uint ea  = EA_AX_PD_8(module);
+	uint dst = m68ki_read_8(module, ea);
 	uint res = dst - src - XFLAG_AS_1();
 
 	FLAG_N = NFLAG_8(res);
@@ -7314,15 +7315,15 @@ M68KMAKE_OP(subx, 8, mm, .)
 	res = MASK_OUT_ABOVE_8(res);
 	FLAG_Z |= res;
 
-	m68ki_write_8(ea, res);
+	m68ki_write_8(module, ea, res);
 }
 
 
 M68KMAKE_OP(subx, 16, mm, .)
 {
-	uint src = OPER_AY_PD_16();
-	uint ea  = EA_AX_PD_16();
-	uint dst = m68ki_read_16(ea);
+	uint src = OPER_AY_PD_16(module);
+	uint ea  = EA_AX_PD_16(module);
+	uint dst = m68ki_read_16(module, ea);
 	uint res = dst - src - XFLAG_AS_1();
 
 	FLAG_N = NFLAG_16(res);
@@ -7332,15 +7333,15 @@ M68KMAKE_OP(subx, 16, mm, .)
 	res = MASK_OUT_ABOVE_16(res);
 	FLAG_Z |= res;
 
-	m68ki_write_16(ea, res);
+	m68ki_write_16(module, ea, res);
 }
 
 
 M68KMAKE_OP(subx, 32, mm, .)
 {
-	uint src = OPER_AY_PD_32();
-	uint ea  = EA_AX_PD_32();
-	uint dst = m68ki_read_32(ea);
+	uint src = OPER_AY_PD_32(module);
+	uint ea  = EA_AX_PD_32(module);
+	uint dst = m68ki_read_32(module, ea);
 	uint res = dst - src - XFLAG_AS_1();
 
 	FLAG_N = NFLAG_32(res);
@@ -7350,7 +7351,7 @@ M68KMAKE_OP(subx, 32, mm, .)
 	res = MASK_OUT_ABOVE_32(res);
 	FLAG_Z |= res;
 
-	m68ki_write_32(ea, res);
+	m68ki_write_32(module, ea, res);
 }
 
 
@@ -7383,7 +7384,7 @@ M68KMAKE_OP(tas, 8, ., d)
 M68KMAKE_OP(tas, 8, ., .)
 {
 	uint ea = M68KMAKE_GET_EA_AY_8;
-	uint dst = m68ki_read_8(ea);
+	uint dst = m68ki_read_8(module, ea);
 	uint allow_writeback;
 
 	FLAG_Z = dst;
@@ -7397,14 +7398,14 @@ M68KMAKE_OP(tas, 8, ., .)
        will be needed. */
 	allow_writeback = m68ki_tas_callback();
 
-	if (allow_writeback==1) m68ki_write_8(ea, dst | 0x80);
+	if (allow_writeback==1) m68ki_write_8(module, ea, dst | 0x80);
 }
 
 
 M68KMAKE_OP(trap, 0, ., .)
 {
 	/* Trap#n stacks exception frame type 0 */
-	m68ki_exception_trapN(EXCEPTION_TRAP_BASE + (REG_IR & 0xf));	/* HJB 990403 */
+	m68ki_exception_trapN(module, EXCEPTION_TRAP_BASE + (REG_IR & 0xf));	/* HJB 990403 */
 }
 
 
@@ -7414,7 +7415,7 @@ M68KMAKE_OP(trapv, 0, ., .)
 	{
 		return;
 	}
-	m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
+	m68ki_exception_trap(module, EXCEPTION_TRAPV);  /* HJB 990403 */
 }
 
 
@@ -7486,7 +7487,7 @@ M68KMAKE_OP(tst, 32, ., .)
 
 M68KMAKE_OP(unlk, 32, ., a7)
 {
-	REG_A[7] = m68ki_read_32(REG_A[7]);
+	REG_A[7] = m68ki_read_32(module, REG_A[7]);
 }
 
 
@@ -7495,7 +7496,7 @@ M68KMAKE_OP(unlk, 32, ., .)
 	uint* r_dst = &AY;
 
 	REG_A[7] = *r_dst;
-	*r_dst = m68ki_pull_32();
+	*r_dst = m68ki_pull_32(module);
 }
 
 

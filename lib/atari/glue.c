@@ -17,6 +17,7 @@
 #include "atari/machine.h"
 
 #include "m68k/m68k.h"
+#include "m68k/m68kcpu.h"
 
 static struct device_cycle vbl_cycle;
 
@@ -31,7 +32,7 @@ void glue_irq_set(int irq)
 	irq_pending |= 1 << irq;
 
 	if (irq_pending > p)
-		m68k_set_irq(irq);
+		m68k_set_irq(&musashi_module, irq);
 }
 
 void glue_irq_clr(int irq)
@@ -44,7 +45,7 @@ void glue_irq_clr(int irq)
 		if (irq_pending & (1u << i))
 			break;
 
-	m68k_set_irq(i);
+	m68k_set_irq(&musashi_module, i);
 }
 
 static void request_vbl_event(struct device_cycle device_cycle)

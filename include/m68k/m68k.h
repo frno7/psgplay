@@ -129,6 +129,8 @@ typedef enum
 	M68K_REG_CPU_TYPE	/* Type of CPU being run */
 } m68k_register_t;
 
+struct m68k_module;
+
 /* ======================================================================== */
 /* ====================== FUNCTIONS CALLED BY THE CPU ===================== */
 /* ======================================================================== */
@@ -210,7 +212,7 @@ void m68k_write_memory_32_pd(unsigned int address, unsigned int value);
  * services the interrupt.
  * Default behavior: return M68K_INT_ACK_AUTOVECTOR.
  */
-void m68k_set_int_ack_callback(int  (*callback)(int int_level));
+void m68k_set_int_ack_callback(struct m68k_module *module, int (*callback)(struct m68k_module *module, int int_level));
 
 
 /* Set the callback for a breakpoint acknowledge (68010+).
@@ -219,7 +221,7 @@ void m68k_set_int_ack_callback(int  (*callback)(int int_level));
  * BKPT instruction for 68020+, or 0 for 68010.
  * Default behavior: do nothing.
  */
-void m68k_set_bkpt_ack_callback(void (*callback)(unsigned int data));
+void m68k_set_bkpt_ack_callback(struct m68k_module *module, void (*callback)(struct m68k_module *module, unsigned int data));
 
 
 /* Set the callback for the RESET instruction.
@@ -227,7 +229,7 @@ void m68k_set_bkpt_ack_callback(void (*callback)(unsigned int data));
  * The CPU calls this callback every time it encounters a RESET instruction.
  * Default behavior: do nothing.
  */
-void m68k_set_reset_instr_callback(void  (*callback)(void));
+void m68k_set_reset_instr_callback(struct m68k_module *module, void (*callback)(struct m68k_module *module));
 
 
 /* Set the callback for informing of a large PC change.
@@ -236,14 +238,14 @@ void m68k_set_reset_instr_callback(void  (*callback)(void));
  * by a large value (currently set for changes by longwords).
  * Default behavior: do nothing.
  */
-void m68k_set_pc_changed_callback(void  (*callback)(unsigned int new_pc));
+void m68k_set_pc_changed_callback(struct m68k_module *module, void (*callback)(struct m68k_module *module, unsigned int new_pc));
 
 /* Set the callback for the TAS instruction.
  * You must enable M68K_TAS_HAS_CALLBACK in m68kconf.h.
  * The CPU calls this callback every time it encounters a TAS instruction.
  * Default behavior: return 1, allow writeback.
  */
-void m68k_set_tas_instr_callback(int  (*callback)(void));
+void m68k_set_tas_instr_callback(struct m68k_module *module, int (*callback)(struct m68k_module *module));
 
 /* Set the callback for illegal instructions.
  * You must enable M68K_ILLG_HAS_CALLBACK in m68kconf.h.
@@ -251,7 +253,7 @@ void m68k_set_tas_instr_callback(int  (*callback)(void));
  * which must return 1 if it handles the instruction normally or 0 if it's really an illegal instruction.
  * Default behavior: return 0, exception will occur.
  */
-void m68k_set_illg_instr_callback(int  (*callback)(int));
+void m68k_set_illg_instr_callback(struct m68k_module *module, int (*callback)(struct m68k_module *module, int));
 
 /* Set the callback for CPU function code changes.
  * You must enable M68K_EMULATE_FC in m68kconf.h.
@@ -260,7 +262,7 @@ void m68k_set_illg_instr_callback(int  (*callback)(int));
  * access it is (supervisor/user, program/data and such).
  * Default behavior: do nothing.
  */
-void m68k_set_fc_callback(void  (*callback)(unsigned int new_fc));
+void m68k_set_fc_callback(struct m68k_module *module, void (*callback)(struct m68k_module *module, unsigned int new_fc));
 
 
 /* Set a callback for the instruction cycle of the CPU.
@@ -269,7 +271,7 @@ void m68k_set_fc_callback(void  (*callback)(unsigned int new_fc));
  * instruction cycle.
  * Default behavior: do nothing.
  */
-void m68k_set_instr_hook_callback(void  (*callback)(unsigned int pc));
+void m68k_set_instr_hook_callback(struct m68k_module *module, void (*callback)(struct m68k_module *module, unsigned int pc));
 
 
 
@@ -281,12 +283,12 @@ void m68k_set_instr_hook_callback(void  (*callback)(unsigned int pc));
  * Currently supported types are: M68K_CPU_TYPE_68000, M68K_CPU_TYPE_68010,
  * M68K_CPU_TYPE_EC020, and M68K_CPU_TYPE_68020.
  */
-void m68k_set_cpu_type(unsigned int cpu_type);
+void m68k_set_cpu_type(struct m68k_module *module, unsigned int cpu_type);
 
 /* Do whatever initialisations the core requires.  Should be called
  * at least once at init time.
  */
-void m68k_init(void);
+void m68k_init(struct m68k_module *module);
 
 /* Pulse the RESET pin on the CPU.
  * You *MUST* reset the CPU at least once to initialize the emulation
@@ -294,10 +296,10 @@ void m68k_init(void);
  *       the CPU for the first time, the CPU will be set to
  *       M68K_CPU_TYPE_68000.
  */
-void m68k_pulse_reset(void);
+void m68k_pulse_reset(struct m68k_module *module);
 
 /* execute num_cycles worth of instructions.  returns number of cycles used */
-int m68k_execute(int num_cycles);
+int m68k_execute(struct m68k_module *module, int num_cycles);
 
 /* These functions let you read/write/modify the number of cycles left to run
  * while m68k_execute() is running.
@@ -314,21 +316,21 @@ void m68k_clear_timeslice(void);        /* Set timeslice to zero */
  * A transition from < 7 to 7 will cause a non-maskable interrupt (NMI).
  * Setting IRQ to 0 will clear an interrupt request.
  */
-void m68k_set_irq(unsigned int int_level);
+void m68k_set_irq(struct m68k_module *module, unsigned int int_level);
 
 /* Set the virtual irq lines, where the highest level
  * active line is automatically selected.  If you use this function,
  * do not use m68k_set_irq.
  */
-void m68k_set_virq(unsigned int level, unsigned int active);
-unsigned int m68k_get_virq(unsigned int level);
+void m68k_set_virq(struct m68k_module *module, unsigned int level, unsigned int active);
+unsigned int m68k_get_virq(struct m68k_module *module, unsigned int level);
 
 /* Halt the CPU as if you pulsed the HALT pin. */
-void m68k_pulse_halt(void);
+void m68k_pulse_halt(struct m68k_module *module);
 
 
 /* Trigger a bus error exception */
-void m68k_pulse_bus_error(void);
+void m68k_pulse_bus_error(struct m68k_module *module);
 
 
 /* Context switching to allow multiple CPUs */
@@ -337,10 +339,10 @@ void m68k_pulse_bus_error(void);
 unsigned int m68k_context_size(void);
 
 /* Get a cpu context */
-unsigned int m68k_get_context(void* dst);
+unsigned int m68k_get_context(struct m68k_module *module, void* dst);
 
 /* set the current cpu context */
-void m68k_set_context(void* dst);
+void m68k_set_context(struct m68k_module *module, void* src);
 
 /* Register the CPU state information */
 void m68k_state_register(const char *type, int index);
@@ -350,10 +352,10 @@ void m68k_state_register(const char *type, int index);
  * retrieved using m68k_get_context() or the currently running context.
  * If context is NULL, the currently running CPU context will be used.
  */
-unsigned int m68k_get_reg(void* context, m68k_register_t reg);
+unsigned int m68k_get_reg(struct m68k_module *module, void* context, m68k_register_t reg);
 
 /* Poke values into the internals of the currently running CPU context */
-void m68k_set_reg(m68k_register_t reg, unsigned int value);
+void m68k_set_reg(struct m68k_module *module, m68k_register_t reg, unsigned int value);
 
 /* Check if an instruction is valid for the specified CPU type */
 unsigned int m68k_is_valid_instruction(unsigned int instruction, unsigned int cpu_type);

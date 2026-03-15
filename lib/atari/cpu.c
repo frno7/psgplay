@@ -53,7 +53,7 @@ static struct device_slice cpu_run(const struct device *device,
 	struct device_cycle device_cycle, struct device_slice device_slice)
 {
 	cpu_execute = true;
-	const int s = m68k_execute(device_slice.s);
+	const int s = m68k_execute(&musashi_module, device_slice.s);
 	cpu_execute = false;
 
 	BUG_ON(s < 0);
@@ -66,9 +66,9 @@ static void cpu_reset(const struct device *device)
 	instruction_callback.cb = NULL;
 	instruction_callback.arg = NULL;
 
-	m68k_init();
-	m68k_set_cpu_type(M68K_CPU_TYPE_68000);
-	m68k_pulse_reset();
+	m68k_init(&musashi_module);
+	m68k_set_cpu_type(&musashi_module, M68K_CPU_TYPE_68000);
+	m68k_pulse_reset(&musashi_module);
 }
 
 const struct device cpu_device = {

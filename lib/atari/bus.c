@@ -16,7 +16,7 @@ u8 bus_error_rd_u8(const struct device *device, u32 address)
 {
 	/* FIXME: Properly report pr_error("bus error: rd u8 %x\n", device->bus.address + address); */
 
-	m68k_pulse_bus_error();
+	m68k_pulse_bus_error(&musashi_module);
 
 	return 0;
 }
@@ -25,7 +25,7 @@ u16 bus_error_rd_u16(const struct device *device, u32 address)
 {
 	/* FIXME: Properly report pr_error("bus error: rd u16 %x\n", device->bus.address + address); */
 
-	m68k_pulse_bus_error();
+	m68k_pulse_bus_error(&musashi_module);
 
 	return 0;
 }
@@ -34,14 +34,14 @@ void bus_error_wr_u8(const struct device *device, u32 address, u8 data)
 {
 	/* FIXME: Properly report pr_error("bus error: wr u8 %x %x\n", device->bus.address + address, data); */
 
-	m68k_pulse_bus_error();
+	m68k_pulse_bus_error(&musashi_module);
 }
 
 void bus_error_wr_u16(const struct device *device, u32 address, u16 data)
 {
 	/* FIXME: Properly report pr_error("bus error: wr u16 %x %x\n", device->bus.address + address, data); */
 
-	m68k_pulse_bus_error();
+	m68k_pulse_bus_error(&musashi_module);
 }
 
 const struct device bus_device_error = {
