@@ -15,6 +15,7 @@
 #include "internal/string.h"
 
 #include "m68k/m68k.h"
+#include "m68k/m68kcpu.h"
 #include "m68k/m68kda.h"
 
 #include "psgplay/psgplay.h"
@@ -763,7 +764,7 @@ static void trace_reg(void)
 {
 	printf("reg %8" PRIu64, machine_cycle());
 
-	printf(" pc %6" PRIx32, m68k_get_reg(NULL, M68K_REG_PC));
+	printf(" pc %6" PRIx32, m68k_get_reg(&musashi_module, NULL, M68K_REG_PC));
 
 #define TRACE_REGS(reg)							\
 	reg(sr, SR)							\
@@ -774,7 +775,7 @@ static void trace_reg(void)
 	reg(usp, USP)							\
 	reg(isp, ISP)
 #define TRACE_REG(symbol_, label_)					\
-	printf(" " #symbol_ " %x", m68k_get_reg(NULL, M68K_REG_ ## label_));
+	printf(" " #symbol_ " %x", m68k_get_reg(&musashi_module, NULL, M68K_REG_ ## label_));
 TRACE_REGS(TRACE_REG)
 
 	printf("\n");
@@ -782,8 +783,8 @@ TRACE_REGS(TRACE_REG)
 
 static void check_stack_bounds(struct trace *trace)
 {
-	const u32 usp = m68k_get_reg(NULL, M68K_REG_USP);
-	const u32 isp = m68k_get_reg(NULL, M68K_REG_ISP);
+	const u32 usp = m68k_get_reg(&musashi_module, NULL, M68K_REG_USP);
+	const u32 isp = m68k_get_reg(&musashi_module, NULL, M68K_REG_ISP);
 
 	if ((0 < usp && usp < 2048) ||
 	    (0 < isp && isp < 2048) || isp < usp)
