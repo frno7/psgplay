@@ -44,7 +44,6 @@ jmp_buf m68ki_aerr_trap;
 #endif
 #endif /* M68K_EMULATE_ADDRESS_ERROR */
 
-uint    m68ki_aerr_write_mode;
 uint    m68ki_aerr_fc;
 
 jmp_buf m68ki_bus_error_jmp_buf;

@@ -592,7 +592,7 @@ extern sigjmp_buf m68ki_aerr_trap;
 	if((ADDR)&1) \
 	{ \
 		module->m68ki_aerr_address = ADDR; \
-		m68ki_aerr_write_mode = WRITE_MODE; \
+		module->m68ki_aerr_write_mode = WRITE_MODE; \
 		m68ki_aerr_fc = FC; \
 		siglongjmp(m68ki_aerr_trap, 1); \
 	}
@@ -620,7 +620,7 @@ extern jmp_buf m68ki_aerr_trap;
 		if((ADDR)&1) \
 		{ \
 			module->m68ki_aerr_address = ADDR; \
-			m68ki_aerr_write_mode = WRITE_MODE; \
+			module->m68ki_aerr_write_mode = WRITE_MODE; \
 			m68ki_aerr_fc = FC; \
 			longjmp(m68ki_aerr_trap, 1); \
 		}
@@ -982,6 +982,7 @@ struct m68k_module {
 	uint m68ki_tracing;
 
 	uint m68ki_aerr_address;
+	uint m68ki_aerr_write_mode;
 
 	unsigned char m68ki_cycles[NUM_CPU_TYPES][0x10000]; /* Cycles used by CPU type */
 
@@ -996,7 +997,6 @@ extern const uint     m68ki_shift_32_table[];
 extern const uint8    m68ki_exception_cycle_table[][256];
 extern const uint8    m68ki_ea_idx_cycle_table[];
 
-extern uint           m68ki_aerr_write_mode;
 extern uint           m68ki_aerr_fc;
 
 /* Forward declarations to keep some of the macros happy */
@@ -1638,7 +1638,7 @@ static inline void m68ki_stack_frame_buserr(struct m68k_module *module, uint sr)
 	 * I/N  0 = instruction, 1 = not
 	 * FC   3-bit function code
 	 */
-	m68ki_push_16(module, m68ki_aerr_write_mode | CPU_INSTR_MODE | m68ki_aerr_fc);
+	m68ki_push_16(module, module->m68ki_aerr_write_mode | CPU_INSTR_MODE | m68ki_aerr_fc);
 }
 
 /* Format 8 stack frame (68010).
