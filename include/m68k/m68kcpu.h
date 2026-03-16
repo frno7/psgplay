@@ -982,6 +982,8 @@ struct m68k_module {
 	uint m68ki_tracing;
 
 	unsigned char m68ki_cycles[NUM_CPU_TYPES][0x10000]; /* Cycles used by CPU type */
+
+	void (*m68ki_instruction_jump_table[0x10000])(struct m68k_module *module); /* opcode handler jump table */
 };
 
 extern struct m68k_module musashi_module;
