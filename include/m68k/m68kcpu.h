@@ -591,7 +591,7 @@ extern sigjmp_buf m68ki_aerr_trap;
 #define m68ki_check_address_error(ADDR, WRITE_MODE, FC) \
 	if((ADDR)&1) \
 	{ \
-		m68ki_aerr_address = ADDR; \
+		module->m68ki_aerr_address = ADDR; \
 		m68ki_aerr_write_mode = WRITE_MODE; \
 		m68ki_aerr_fc = FC; \
 		siglongjmp(m68ki_aerr_trap, 1); \
@@ -619,7 +619,7 @@ extern jmp_buf m68ki_aerr_trap;
 	#define m68ki_check_address_error(ADDR, WRITE_MODE, FC) \
 		if((ADDR)&1) \
 		{ \
-			m68ki_aerr_address = ADDR; \
+			module->m68ki_aerr_address = ADDR; \
 			m68ki_aerr_write_mode = WRITE_MODE; \
 			m68ki_aerr_fc = FC; \
 			longjmp(m68ki_aerr_trap, 1); \
@@ -981,6 +981,8 @@ struct m68k_module {
 	uint m68ki_address_space;
 	uint m68ki_tracing;
 
+	uint m68ki_aerr_address;
+
 	unsigned char m68ki_cycles[NUM_CPU_TYPES][0x10000]; /* Cycles used by CPU type */
 
 	void (*m68ki_instruction_jump_table[0x10000])(struct m68k_module *module); /* opcode handler jump table */
@@ -994,7 +996,6 @@ extern const uint     m68ki_shift_32_table[];
 extern const uint8    m68ki_exception_cycle_table[][256];
 extern const uint8    m68ki_ea_idx_cycle_table[];
 
-extern uint           m68ki_aerr_address;
 extern uint           m68ki_aerr_write_mode;
 extern uint           m68ki_aerr_fc;
 
@@ -1631,7 +1632,7 @@ static inline void m68ki_stack_frame_buserr(struct m68k_module *module, uint sr)
 	m68ki_push_32(module, REG_PC);
 	m68ki_push_16(module, sr);
 	m68ki_push_16(module, REG_IR);
-	m68ki_push_32(module, m68ki_aerr_address);	/* access address */
+	m68ki_push_32(module, module->m68ki_aerr_address);	/* access address */
 	/* 0 0 0 0 0 0 0 0 0 0 0 R/W I/N FC
 	 * R/W  0 = write, 1 = read
 	 * I/N  0 = instruction, 1 = not
