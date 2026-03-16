@@ -5,22 +5,30 @@ set -o pipefail
 
 for f in "$@"
 do
-	nm --print-file-name "$f" | awk '
-		# rR - the symbol is in a read only data section
-		# tT - the symbol is in the text (code) section
-		# uU - the symbol is undefined
-		$2 ~ /[rRtTuU]/ { next }
+	readelf --extra-sym-info --wide --syms --dyn-syms --lto-syms "$f" |
+	awk -v "f=$f" '
+		$0 ~ /^File: / { f = $2; next }
 
-		# Dotted names are apparently compiler internal, ignore
-		$3 ~ /[.]/ { next }
+		!($1 ~ /^[0-9a-fA-F]+:$/) { next }
 
-		# Pretty paths
-		{ sub(/:[0-9a-fA-F]+$/, "", $1) }
-		{ gsub(/:/, "    ", $1) }
+		$4 == "FILE"    ||
+		$4 == "FUNC"    ||
+		$4 == "NOTYPE"  ||
+		$4 == "SECTION"  \
+		{ next }
 
-		{ printf("%-40s %s    %s\n", $1, $2, $3) }
+		$7 == "ABS" ||
+		$7 == "UND"  \
+		{ next }
+
+		$8 == "(.rodata)"            ||
+		$8 == "(.data.rel.ro)"       ||
+		$8 == "(.data.rel.ro.local)"  \
+		{ next }
+
+		{ printf("%-40s  %-20s  %s\n", f, $8, $9) }
 		{ n++ }
 
 		END { exit(n != 0) }
-	'
+	' | column -t
 done
