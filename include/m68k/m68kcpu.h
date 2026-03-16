@@ -575,9 +575,8 @@ typedef uint32 uint64;
 
 /* sigjmp() on Mac OS X and *BSD in general saves signal contexts and is super-slow, use sigsetjmp() to tell it not to */
 #ifdef _BSD_SETJMP_H
-extern sigjmp_buf m68ki_aerr_trap;
 #define m68ki_set_address_error_trap() \
-	if(sigsetjmp(m68ki_aerr_trap, 0) != 0) \
+	if(sigsetjmp(module->m68ki_aerr_trap, 0) != 0) \
 	{ \
 		m68ki_exception_address_error(module); \
 		if(CPU_STOPPED) \
@@ -594,12 +593,11 @@ extern sigjmp_buf m68ki_aerr_trap;
 		module->m68ki_aerr_address = ADDR; \
 		module->m68ki_aerr_write_mode = WRITE_MODE; \
 		module->m68ki_aerr_fc = FC; \
-		siglongjmp(m68ki_aerr_trap, 1); \
+		siglongjmp(module->m68ki_aerr_trap, 1); \
 	}
 #else
-extern jmp_buf m68ki_aerr_trap;
 	#define m68ki_set_address_error_trap() \
-		if(setjmp(m68ki_aerr_trap) != 0) \
+		if(setjmp(module->m68ki_aerr_trap) != 0) \
 		{ \
 			m68ki_exception_address_error(module); \
 			if(CPU_STOPPED) \
@@ -622,7 +620,7 @@ extern jmp_buf m68ki_aerr_trap;
 			module->m68ki_aerr_address = ADDR; \
 			module->m68ki_aerr_write_mode = WRITE_MODE; \
 			module->m68ki_aerr_fc = FC; \
-			longjmp(m68ki_aerr_trap, 1); \
+			longjmp(module->m68ki_aerr_trap, 1); \
 		}
 #endif
 
@@ -990,6 +988,13 @@ struct m68k_module {
 	void (*m68ki_instruction_jump_table[0x10000])(struct m68k_module *module); /* opcode handler jump table */
 
 	jmp_buf m68ki_bus_error_jmp_buf;
+#if M68K_EMULATE_ADDRESS_ERROR
+#ifdef _BSD_SETJMP_H
+	sigjmp_buf m68ki_aerr_trap;
+#else
+	jmp_buf m68ki_aerr_trap;
+#endif
+#endif /* M68K_EMULATE_ADDRESS_ERROR */
 };
 
 extern struct m68k_module musashi_module;

@@ -36,14 +36,6 @@ const char *const m68ki_cpu_names[] =
 };
 #endif /* M68K_LOG_ENABLE */
 
-#if M68K_EMULATE_ADDRESS_ERROR
-#ifdef _BSD_SETJMP_H
-sigjmp_buf m68ki_aerr_trap;
-#else
-jmp_buf m68ki_aerr_trap;
-#endif
-#endif /* M68K_EMULATE_ADDRESS_ERROR */
-
 /* Used by shift & rotate instructions */
 const uint8 m68ki_shift_8_table[65] =
 {
@@ -549,15 +541,6 @@ static void default_instr_hook_callback(struct m68k_module *module, unsigned int
 	(void)pc;
 }
 
-
-#if M68K_EMULATE_ADDRESS_ERROR
-	#include <setjmp.h>
-#ifdef _BSD_SETJMP_H
-sigjmp_buf m68ki_aerr_trap;
-#else
-	jmp_buf m68ki_aerr_trap;
-#endif
-#endif /* M68K_EMULATE_ADDRESS_ERROR */
 
 /* ======================================================================== */
 /* ================================= API ================================== */
