@@ -7,8 +7,6 @@
 
 #include "toslibc/asm/machine.h"
 
-#include "internal/assert.h"
-
 #include "atari/bus.h"
 #include "atari/glue.h"
 #include "atari/irq.h"
@@ -27,7 +25,9 @@ void glue_irq_set(int irq)
 {
 	const u32 p = irq_pending;
 
+#if 0  /* FIXME: Dependency on pr_bug */
 	BUG_ON(irq < 1 || 7 < irq);
+#endif
 
 	irq_pending |= 1 << irq;
 

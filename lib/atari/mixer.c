@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "internal/assert.h"
 #include "internal/compare.h"
 #include "internal/macro.h"
 

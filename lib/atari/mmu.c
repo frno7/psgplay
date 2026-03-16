@@ -3,7 +3,7 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#include "internal/assert.h"
+#include "internal/macro.h"
 #include "internal/types.h"
 
 #include "atari/bus.h"

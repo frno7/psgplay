@@ -3,7 +3,6 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#include "internal/assert.h"
 #include "internal/compare.h"
 #include "internal/struct.h"
 #include "internal/types.h"
@@ -131,7 +130,9 @@ void request_device_event(const struct device *device,
 			machine_device = &list[i];
 			break;
 		}
+#if 0  /* FIXME: Dependency on pr_bug */
 	BUG_ON(!machine_device);
+#endif
 
 	if (!machine_device->machine_cycle_event ||
 	    machine_cycle < machine_device->machine_cycle_event)

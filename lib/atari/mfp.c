@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "internal/assert.h"
 #include "internal/build-assert.h"
 #include "internal/types.h"
 

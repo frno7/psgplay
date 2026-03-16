@@ -3,7 +3,6 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
-#include "internal/assert.h"
 #include "internal/build-assert.h"
 #include "internal/macro.h"
 

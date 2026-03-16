@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "internal/assert.h"
 #include "internal/macro.h"
 
 #include "atari/bus.h"
@@ -86,7 +85,10 @@ static u8 psg_rd_u8(const struct device *device, u32 dev_address)
 	case 2:
 	case 3: return 0xff;
 	default:
+#if 0  /* FIXME: Dependency on pr_bug */
 		BUG();
+#endif
+		return 0xff;
 	}
 }
 
@@ -115,8 +117,10 @@ static void psg_wr_u8(const struct device *device, u32 dev_address, u8 data)
 			(struct cf2149_bdc) { .u8 = CF2149_BDC_DWS });
 		cf2149.port.wr_da(&cf2149, cycle, data);
 		break;
+#if 0  /* FIXME: Dependency on pr_bug */
 	default:
 		BUG();
+#endif
 	}
 }
 
@@ -140,7 +144,9 @@ static size_t psg_id_u8(const struct device *device,
 		break;
 	default:
 		snprintf(buf, size, "%2u", dev_address);
+#if 0  /* FIXME: Dependency on pr_bug */
 		BUG();
+#endif
 	}
 
 	return strlen(buf);

@@ -9,7 +9,6 @@
 
 #include "toslibc/asm/machine.h"
 
-#include "internal/assert.h"
 #include "internal/compare.h"
 #include "internal/macro.h"
 

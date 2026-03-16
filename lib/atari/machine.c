@@ -6,7 +6,6 @@
 #include <inttypes.h>
 #include <string.h>
 
-#include "internal/assert.h"
 #include "internal/build-assert.h"
 #include "internal/compare.h"
 #include "internal/macro.h"
@@ -76,9 +75,11 @@ void atari_st_init(const void *prg, size_t size, size_t offset,
 	cycle = 0;
 	m68k_clear_timeslice(&musashi_module);
 
+#if 0  /* FIXME: Dependency on pr_bug */
 	if (offset + size >= ram_device.bus.size)
 		pr_fatal_error("Program at %zu bytes too large for %u bytes\n",
 			size, ram_device.bus.size);
+#endif
 
 	device_reset();
 

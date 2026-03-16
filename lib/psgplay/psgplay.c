@@ -9,7 +9,6 @@
 
 #include "toslibc/asm/machine.h"
 
-#include "internal/assert.h"
 #include "internal/compare.h"
 #include "internal/psgplay.h"
 
@@ -524,9 +523,11 @@ static void record_digital(uint64_t cycle, void *arg)
 {
 	struct psgplay *pp = arg;
 
+#if 0	/* FIXME: Dependency on pr_bug */
 	BUG_ON(cycle < pp->record.psg);
 	BUG_ON(cycle < pp->record.dma);
 	BUG_ON(cycle < pp->record.mix);
+#endif
 
 	if (cycle < pp->record.play)
 		pp->record.play = cycle;

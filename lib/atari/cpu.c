@@ -5,8 +5,6 @@
  * FIXME: Supervisor address access
  */
 
-#include "internal/assert.h"
-
 #include "atari/cpu.h"
 #include "atari/device.h"
 #include "atari/machine.h"
@@ -45,7 +43,9 @@ u64 cpu_cycles_run(void)
 	const int cycles_run = cpu_execute ?
 		m68k_cycles_run(&musashi_module) : 0;
 
+#if 0  /* FIXME: Dependency on pr_bug */
 	BUG_ON(cycles_run < 0);
+#endif
 
 	return cycles_run;
 }
@@ -57,7 +57,9 @@ static struct device_slice cpu_run(const struct device *device,
 	const int s = m68k_execute(&musashi_module, device_slice.s);
 	cpu_execute = false;
 
+#if 0  /* FIXME: Dependency on pr_bug */
 	BUG_ON(s < 0);
+#endif
 
 	return (struct device_slice) { .s = s };
 }
