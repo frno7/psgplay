@@ -44,8 +44,6 @@ jmp_buf m68ki_aerr_trap;
 #endif
 #endif /* M68K_EMULATE_ADDRESS_ERROR */
 
-jmp_buf m68ki_bus_error_jmp_buf;
-
 /* Used by shift & rotate instructions */
 const uint8 m68ki_shift_8_table[65] =
 {

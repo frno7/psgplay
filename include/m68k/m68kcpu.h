@@ -988,6 +988,8 @@ struct m68k_module {
 	unsigned char m68ki_cycles[NUM_CPU_TYPES][0x10000]; /* Cycles used by CPU type */
 
 	void (*m68ki_instruction_jump_table[0x10000])(struct m68k_module *module); /* opcode handler jump table */
+
+	jmp_buf m68ki_bus_error_jmp_buf;
 };
 
 extern struct m68k_module musashi_module;
@@ -1887,9 +1889,7 @@ static inline void m68ki_exception_privilege_violation(struct m68k_module *modul
 	USE_CYCLES(CYC_EXCEPTION[EXCEPTION_PRIVILEGE_VIOLATION] - CYC_INSTRUCTION[REG_IR]);
 }
 
-extern jmp_buf m68ki_bus_error_jmp_buf;
-
-#define m68ki_check_bus_error_trap() setjmp(m68ki_bus_error_jmp_buf)
+#define m68ki_check_bus_error_trap() setjmp(module->m68ki_bus_error_jmp_buf)
 
 /* Exception for bus error */
 static inline void m68ki_exception_bus_error(struct m68k_module *module)
@@ -1918,7 +1918,7 @@ static inline void m68ki_exception_bus_error(struct m68k_module *module)
 	m68ki_stack_frame_1000(module, REG_PPC, sr, EXCEPTION_BUS_ERROR);
 
 	m68ki_jump_vector(module, EXCEPTION_BUS_ERROR);
-	longjmp(m68ki_bus_error_jmp_buf, 1);
+	longjmp(module->m68ki_bus_error_jmp_buf, 1);
 }
 
 extern int cpu_log_enabled;
