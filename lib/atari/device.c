@@ -124,7 +124,7 @@ void request_device_event(const struct device *device,
 
 	if (device_run_cycle.machine_slice_end &&
 	    device_run_cycle.machine_slice_end > machine_cycle)
-		m68k_end_timeslice();
+		m68k_end_timeslice(&musashi_module);
 
 	for (size_t i = 0; i < ARRAY_SIZE(list); i++)
 		if (list[i].device == device) {

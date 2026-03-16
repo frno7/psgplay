@@ -72,7 +72,7 @@ void atari_st_init(const void *prg, size_t size, size_t offset,
 	const u8 *p = prg;
 
 	cycle = 0;
-	m68k_clear_timeslice();
+	m68k_clear_timeslice(&musashi_module);
 
 	if (offset + size >= ram_device.bus.size)
 		pr_fatal_error("Program at %zu bytes too large for %u bytes\n",

@@ -24,7 +24,6 @@ extern void m68ki_build_opcode_table(void);
 struct m68k_module musashi_module;
 
 int  m68ki_initial_cycles;
-int  m68ki_remaining_cycles = 0;                     /* Number of clocks remaining */
 uint m68ki_address_space;
 
 #ifdef M68K_LOG_ENABLE
@@ -972,31 +971,31 @@ int m68k_execute(struct m68k_module *module, int num_cycles)
 }
 
 
-int m68k_cycles_run(void)
+int m68k_cycles_run(struct m68k_module *module)
 {
 	return m68ki_initial_cycles - GET_CYCLES();
 }
 
-int m68k_cycles_remaining(void)
+int m68k_cycles_remaining(struct m68k_module *module)
 {
 	return GET_CYCLES();
 }
 
 /* Change the timeslice */
-void m68k_modify_timeslice(int cycles)
+void m68k_modify_timeslice(struct m68k_module *module, int cycles)
 {
 	m68ki_initial_cycles += cycles;
 	ADD_CYCLES(cycles);
 }
 
 
-void m68k_end_timeslice(void)
+void m68k_end_timeslice(struct m68k_module *module)
 {
 	m68ki_initial_cycles -= GET_CYCLES();
 	SET_CYCLES(0);
 }
 
-void m68k_clear_timeslice(void)
+void m68k_clear_timeslice(struct m68k_module *module)
 {
 	m68ki_initial_cycles = 0;
 	SET_CYCLES(0);

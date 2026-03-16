@@ -42,7 +42,8 @@ void cpu_instruction_callback(void (*cb)(uint32_t pc, void *arg), void *arg)
 
 u64 cpu_cycles_run(void)
 {
-	const int cycles_run = cpu_execute ? m68k_cycles_run() : 0;
+	const int cycles_run = cpu_execute ?
+		m68k_cycles_run(&musashi_module) : 0;
 
 	BUG_ON(cycles_run < 0);
 

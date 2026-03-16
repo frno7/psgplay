@@ -582,8 +582,8 @@ extern sigjmp_buf m68ki_aerr_trap;
 		m68ki_exception_address_error(module); \
 		if(CPU_STOPPED) \
 		{ \
-			if (m68ki_remaining_cycles > 0) \
-				m68ki_remaining_cycles = 0; \
+			if (module->m68ki_remaining_cycles > 0) \
+				module->m68ki_remaining_cycles = 0; \
 			return m68ki_initial_cycles; \
 		} \
 	}
@@ -840,11 +840,11 @@ extern jmp_buf m68ki_aerr_trap;
 
 /* ---------------------------- Cycle Counting ---------------------------- */
 
-#define ADD_CYCLES(A)    m68ki_remaining_cycles += (A)
-#define USE_CYCLES(A)    m68ki_remaining_cycles -= (A)
-#define SET_CYCLES(A)    m68ki_remaining_cycles = A
-#define GET_CYCLES()     m68ki_remaining_cycles
-#define USE_ALL_CYCLES() m68ki_remaining_cycles %= CYC_INSTRUCTION[REG_IR]
+#define ADD_CYCLES(A)    module->m68ki_remaining_cycles += (A)
+#define USE_CYCLES(A)    module->m68ki_remaining_cycles -= (A)
+#define SET_CYCLES(A)    module->m68ki_remaining_cycles = A
+#define GET_CYCLES()     module->m68ki_remaining_cycles
+#define USE_ALL_CYCLES() module->m68ki_remaining_cycles %= CYC_INSTRUCTION[REG_IR]
 
 
 
@@ -976,12 +976,12 @@ struct m68k_module {
 	/* The CPU core */
 	m68ki_cpu_core m68ki_cpu;
 
+	int  m68ki_remaining_cycles;	/* Number of clocks remaining */
 	uint m68ki_tracing;
 };
 
 extern struct m68k_module musashi_module;
 
-extern sint           m68ki_remaining_cycles;
 extern const uint8    m68ki_shift_8_table[];
 extern const uint16   m68ki_shift_16_table[];
 extern const uint     m68ki_shift_32_table[];
