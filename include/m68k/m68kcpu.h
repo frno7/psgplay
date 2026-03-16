@@ -1127,7 +1127,7 @@ static inline uint m68ki_read_8_fc(struct m68k_module *module, uint address, uin
 	    address = pmmu_translate_addr(address);
 #endif
 
-	return m68k_read_memory_8(ADDRESS_68K(address));
+	return m68k_read_memory_8(module, ADDRESS_68K(address));
 }
 static inline uint m68ki_read_16_fc(struct m68k_module *module, uint address, uint fc)
 {
@@ -1140,7 +1140,7 @@ static inline uint m68ki_read_16_fc(struct m68k_module *module, uint address, ui
 	    address = pmmu_translate_addr(address);
 #endif
 
-	return m68k_read_memory_16(ADDRESS_68K(address));
+	return m68k_read_memory_16(module, ADDRESS_68K(address));
 }
 static inline uint m68ki_read_32_fc(struct m68k_module *module, uint address, uint fc)
 {
@@ -1153,7 +1153,7 @@ static inline uint m68ki_read_32_fc(struct m68k_module *module, uint address, ui
 	    address = pmmu_translate_addr(address);
 #endif
 
-	return m68k_read_memory_32(ADDRESS_68K(address));
+	return m68k_read_memory_32(module, ADDRESS_68K(address));
 }
 
 static inline void m68ki_write_8_fc(struct m68k_module *module, uint address, uint fc, uint value)
@@ -1166,7 +1166,7 @@ static inline void m68ki_write_8_fc(struct m68k_module *module, uint address, ui
 	    address = pmmu_translate_addr(address);
 #endif
 
-	m68k_write_memory_8(ADDRESS_68K(address), value);
+	m68k_write_memory_8(module, ADDRESS_68K(address), value);
 }
 static inline void m68ki_write_16_fc(struct m68k_module *module, uint address, uint fc, uint value)
 {
@@ -1179,7 +1179,7 @@ static inline void m68ki_write_16_fc(struct m68k_module *module, uint address, u
 	    address = pmmu_translate_addr(address);
 #endif
 
-	m68k_write_memory_16(ADDRESS_68K(address), value);
+	m68k_write_memory_16(module, ADDRESS_68K(address), value);
 }
 static inline void m68ki_write_32_fc(struct m68k_module *module, uint address, uint fc, uint value)
 {
@@ -1192,7 +1192,7 @@ static inline void m68ki_write_32_fc(struct m68k_module *module, uint address, u
 	    address = pmmu_translate_addr(address);
 #endif
 
-	m68k_write_memory_32(ADDRESS_68K(address), value);
+	m68k_write_memory_32(module, ADDRESS_68K(address), value);
 }
 
 #if M68K_SIMULATE_PD_WRITES
@@ -1207,7 +1207,7 @@ static inline void m68ki_write_32_pd_fc(struct m68k_module *module, uint address
 	    address = pmmu_translate_addr(address);
 #endif
 
-	m68k_write_memory_32_pd(ADDRESS_68K(address), value);
+	m68k_write_memory_32_pd(module, ADDRESS_68K(address), value);
 }
 #endif
 
@@ -2023,7 +2023,7 @@ static inline void m68ki_exception_address_error(struct m68k_module *module)
 	 */
 	if(CPU_RUN_MODE == RUN_MODE_BERR_AERR_RESET)
 	{
-m68k_read_memory_8(0x00ffff01);
+		m68k_read_memory_8(module, 0x00ffff01);
 		CPU_STOPPED = STOP_LEVEL_HALT;
 		return;
 	}
