@@ -29,6 +29,7 @@ system/unix/system-unix-disassemble.o: PSGPLAY_CFLAGS += -Ilib/toslibc/include
 endif
 
 PSGPLAY_SRC :=								\
+	lib/internal/print.c						\
 	$(AUDIO_SRC)							\
 	$(DISASSEMBLE_SRC) 						\
 	$(SYSTEM_UNIX_SRC)						\

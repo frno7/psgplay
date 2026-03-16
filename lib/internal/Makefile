@@ -3,7 +3,6 @@
 INTERNAL_SRC :=								\
 	lib/internal/bit.c						\
 	lib/internal/fifo.c						\
-	lib/internal/print.c						\
 	lib/internal/string.c
 
 ALL_OBJ += lib/internal/sso.o
