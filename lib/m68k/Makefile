@@ -72,12 +72,11 @@ ALL_OBJ += $(M68KDG).o $(M68KMAKE).o					\
 
 ifeq (1,$(HAVE_SSO))
 
-M68K_SRC += $(M68KDA_SRC)
 M68K_OBJ := $(M68K_SRC:%.c=%.o)
 
 lib/m68k/m68kdt.c: $(M68KDG_GEN_H)
 
-$(M68K_OBJ) $(M68KDT_OBJ): %.o : %.c
+$(M68K_OBJ) $(M68KDA_OBJ) $(M68KDT_OBJ): %.o : %.c
 	$(QUIET_CC)$(HOST_CC) $(M68K_HOST_CFLAGS) -c -o $@ $<
 
 $(M68KDT): $(M68KDT_OBJ) $(M68KDG_LINK_OBJ) $(M68KDA_OBJ)

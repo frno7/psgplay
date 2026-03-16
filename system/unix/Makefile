@@ -38,6 +38,11 @@ PSGPLAY_SRC :=								\
 
 PSGPLAY_object = $(addprefix system/unix/,$(subst /,-,$(1:%.c=%.o)))
 
+ifeq (1,$(HAVE_SSO))
+PSGPLAY_SRC += $(M68KDA_SRC)
+endif
+ALL_OBJ += $(call PSGPLAY_object,$(M68KDA_SRC))
+
 define PSGPLAY_target
 PSGPLAY_OBJ += $(call PSGPLAY_object,$(1))
 $(call PSGPLAY_object,$(1)): $(1)
