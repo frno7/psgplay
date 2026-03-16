@@ -553,13 +553,13 @@ typedef uint32 uint64;
 /* Enable or disable trace emulation */
 #if M68K_EMULATE_TRACE
 	/* Initiates trace checking before each instruction (t1) */
-	#define m68ki_trace_t1() m68ki_tracing = FLAG_T1
+	#define m68ki_trace_t1() module->m68ki_tracing = FLAG_T1
 	/* adds t0 to trace checking if we encounter change of flow */
-	#define m68ki_trace_t0() m68ki_tracing |= FLAG_T0
+	#define m68ki_trace_t0() module->m68ki_tracing |= FLAG_T0
 	/* Clear all tracing */
-	#define m68ki_clear_trace() m68ki_tracing = 0
+	#define m68ki_clear_trace() module->m68ki_tracing = 0
 	/* Cause a trace exception if we are tracing */
-	#define m68ki_exception_if_trace() if(m68ki_tracing) m68ki_exception_trace(module)
+	#define m68ki_exception_if_trace() if(module->m68ki_tracing) m68ki_exception_trace(module)
 #else
 	#define m68ki_trace_t1()
 	#define m68ki_trace_t0()
@@ -975,12 +975,13 @@ typedef struct
 struct m68k_module {
 	/* The CPU core */
 	m68ki_cpu_core m68ki_cpu;
+
+	uint m68ki_tracing;
 };
 
 extern struct m68k_module musashi_module;
 
 extern sint           m68ki_remaining_cycles;
-extern uint           m68ki_tracing;
 extern const uint8    m68ki_shift_8_table[];
 extern const uint16   m68ki_shift_16_table[];
 extern const uint     m68ki_shift_32_table[];
