@@ -584,7 +584,7 @@ extern sigjmp_buf m68ki_aerr_trap;
 		{ \
 			if (module->m68ki_remaining_cycles > 0) \
 				module->m68ki_remaining_cycles = 0; \
-			return m68ki_initial_cycles; \
+			return module->m68ki_initial_cycles; \
 		} \
 	}
 
@@ -605,14 +605,14 @@ extern jmp_buf m68ki_aerr_trap;
 			if(CPU_STOPPED) \
 			{ \
 				SET_CYCLES(0); \
-				return m68ki_initial_cycles; \
+				return module->m68ki_initial_cycles; \
 			} \
 			/* ensure we don't re-enter execution loop after an
 			   address error if there's no more cycles remaining */ \
 			if(GET_CYCLES() <= 0) \
 			{ \
 				/* return how many clocks we used */ \
-				return m68ki_initial_cycles - GET_CYCLES(); \
+				return module->m68ki_initial_cycles - GET_CYCLES(); \
 			} \
 		}
 
@@ -976,6 +976,7 @@ struct m68k_module {
 	/* The CPU core */
 	m68ki_cpu_core m68ki_cpu;
 
+	int  m68ki_initial_cycles;
 	int  m68ki_remaining_cycles;	/* Number of clocks remaining */
 	uint m68ki_tracing;
 };

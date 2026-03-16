@@ -23,7 +23,6 @@ extern void m68ki_build_opcode_table(void);
 
 struct m68k_module musashi_module;
 
-int  m68ki_initial_cycles;
 uint m68ki_address_space;
 
 #ifdef M68K_LOG_ENABLE
@@ -917,7 +916,7 @@ int m68k_execute(struct m68k_module *module, int num_cycles)
 
 	/* Set our pool of clock cycles available */
 	SET_CYCLES(num_cycles);
-	m68ki_initial_cycles = num_cycles;
+	module->m68ki_initial_cycles = num_cycles;
 
 	/* See if interrupts came in */
 	m68ki_check_interrupts(module);
@@ -967,13 +966,13 @@ int m68k_execute(struct m68k_module *module, int num_cycles)
 		SET_CYCLES(0);
 
 	/* return how many clocks we used */
-	return m68ki_initial_cycles - GET_CYCLES();
+	return module->m68ki_initial_cycles - GET_CYCLES();
 }
 
 
 int m68k_cycles_run(struct m68k_module *module)
 {
-	return m68ki_initial_cycles - GET_CYCLES();
+	return module->m68ki_initial_cycles - GET_CYCLES();
 }
 
 int m68k_cycles_remaining(struct m68k_module *module)
@@ -984,20 +983,20 @@ int m68k_cycles_remaining(struct m68k_module *module)
 /* Change the timeslice */
 void m68k_modify_timeslice(struct m68k_module *module, int cycles)
 {
-	m68ki_initial_cycles += cycles;
+	module->m68ki_initial_cycles += cycles;
 	ADD_CYCLES(cycles);
 }
 
 
 void m68k_end_timeslice(struct m68k_module *module)
 {
-	m68ki_initial_cycles -= GET_CYCLES();
+	module->m68ki_initial_cycles -= GET_CYCLES();
 	SET_CYCLES(0);
 }
 
 void m68k_clear_timeslice(struct m68k_module *module)
 {
-	m68ki_initial_cycles = 0;
+	module->m68ki_initial_cycles = 0;
 	SET_CYCLES(0);
 }
 
