@@ -88,10 +88,9 @@ M68KMAKE_PROTOTYPE_FOOTER
 struct m68k_module;
 
 /* Build the opcode handler table */
-void m68ki_build_opcode_table(void);
+void m68ki_build_opcode_table(struct m68k_module *module);
 
 extern void (*m68ki_instruction_jump_table[0x10000])(struct m68k_module *module); /* opcode handler jump table */
-extern unsigned char m68ki_cycles[][0x10000];
 
 
 /* ======================================================================== */
@@ -112,10 +111,7 @@ M68KMAKE_TABLE_HEADER
 #include <stdio.h>
 #include "m68k/m68kops.h"
 
-#define NUM_CPU_TYPES 5
-
 void  (*m68ki_instruction_jump_table[0x10000])(struct m68k_module *module); /* opcode handler jump table */
-unsigned char m68ki_cycles[NUM_CPU_TYPES][0x10000]; /* Cycles used by CPU type */
 
 /* This is used to generate the opcode handler jump table */
 typedef struct
@@ -142,7 +138,7 @@ M68KMAKE_TABLE_FOOTER
 
 
 /* Build the opcode handler jump table */
-void m68ki_build_opcode_table(void)
+void m68ki_build_opcode_table(struct m68k_module *module)
 {
 	const opcode_handler_struct *ostruct;
 	int cycle_cost;
@@ -156,7 +152,7 @@ void m68ki_build_opcode_table(void)
 		/* default to illegal */
 		m68ki_instruction_jump_table[i] = m68k_op_illegal;
 		for(k=0;k<NUM_CPU_TYPES;k++)
-			m68ki_cycles[k][i] = 0;
+			module->m68ki_cycles[k][i] = 0;
 	}
 
 	ostruct = m68k_opcode_handler_table;
@@ -168,7 +164,7 @@ void m68ki_build_opcode_table(void)
 			{
 				m68ki_instruction_jump_table[i] = ostruct->opcode_handler;
 				for(k=0;k<NUM_CPU_TYPES;k++)
-					m68ki_cycles[k][i] = ostruct->cycles[k];
+					module->m68ki_cycles[k][i] = ostruct->cycles[k];
 			}
 		}
 		ostruct++;
@@ -179,7 +175,7 @@ void m68ki_build_opcode_table(void)
 		{
 			m68ki_instruction_jump_table[ostruct->match | i] = ostruct->opcode_handler;
 			for(k=0;k<NUM_CPU_TYPES;k++)
-				m68ki_cycles[k][ostruct->match | i] = ostruct->cycles[k];
+				module->m68ki_cycles[k][ostruct->match | i] = ostruct->cycles[k];
 		}
 		ostruct++;
 	}
@@ -192,17 +188,17 @@ void m68ki_build_opcode_table(void)
 				instr = ostruct->match | (i << 9) | j;
 				m68ki_instruction_jump_table[instr] = ostruct->opcode_handler;
 				for(k=0;k<NUM_CPU_TYPES;k++)
-					m68ki_cycles[k][instr] = ostruct->cycles[k];
+					module->m68ki_cycles[k][instr] = ostruct->cycles[k];
 				// For all shift operations with known shift distance (encoded in instruction word)
 				if((instr & 0xf000) == 0xe000 && (!(instr & 0x20)))
 				{
 					// On the 68000 and 68010 shift distance affect execution time.
 					// Add the cycle cost of shifting; 2 times the shift distance
 					cycle_cost = ((((i-1)&7)+1)<<1);
-					m68ki_cycles[0][instr] += cycle_cost;
-					m68ki_cycles[1][instr] += cycle_cost;
+					module->m68ki_cycles[0][instr] += cycle_cost;
+					module->m68ki_cycles[1][instr] += cycle_cost;
 					// On the 68020 shift distance does not affect execution time
-					m68ki_cycles[2][instr] += 0;
+					module->m68ki_cycles[2][instr] += 0;
 				}
 			}
 		}
@@ -214,7 +210,7 @@ void m68ki_build_opcode_table(void)
 		{
 			m68ki_instruction_jump_table[ostruct->match | i] = ostruct->opcode_handler;
 			for(k=0;k<NUM_CPU_TYPES;k++)
-				m68ki_cycles[k][ostruct->match | i] = ostruct->cycles[k];
+				module->m68ki_cycles[k][ostruct->match | i] = ostruct->cycles[k];
 		}
 		ostruct++;
 	}
@@ -224,7 +220,7 @@ void m68ki_build_opcode_table(void)
 		{
 			m68ki_instruction_jump_table[ostruct->match | (i << 9)] = ostruct->opcode_handler;
 			for(k=0;k<NUM_CPU_TYPES;k++)
-				m68ki_cycles[k][ostruct->match | (i << 9)] = ostruct->cycles[k];
+				module->m68ki_cycles[k][ostruct->match | (i << 9)] = ostruct->cycles[k];
 		}
 		ostruct++;
 	}
@@ -234,7 +230,7 @@ void m68ki_build_opcode_table(void)
 		{
 			m68ki_instruction_jump_table[ostruct->match | i] = ostruct->opcode_handler;
 			for(k=0;k<NUM_CPU_TYPES;k++)
-				m68ki_cycles[k][ostruct->match | i] = ostruct->cycles[k];
+				module->m68ki_cycles[k][ostruct->match | i] = ostruct->cycles[k];
 		}
 		ostruct++;
 	}
@@ -242,7 +238,7 @@ void m68ki_build_opcode_table(void)
 	{
 		m68ki_instruction_jump_table[ostruct->match] = ostruct->opcode_handler;
 		for(k=0;k<NUM_CPU_TYPES;k++)
-			m68ki_cycles[k][ostruct->match] = ostruct->cycles[k];
+			module->m68ki_cycles[k][ostruct->match] = ostruct->cycles[k];
 		ostruct++;
 	}
 }

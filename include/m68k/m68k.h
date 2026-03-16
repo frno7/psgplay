@@ -37,6 +37,8 @@ extern "C" {
 
 /* ======================================================================== */
 
+#define NUM_CPU_TYPES 5
+
 /* There are 7 levels of interrupt to the 68K.
  * A transition from < 7 to 7 will cause a non-maskable interrupt (NMI).
  */

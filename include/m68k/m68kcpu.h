@@ -980,6 +980,8 @@ struct m68k_module {
 	int  m68ki_remaining_cycles;	/* Number of clocks remaining */
 	uint m68ki_address_space;
 	uint m68ki_tracing;
+
+	unsigned char m68ki_cycles[NUM_CPU_TYPES][0x10000]; /* Cycles used by CPU type */
 };
 
 extern struct m68k_module musashi_module;

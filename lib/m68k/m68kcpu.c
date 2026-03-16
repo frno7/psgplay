@@ -10,9 +10,8 @@ struct m68k_module;
 extern void m68040_fpu_op0(void);
 extern void m68040_fpu_op1(void);
 extern void m68881_mmu_ops(void);
-extern unsigned char m68ki_cycles[][0x10000];
 extern void (*m68ki_instruction_jump_table[0x10000])(struct m68k_module *module); /* opcode handler jump table */
-extern void m68ki_build_opcode_table(void);
+extern void m68ki_build_opcode_table(struct m68k_module *module);
 
 #include "m68k/m68kops.h"
 #include "m68k/m68kcpu.h"
@@ -743,7 +742,7 @@ void m68k_set_cpu_type(struct m68k_module *module, unsigned int cpu_type)
 			CPU_TYPE         = CPU_TYPE_000;
 			CPU_ADDRESS_MASK = 0x00ffffff;
 			CPU_SR_MASK      = 0xa71f; /* T1 -- S  -- -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
-			CYC_INSTRUCTION  = m68ki_cycles[0];
+			CYC_INSTRUCTION  = module->m68ki_cycles[0];
 			CYC_EXCEPTION    = m68ki_exception_cycle_table[0];
 			CYC_BCC_NOTAKE_B = -2;
 			CYC_BCC_NOTAKE_W = 2;
@@ -765,7 +764,7 @@ void m68k_set_cpu_type(struct m68k_module *module, unsigned int cpu_type)
 			CPU_TYPE         = CPU_TYPE_010;
 			CPU_ADDRESS_MASK = 0x00ffffff;
 			CPU_SR_MASK      = 0xa71f; /* T1 -- S  -- -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
-			CYC_INSTRUCTION  = m68ki_cycles[1];
+			CYC_INSTRUCTION  = module->m68ki_cycles[1];
 			CYC_EXCEPTION    = m68ki_exception_cycle_table[1];
 			CYC_BCC_NOTAKE_B = -4;
 			CYC_BCC_NOTAKE_W = 0;
@@ -782,7 +781,7 @@ void m68k_set_cpu_type(struct m68k_module *module, unsigned int cpu_type)
 			CPU_TYPE         = CPU_TYPE_EC020;
 			CPU_ADDRESS_MASK = 0x00ffffff;
 			CPU_SR_MASK      = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
-			CYC_INSTRUCTION  = m68ki_cycles[2];
+			CYC_INSTRUCTION  = module->m68ki_cycles[2];
 			CYC_EXCEPTION    = m68ki_exception_cycle_table[2];
 			CYC_BCC_NOTAKE_B = -2;
 			CYC_BCC_NOTAKE_W = 0;
@@ -799,7 +798,7 @@ void m68k_set_cpu_type(struct m68k_module *module, unsigned int cpu_type)
 			CPU_TYPE         = CPU_TYPE_020;
 			CPU_ADDRESS_MASK = 0xffffffff;
 			CPU_SR_MASK      = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
-			CYC_INSTRUCTION  = m68ki_cycles[2];
+			CYC_INSTRUCTION  = module->m68ki_cycles[2];
 			CYC_EXCEPTION    = m68ki_exception_cycle_table[2];
 			CYC_BCC_NOTAKE_B = -2;
 			CYC_BCC_NOTAKE_W = 0;
@@ -816,7 +815,7 @@ void m68k_set_cpu_type(struct m68k_module *module, unsigned int cpu_type)
 			CPU_TYPE         = CPU_TYPE_030;
 			CPU_ADDRESS_MASK = 0xffffffff;
 			CPU_SR_MASK      = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
-			CYC_INSTRUCTION  = m68ki_cycles[3];
+			CYC_INSTRUCTION  = module->m68ki_cycles[3];
 			CYC_EXCEPTION    = m68ki_exception_cycle_table[3];
 			CYC_BCC_NOTAKE_B = -2;
 			CYC_BCC_NOTAKE_W = 0;
@@ -833,7 +832,7 @@ void m68k_set_cpu_type(struct m68k_module *module, unsigned int cpu_type)
 			CPU_TYPE         = CPU_TYPE_EC030;
 			CPU_ADDRESS_MASK = 0xffffffff;
 			CPU_SR_MASK          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
-			CYC_INSTRUCTION  = m68ki_cycles[3];
+			CYC_INSTRUCTION  = module->m68ki_cycles[3];
 			CYC_EXCEPTION    = m68ki_exception_cycle_table[3];
 			CYC_BCC_NOTAKE_B = -2;
 			CYC_BCC_NOTAKE_W = 0;
@@ -850,7 +849,7 @@ void m68k_set_cpu_type(struct m68k_module *module, unsigned int cpu_type)
 			CPU_TYPE         = CPU_TYPE_040;
 			CPU_ADDRESS_MASK = 0xffffffff;
 			CPU_SR_MASK      = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
-			CYC_INSTRUCTION  = m68ki_cycles[4];
+			CYC_INSTRUCTION  = module->m68ki_cycles[4];
 			CYC_EXCEPTION    = m68ki_exception_cycle_table[4];
 			CYC_BCC_NOTAKE_B = -2;
 			CYC_BCC_NOTAKE_W = 0;
@@ -867,7 +866,7 @@ void m68k_set_cpu_type(struct m68k_module *module, unsigned int cpu_type)
 			CPU_TYPE         = CPU_TYPE_EC040;
 			CPU_ADDRESS_MASK = 0xffffffff;
 			CPU_SR_MASK      = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
-			CYC_INSTRUCTION  = m68ki_cycles[4];
+			CYC_INSTRUCTION  = module->m68ki_cycles[4];
 			CYC_EXCEPTION    = m68ki_exception_cycle_table[4];
 			CYC_BCC_NOTAKE_B = -2;
 			CYC_BCC_NOTAKE_W = 0;
@@ -883,7 +882,7 @@ void m68k_set_cpu_type(struct m68k_module *module, unsigned int cpu_type)
 		case M68K_CPU_TYPE_68LC040:
 			CPU_TYPE         = CPU_TYPE_LC040;
 			module->m68ki_cpu.sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
-			module->m68ki_cpu.cyc_instruction  = m68ki_cycles[4];
+			module->m68ki_cpu.cyc_instruction  = module->m68ki_cycles[4];
 			module->m68ki_cpu.cyc_exception    = m68ki_exception_cycle_table[4];
 			module->m68ki_cpu.cyc_bcc_notake_b = -2;
 			module->m68ki_cpu.cyc_bcc_notake_w = 0;
@@ -1039,7 +1038,7 @@ void m68k_init(struct m68k_module *module)
 {
 	*module = (struct m68k_module) { };
 
-	m68ki_build_opcode_table();
+	m68ki_build_opcode_table(module);
 
 	m68k_set_int_ack_callback(module, NULL);
 	m68k_set_bkpt_ack_callback(module, NULL);
