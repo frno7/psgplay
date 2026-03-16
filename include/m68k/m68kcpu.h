@@ -539,9 +539,9 @@ typedef uint32 uint64;
 	#else
 		#define m68ki_set_fc(A) CALLBACK_SET_FC(A)
 	#endif
-	#define m68ki_use_data_space() m68ki_address_space = FUNCTION_CODE_USER_DATA
-	#define m68ki_use_program_space() m68ki_address_space = FUNCTION_CODE_USER_PROGRAM
-	#define m68ki_get_address_space() m68ki_address_space
+	#define m68ki_use_data_space() module->m68ki_address_space = FUNCTION_CODE_USER_DATA
+	#define m68ki_use_program_space() module->m68ki_address_space = FUNCTION_CODE_USER_PROGRAM
+	#define m68ki_get_address_space() module->m68ki_address_space
 #else
 	#define m68ki_set_fc(A)
 	#define m68ki_use_data_space()
@@ -978,6 +978,7 @@ struct m68k_module {
 
 	int  m68ki_initial_cycles;
 	int  m68ki_remaining_cycles;	/* Number of clocks remaining */
+	uint m68ki_address_space;
 	uint m68ki_tracing;
 };
 
@@ -987,7 +988,6 @@ extern const uint8    m68ki_shift_8_table[];
 extern const uint16   m68ki_shift_16_table[];
 extern const uint     m68ki_shift_32_table[];
 extern const uint8    m68ki_exception_cycle_table[][256];
-extern uint           m68ki_address_space;
 extern const uint8    m68ki_ea_idx_cycle_table[];
 
 extern uint           m68ki_aerr_address;

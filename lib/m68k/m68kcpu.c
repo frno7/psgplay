@@ -23,8 +23,6 @@ extern void m68ki_build_opcode_table(void);
 
 struct m68k_module musashi_module;
 
-uint m68ki_address_space;
-
 #ifdef M68K_LOG_ENABLE
 const char *const m68ki_cpu_names[] =
 {
