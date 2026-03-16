@@ -43,6 +43,8 @@ Test and verification targets and options (requires TARGET_COMPILE=m68k-elf-):
 
   PSGPLAY_TEST    - set optional program to test, other than the psgplay command
 
+  global          - compile PSG play library and check for global variables
+
 Makefile options:
 
   -j [n]          - n simultaneous jobs for speed; unlimited with no argument

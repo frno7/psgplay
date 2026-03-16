@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+set -e
+set -o pipefail
+
+for f in "$@"
+do
+	nm --print-file-name "$f" | awk '
+		# rR - the symbol is in a read only data section
+		# tT - the symbol is in the text (code) section
+		# uU - the symbol is undefined
+		$2 ~ /[rRtTuU]/ { next }
+
+		# Dotted names are apparently compiler internal, ignore
+		$3 ~ /[.]/ { next }
+
+		# Pretty paths
+		{ sub(/:[0-9a-fA-F]+$/, "", $1) }
+		{ gsub(/:/, "    ", $1) }
+
+		{ printf("%-40s %s    %s\n", $1, $2, $3) }
+		{ n++ }
+
+		END { exit(n != 0) }
+	'
+done

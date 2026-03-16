@@ -112,6 +112,10 @@ endif
 version:
 	@script/version
 
+.PHONY: global
+global: $(LIBPSGPLAY_STATIC)
+	@script/global $^
+
 .PHONY: gtags
 gtags:
 	$(QUIET_GEN)gtags
