@@ -40,11 +40,6 @@ static struct {
 	struct mixer_sample sample;
 } state;
 
-static struct {
-	mixer_sample_f sample;
-	void *sample_arg;
-} output;
-
 static char *mixer_register_name(u32 reg)
 {
 	switch (reg) {
@@ -87,14 +82,16 @@ static void mixer_emit(struct machine *machine,
 		buffer[count++] = state.sample;
 
 		if (count >= ARRAY_SIZE(buffer)) {
-			if (output.sample)
-				output.sample(buffer, count, output.sample_arg);
+			if (machine->mixer.output.sample)
+				machine->mixer.output.sample(buffer, count,
+					machine->mixer.output.sample_arg);
 			count = 0;
 		}
 	}
 
-	if (count && output.sample)
-		output.sample(buffer, count, output.sample_arg);
+	if (count && machine->mixer.output.sample)
+		machine->mixer.output.sample(buffer,
+			count, machine->mixer.output.sample_arg);
 
 	const u32 shift = microwire_shift(mixer_cycle);
 	if (shift) {
@@ -280,8 +277,8 @@ static void mixer_reset(struct machine *machine, const struct device *device)
 void mixer_sample(struct machine *machine,
 	mixer_sample_f sample, void *sample_arg)
 {
-	output.sample = sample;
-	output.sample_arg = sample_arg;
+	machine->mixer.output.sample = sample;
+	machine->mixer.output.sample_arg = sample_arg;
 }
 
 const struct device mixer_device = {

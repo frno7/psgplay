@@ -52,6 +52,11 @@ struct machine {
 
 	struct {
 		u64 mixer_emit_latest_cycle;
+
+		struct {
+			mixer_sample_f sample;
+			void *sample_arg;
+		} output;
 	} mixer;
 
 	struct {
