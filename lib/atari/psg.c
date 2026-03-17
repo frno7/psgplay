@@ -19,11 +19,6 @@
 #define PSG_EVENT_FREQUENCY 100		/* 10 ms */
 #define PSG_EVENT_CYCLES (PSG_FREQUENCY / PSG_EVENT_FREQUENCY)
 
-static struct {
-	psg_sample_f sample;
-	void *sample_arg;
-} output;
-
 static char *psg_register_name(u32 reg)
 {
 	switch (reg) {
@@ -55,8 +50,9 @@ static void psg_emit(struct machine *machine,
 		if (!n)
 			return;
 
-		if (output.sample)
-			output.sample(buffer, n, output.sample_arg);
+		if (machine->psg.output.sample)
+			machine->psg.output.sample(buffer, n,
+					machine->psg.output.sample_arg);
 	}
 }
 
@@ -180,8 +176,8 @@ static void psg_reset(struct machine *machine, const struct device *device)
 void psg_sample(struct machine *machine,
 	psg_sample_f sample, void *sample_arg)
 {
-	output.sample = sample;
-	output.sample_arg = sample_arg;
+	machine->psg.output.sample = sample;
+	machine->psg.output.sample_arg = sample_arg;
 }
 
 const struct device psg_device = {

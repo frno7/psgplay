@@ -52,6 +52,11 @@ struct machine {
 
 	struct {
 		struct cf2149_module cf2149;
+
+		struct {
+			psg_sample_f sample;
+			void *sample_arg;
+		} output;
 	} psg;
 
 	struct {
