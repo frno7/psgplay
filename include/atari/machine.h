@@ -32,6 +32,10 @@ struct machine_ports {
 	void *arg;
 };
 
+enum {
+	MACHINE_RAM_SIZE = 4 * 1024 * 1024,	/* 4 MiB of RAM */
+};
+
 struct machine {
 	void (*init)(struct machine *machine,
 		const void *prg, size_t size, size_t offset,
@@ -43,6 +47,10 @@ struct machine {
 		void (*cb)(uint32_t pc, void *arg);
 		void *arg;
 	} instruction_callback;
+
+	struct {
+		uint8_t u8[MACHINE_RAM_SIZE];
+	} ram;
 };
 
 u64 cycle_transform(u64 to_frequency, u64 from_frequency, u64 cycle);

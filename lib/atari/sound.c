@@ -84,7 +84,7 @@ static void sound_event(struct machine *machine, const struct device *device,
 	const struct cf300588_sound_dma_region dma_region =
 		cf300588.port.dma(&cf300588);
 	const struct ram_map_ro ram_map =
-		ram_map_ro(dma_region.size, dma_region.addr);
+		ram_map_ro(machine, dma_region.size, dma_region.addr);
 	const struct cf300588_sound_dma_map dma_map = {
 		.size = ram_map.size,
 		.addr = ram_map.addr,

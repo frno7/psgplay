@@ -17,36 +17,36 @@
 
 #include "tos/tos.h"
 
-static u8 ram[4 * 1024 * 1024];	/* 4 MiB of RAM */
-
-struct ram_map_ro ram_map_ro(uint32_t size, uint32_t addr)
+struct ram_map_ro ram_map_ro(struct machine *machine,
+	uint32_t size, uint32_t addr)
 {
-	if (ARRAY_SIZE(ram) <= addr)
+	if (ARRAY_SIZE(machine->ram.u8) <= addr)
 		return (struct ram_map_ro) { };
 
 	return (struct ram_map_ro) {
-		.size = min_t(uint32_t, size, ARRAY_SIZE(ram) - addr),
+		.size = min_t(uint32_t, size, ARRAY_SIZE(machine->ram.u8) - addr),
 		.addr = addr,
-		.p = &ram[addr],
+		.p = &machine->ram.u8[addr],
 	};
 }
 
 static void ram_reset(struct machine *machine, const struct device *device)
 {
-	memcpy(&ram[0], tos, 8);	/* ROM overlay during reset */
-	memset(&ram[8], 0, sizeof(ram) - 8);
+	memcpy(&machine->ram.u8[0], tos, 8);	/* ROM overlay during reset */
+	memset(&machine->ram.u8[8], 0, sizeof(machine->ram.u8) - 8);
 }
 
 static u8 ram_rd_u8(struct machine *machine, const struct device *device,
 	u32 dev_address)
 {
-	return ram[dev_address];
+	return machine->ram.u8[dev_address];
 }
 
 static u16 ram_rd_u16(struct machine *machine, const struct device *device,
 	u32 dev_address)
 {
-	return (ram[dev_address] << 8) | ram[dev_address + 1];
+	return (machine->ram.u8[dev_address] << 8) |
+		machine->ram.u8[dev_address + 1];
 }
 
 static void ram_wr_u8(struct machine *machine, const struct device *device,
@@ -54,7 +54,7 @@ static void ram_wr_u8(struct machine *machine, const struct device *device,
 {
 	sound_check(machine, dev_address);
 
-	ram[dev_address] = data;
+	machine->ram.u8[dev_address] = data;
 }
 
 static void ram_wr_u16(struct machine *machine, const struct device *device,
@@ -62,8 +62,8 @@ static void ram_wr_u16(struct machine *machine, const struct device *device,
 {
 	sound_check(machine, dev_address);
 
-	ram[dev_address] = data >> 8;
-	ram[dev_address + 1] = data & 0xff;
+	machine->ram.u8[dev_address] = data >> 8;
+	machine->ram.u8[dev_address + 1] = data & 0xff;
 }
 
 static size_t ram_id_u8(struct machine *machine,
@@ -94,7 +94,7 @@ const struct device ram_device = {
 	.main_bus = true,
 	.bus = {
 		.address = 0,
-		.size = sizeof(ram),
+		.size = MACHINE_RAM_SIZE,
 	},
 	.reset  = ram_reset,
 	.rd_u8  = ram_rd_u8,

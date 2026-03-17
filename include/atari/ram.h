@@ -14,7 +14,8 @@ struct ram_map_ro {
 	const void *p;
 };
 
-struct ram_map_ro ram_map_ro(uint32_t size, uint32_t addr);
+struct ram_map_ro ram_map_ro(struct machine *machine,
+	uint32_t size, uint32_t addr);
 
 extern const struct device ram_device;
 
