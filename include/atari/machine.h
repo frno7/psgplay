@@ -57,6 +57,8 @@ struct machine {
 
 	struct {
 		struct cf68901_module cf68901;
+
+		bool dma_sound_active_prev_level;
 	} mfp;
 
 	struct {

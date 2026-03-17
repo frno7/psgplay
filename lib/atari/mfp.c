@@ -156,9 +156,8 @@ const struct device mfp_device = {
 void dma_sound_active(struct machine *machine, bool level)
 {
 	struct cf68901_module *cf68901 = &machine->mfp.cf68901;
-	static bool prev_level = 0;
 
-	if (level == prev_level)
+	if (level == machine->mfp.dma_sound_active_prev_level)
 		return;
 
 	const struct device_cycle mfp_cycle = device_cycle(machine, &mfp_device);
@@ -168,5 +167,5 @@ void dma_sound_active(struct machine *machine, bool level)
 	request_event(machine, &mfp_device, cf68901->port.wr_gpip(cf68901, clk,
 		GPIP_MONITOR_DETECT, level ^ mono_monitor_detect()));
 
-	prev_level = level;
+	machine->mfp.dma_sound_active_prev_level = level;
 }
