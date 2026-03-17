@@ -287,6 +287,9 @@ void m68k_set_instr_hook_callback(struct m68k_module *module, void (*callback)(s
  */
 void m68k_set_cpu_type(struct m68k_module *module, unsigned int cpu_type);
 
+/* Set callback argument. */
+void m68k_set_callback_arg(struct m68k_module *module, void *arg);
+
 /* Do whatever initialisations the core requires.  Should be called
  * at least once at init time.
  */

@@ -870,6 +870,11 @@ void m68k_set_cpu_type(struct m68k_module *module, unsigned int cpu_type)
 	}
 }
 
+void m68k_set_callback_arg(struct m68k_module *module, void *arg)
+{
+	module->callback.arg = arg;
+}
+
 /* Execute some instructions until we use up num_cycles clock cycles */
 /* ASG: removed per-instruction interrupt checks */
 int m68k_execute(struct m68k_module *module, int num_cycles)

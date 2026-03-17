@@ -1000,6 +1000,10 @@ struct m68k_module {
 	jmp_buf m68ki_aerr_trap;
 #endif
 #endif /* M68K_EMULATE_ADDRESS_ERROR */
+
+	struct {
+		void *arg;
+	} callback;
 };
 
 extern struct m68k_module musashi_module;
