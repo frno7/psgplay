@@ -16,7 +16,9 @@ extern "C" {
 
 #include <limits.h>
 
+#if !defined(__m68k__)
 #include <setjmp.h>
+#endif
 
 /* ======================================================================== */
 /* ==================== ARCHITECTURE-DEPENDANT DEFINES ==================== */
@@ -570,7 +572,7 @@ typedef uint32 uint64;
 
 
 /* Address error */
-#if M68K_EMULATE_ADDRESS_ERROR
+#if M68K_EMULATE_ADDRESS_ERROR && !defined(__m68k__)
 	#include <setjmp.h>
 
 /* sigjmp() on Mac OS X and *BSD in general saves signal contexts and is super-slow, use sigsetjmp() to tell it not to */
@@ -992,8 +994,10 @@ struct m68k_module {
 
 	void (*m68ki_instruction_jump_table[0x10000])(struct m68k_module *module); /* opcode handler jump table */
 
+#if !defined(__m68k__)
 	jmp_buf m68ki_bus_error_jmp_buf;
-#if M68K_EMULATE_ADDRESS_ERROR
+#endif
+#if M68K_EMULATE_ADDRESS_ERROR && !defined(__m68k__)
 #ifdef _BSD_SETJMP_H
 	sigjmp_buf m68ki_aerr_trap;
 #else
@@ -1930,7 +1934,9 @@ static inline void m68ki_exception_bus_error(struct m68k_module *module)
 	m68ki_stack_frame_1000(module, REG_PPC, sr, EXCEPTION_BUS_ERROR);
 
 	m68ki_jump_vector(module, EXCEPTION_BUS_ERROR);
+#if !defined(__m68k__)
 	longjmp(module->m68ki_bus_error_jmp_buf, 1);
+#endif
 }
 
 extern int cpu_log_enabled;

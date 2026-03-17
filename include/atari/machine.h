@@ -12,6 +12,8 @@
 
 #include "atari/sample.h"
 
+#include "m68k/m68kcpu.h"
+
 #define CPU_FREQUENCY (ATARI_STE_PAL_MCLK / ATARI_STE_CPU_CLK_DIV)
 
 #define MACHINE_PROGRAM   0x40000	/* 256 KiB */
@@ -36,6 +38,11 @@ struct machine {
 		const struct machine_registers *regs,
 		const struct machine_ports *ports);
 	bool (*run)(struct machine *machine);
+
+	struct {
+		void (*cb)(uint32_t pc, void *arg);
+		void *arg;
+	} instruction_callback;
 };
 
 u64 cycle_transform(u64 to_frequency, u64 from_frequency, u64 cycle);
@@ -50,6 +57,12 @@ void atari_st_init(struct machine *machine,
 	const struct machine_ports *ports);
 
 bool atari_st_run(struct machine *machine);
+
+static inline struct machine *machine_from_m68k_module(
+	const struct m68k_module *module)
+{
+	return module->callback.arg;
+}
 
 extern struct m68k_module musashi_module;
 

@@ -12,31 +12,28 @@
 #include "m68k/m68k.h"
 #include "m68k/m68kcpu.h"
 
-static struct {
-	void (*cb)(uint32_t pc, void *arg);
-	void *arg;
-} instruction_callback;
-
 bool cpu_execute;
 
 void m68k_instruction_callback(struct m68k_module *module, int pc)
 {
+	struct machine *machine = machine_from_m68k_module(module);
+
 #if 0	/* FIXME */
 	printf("%08x: %04x %s\n", pc, REG_IR,
 		m68ki_disassemble_quick(pc, M68K_CPU_TYPE_68000));
 #endif
 
-	if (!instruction_callback.cb)
+	if (!machine->instruction_callback.cb)
 		return;
 
-	instruction_callback.cb(pc, instruction_callback.arg);
+	machine->instruction_callback.cb(pc, machine->instruction_callback.arg);
 }
 
 void cpu_instruction_callback(struct machine *machine,
 	void (*cb)(uint32_t pc, void *arg), void *arg)
 {
-	instruction_callback.cb = cb;
-	instruction_callback.arg = arg;
+	machine->instruction_callback.cb = cb;
+	machine->instruction_callback.arg = arg;
 }
 
 u64 cpu_cycles_run(void)
@@ -68,8 +65,8 @@ static struct device_slice cpu_run(struct machine *machine,
 
 static void cpu_reset(struct machine *machine, const struct device *device)
 {
-	instruction_callback.cb = NULL;
-	instruction_callback.arg = NULL;
+	machine->instruction_callback.cb = NULL;
+	machine->instruction_callback.arg = NULL;
 
 	m68k_init(&musashi_module);
 	m68k_set_callback_arg(&musashi_module, machine);
