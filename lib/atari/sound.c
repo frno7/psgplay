@@ -27,14 +27,6 @@
 #define SOUND_EVENT_FREQUENCY 100		/* 10 ms */
 #define SOUND_EVENT_CYCLES (SOUND_FREQUENCY / SOUND_EVENT_FREQUENCY)
 
-static struct {
-	sound_sample_f sample;
-	void *sample_arg;
-
-	record_sample_f record;
-	void *record_arg;
-} output;
-
 static char *sound_register_name(u32 reg)
 {
 	switch (reg) {
@@ -95,7 +87,7 @@ static void sound_event(struct machine *machine, const struct device *device,
 
 	while ((n = cf300588->port.sample(cf300588,
 			module_cycle, samples8, dma_map)))
-		if (output.sample) {
+		if (machine->sound.output.sample) {
 			struct sound_sample buffer16[ARRAY_SIZE(buffer8)];
 
 			for (size_t i = 0; i < n; i++)
@@ -104,7 +96,8 @@ static void sound_event(struct machine *machine, const struct device *device,
 					.right = 256 * buffer8[i].right
 				};
 
-			output.sample(buffer16, n, output.sample_arg);
+			machine->sound.output.sample(buffer16, n,
+					machine->sound.output.sample_arg);
 		}
 
 	request_event(machine, device, sound_cycle,
@@ -147,7 +140,8 @@ static void sound_wr_u8(struct machine *machine, const struct device *device,
 		return;
 
 	if (reg == 0 && (val & 0x10))
-		output.record(sound_cycle.c / 8, output.record_arg);
+		machine->sound.output.record(sound_cycle.c / 8,
+				machine->sound.output.record_arg);
 
 	sound_event(machine, device, sound_cycle);
 
@@ -198,15 +192,15 @@ static void sound_reset(struct machine *machine, const struct device *device)
 void sound_sample(struct machine *machine,
 	sound_sample_f sample, void *sample_arg)
 {
-	output.sample = sample;
-	output.sample_arg = sample_arg;
+	machine->sound.output.sample = sample;
+	machine->sound.output.sample_arg = sample_arg;
 }
 
 void record_sample(struct machine *machine,
 	record_sample_f record, void *record_arg)
 {
-	output.record = record;
-	output.record_arg = record_arg;
+	machine->sound.output.record = record;
+	machine->sound.output.record_arg = record_arg;
 }
 
 void sound_check(struct machine *machine, u32 bus_address)

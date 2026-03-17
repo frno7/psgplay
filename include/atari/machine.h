@@ -55,6 +55,14 @@ struct machine {
 
 	struct {
 		struct cf300588_sound_module cf300588;
+
+		struct {
+			sound_sample_f sample;
+			void *sample_arg;
+
+			record_sample_f record;
+			void *record_arg;
+		} output;
 	} sound;
 };
 
