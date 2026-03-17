@@ -1006,8 +1006,6 @@ struct m68k_module {
 	} callback;
 };
 
-extern struct m68k_module musashi_module;
-
 extern const uint8    m68ki_shift_8_table[];
 extern const uint16   m68ki_shift_16_table[];
 extern const uint     m68ki_shift_32_table[];

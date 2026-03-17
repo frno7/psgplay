@@ -19,8 +19,6 @@ extern void m68ki_build_opcode_table(struct m68k_module *module);
 /* ================================= DATA ================================= */
 /* ======================================================================== */
 
-struct m68k_module musashi_module;
-
 #ifdef M68K_LOG_ENABLE
 const char *const m68ki_cpu_names[] =
 {

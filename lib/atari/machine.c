@@ -41,6 +41,8 @@
 	reg(6, a, A)							\
 	reg(7, a, A)
 
+struct m68k_module musashi_module;
+
 static u64 cycle;
 
 u64 cycle_transform(u64 to_frequency, u64 from_frequency, u64 cycle)

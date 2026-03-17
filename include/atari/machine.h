@@ -49,4 +49,6 @@ void atari_st_init(const void *prg, size_t size, size_t offset,
 
 bool atari_st_run(void);
 
+extern struct m68k_module musashi_module;
+
 #endif /* ATARI_MACHINE_H */
