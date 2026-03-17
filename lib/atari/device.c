@@ -176,7 +176,8 @@ u64 device_run(struct machine *machine, u64 machine_cycle, u64 machine_slice)
 		if (machine_device->machine_cycle_event <= machine_cycle) {
 			machine_device->machine_cycle_event = 0;
 
-			machine_device->device->event(machine_device->device,
+			machine_device->device->event(machine,
+				machine_device->device,
 				device_from_machine_cycle(
 					machine_device->device, machine_cycle));
 		}

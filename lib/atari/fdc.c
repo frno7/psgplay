@@ -13,7 +13,7 @@
 #include "atari/fdc.h"
 #include "atari/machine.h"
 
-static void fdc_event(const struct device *device,
+static void fdc_event(struct machine *machine, const struct device *device,
 	const struct device_cycle mfp_cycle)
 {
 }

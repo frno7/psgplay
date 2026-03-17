@@ -84,7 +84,7 @@ static int glue_mfp(void)
 	return mfp_irq_vector();
 }
 
-static void glue_event(const struct device *device,
+static void glue_event(struct machine *machine, const struct device *device,
 	struct device_cycle device_cycle)
 {
 	if (vbl_cycle.c <= device_cycle.c)

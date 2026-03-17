@@ -62,7 +62,7 @@ static void psg_emit(const struct device_cycle psg_cycle)
 	}
 }
 
-static void psg_event(const struct device *device,
+static void psg_event(struct machine *machine, const struct device *device,
 	const struct device_cycle psg_cycle)
 {
 	psg_emit(psg_cycle);
@@ -171,7 +171,7 @@ static void psg_reset(struct machine *machine, const struct device *device)
 
 	cf2149.port.select_l(&cf2149, cycle, CF2149_SELECT_MODE_CLKDIV8);
 
-	psg_event(device, device_cycle(device));
+	psg_event(machine, device, device_cycle(device));
 }
 
 void psg_sample(psg_sample_f sample, void *sample_arg)

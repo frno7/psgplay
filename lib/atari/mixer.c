@@ -110,7 +110,7 @@ static void mixer_emit(const struct device_cycle mixer_cycle)
 	mixer_emit_latest_cycle = mixer_cycle.c;
 }
 
-static void mixer_event(const struct device *device,
+static void mixer_event(struct machine *machine, const struct device *device,
 	const struct device_cycle mixer_cycle)
 {
 	mixer_emit(mixer_cycle);
@@ -273,7 +273,7 @@ static void mixer_reset(struct machine *machine, const struct device *device)
 
 	mixer_emit_latest_cycle = 0;
 
-	mixer_event(device, device_cycle(device));
+	mixer_event(machine, device, device_cycle(device));
 }
 
 void mixer_sample(mixer_sample_f sample, void *sample_arg)

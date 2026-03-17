@@ -62,7 +62,7 @@ static size_t shifter_id_u8(struct machine *machine,
 	return strlen(buf);
 }
 
-static void shifter_event(const struct device *device,
+static void shifter_event(struct machine *machine, const struct device *device,
 	const struct device_cycle mfp_cycle)
 {
 }

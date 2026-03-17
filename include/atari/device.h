@@ -43,7 +43,7 @@ struct device {
 		const struct device *device, struct device_cycle,
 		struct device_slice);
 	void (*reset)(struct machine *machine, const struct device *device);
-	void (*event)(const struct device *device,
+	void (*event)(struct machine *machine, const struct device *device,
 		struct device_cycle device_cycle);
 
 	u8 (*rd_u8)(struct machine *machine, const struct device *device,

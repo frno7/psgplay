@@ -74,7 +74,7 @@ static void request_event(const struct device *device,
 	dma_sound_active(event.sint.active);
 }
 
-static void sound_event(const struct device *device,
+static void sound_event(struct machine *machine, const struct device *device,
 	const struct device_cycle sound_cycle)
 {
 	struct cf300588_sound_cycle module_cycle =
@@ -125,7 +125,7 @@ static u8 sound_rd_u8(struct machine *machine, const struct device *device,
 	if ((dev_address & 1) == 0)
 		return 0;
 
-	sound_event(device, sound_cycle);
+	sound_event(machine, device, sound_cycle);
 
 	return cf300588.port.rd_da(&cf300588, module_cycle, reg);
 }
@@ -150,7 +150,7 @@ static void sound_wr_u8(struct machine *machine, const struct device *device,
 	if (reg == 0 && (val & 0x10))
 		output.record(sound_cycle.c / 8, output.record_arg);
 
-	sound_event(device, sound_cycle);
+	sound_event(machine, device, sound_cycle);
 
 	request_event(device, sound_cycle,
 		cf300588.port.wr_da(&cf300588, module_cycle, reg, val));
@@ -205,7 +205,7 @@ void record_sample(record_sample_f record, void *record_arg)
 	output.record_arg = record_arg;
 }
 
-void sound_check(u32 bus_address)
+void sound_check(struct machine *machine, u32 bus_address)
 {
 	if (!cf300588.port.wr_ar(&cf300588, bus_address, 4 /* FIXME */))
 		return;
@@ -213,7 +213,7 @@ void sound_check(u32 bus_address)
 	extern const struct device sound_device;
 	const struct device *device = &sound_device;
 
-	sound_event(device, device_cycle(device));
+	sound_event(machine, device, device_cycle(device));
 }
 
 const struct device sound_device = {
