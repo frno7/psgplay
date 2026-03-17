@@ -8,8 +8,8 @@
 
 #include "atari/device.h"
 
-void glue_irq_set(int irq);
-void glue_irq_clr(int irq);
+void glue_irq_set(struct machine *machine, int irq);
+void glue_irq_clr(struct machine *machine, int irq);
 
 extern const struct device glue_device;
 

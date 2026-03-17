@@ -52,7 +52,7 @@ static void request_event(struct machine *machine,
 	if (event.clk.c)
 		request_device_event(device,
 			(struct device_cycle) { .c = event.clk.c });
-	(event.irq ? glue_irq_set : glue_irq_clr)(IRQ_MFP);
+	(event.irq ? glue_irq_set : glue_irq_clr)(machine, IRQ_MFP);
 }
 
 static void mfp_event(struct machine *machine, const struct device *device,

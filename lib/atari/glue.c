@@ -21,7 +21,7 @@ static struct device_cycle vbl_cycle;
 
 static u32 irq_pending;
 
-void glue_irq_set(int irq)
+void glue_irq_set(struct machine *machine, int irq)
 {
 	const u32 p = irq_pending;
 
@@ -35,7 +35,7 @@ void glue_irq_set(int irq)
 		m68k_set_irq(&musashi_module, irq);
 }
 
-void glue_irq_clr(int irq)
+void glue_irq_clr(struct machine *machine, int irq)
 {
 	int i;
 
@@ -48,7 +48,8 @@ void glue_irq_clr(int irq)
 	m68k_set_irq(&musashi_module, i);
 }
 
-static void request_vbl_event(struct device_cycle device_cycle)
+static void request_vbl_event(struct machine *machine,
+	struct device_cycle device_cycle)
 {
 	const u64 pal_vbl = ATARI_STE_CYCLES_PER_VBL_PAL;
 
@@ -57,29 +58,30 @@ static void request_vbl_event(struct device_cycle device_cycle)
 	request_device_event(&glue_device, vbl_cycle);
 }
 
-static void vbl_execute(struct device_cycle device_cycle)
+static void vbl_execute(struct machine *machine,
+	struct device_cycle device_cycle)
 {
 	if (vbl_cycle.c)
-		glue_irq_set(IRQ_VBL);
+		glue_irq_set(machine, IRQ_VBL);
 }
 
-static int glue_hbl(void)
+static int glue_hbl(struct machine *machine)
 {
-	glue_irq_clr(IRQ_VBL);
+	glue_irq_clr(machine, IRQ_VBL);
 
 	return 26;	/* FIXME: HBL exception vector */
 }
 
-static int glue_vbl(void)
+static int glue_vbl(struct machine *machine)
 {
-	glue_irq_clr(IRQ_VBL);
+	glue_irq_clr(machine, IRQ_VBL);
 
 	return 28;	/* FIXME: VBL exception vector */
 }
 
-static int glue_mfp(void)
+static int glue_mfp(struct machine *machine)
 {
-	glue_irq_clr(IRQ_MFP);
+	glue_irq_clr(machine, IRQ_MFP);
 
 	return mfp_irq_vector();
 }
@@ -88,23 +90,25 @@ static void glue_event(struct machine *machine, const struct device *device,
 	struct device_cycle device_cycle)
 {
 	if (vbl_cycle.c <= device_cycle.c)
-		vbl_execute(device_cycle);
+		vbl_execute(machine, device_cycle);
 
-	request_vbl_event(device_cycle);
+	request_vbl_event(machine, device_cycle);
 }
 
 static void glue_reset(struct machine *machine, const struct device *device)
 {
-	request_vbl_event(device_cycle(&glue_device));
+	request_vbl_event(machine, device_cycle(&glue_device));
 }
 
 int m68k_int_ack_callback(struct m68k_module *module, int level)
 {
+	struct machine *machine = machine_from_m68k_module(module);
+
 	switch(level)
 	{
-	case IRQ_HBL: return glue_hbl();
-	case IRQ_VBL: return glue_vbl();
-	case IRQ_MFP: return glue_mfp();
+	case IRQ_HBL: return glue_hbl(machine);
+	case IRQ_VBL: return glue_vbl(machine);
+	case IRQ_MFP: return glue_mfp(machine);
 	default: return M68K_INT_ACK_SPURIOUS;
 	}
 }
