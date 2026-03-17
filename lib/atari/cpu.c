@@ -50,8 +50,9 @@ u64 cpu_cycles_run(void)
 	return cycles_run;
 }
 
-static struct device_slice cpu_run(const struct device *device,
-	struct device_cycle device_cycle, struct device_slice device_slice)
+static struct device_slice cpu_run(struct machine *machine,
+	const struct device *device, struct device_cycle device_cycle,
+	struct device_slice device_slice)
 {
 	cpu_execute = true;
 	const int s = m68k_execute(&musashi_module, device_slice.s);

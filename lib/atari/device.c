@@ -148,8 +148,8 @@ void device_reset(struct machine *machine)
 			device->reset(machine, device);
 }
 
-static struct device_slice run(const struct device *device,
-	u64 machine_cycle, u64 machine_slice)
+static struct device_slice run(struct machine *machine,
+	const struct device *device, u64 machine_cycle, u64 machine_slice)
 {
 	if (!device->run)
 		return (struct device_slice) { };
@@ -159,7 +159,7 @@ static struct device_slice run(const struct device *device,
 	};
 
 	const struct device_slice slice =
-		device->run(device,
+		device->run(machine, device,
 			device_from_machine_cycle(device, machine_cycle),
 			device_from_machine_slice(device, machine_slice));
 
@@ -168,7 +168,7 @@ static struct device_slice run(const struct device *device,
 	return slice;
 }
 
-u64 device_run(u64 machine_cycle, u64 machine_slice)
+u64 device_run(struct machine *machine, u64 machine_cycle, u64 machine_slice)
 {
 	struct machine_device *machine_device;
 
@@ -195,7 +195,7 @@ u64 device_run(u64 machine_cycle, u64 machine_slice)
 
 	for_each_device (device) {
 		struct device_slice device_slice =
-			run(device, machine_cycle, machine_slice);
+			run(machine, device, machine_cycle, machine_slice);
 
 		if (device_slice.s)
 			return machine_from_device_slice(device, device_slice);

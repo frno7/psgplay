@@ -99,7 +99,7 @@ void atari_st_init(struct machine *machine,
 
 bool atari_st_run(struct machine *machine)
 {
-	cycle += device_run(cycle, MACHINE_RUN_SLICE);
+	cycle += device_run(machine, cycle, MACHINE_RUN_SLICE);
 
 	return true;
 }

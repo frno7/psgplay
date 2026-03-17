@@ -39,8 +39,9 @@ struct device {
 
 	struct device_state state;
 
-	struct device_slice (*run)(const struct device *device,
-		struct device_cycle, struct device_slice);
+	struct device_slice (*run)(struct machine *machine,
+		const struct device *device, struct device_cycle,
+		struct device_slice);
 	void (*reset)(struct machine *machine, const struct device *device);
 	void (*event)(const struct device *device,
 		struct device_cycle device_cycle);
@@ -71,6 +72,6 @@ void request_device_event(const struct device *device,
 
 void device_reset(struct machine *machine);
 
-u64 device_run(u64 machine_cycle, u64 machine_cycle_slice);
+u64 device_run(struct machine *machine, u64 machine_cycle, u64 machine_slice);
 
 #endif /* ATARI_DEVICE_H */
