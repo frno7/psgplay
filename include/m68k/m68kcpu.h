@@ -513,7 +513,7 @@ typedef uint32 uint64;
 
 #if M68K_INSTRUCTION_HOOK
 	#if M68K_INSTRUCTION_HOOK == OPT_SPECIFY_HANDLER
-		#define m68ki_instr_hook(pc) M68K_INSTRUCTION_CALLBACK(pc)
+		#define m68ki_instr_hook(pc) M68K_INSTRUCTION_CALLBACK(module, pc)
 	#else
 		#define m68ki_instr_hook(pc) CALLBACK_INSTR_HOOK(pc)
 	#endif

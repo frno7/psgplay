@@ -141,7 +141,7 @@
  * instruction.
  */
 #define M68K_INSTRUCTION_HOOK       OPT_SPECIFY_HANDLER
-#define M68K_INSTRUCTION_CALLBACK(pc) m68k_instruction_callback(pc)
+#define M68K_INSTRUCTION_CALLBACK(module, pc) m68k_instruction_callback(module, pc)
 
 
 /* If ON, the CPU will emulate the 4-byte prefetch queue of a real 68000 */

@@ -8,7 +8,9 @@
 
 #include "atari/device.h"
 
-void m68k_instruction_callback(int pc);
+#include "m68k/m68kcpu.h"
+
+void m68k_instruction_callback(struct m68k_module *module, int pc);
 
 void cpu_instruction_callback(void (*cb)(uint32_t pc, void *arg), void *arg);
 

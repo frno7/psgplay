@@ -21,7 +21,7 @@ static struct {
 
 bool cpu_execute;
 
-void m68k_instruction_callback(int pc)
+void m68k_instruction_callback(struct m68k_module *module, int pc)
 {
 #if 0	/* FIXME */
 	printf("%08x: %04x %s\n", pc, REG_IR,
