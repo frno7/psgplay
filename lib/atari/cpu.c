@@ -72,6 +72,7 @@ static void cpu_reset(struct machine *machine, const struct device *device)
 	instruction_callback.arg = NULL;
 
 	m68k_init(&musashi_module);
+	m68k_set_callback_arg(&musashi_module, machine);
 	m68k_set_cpu_type(&musashi_module, M68K_CPU_TYPE_68000);
 	m68k_pulse_reset(&musashi_module);
 }
