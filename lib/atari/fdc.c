@@ -37,7 +37,7 @@ static void fdc_wr_u16(const struct device *device, u32 dev_address, u16 data)
 	fdc_wr_u8(device, dev_address, data >> 8);
 }
 
-static size_t fdc_id_u8(const struct device *device,
+static size_t fdc_id_u8(struct machine *machine, const struct device *device,
 	u32 dev_address, char *buf, size_t size)
 {
 	buf[0] = '\0';
@@ -45,10 +45,10 @@ static size_t fdc_id_u8(const struct device *device,
 	return strlen(buf);
 }
 
-static size_t fdc_id_u16(const struct device *device,
+static size_t fdc_id_u16(struct machine *machine, const struct device *device,
 	u32 dev_address, char *buf, size_t size)
 {
-	return fdc_id_u8(device, dev_address, buf, size);
+	return fdc_id_u8(machine, device, dev_address, buf, size);
 }
 
 static void fdc_reset(struct machine *machine, const struct device *device)

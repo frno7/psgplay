@@ -15,7 +15,8 @@
 static void mmu_trace(struct machine *machine,
 	const char *op, u32 dev_address,
 	const char *spacing, int size, u32 value,
-	size_t (*sh)(const struct device *device,
+	size_t (*sh)(struct machine *machine,
+		const struct device *device,
 		u32 dev_address, char *buf, size_t size),
 	const struct device *dev)
 {
@@ -36,7 +37,7 @@ static void mmu_trace(struct machine *machine,
 trace:
 
 	if (sh)
-		sh(dev, dev_address, description, sizeof(description));
+		sh(machine, dev, dev_address, description, sizeof(description));
 	else
 		description[0] = '\0';
 

@@ -42,16 +42,16 @@ static void shifter_wr_u16(const struct device *device, u32 dev_address, u16 dat
 	/* FIXME */
 }
 
-static size_t shifter_id_u16(const struct device *device,
-	u32 dev_address, char *buf, size_t size)
+static size_t shifter_id_u16(struct machine *machine,
+	const struct device *device, u32 dev_address, char *buf, size_t size)
 {
 	snprintf(buf, size, "wr %s", shifter_register_name(dev_address / 2));	/* FIXME */
 
 	return strlen(buf);
 }
 
-static size_t shifter_id_u8(const struct device *device,
-	u32 dev_address, char *buf, size_t size)
+static size_t shifter_id_u8(struct machine *machine,
+	const struct device *device, u32 dev_address, char *buf, size_t size)
 {
 	snprintf(buf, size, "wr %s", shifter_register_name(dev_address / 2));	/* FIXME */
 

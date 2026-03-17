@@ -64,8 +64,8 @@ static void ram_wr_u16(const struct device *device,
 	ram[dev_address + 1] = data & 0xff;
 }
 
-static size_t ram_id_u8(const struct device *device,
-	u32 dev_address, char *buf, size_t size)
+static size_t ram_id_u8(struct machine *machine,
+	const struct device *device, u32 dev_address, char *buf, size_t size)
 {
 	const char *description = exception_vector_description(dev_address);
 
@@ -77,10 +77,10 @@ static size_t ram_id_u8(const struct device *device,
 	return strlen(buf);
 }
 
-static size_t ram_id_u16(const struct device *device,
-	u32 dev_address, char *buf, size_t size)
+static size_t ram_id_u16(struct machine *machine,
+	const struct device *device, u32 dev_address, char *buf, size_t size)
 {
-	return ram_id_u8(device, dev_address, buf, size);
+	return ram_id_u8(machine, device, dev_address, buf, size);
 }
 
 const struct device ram_device = {

@@ -129,8 +129,8 @@ static void psg_wr_u16(const struct device *device, u32 dev_address, u16 data)
 	psg_wr_u8(device, dev_address, data >> 8);
 }
 
-static size_t psg_id_u8(const struct device *device,
-	u32 dev_address, char *buf, size_t size)
+static size_t psg_id_u8(struct machine *machine,
+	const struct device *device, u32 dev_address, char *buf, size_t size)
 {
 	switch (dev_address % 4) {
 	case 0:
@@ -152,10 +152,10 @@ static size_t psg_id_u8(const struct device *device,
 	return strlen(buf);
 }
 
-static size_t psg_id_u16(const struct device *device,
-	u32 dev_address, char *buf, size_t size)
+static size_t psg_id_u16(struct machine *machine,
+	const struct device *device, u32 dev_address, char *buf, size_t size)
 {
-	return psg_id_u8(device, dev_address, buf, size);
+	return psg_id_u8(machine, device, dev_address, buf, size);
 }
 
 static void psg_reset(struct machine *machine, const struct device *device)
