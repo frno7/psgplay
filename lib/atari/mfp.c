@@ -46,8 +46,8 @@ uint32_t mfp_irq_vector(void)
 	return cf68901.port.vector(&cf68901);
 }
 
-static void request_event(const struct device *device,
-	struct cf68901_event event)
+static void request_event(struct machine *machine,
+	const struct device *device, struct cf68901_event event)
 {
 	if (event.clk.c)
 		request_device_event(device,
@@ -60,7 +60,7 @@ static void mfp_event(struct machine *machine, const struct device *device,
 {
 	const struct cf68901_clk clk = cf68901_clk_cycle(mfp_cycle.c);
 
-	request_event(device, cf68901.port.event(&cf68901, clk));
+	request_event(machine, device, cf68901.port.event(&cf68901, clk));
 }
 
 static u8 mfp_rd_u8(struct machine *machine, const struct device *device,
@@ -92,7 +92,7 @@ static void mfp_wr_u8(struct machine *machine, const struct device *device,
 	if ((dev_address & 1) == 0)
 		return;
 
-	request_event(device, cf68901.port.wr_da(&cf68901, clk, reg, data));
+	request_event(machine, device, cf68901.port.wr_da(&cf68901, clk, reg, data));
 }
 
 static void mfp_wr_u16(struct machine *machine, const struct device *device,
@@ -161,8 +161,8 @@ void dma_sound_active(struct machine *machine, bool level)
 	const struct device_cycle mfp_cycle = device_cycle(&mfp_device);
 	const struct cf68901_clk clk = cf68901_clk_cycle(mfp_cycle.c);
 
-	request_event(&mfp_device, cf68901.port.tai(&cf68901, clk, level));
-	request_event(&mfp_device, cf68901.port.wr_gpip(&cf68901, clk,
+	request_event(machine, &mfp_device, cf68901.port.tai(&cf68901, clk, level));
+	request_event(machine, &mfp_device, cf68901.port.wr_gpip(&cf68901, clk,
 		GPIP_MONITOR_DETECT, level ^ mono_monitor_detect()));
 
 	prev_level = level;
