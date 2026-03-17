@@ -49,6 +49,7 @@ struct memory {
 struct disassembly {
 	struct strbuf sb;
 	struct options *options;
+	struct machine *machine;
 	const char *path;
 	size_t size;
 	uint8_t *data;
@@ -697,8 +698,11 @@ static void dasm_mark_text_trace_run(
 
 void sndh_disassemble(struct options *options, struct file file)
 {
+	static struct machine machine;
+
 	struct disassembly dasm = {
 		.options = options,
+		.machine = &machine,
 		.path = file.path,
 		.size = file.size,
 		.data = xmalloc(file.size),
@@ -744,6 +748,7 @@ void sndh_disassemble(struct options *options, struct file file)
 
 struct trace {
 	struct options *options;
+	struct machine *machine;
 	struct strbuf sb;
 };
 
@@ -842,8 +847,11 @@ trace_reg:
 
 void sndh_trace(struct options *options, struct file file)
 {
+	static struct machine machine;
+
 	struct trace trace = {
 		.options = options,
+		.machine = &machine,
 	};
 
 	dasm_mark_text_trace_run(cpu_instruction_trace, &trace, options, file);
