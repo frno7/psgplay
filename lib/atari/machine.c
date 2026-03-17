@@ -66,7 +66,8 @@ u64 machine_cycle(void)
 	return cycle + cpu_cycles_run();
 }
 
-void atari_st_init(const void *prg, size_t size, size_t offset,
+void atari_st_init(struct machine *machine,
+	const void *prg, size_t size, size_t offset,
 	const struct machine_registers *regs,
 	const struct machine_ports *ports)
 {

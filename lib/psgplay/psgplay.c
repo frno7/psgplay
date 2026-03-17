@@ -574,7 +574,7 @@ struct psgplay *psgplay_init(const void *data, size_t size,
 		.init = atari_st_init,
 		.run = atari_st_run,
 	};
-	pp->machine.init(data, size, offset, &regs, &ports);
+	pp->machine.init(&pp->machine, data, size, offset, &regs, &ports);
 
 	psgplay_digital_to_stereo_callback(pp,
 		psgplay_digital_to_stereo_empiric, NULL);

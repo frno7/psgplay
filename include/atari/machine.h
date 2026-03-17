@@ -31,7 +31,8 @@ struct machine_ports {
 };
 
 struct machine {
-	void (*init)(const void *prg, size_t size, size_t offset,
+	void (*init)(struct machine *machine,
+		const void *prg, size_t size, size_t offset,
 		const struct machine_registers *regs,
 		const struct machine_ports *ports);
 	bool (*run)(void);
@@ -43,7 +44,8 @@ u64 cycle_transform_align(u64 to_frequency, u64 from_frequency, u64 cycle);
 
 u64 machine_cycle(void);
 
-void atari_st_init(const void *prg, size_t size, size_t offset,
+void atari_st_init(struct machine *machine,
+	const void *prg, size_t size, size_t offset,
 	const struct machine_registers *regs,
 	const struct machine_ports *ports);
 
