@@ -16,12 +16,8 @@
 #include "atari/machine.h"
 #include "atari/psg.h"
 
-#include "cf2149/module/cf2149.h"
-
 #define PSG_EVENT_FREQUENCY 100		/* 10 ms */
 #define PSG_EVENT_CYCLES (PSG_FREQUENCY / PSG_EVENT_FREQUENCY)
-
-static struct cf2149_module cf2149;
 
 static struct {
 	psg_sample_f sample;
@@ -45,13 +41,15 @@ static inline struct cf2149_cycle cf2149_cycle_from_device(
 	return cf2149_cycle_cd(cycle.c, 1 /* FIXME */);
 }
 
-static void psg_emit(const struct device_cycle psg_cycle)
+static void psg_emit(struct machine *machine,
+	const struct device_cycle psg_cycle)
 {
+	struct cf2149_module *cf2149 = &machine->psg.cf2149;
 	const struct cf2149_cycle cycle = cf2149_cycle_from_device(psg_cycle);
 	struct cf2149_ac buffer[256];
 
 	for (;;) {
-		const size_t n = cf2149.port.rd_ac(&cf2149,
+		const size_t n = cf2149->port.rd_ac(cf2149,
 			cycle, &buffer[0], ARRAY_SIZE(buffer));
 
 		if (!n)
@@ -65,7 +63,7 @@ static void psg_emit(const struct device_cycle psg_cycle)
 static void psg_event(struct machine *machine, const struct device *device,
 	const struct device_cycle psg_cycle)
 {
-	psg_emit(psg_cycle);
+	psg_emit(machine, psg_cycle);
 
 	request_device_event(machine, device,
 		(struct device_cycle) { .c = psg_cycle.c + PSG_EVENT_CYCLES });
@@ -74,15 +72,16 @@ static void psg_event(struct machine *machine, const struct device *device,
 static u8 psg_rd_u8(struct machine *machine, const struct device *device,
 	u32 dev_address)
 {
+	struct cf2149_module *cf2149 = &machine->psg.cf2149;
 	const struct device_cycle psg_cycle = device_cycle(machine, device);
 	const struct cf2149_cycle cycle = cf2149_cycle_from_device(psg_cycle);
 
 	switch (dev_address) {
 	case 0:
 	case 1:
-		cf2149.port.bdc(&cf2149, cycle,
+		cf2149->port.bdc(cf2149, cycle,
 			(struct cf2149_bdc) { .u8 = CF2149_BDC_DTB });
-		return cf2149.port.rd_da(&cf2149, cycle);
+		return cf2149->port.rd_da(cf2149, cycle);
 	case 2:
 	case 3: return 0xff;
 	default:
@@ -102,23 +101,24 @@ static u16 psg_rd_u16(struct machine *machine, const struct device *device,
 static void psg_wr_u8(struct machine *machine, const struct device *device,
 	u32 dev_address, u8 data)
 {
+	struct cf2149_module *cf2149 = &machine->psg.cf2149;
 	const struct device_cycle psg_cycle = device_cycle(machine, device);
 	const struct cf2149_cycle cycle = cf2149_cycle_from_device(psg_cycle);
 
-	psg_emit(psg_cycle);
+	psg_emit(machine, psg_cycle);
 
 	switch (dev_address % 4) {
 	case 0:
 	case 1:
-		cf2149.port.bdc(&cf2149, cycle,
+		cf2149->port.bdc(cf2149, cycle,
 			(struct cf2149_bdc) { .u8 = CF2149_BDC_BAR });
-		cf2149.port.wr_da(&cf2149, cycle, data);
+		cf2149->port.wr_da(cf2149, cycle, data);
 		break;
 	case 2:
 	case 3:
-		cf2149.port.bdc(&cf2149, cycle,
+		cf2149->port.bdc(cf2149, cycle,
 			(struct cf2149_bdc) { .u8 = CF2149_BDC_DWS });
-		cf2149.port.wr_da(&cf2149, cycle, data);
+		cf2149->port.wr_da(cf2149, cycle, data);
 		break;
 #if 0  /* FIXME: Dependency on pr_bug */
 	default:
@@ -136,6 +136,8 @@ static void psg_wr_u16(struct machine *machine, const struct device *device,
 static size_t psg_id_u8(struct machine *machine,
 	const struct device *device, u32 dev_address, char *buf, size_t size)
 {
+	struct cf2149_module *cf2149 = &machine->psg.cf2149;
+
 	switch (dev_address % 4) {
 	case 0:
 	case 1:
@@ -144,7 +146,7 @@ static size_t psg_id_u8(struct machine *machine,
 	case 2:
 	case 3:
 		snprintf(buf, size, "wr %s",
-			psg_register_name(cf2149.state.reg));
+			psg_register_name(cf2149->state.reg));
 		break;
 	default:
 		snprintf(buf, size, "%2u", dev_address);
@@ -164,12 +166,13 @@ static size_t psg_id_u16(struct machine *machine,
 
 static void psg_reset(struct machine *machine, const struct device *device)
 {
+	struct cf2149_module *cf2149 = &machine->psg.cf2149;
 	const struct device_cycle psg_cycle = device_cycle(machine, device);
 	const struct cf2149_cycle cycle = cf2149_cycle_from_device(psg_cycle);
 
-	cf2149 = cf2149_init();
+	*cf2149 = cf2149_init();
 
-	cf2149.port.select_l(&cf2149, cycle, CF2149_SELECT_MODE_CLKDIV8);
+	cf2149->port.select_l(cf2149, cycle, CF2149_SELECT_MODE_CLKDIV8);
 
 	psg_event(machine, device, device_cycle(machine, device));
 }

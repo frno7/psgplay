@@ -12,6 +12,7 @@
 
 #include "atari/sample.h"
 
+#include "cf2149/module/cf2149.h"
 #include "cf300588/module/cf300588-sound.h"
 #include "m68k/m68kcpu.h"
 
@@ -48,6 +49,10 @@ struct machine {
 		void (*cb)(uint32_t pc, void *arg);
 		void *arg;
 	} instruction_callback;
+
+	struct {
+		struct cf2149_module cf2149;
+	} psg;
 
 	struct {
 		uint8_t u8[MACHINE_RAM_SIZE];
