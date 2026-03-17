@@ -91,10 +91,10 @@ void atari_st_init(struct machine *machine,
 	for (size_t i = 0; i < size; i++)
 		ram_device.wr_u8(machine, &ram_device, offset + i, p[i]);
 
-	psg_sample(ports->psg_sample, ports->arg);
-	sound_sample(ports->sound_sample, ports->arg);
-	mixer_sample(ports->mixer_sample, ports->arg);
-	record_sample(ports->record_sample, ports->arg);
+	psg_sample(machine, ports->psg_sample, ports->arg);
+	sound_sample(machine, ports->sound_sample, ports->arg);
+	mixer_sample(machine, ports->mixer_sample, ports->arg);
+	record_sample(machine, ports->record_sample, ports->arg);
 }
 
 bool atari_st_run(struct machine *machine)

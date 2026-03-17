@@ -174,7 +174,8 @@ static void psg_reset(struct machine *machine, const struct device *device)
 	psg_event(machine, device, device_cycle(device));
 }
 
-void psg_sample(psg_sample_f sample, void *sample_arg)
+void psg_sample(struct machine *machine,
+	psg_sample_f sample, void *sample_arg)
 {
 	output.sample = sample;
 	output.sample_arg = sample_arg;

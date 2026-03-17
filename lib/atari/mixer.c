@@ -276,7 +276,8 @@ static void mixer_reset(struct machine *machine, const struct device *device)
 	mixer_event(machine, device, device_cycle(device));
 }
 
-void mixer_sample(mixer_sample_f sample, void *sample_arg)
+void mixer_sample(struct machine *machine,
+	mixer_sample_f sample, void *sample_arg)
 {
 	output.sample = sample;
 	output.sample_arg = sample_arg;

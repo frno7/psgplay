@@ -15,6 +15,7 @@
 
 extern const struct device psg_device;
 
-void psg_sample(psg_sample_f sample, void *sample_arg);
+void psg_sample(struct machine *machine,
+	psg_sample_f sample, void *sample_arg);
 
 #endif /* ATARI_PSG_H */

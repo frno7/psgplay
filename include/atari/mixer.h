@@ -34,6 +34,7 @@ MIXER_LMC1992_REGISTERS(MIXER_LMC1992_REG_ENUM)
 
 extern const struct device mixer_device;
 
-void mixer_sample(mixer_sample_f sample, void *sample_arg);
+void mixer_sample(struct machine *machine,
+	mixer_sample_f sample, void *sample_arg);
 
 #endif /* ATARI_MIXER_H */

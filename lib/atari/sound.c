@@ -193,13 +193,15 @@ static void sound_reset(struct machine *machine, const struct device *device)
 	request_event(device, sound_cycle, (struct cf300588_sound_event) { });
 }
 
-void sound_sample(sound_sample_f sample, void *sample_arg)
+void sound_sample(struct machine *machine,
+	sound_sample_f sample, void *sample_arg)
 {
 	output.sample = sample;
 	output.sample_arg = sample_arg;
 }
 
-void record_sample(record_sample_f record, void *record_arg)
+void record_sample(struct machine *machine,
+	record_sample_f record, void *record_arg)
 {
 	output.record = record;
 	output.record_arg = record_arg;

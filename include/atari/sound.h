@@ -11,9 +11,11 @@
 
 extern const struct device sound_device;
 
-void sound_sample(sound_sample_f sample, void *sample_arg);
+void sound_sample(struct machine *machine,
+	sound_sample_f sample, void *sample_arg);
 
-void record_sample(record_sample_f record, void *record_arg);
+void record_sample(struct machine *machine,
+	record_sample_f record, void *record_arg);
 
 void sound_check(struct machine *machine, u32 bus_address);
 
