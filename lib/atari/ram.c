@@ -49,7 +49,7 @@ static u16 ram_rd_u16(struct machine *machine, const struct device *device,
 	return (ram[dev_address] << 8) | ram[dev_address + 1];
 }
 
-static void ram_wr_u8(const struct device *device,
+static void ram_wr_u8(struct machine *machine, const struct device *device,
 	u32 dev_address, u8 data)
 {
 	sound_check(dev_address);
@@ -57,7 +57,7 @@ static void ram_wr_u8(const struct device *device,
 	ram[dev_address] = data;
 }
 
-static void ram_wr_u16(const struct device *device,
+static void ram_wr_u16(struct machine *machine, const struct device *device,
 	u32 dev_address, u16 data)
 {
 	sound_check(dev_address);

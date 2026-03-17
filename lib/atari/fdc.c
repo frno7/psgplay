@@ -30,13 +30,15 @@ static u16 fdc_rd_u16(struct machine *machine, const struct device *device,
 	return fdc_rd_u8(machine, device, dev_address) << 8;
 }
 
-static void fdc_wr_u8(const struct device *device, u32 dev_address, u8 data)
+static void fdc_wr_u8(struct machine *machine, const struct device *device,
+	u32 dev_address, u8 data)
 {
 }
 
-static void fdc_wr_u16(const struct device *device, u32 dev_address, u16 data)
+static void fdc_wr_u16(struct machine *machine, const struct device *device,
+	u32 dev_address, u16 data)
 {
-	fdc_wr_u8(device, dev_address, data >> 8);
+	fdc_wr_u8(machine, device, dev_address, data >> 8);
 }
 
 static size_t fdc_id_u8(struct machine *machine, const struct device *device,

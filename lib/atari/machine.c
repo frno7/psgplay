@@ -89,7 +89,7 @@ void atari_st_init(struct machine *machine,
 	MACHINE_REGISTERS(MACHINE_REGISTER_SET)
 
 	for (size_t i = 0; i < size; i++)
-		ram_device.wr_u8(&ram_device, offset + i, p[i]);
+		ram_device.wr_u8(machine, &ram_device, offset + i, p[i]);
 
 	psg_sample(ports->psg_sample, ports->arg);
 	sound_sample(ports->sound_sample, ports->arg);

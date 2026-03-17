@@ -157,7 +157,7 @@ void m68k_write_memory_8(struct m68k_module *module, u32 bus_address, u32 value)
 
 	mmu_trace_wr_u8(machine, dev_address, value, dev);
 
-	dev->wr_u8(dev, dev_address, value & 0xff);
+	dev->wr_u8(machine, dev, dev_address, value & 0xff);
 }
 
 void m68k_write_memory_16(struct m68k_module *module, u32 bus_address, u32 value)
@@ -170,7 +170,7 @@ void m68k_write_memory_16(struct m68k_module *module, u32 bus_address, u32 value
 
 	mmu_trace_wr_u16(machine, dev_address, value, dev);
 
-	dev->wr_u16(dev, dev_address, value & 0xffff);
+	dev->wr_u16(machine, dev, dev_address, value & 0xffff);
 }
 
 void m68k_write_memory_32(struct m68k_module *module, u32 bus_address, u32 value)

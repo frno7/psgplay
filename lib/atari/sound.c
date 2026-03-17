@@ -136,7 +136,8 @@ static u16 sound_rd_u16(struct machine *machine, const struct device *device,
 	return sound_rd_u8(machine, device, dev_address + 1);
 }
 
-static void sound_wr_u8(const struct device *device, u32 dev_address, u8 val)
+static void sound_wr_u8(struct machine *machine, const struct device *device,
+	u32 dev_address, u8 val)
 {
 	const struct device_cycle sound_cycle = device_cycle(device);
 	struct cf300588_sound_cycle module_cycle =
@@ -155,9 +156,10 @@ static void sound_wr_u8(const struct device *device, u32 dev_address, u8 val)
 		cf300588.port.wr_da(&cf300588, module_cycle, reg, val));
 }
 
-static void sound_wr_u16(const struct device *device, u32 dev_address, u16 data)
+static void sound_wr_u16(struct machine *machine, const struct device *device,
+	u32 dev_address, u16 data)
 {
-	sound_wr_u8(device, dev_address + 1, data);
+	sound_wr_u8(machine, device, dev_address + 1, data);
 }
 
 static size_t sound_id_u8(struct machine *machine, const struct device *device,

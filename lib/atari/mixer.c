@@ -198,7 +198,8 @@ static u16 mixer_rd_u16(struct machine *machine, const struct device *device,
 		state.microwire.rd.halfword[reg] : 0;
 }
 
-static void mixer_wr_u8(const struct device *device, u32 dev_address, u8 data)
+static void mixer_wr_u8(struct machine *machine, const struct device *device,
+	u32 dev_address, u8 data)
 {
 	const struct device_cycle mixer_cycle = device_cycle(device);
 	const u32 reg = dev_address >> 1;
@@ -216,7 +217,8 @@ static void mixer_wr_u8(const struct device *device, u32 dev_address, u8 data)
 		microwire(device, mixer_cycle);
 }
 
-static void mixer_wr_u16(const struct device *device, u32 dev_address, u16 data)
+static void mixer_wr_u16(struct machine *machine, const struct device *device,
+	u32 dev_address, u16 data)
 {
 	const struct device_cycle mixer_cycle = device_cycle(device);
 	const u32 reg = dev_address >> 1;

@@ -51,8 +51,10 @@ struct device {
 	u16 (*rd_u16)(struct machine *machine,const struct device *device,
 		u32 dev_address);
 
-	void (*wr_u8)(const struct device *device, u32 dev_address, u8 data);
-	void (*wr_u16)(const struct device *device, u32 dev_address, u16 data);
+	void (*wr_u8)(struct machine *machine, const struct device *device,
+		u32 dev_address, u8 data);
+	void (*wr_u16)(struct machine *machine, const struct device *device,
+		u32 dev_address, u16 data);
 
 	size_t (*id_u8)(struct machine *machine, const struct device *device,
 		u32 dev_address, char *buf, size_t size);

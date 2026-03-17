@@ -99,7 +99,8 @@ static u16 psg_rd_u16(struct machine *machine, const struct device *device,
 	return psg_rd_u8(machine, device, dev_address) << 8;
 }
 
-static void psg_wr_u8(const struct device *device, u32 dev_address, u8 data)
+static void psg_wr_u8(struct machine *machine, const struct device *device,
+	u32 dev_address, u8 data)
 {
 	const struct device_cycle psg_cycle = device_cycle(device);
 	const struct cf2149_cycle cycle = cf2149_cycle_from_device(psg_cycle);
@@ -126,9 +127,10 @@ static void psg_wr_u8(const struct device *device, u32 dev_address, u8 data)
 	}
 }
 
-static void psg_wr_u16(const struct device *device, u32 dev_address, u16 data)
+static void psg_wr_u16(struct machine *machine, const struct device *device,
+	u32 dev_address, u16 data)
 {
-	psg_wr_u8(device, dev_address, data >> 8);
+	psg_wr_u8(machine, device, dev_address, data >> 8);
 }
 
 static size_t psg_id_u8(struct machine *machine,

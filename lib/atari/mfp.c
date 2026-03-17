@@ -82,7 +82,7 @@ static u16 mfp_rd_u16(struct machine *machine, const struct device *device,
 	return mfp_rd_u8(machine, device, dev_address + 1);
 }
 
-static void mfp_wr_u8(const struct device *device,
+static void mfp_wr_u8(struct machine *machine, const struct device *device,
 	u32 dev_address, u8 data)
 {
 	const struct device_cycle mfp_cycle = device_cycle(device);
@@ -95,9 +95,10 @@ static void mfp_wr_u8(const struct device *device,
 	request_event(device, cf68901.port.wr_da(&cf68901, clk, reg, data));
 }
 
-static void mfp_wr_u16(const struct device *device, u32 dev_address, u16 data)
+static void mfp_wr_u16(struct machine *machine, const struct device *device,
+	u32 dev_address, u16 data)
 {
-	mfp_wr_u8(device, dev_address + 1, data & 0xff);
+	mfp_wr_u8(machine, device, dev_address + 1, data & 0xff);
 }
 
 static size_t mfp_id_u8(struct machine *machine, const struct device *device,
