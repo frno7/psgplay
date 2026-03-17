@@ -43,7 +43,7 @@ static void mmu_bus_wait(const struct device *dev)
 	DMA_DEVICE(bus_address, &ram_device) :				\
 	DMA_DEVICE(bus_address, &rom_device) : NULL
 
-u8 dma_read_memory_8(u32 bus_address)
+u8 dma_read_memory_8(struct machine *machine, u32 bus_address)
 {
 	const struct device *dev = DMA_DEVICES(bus_address);
 
@@ -58,7 +58,7 @@ u8 dma_read_memory_8(u32 bus_address)
 	return value;
 }
 
-u16 dma_read_memory_16(u32 bus_address)
+u16 dma_read_memory_16(struct machine *machine, u32 bus_address)
 {
 	const struct device *dev = DMA_DEVICES(bus_address);
 
