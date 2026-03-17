@@ -17,13 +17,9 @@
 #include "atari/mfp.h"
 #include "atari/mfp-map.h"
 
-#include "cf68901/module/cf68901.h"
-
 #define MFP_FREQUENCY	(CPU_FREQUENCY / 2)
 
 #define GPIP_MONITOR_DETECT 7
-
-static struct cf68901_module cf68901;
 
 static bool mono_monitor_detect(void)
 {
@@ -43,7 +39,9 @@ CF68901_REGISTERS(MFP_REG_NAME)
 
 uint32_t mfp_irq_vector(struct machine *machine)
 {
-	return cf68901.port.vector(&cf68901);
+	struct cf68901_module *cf68901 = &machine->mfp.cf68901;
+
+	return cf68901->port.vector(cf68901);
 }
 
 static void request_event(struct machine *machine,
@@ -58,14 +56,16 @@ static void request_event(struct machine *machine,
 static void mfp_event(struct machine *machine, const struct device *device,
 	const struct device_cycle mfp_cycle)
 {
+	struct cf68901_module *cf68901 = &machine->mfp.cf68901;
 	const struct cf68901_clk clk = cf68901_clk_cycle(mfp_cycle.c);
 
-	request_event(machine, device, cf68901.port.event(&cf68901, clk));
+	request_event(machine, device, cf68901->port.event(cf68901, clk));
 }
 
 static u8 mfp_rd_u8(struct machine *machine, const struct device *device,
 	u32 dev_address)
 {
+	struct cf68901_module *cf68901 = &machine->mfp.cf68901;
 	const struct device_cycle mfp_cycle = device_cycle(machine, device);
 	const struct cf68901_clk clk = cf68901_clk_cycle(mfp_cycle.c);
 	const u32 reg = dev_address >> 1;
@@ -73,7 +73,7 @@ static u8 mfp_rd_u8(struct machine *machine, const struct device *device,
 	if ((dev_address & 1) == 0)
 		return 0;
 
-	return cf68901.port.rd_da(&cf68901, clk, reg);
+	return cf68901->port.rd_da(cf68901, clk, reg);
 }
 
 static u16 mfp_rd_u16(struct machine *machine, const struct device *device,
@@ -85,6 +85,7 @@ static u16 mfp_rd_u16(struct machine *machine, const struct device *device,
 static void mfp_wr_u8(struct machine *machine, const struct device *device,
 	u32 dev_address, u8 data)
 {
+	struct cf68901_module *cf68901 = &machine->mfp.cf68901;
 	const struct device_cycle mfp_cycle = device_cycle(machine, device);
 	const struct cf68901_clk clk = cf68901_clk_cycle(mfp_cycle.c);
 	const u32 reg = dev_address >> 1;
@@ -92,7 +93,7 @@ static void mfp_wr_u8(struct machine *machine, const struct device *device,
 	if ((dev_address & 1) == 0)
 		return;
 
-	request_event(machine, device, cf68901.port.wr_da(&cf68901, clk, reg, data));
+	request_event(machine, device, cf68901->port.wr_da(cf68901, clk, reg, data));
 }
 
 static void mfp_wr_u16(struct machine *machine, const struct device *device,
@@ -122,12 +123,13 @@ static size_t mfp_id_u16(struct machine *machine, const struct device *device,
 
 static void mfp_reset(struct machine *machine, const struct device *device)
 {
+	struct cf68901_module *cf68901 = &machine->mfp.cf68901;
 	const struct device_cycle mfp_cycle = device_cycle(machine, &mfp_device);
 	const struct cf68901_clk clk = cf68901_clk_cycle(mfp_cycle.c);
 
-	cf68901 = cf68901_init(MFP_FREQUENCY, MFP_TIMER_FREQUENCY);
+	*cf68901 = cf68901_init(MFP_FREQUENCY, MFP_TIMER_FREQUENCY);
 
-	cf68901.port.wr_gpip(&cf68901, clk,
+	cf68901->port.wr_gpip(cf68901, clk,
 		GPIP_MONITOR_DETECT, mono_monitor_detect());
 }
 
@@ -153,6 +155,7 @@ const struct device mfp_device = {
 
 void dma_sound_active(struct machine *machine, bool level)
 {
+	struct cf68901_module *cf68901 = &machine->mfp.cf68901;
 	static bool prev_level = 0;
 
 	if (level == prev_level)
@@ -161,8 +164,8 @@ void dma_sound_active(struct machine *machine, bool level)
 	const struct device_cycle mfp_cycle = device_cycle(machine, &mfp_device);
 	const struct cf68901_clk clk = cf68901_clk_cycle(mfp_cycle.c);
 
-	request_event(machine, &mfp_device, cf68901.port.tai(&cf68901, clk, level));
-	request_event(machine, &mfp_device, cf68901.port.wr_gpip(&cf68901, clk,
+	request_event(machine, &mfp_device, cf68901->port.tai(cf68901, clk, level));
+	request_event(machine, &mfp_device, cf68901->port.wr_gpip(cf68901, clk,
 		GPIP_MONITOR_DETECT, level ^ mono_monitor_detect()));
 
 	prev_level = level;

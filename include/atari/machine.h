@@ -14,6 +14,7 @@
 
 #include "cf2149/module/cf2149.h"
 #include "cf300588/module/cf300588-sound.h"
+#include "cf68901/module/cf68901.h"
 #include "m68k/m68kcpu.h"
 
 #define CPU_FREQUENCY (ATARI_STE_PAL_MCLK / ATARI_STE_CPU_CLK_DIV)
@@ -53,6 +54,10 @@ struct machine {
 		void (*cb)(uint32_t pc, void *arg);
 		void *arg;
 	} instruction_callback;
+
+	struct {
+		struct cf68901_module cf68901;
+	} mfp;
 
 	struct {
 		struct mixer_state {
