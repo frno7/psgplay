@@ -10,10 +10,6 @@
 
 #include "atari/machine.h"
 
-struct device_cycle {
-	u64 c;
-};
-
 struct device_slice {
 	u64 s;
 };

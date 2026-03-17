@@ -23,23 +23,6 @@
 #define MIXER_EVENT_CYCLES (MIXER_FREQUENCY / MIXER_EVENT_FREQUENCY)
 #define MIXER_SAMPLE_CYCLES 4			/* 250.332 kHz */
 
-static struct {
-	struct {
-		union {
-			struct {
-				u16 data;
-				u16 mask;
-			};
-			u16 halfword[2];
-			u8 byte[4];
-		} wr, rd;
-		struct device_cycle cycle;
-		struct mixer_sample sample;
-	} microwire;
-
-	struct mixer_sample sample;
-} state;
-
 static char *mixer_register_name(u32 reg)
 {
 	switch (reg) {
@@ -51,21 +34,26 @@ MIXER_MICROWIRE_REGISTERS(MIXER_MICROWIRE_REG_NAME)
 	}
 }
 
-static u32 microwire_shift(const struct device_cycle mixer_cycle)
+static u32 microwire_shift(struct machine *machine,
+	const struct device_cycle mixer_cycle)
 {
+	struct mixer_state *state = &machine->mixer.state;
+
 	/* The Microwire begins shifting on the first cycle. */
-	return mixer_cycle.c < state.microwire.cycle.c + 15 ?
-		1 + mixer_cycle.c - state.microwire.cycle.c: 0;
+	return mixer_cycle.c < state->microwire.cycle.c + 15 ?
+		1 + mixer_cycle.c - state->microwire.cycle.c: 0;
 }
 
-static bool microwire_busy(const struct device_cycle mixer_cycle)
+static bool microwire_busy(struct machine *machine,
+	const struct device_cycle mixer_cycle)
 {
-	return microwire_shift(mixer_cycle) != 0;
+	return microwire_shift(machine, mixer_cycle) != 0;
 }
 
 static void mixer_emit(struct machine *machine,
 	const struct device_cycle mixer_cycle)
 {
+	struct mixer_state *state = &machine->mixer.state;
 	struct mixer_sample buffer[256];
 	size_t count = 0;
 
@@ -76,10 +64,10 @@ static void mixer_emit(struct machine *machine,
 		const struct device_cycle sample_cycle =
 			(struct device_cycle) { .c = c };
 
-		if (!microwire_busy(sample_cycle))
-			state.sample = state.microwire.sample;
+		if (!microwire_busy(machine, sample_cycle))
+			state->sample = state->microwire.sample;
 
-		buffer[count++] = state.sample;
+		buffer[count++] = state->sample;
 
 		if (count >= ARRAY_SIZE(buffer)) {
 			if (machine->mixer.output.sample)
@@ -93,17 +81,17 @@ static void mixer_emit(struct machine *machine,
 		machine->mixer.output.sample(buffer,
 			count, machine->mixer.output.sample_arg);
 
-	const u32 shift = microwire_shift(mixer_cycle);
+	const u32 shift = microwire_shift(machine, mixer_cycle);
 	if (shift) {
 		/* Shift data and mask words during 16 us transmission. */
-		state.microwire.rd.data =
-			(state.microwire.wr.data << shift) |
-			(state.microwire.wr.data >> (16 - shift));
-		state.microwire.rd.mask =
-			(state.microwire.wr.mask << shift) |
-			(state.microwire.wr.mask >> (16 - shift));
+		state->microwire.rd.data =
+			(state->microwire.wr.data << shift) |
+			(state->microwire.wr.data >> (16 - shift));
+		state->microwire.rd.mask =
+			(state->microwire.wr.mask << shift) |
+			(state->microwire.wr.mask >> (16 - shift));
 	} else
-		state.microwire.rd = state.microwire.wr;
+		state->microwire.rd = state->microwire.wr;
 
 	machine->mixer.mixer_emit_latest_cycle = mixer_cycle.c;
 }
@@ -118,25 +106,28 @@ static void mixer_event(struct machine *machine, const struct device *device,
 		});
 }
 
-static u16 microwire_cmd(const struct device *device)
+static u16 microwire_cmd(struct machine *machine, const struct device *device)
 {
+	struct mixer_state *state = &machine->mixer.state;
 	u16 cmd = 0;
 
 	for (int i = 0; i < 16; i++)
-		if (state.microwire.wr.mask & (0x8000 >> i)) {
+		if (state->microwire.wr.mask & (0x8000 >> i)) {
 			cmd <<= 1;
-			cmd |= (state.microwire.wr.data & (0x8000 >> i) ? 1 : 0);
+			cmd |= (state->microwire.wr.data & (0x8000 >> i) ? 1 : 0);
 		}
 
 	return cmd;
 }
 
-static void microwire(const struct device *device,
+static void microwire(struct machine *machine, const struct device *device,
 	const struct device_cycle mixer_cycle)
 {
-	state.microwire.cycle = (struct device_cycle) { .c = mixer_cycle.c };
+	struct mixer_state *state = &machine->mixer.state;
 
-	const u16 cmd = microwire_cmd(device);
+	state->microwire.cycle = (struct device_cycle) { .c = mixer_cycle.c };
+
+	const u16 cmd = microwire_cmd(machine, device);
 	const u16 addr = cmd >> 9;
 	const u16 reg = (cmd >> 6) & 0x7;
 	const s16 data = cmd & 0x3f;
@@ -146,31 +137,31 @@ static void microwire(const struct device *device,
 
 	switch (reg)  {
 	case MIXER_LMC1992_REG_MIXER:
-		state.microwire.sample.mix = ((data & 0x3) == 1);
+		state->microwire.sample.mix = ((data & 0x3) == 1);
 		break;
 
 	case MIXER_LMC1992_REG_BASS:
-		state.microwire.sample.tone.bass =
+		state->microwire.sample.tone.bass =
 			clamp(2 * (data & 0xf) - 12, -12, 12);
 		break;
 
 	case MIXER_LMC1992_REG_TREBLE:
-		state.microwire.sample.tone.treble =
+		state->microwire.sample.tone.treble =
 			clamp(2 * (data & 0xf) - 12, -12, 12);
 		break;
 
 	case MIXER_LMC1992_REG_VOLUME_MAIN:
-		state.microwire.sample.volume.main =
+		state->microwire.sample.volume.main =
 			clamp(2 * (data & 0x3f) - 80, -80, 0);
 		break;
 
 	case MIXER_LMC1992_REG_VOLUME_RIGHT:
-		state.microwire.sample.volume.right =
+		state->microwire.sample.volume.right =
 			clamp(2 * (data & 0x1f) - 40, -40, 0);
 		break;
 
 	case MIXER_LMC1992_REG_VOLUME_LEFT:
-		state.microwire.sample.volume.left =
+		state->microwire.sample.volume.left =
 			clamp(2 * (data & 0x1f) - 40, -40, 0);
 		break;
 	}
@@ -179,59 +170,65 @@ static void microwire(const struct device *device,
 static u8 mixer_rd_u8(struct machine *machine, const struct device *device,
 	u32 dev_address)
 {
+	struct mixer_state *state = &machine->mixer.state;
+
 	mixer_emit(machine, device_cycle(machine, device));
 
-	return dev_address < ARRAY_SIZE(state.microwire.rd.byte) ?
-		state.microwire.rd.byte[dev_address] : 0;
+	return dev_address < ARRAY_SIZE(state->microwire.rd.byte) ?
+		state->microwire.rd.byte[dev_address] : 0;
 }
 
 static u16 mixer_rd_u16(struct machine *machine, const struct device *device,
 	u32 dev_address)
 {
+	struct mixer_state *state = &machine->mixer.state;
+
 	const u32 reg = dev_address >> 1;
 
 	mixer_emit(machine, device_cycle(machine, device));
 
-	return reg < ARRAY_SIZE(state.microwire.rd.halfword) ?
-		state.microwire.rd.halfword[reg] : 0;
+	return reg < ARRAY_SIZE(state->microwire.rd.halfword) ?
+		state->microwire.rd.halfword[reg] : 0;
 }
 
 static void mixer_wr_u8(struct machine *machine, const struct device *device,
 	u32 dev_address, u8 data)
 {
+	struct mixer_state *state = &machine->mixer.state;
 	const struct device_cycle mixer_cycle = device_cycle(machine, device);
 	const u32 reg = dev_address >> 1;
 
 	/* Writing is ignored during the 16 us Microwire transmission. */
-	if (microwire_busy(mixer_cycle))
+	if (microwire_busy(machine, mixer_cycle))
 		return;
 
-	if (ARRAY_SIZE(state.microwire.wr.byte) <= dev_address)
+	if (ARRAY_SIZE(state->microwire.wr.byte) <= dev_address)
 		return;
 
-	state.microwire.wr.byte[dev_address] = data;
+	state->microwire.wr.byte[dev_address] = data;
 
 	if (reg == MIXER_MICROWIRE_REG_DATA)
-		microwire(device, mixer_cycle);
+		microwire(machine, device, mixer_cycle);
 }
 
 static void mixer_wr_u16(struct machine *machine, const struct device *device,
 	u32 dev_address, u16 data)
 {
+	struct mixer_state *state = &machine->mixer.state;
 	const struct device_cycle mixer_cycle = device_cycle(machine, device);
 	const u32 reg = dev_address >> 1;
 
 	/* Writing is ignored during the 16 us Microwire transmission. */
-	if (microwire_busy(mixer_cycle))
+	if (microwire_busy(machine, mixer_cycle))
 		return;
 
-	if (ARRAY_SIZE(state.microwire.wr.halfword) <= reg)
+	if (ARRAY_SIZE(state->microwire.wr.halfword) <= reg)
 		return;
 
-	state.microwire.wr.halfword[reg] = data;
+	state->microwire.wr.halfword[reg] = data;
 
 	if (reg == MIXER_MICROWIRE_REG_DATA)
-		microwire(device, mixer_cycle);
+		microwire(machine, device, mixer_cycle);
 }
 
 static size_t mixer_id_u8(struct machine *machine, const struct device *device,
@@ -264,10 +261,12 @@ static size_t mixer_id_u16(struct machine *machine, const struct device *device,
 
 static void mixer_reset(struct machine *machine, const struct device *device)
 {
-	memset(&state, 0, sizeof(state));
+	struct mixer_state *state = &machine->mixer.state;
 
-	state.microwire.sample.mix = true;
-	state.sample = state.microwire.sample;
+	*state = (struct mixer_state) { };
+
+	state->microwire.sample.mix = true;
+	state->sample = state->microwire.sample;
 
 	machine->mixer.mixer_emit_latest_cycle = 0;
 

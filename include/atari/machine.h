@@ -21,6 +21,10 @@
 #define MACHINE_PROGRAM   0x40000	/* 256 KiB */
 #define MACHINE_RUN_SLICE   10000
 
+struct device_cycle {
+	u64 c;
+};
+
 struct machine_registers {
 	u32 d[8];	/* Data registers */
 	u32 a[8];	/* Address registers */
@@ -51,6 +55,23 @@ struct machine {
 	} instruction_callback;
 
 	struct {
+		struct mixer_state {
+			struct {
+				union {
+					struct {
+						u16 data;
+						u16 mask;
+					};
+					u16 halfword[2];
+					u8 byte[4];
+				} wr, rd;
+				struct device_cycle cycle;
+				struct mixer_sample sample;
+			} microwire;
+
+			struct mixer_sample sample;
+		} state;
+
 		u64 mixer_emit_latest_cycle;
 
 		struct {
