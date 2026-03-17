@@ -68,7 +68,7 @@
  * auto-clear when the interrupt is serviced.
  */
 #define M68K_EMULATE_INT_ACK        OPT_SPECIFY_HANDLER
-#define M68K_INT_ACK_CALLBACK(A)    m68k_int_ack_callback(A)
+#define M68K_INT_ACK_CALLBACK(module, A)    m68k_int_ack_callback(module, A)
 
 
 /* If ON, CPU will call the breakpoint acknowledge callback when it encounters

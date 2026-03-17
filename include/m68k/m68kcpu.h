@@ -442,7 +442,7 @@ typedef uint32 uint64;
 /* Enable or disable callback functions */
 #if M68K_EMULATE_INT_ACK
 	#if M68K_EMULATE_INT_ACK == OPT_SPECIFY_HANDLER
-		#define m68ki_int_ack(A) M68K_INT_ACK_CALLBACK(A)
+		#define m68ki_int_ack(A) M68K_INT_ACK_CALLBACK(module, A)
 	#else
 		#define m68ki_int_ack(A) CALLBACK_INT_ACK(A)
 	#endif

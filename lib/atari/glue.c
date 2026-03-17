@@ -98,7 +98,7 @@ static void glue_reset(const struct device *device)
 	request_vbl_event(device_cycle(&glue_device));
 }
 
-int m68k_int_ack_callback(int level)
+int m68k_int_ack_callback(struct m68k_module *module, int level)
 {
 	switch(level)
 	{
