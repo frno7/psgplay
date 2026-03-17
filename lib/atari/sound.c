@@ -177,7 +177,7 @@ static size_t sound_id_u16(const struct device *device,
 	return sound_id_u8(device, dev_address + 1, buf, size);
 }
 
-static void sound_reset(const struct device *device)
+static void sound_reset(struct machine *machine, const struct device *device)
 {
 	const struct device_cycle sound_cycle = device_cycle(device);
 

@@ -63,7 +63,7 @@ static void shifter_event(const struct device *device,
 {
 }
 
-static void shifter_reset(const struct device *device)
+static void shifter_reset(struct machine *machine, const struct device *device)
 {
 }
 

@@ -8,6 +8,8 @@
 
 #include "internal/types.h"
 
+#include "atari/machine.h"
+
 struct device_cycle {
 	u64 c;
 };
@@ -39,7 +41,7 @@ struct device {
 
 	struct device_slice (*run)(const struct device *device,
 		struct device_cycle, struct device_slice);
-	void (*reset)(const struct device *device);
+	void (*reset)(struct machine *machine, const struct device *device);
 	void (*event)(const struct device *device,
 		struct device_cycle device_cycle);
 
@@ -67,7 +69,7 @@ struct device_cycle device_from_machine_cycle(
 void request_device_event(const struct device *device,
 	struct device_cycle device_cycle);
 
-void device_reset(void);
+void device_reset(struct machine *machine);
 
 u64 device_run(u64 machine_cycle, u64 machine_cycle_slice);
 

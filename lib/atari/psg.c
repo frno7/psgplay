@@ -158,7 +158,7 @@ static size_t psg_id_u16(const struct device *device,
 	return psg_id_u8(device, dev_address, buf, size);
 }
 
-static void psg_reset(const struct device *device)
+static void psg_reset(struct machine *machine, const struct device *device)
 {
 	const struct device_cycle psg_cycle = device_cycle(device);
 	const struct cf2149_cycle cycle = cf2149_cycle_from_device(psg_cycle);

@@ -64,7 +64,7 @@ static struct device_slice cpu_run(const struct device *device,
 	return (struct device_slice) { .s = s };
 }
 
-static void cpu_reset(const struct device *device)
+static void cpu_reset(struct machine *machine, const struct device *device)
 {
 	instruction_callback.cb = NULL;
 	instruction_callback.arg = NULL;

@@ -260,7 +260,7 @@ static size_t mixer_id_u16(const struct device *device,
 	return strlen(buf);
 }
 
-static void mixer_reset(const struct device *device)
+static void mixer_reset(struct machine *machine, const struct device *device)
 {
 	memset(&state, 0, sizeof(state));
 

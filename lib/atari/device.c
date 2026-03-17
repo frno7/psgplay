@@ -139,13 +139,13 @@ void request_device_event(const struct device *device,
 		machine_device->machine_cycle_event = machine_cycle;
 }
 
-void device_reset(void)
+void device_reset(struct machine *machine)
 {
 	const struct device *device;
 
 	for_each_device (device)
 		if (device->reset)
-			device->reset(device);
+			device->reset(machine, device);
 }
 
 static struct device_slice run(const struct device *device,

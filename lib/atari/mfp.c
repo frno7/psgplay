@@ -117,7 +117,7 @@ static size_t mfp_id_u16(const struct device *device,
 	return mfp_id_u8(device, dev_address + 1, buf, size);
 }
 
-static void mfp_reset(const struct device *device)
+static void mfp_reset(struct machine *machine, const struct device *device)
 {
 	const struct device_cycle mfp_cycle = device_cycle(&mfp_device);
 	const struct cf68901_clk clk = cf68901_clk_cycle(mfp_cycle.c);

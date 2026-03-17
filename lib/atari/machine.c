@@ -82,7 +82,7 @@ void atari_st_init(struct machine *machine,
 			size, ram_device.bus.size);
 #endif
 
-	device_reset();
+	device_reset(machine);
 
 #define MACHINE_REGISTER_SET(index_, field_, label_)			\
 	m68k_set_reg(&musashi_module, M68K_REG_##label_##index_, regs->field_[index_]);

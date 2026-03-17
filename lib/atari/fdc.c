@@ -51,7 +51,7 @@ static size_t fdc_id_u16(const struct device *device,
 	return fdc_id_u8(device, dev_address, buf, size);
 }
 
-static void fdc_reset(const struct device *device)
+static void fdc_reset(struct machine *machine, const struct device *device)
 {
 }
 

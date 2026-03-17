@@ -31,7 +31,7 @@ struct ram_map_ro ram_map_ro(uint32_t size, uint32_t addr)
 	};
 }
 
-static void ram_reset(const struct device *device)
+static void ram_reset(struct machine *machine, const struct device *device)
 {
 	memcpy(&ram[0], tos, 8);	/* ROM overlay during reset */
 	memset(&ram[8], 0, sizeof(ram) - 8);

@@ -93,7 +93,7 @@ static void glue_event(const struct device *device,
 	request_vbl_event(device_cycle);
 }
 
-static void glue_reset(const struct device *device)
+static void glue_reset(struct machine *machine, const struct device *device)
 {
 	request_vbl_event(device_cycle(&glue_device));
 }
