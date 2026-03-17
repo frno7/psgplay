@@ -68,13 +68,14 @@ static bool microwire_busy(const struct device_cycle mixer_cycle)
 	return microwire_shift(mixer_cycle) != 0;
 }
 
-static u64 mixer_emit_latest_cycle;
-static void mixer_emit(const struct device_cycle mixer_cycle)
+static void mixer_emit(struct machine *machine,
+	const struct device_cycle mixer_cycle)
 {
 	struct mixer_sample buffer[256];
 	size_t count = 0;
 
-	for (u64 c = ALIGN(mixer_emit_latest_cycle, MIXER_SAMPLE_CYCLES);
+	for (u64 c = ALIGN(machine->mixer.mixer_emit_latest_cycle,
+			   MIXER_SAMPLE_CYCLES);
 	     c < mixer_cycle.c;
 	     c += MIXER_SAMPLE_CYCLES) {
 		const struct device_cycle sample_cycle =
@@ -107,13 +108,13 @@ static void mixer_emit(const struct device_cycle mixer_cycle)
 	} else
 		state.microwire.rd = state.microwire.wr;
 
-	mixer_emit_latest_cycle = mixer_cycle.c;
+	machine->mixer.mixer_emit_latest_cycle = mixer_cycle.c;
 }
 
 static void mixer_event(struct machine *machine, const struct device *device,
 	const struct device_cycle mixer_cycle)
 {
-	mixer_emit(mixer_cycle);
+	mixer_emit(machine, mixer_cycle);
 
 	request_device_event(machine, device, (struct device_cycle) {
 			.c = mixer_cycle.c + MIXER_EVENT_CYCLES
@@ -181,7 +182,7 @@ static void microwire(const struct device *device,
 static u8 mixer_rd_u8(struct machine *machine, const struct device *device,
 	u32 dev_address)
 {
-	mixer_emit(device_cycle(machine, device));
+	mixer_emit(machine, device_cycle(machine, device));
 
 	return dev_address < ARRAY_SIZE(state.microwire.rd.byte) ?
 		state.microwire.rd.byte[dev_address] : 0;
@@ -192,7 +193,7 @@ static u16 mixer_rd_u16(struct machine *machine, const struct device *device,
 {
 	const u32 reg = dev_address >> 1;
 
-	mixer_emit(device_cycle(machine, device));
+	mixer_emit(machine, device_cycle(machine, device));
 
 	return reg < ARRAY_SIZE(state.microwire.rd.halfword) ?
 		state.microwire.rd.halfword[reg] : 0;
@@ -271,7 +272,7 @@ static void mixer_reset(struct machine *machine, const struct device *device)
 	state.microwire.sample.mix = true;
 	state.sample = state.microwire.sample;
 
-	mixer_emit_latest_cycle = 0;
+	machine->mixer.mixer_emit_latest_cycle = 0;
 
 	mixer_event(machine, device, device_cycle(machine, device));
 }

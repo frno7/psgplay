@@ -51,6 +51,10 @@ struct machine {
 	} instruction_callback;
 
 	struct {
+		u64 mixer_emit_latest_cycle;
+	} mixer;
+
+	struct {
 		struct cf2149_module cf2149;
 
 		struct {
