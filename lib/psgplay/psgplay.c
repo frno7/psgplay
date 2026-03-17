@@ -623,7 +623,7 @@ static ssize_t psgplay_read_digital__(struct psgplay *pp,
 		count = min(count, db->stop - db->total);
 	}
 
-	cpu_instruction_callback(
+	cpu_instruction_callback(&pp->machine,
 		pp->instruction_callback.cb,
 		pp->instruction_callback.arg);
 

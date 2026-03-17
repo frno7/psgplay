@@ -32,7 +32,8 @@ void m68k_instruction_callback(struct m68k_module *module, int pc)
 	instruction_callback.cb(pc, instruction_callback.arg);
 }
 
-void cpu_instruction_callback(void (*cb)(uint32_t pc, void *arg), void *arg)
+void cpu_instruction_callback(struct machine *machine,
+	void (*cb)(uint32_t pc, void *arg), void *arg)
 {
 	instruction_callback.cb = cb;
 	instruction_callback.arg = arg;
