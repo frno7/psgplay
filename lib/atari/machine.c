@@ -97,7 +97,7 @@ void atari_st_init(struct machine *machine,
 	record_sample(ports->record_sample, ports->arg);
 }
 
-bool atari_st_run(void)
+bool atari_st_run(struct machine *machine)
 {
 	cycle += device_run(cycle, MACHINE_RUN_SLICE);
 

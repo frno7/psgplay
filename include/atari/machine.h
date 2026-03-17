@@ -35,7 +35,7 @@ struct machine {
 		const void *prg, size_t size, size_t offset,
 		const struct machine_registers *regs,
 		const struct machine_ports *ports);
-	bool (*run)(void);
+	bool (*run)(struct machine *machine);
 };
 
 u64 cycle_transform(u64 to_frequency, u64 from_frequency, u64 cycle);
@@ -49,7 +49,7 @@ void atari_st_init(struct machine *machine,
 	const struct machine_registers *regs,
 	const struct machine_ports *ports);
 
-bool atari_st_run(void);
+bool atari_st_run(struct machine *machine);
 
 extern struct m68k_module musashi_module;
 

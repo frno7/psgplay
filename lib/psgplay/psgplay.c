@@ -635,7 +635,7 @@ static ssize_t psgplay_read_digital__(struct psgplay *pp,
 				if (pp->errno_) {
 					errno = pp->errno_;
 					return -1;
-				} else if (!pp->machine.run()) {
+				} else if (!pp->machine.run(&pp->machine)) {
 					errno = -EIO;
 					return -1;
 				}
