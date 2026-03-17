@@ -73,34 +73,36 @@ u16 dma_read_memory_16(u32 bus_address)
 	return value;
 }
 
-u8 probe_read_memory_8(u32 bus_address)
+u8 probe_read_memory_8(struct machine *machine, u32 bus_address)
 {
 	const struct device *dev = DMA_DEVICES(bus_address);
 
 	return dev ? dev->rd_u8(dev, bus_address - dev->bus.address) : 0;
 }
 
-u16 probe_read_memory_16(u32 bus_address)
+u16 probe_read_memory_16(struct machine *machine, u32 bus_address)
 {
 	const struct device *dev = DMA_DEVICES(bus_address);
 
 	return dev ? dev->rd_u16(dev, bus_address - dev->bus.address) : 0;
 }
 
-void probe_copy_memory_8(void *buffer, u32 bus_address, size_t byte_count)
+void probe_copy_memory_8(struct machine *machine,
+	void *buffer, u32 bus_address, size_t byte_count)
 {
 	uint8_t *b = buffer;
 
 	for (size_t i = 0; i < byte_count; i++)
-		b[i] = probe_read_memory_8(bus_address + i);
+		b[i] = probe_read_memory_8(machine, bus_address + i);
 }
 
-void probe_copy_memory_16(void *buffer, u32 bus_address, size_t word_count)
+void probe_copy_memory_16(struct machine *machine,
+	void *buffer, u32 bus_address, size_t word_count)
 {
 	uint8_t *b = buffer;
 
 	for (size_t i = 0; i < word_count; i++) {
-		const uint16_t v = probe_read_memory_16(
+		const uint16_t v = probe_read_memory_16(machine,
 			bus_address + sizeof(uint16_t[i]));
 
 		b[sizeof(uint16_t[i]) + 0] = v >> 8;

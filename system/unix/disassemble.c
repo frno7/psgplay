@@ -621,7 +621,9 @@ static void dasm_instruction(uint32_t pc, void *arg)
 		i == 4 ? SNDH_INSN_EXIT :
 		i == 8 ? SNDH_INSN_PLAY : dasm->sndh_insn_run;
 
-	const union m68kda_insn insn = { .word = probe_read_memory_16(pc) };
+	const union m68kda_insn insn = {
+		.word = probe_read_memory_16(dasm->machine, pc)
+	};
 	const struct m68kda_spec *spec0 = m68kda_insn_find(insn);
 
 	if (!spec0) {
@@ -635,7 +637,7 @@ static void dasm_instruction(uint32_t pc, void *arg)
 
 	BUG_ON(insn_size % 2 != 0);
 	BUG_ON(insn_size < 2 || sizeof(buffer) < insn_size);
-	probe_copy_memory_16(buffer, pc, insn_size / 2);
+	probe_copy_memory_16(dasm->machine, buffer, pc, insn_size / 2);
 
 	if (dasm->size < i + insn_size)
 		return;
@@ -725,7 +727,8 @@ void sndh_disassemble(struct options *options, struct file file)
 		dasm_mark_text_trace_run(dasm_instruction,
 			&dasm, options, file);
 
-		probe_copy_memory_8(dasm.data, MACHINE_PROGRAM, dasm.size);
+		probe_copy_memory_8(dasm.machine,
+			dasm.data, MACHINE_PROGRAM, dasm.size);
 	}
 
 	dasm_mark_text_trace_entries(&dasm);
@@ -810,7 +813,9 @@ static void cpu_instruction_trace(uint32_t pc, void *arg)
 
 	sbprintf(&trace->sb, "cpu %8" PRIu64 "  ", machine_cycle());
 
-	const union m68kda_insn insn = { .word = probe_read_memory_16(pc) };
+	const union m68kda_insn insn = {
+		.word = probe_read_memory_16(trace->machine, pc)
+	};
 	const struct m68kda_spec *spec0 = m68kda_insn_find(insn);
 
 	if (!spec0) {
@@ -826,7 +831,7 @@ static void cpu_instruction_trace(uint32_t pc, void *arg)
 	BUG_ON(insn_size % 2 != 0);
 	BUG_ON(insn_size < 2 || sizeof(buffer) < insn_size);
 
-	probe_copy_memory_16(buffer, pc, insn_size / 2);
+	probe_copy_memory_16(trace->machine, buffer, pc, insn_size / 2);
 
 	print_address(&trace->sb, pc, buffer, insn_size);
 
