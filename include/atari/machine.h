@@ -12,6 +12,7 @@
 
 #include "atari/sample.h"
 
+#include "cf300588/module/cf300588-sound.h"
 #include "m68k/m68kcpu.h"
 
 #define CPU_FREQUENCY (ATARI_STE_PAL_MCLK / ATARI_STE_CPU_CLK_DIV)
@@ -51,6 +52,10 @@ struct machine {
 	struct {
 		uint8_t u8[MACHINE_RAM_SIZE];
 	} ram;
+
+	struct {
+		struct cf300588_sound_module cf300588;
+	} sound;
 };
 
 u64 cycle_transform(u64 to_frequency, u64 from_frequency, u64 cycle);
