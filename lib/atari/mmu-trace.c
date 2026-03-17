@@ -12,7 +12,8 @@
 #include "atari/bus.h"
 #include "atari/machine.h"
 
-static void mmu_trace(const char *op, u32 dev_address,
+static void mmu_trace(struct machine *machine,
+	const char *op, u32 dev_address,
 	const char *spacing, int size, u32 value,
 	size_t (*sh)(const struct device *device,
 		u32 dev_address, char *buf, size_t size),
@@ -52,22 +53,26 @@ trace:
 			op, spacing, size, value);
 }
 
-void mmu_trace_rd_u8(u32 dev_address, u32 value, const struct device *dev)
+void mmu_trace_rd_u8(struct machine *machine,
+	u32 dev_address, u32 value, const struct device *dev)
 {
-	mmu_trace("rd  u8", dev_address, "  ", 2, value, dev->id_u8, dev);
+	mmu_trace(machine, "rd  u8", dev_address, "  ", 2, value, dev->id_u8, dev);
 }
 
-void mmu_trace_rd_u16(u32 dev_address, u32 value, const struct device *dev)
+void mmu_trace_rd_u16(struct machine *machine,
+	u32 dev_address, u32 value, const struct device *dev)
 {
-	mmu_trace("rd u16", dev_address, "", 4, value, dev->id_u16, dev);
+	mmu_trace(machine, "rd u16", dev_address, "", 4, value, dev->id_u16, dev);
 }
 
-void mmu_trace_wr_u8(u32 dev_address, u32 value, const struct device *dev)
+void mmu_trace_wr_u8(struct machine *machine,
+	u32 dev_address, u32 value, const struct device *dev)
 {
-	mmu_trace("wr  u8", dev_address, "  ", 2, value, dev->id_u8, dev);
+	mmu_trace(machine, "wr  u8", dev_address, "  ", 2, value, dev->id_u8, dev);
 }
 
-void mmu_trace_wr_u16(u32 dev_address, u32 value, const struct device *dev)
+void mmu_trace_wr_u16(struct machine *machine,
+	u32 dev_address, u32 value, const struct device *dev)
 {
-	mmu_trace("wr u16", dev_address, "", 4, value, dev->id_u16, dev);
+	mmu_trace(machine, "wr u16", dev_address, "", 4, value, dev->id_u16, dev);
 }

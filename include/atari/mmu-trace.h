@@ -10,9 +10,13 @@
 
 #include "atari/device.h"
 
-void mmu_trace_rd_u8(u32 dev_address, u32 value, const struct device *bd);
-void mmu_trace_rd_u16(u32 dev_address, u32 value, const struct device *bd);
-void mmu_trace_wr_u8(u32 dev_address, u32 value, const struct device *bd);
-void mmu_trace_wr_u16(u32 dev_address, u32 value, const struct device *bd);
+void mmu_trace_rd_u8(struct machine *machine,
+	u32 dev_address, u32 value, const struct device *bd);
+void mmu_trace_rd_u16(struct machine *machine,
+	u32 dev_address, u32 value, const struct device *bd);
+void mmu_trace_wr_u8(struct machine *machine,
+	u32 dev_address, u32 value, const struct device *bd);
+void mmu_trace_wr_u16(struct machine *machine,
+	u32 dev_address, u32 value, const struct device *bd);
 
 #endif /* ATARI_MMU_TRACE_H */
