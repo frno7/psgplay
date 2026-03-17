@@ -63,7 +63,8 @@ static void mfp_event(const struct device *device,
 	request_event(device, cf68901.port.event(&cf68901, clk));
 }
 
-static u8 mfp_rd_u8(const struct device *device, u32 dev_address)
+static u8 mfp_rd_u8(struct machine *machine, const struct device *device,
+	u32 dev_address)
 {
 	const struct device_cycle mfp_cycle = device_cycle(device);
 	const struct cf68901_clk clk = cf68901_clk_cycle(mfp_cycle.c);
@@ -75,9 +76,10 @@ static u8 mfp_rd_u8(const struct device *device, u32 dev_address)
 	return cf68901.port.rd_da(&cf68901, clk, reg);
 }
 
-static u16 mfp_rd_u16(const struct device *device, u32 dev_address)
+static u16 mfp_rd_u16(struct machine *machine, const struct device *device,
+	u32 dev_address)
 {
-	return mfp_rd_u8(device, dev_address + 1);
+	return mfp_rd_u8(machine, device, dev_address + 1);
 }
 
 static void mfp_wr_u8(const struct device *device,

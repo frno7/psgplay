@@ -18,14 +18,16 @@ static void fdc_event(const struct device *device,
 {
 }
 
-static u8 fdc_rd_u8(const struct device *device, u32 dev_address)
+static u8 fdc_rd_u8(struct machine *machine, const struct device *device,
+	u32 dev_address)
 {
 	return 0;
 }
 
-static u16 fdc_rd_u16(const struct device *device, u32 dev_address)
+static u16 fdc_rd_u16(struct machine *machine, const struct device *device,
+	u32 dev_address)
 {
-	return fdc_rd_u8(device, dev_address) << 8;
+	return fdc_rd_u8(machine, device, dev_address) << 8;
 }
 
 static void fdc_wr_u8(const struct device *device, u32 dev_address, u8 data)

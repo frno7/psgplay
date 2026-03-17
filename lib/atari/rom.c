@@ -10,12 +10,14 @@
 
 #include "tos/tos.h"
 
-static u8 rom_rd_u8(const struct device *device, u32 dev_address)
+static u8 rom_rd_u8(struct machine *machine, const struct device *device,
+	u32 dev_address)
 {
 	return dev_address + 1 <= sizeof(tos) ? tos[dev_address] : 0;
 }
 
-static u16 rom_rd_u16(const struct device *device, u32 dev_address)
+static u16 rom_rd_u16(struct machine *machine, const struct device *device,
+	u32 dev_address)
 {
 	return dev_address + 2 <= sizeof(tos) ?
 		(tos[dev_address] << 8) | tos[dev_address + 1] : 0;

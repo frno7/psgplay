@@ -22,12 +22,14 @@ SHIFTER_REGISTERS(SHIFTER_REG_NAME)
 	}
 }
 
-static u8 shifter_rd_u8(const struct device *device, u32 dev_address)
+static u8 shifter_rd_u8(struct machine *machine, const struct device *device,
+	u32 dev_address)
 {
 	return 0;	/* FIXME */
 }
 
-static u16 shifter_rd_u16(const struct device *device, u32 dev_address)
+static u16 shifter_rd_u16(struct machine *machine, const struct device *device,
+	u32 dev_address)
 {
 	return 0;	/* FIXME */
 }

@@ -37,12 +37,14 @@ static void ram_reset(struct machine *machine, const struct device *device)
 	memset(&ram[8], 0, sizeof(ram) - 8);
 }
 
-static u8 ram_rd_u8(const struct device *device, u32 dev_address)
+static u8 ram_rd_u8(struct machine *machine, const struct device *device,
+	u32 dev_address)
 {
 	return ram[dev_address];
 }
 
-static u16 ram_rd_u16(const struct device *device, u32 dev_address)
+static u16 ram_rd_u16(struct machine *machine, const struct device *device,
+	u32 dev_address)
 {
 	return (ram[dev_address] << 8) | ram[dev_address + 1];
 }

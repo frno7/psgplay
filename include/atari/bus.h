@@ -11,8 +11,11 @@
 #include "atari/machine.h"
 #include "atari/device.h"
 
-u8 bus_error_rd_u8(const struct device *device, u32 address);
-u16 bus_error_rd_u16(const struct device *device, u32 address);
+u8 bus_error_rd_u8(struct machine *machine, const struct device *device,
+	u32 address);
+u16 bus_error_rd_u16(struct machine *machine, const struct device *device,
+	u32 address);
+
 void bus_error_wr_u8(const struct device *device, u32 address, u8 data);
 void bus_error_wr_u16(const struct device *device, u32 address, u16 data);
 
