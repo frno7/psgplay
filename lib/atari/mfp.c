@@ -41,7 +41,7 @@ CF68901_REGISTERS(MFP_REG_NAME)
 	}
 }
 
-uint32_t mfp_irq_vector(void)
+uint32_t mfp_irq_vector(struct machine *machine)
 {
 	return cf68901.port.vector(&cf68901);
 }

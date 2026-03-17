@@ -83,7 +83,7 @@ static int glue_mfp(struct machine *machine)
 {
 	glue_irq_clr(machine, IRQ_MFP);
 
-	return mfp_irq_vector();
+	return mfp_irq_vector(machine);
 }
 
 static void glue_event(struct machine *machine, const struct device *device,

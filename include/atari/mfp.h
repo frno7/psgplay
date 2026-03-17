@@ -8,7 +8,7 @@
 
 #include "bus.h"
 
-u32 mfp_irq_vector(void);
+u32 mfp_irq_vector(struct machine *machine);
 
 void dma_sound_active(struct machine *machine, bool level);
 
