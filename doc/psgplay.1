@@ -41,9 +41,9 @@ Play options:
 
 .TP
 .BR \-o ", " \-\-output "=<" \fIfile\fR ">"
-Write audio output to the given file in WAVE format,
+Write audio output to the file in WAVE format,
 or, if ALSA is available, to an ALSA handle if prefixed with "alsa:"
-(default is "alsa:default").
+(default is "alsa:default"). See \fBNOTES\fR on post-processing audio.
 
 .TP
 .BR \-\-start "=<[" \fImm:\fR "]" \fIss\fR "[" \fI.ss\fR "]>"
@@ -183,3 +183,9 @@ https://github.com/frno7/psgplay
 Multiple filters using the \fB--psg-mix\fR, \fB--psg-balance\fR, or
 \fB--psg-volume\fR options cannot be combined. The last option given
 replaces any previous ones.
+
+\fIPSG play\fR audio has a DC offset for optimum audio quality, because
+YM2149 chip music hardware, made in the 1970s, fundamentally generates
+a unipolar signal which is converted into a bipolar signal. It may be
+necessary to remove this DC offset with a 2-5 Hz high-pass filter before
+post-processing.

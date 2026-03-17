@@ -111,8 +111,9 @@ General options:
 
 Play options:
 
-    -o, --output=<file>    write audio output to the given file in WAVE format
-                           or to an ALSA handle if prefixed with "alsa:"
+    -o, --output=<file>    write audio output to the file in WAVE format
+                           or to an ALSA handle if prefixed with "alsa:".
+			   See Notes below on post-processing audio
 
     --start=<[mm:]ss.ss>   start playing at the given time
     --stop=<[mm:]ss.ss|auto|never>
@@ -163,6 +164,11 @@ treble) hardware.
 
 Multiple filters using the --psg-mix, --psg-balance, or --psg-volume options
 cannot be combined. The last option given replaces any previous ones.
+
+PSG play audio has a DC offset for optimum audio quality, because YM2149 chip
+music hardware, made in the 1970s, fundamentally generates a unipolar signal
+which is converted into a bipolar signal. It may be necessary to remove this
+DC offset with a 2-5 Hz high-pass filter before post-processing.
 ```
 
 ## Interactive text mode

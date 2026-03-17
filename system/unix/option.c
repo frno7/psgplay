@@ -48,10 +48,14 @@ static void help(FILE *file)
 "\n"
 "Play options:\n"
 "\n"
-"    -o, --output=<file>    write audio output to the given file in WAVE format\n"
+"    -o, --output=<file>    write audio output to the file in WAVE format"
 #ifdef HAVE_ALSA
-"                           or to an ALSA handle if prefixed with \"alsa:\"\n"
+"\n"
+"                           or to an ALSA handle if prefixed with \"alsa:\".\n"
+#else
+".\n"
 #endif /* HAVE_ALSA */
+"                           See Notes below on post-processing audio\n"
 "\n"
 "    --start=<[mm:]ss.ss>   start playing at the given time\n"
 "    --stop=<[mm:]ss.ss|auto|never>\n"
@@ -103,6 +107,11 @@ static void help(FILE *file)
 "\n"
 "Multiple filters using the --psg-mix, --psg-balance, or --psg-volume options\n"
 "cannot be combined. The last option given replaces any previous ones.\n"
+"\n"
+"PSG play audio has a DC offset for optimum audio quality, because YM2149 chip\n"
+"music hardware, made in the 1970s, fundamentally generates a unipolar signal\n"
+"which is converted into a bipolar signal. It may be necessary to remove this\n"
+"DC offset with a 2-5 Hz high-pass filter before post-processing.\n"
 "\n",
 		progname);
 }
