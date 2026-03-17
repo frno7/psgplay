@@ -56,7 +56,7 @@ static inline struct cf300588_sound_cycle cf300588_sound_cycle_from_device(
 	return cf300588_sound_cycle_cd(cycle.c, 1 /* FIXME */);
 }
 
-static void request_event(const struct device *device,
+static void request_event(struct machine *machine, const struct device *device,
 	struct device_cycle sound_cycle, struct cf300588_sound_event event)
 {
 	if (event.cycle.c)
@@ -70,8 +70,8 @@ static void request_event(const struct device *device,
 		});
 
 	for (size_t i = 1; i < event.sint.count; i++)
-		dma_sound_active(event.sint.active ^ (i & 1));
-	dma_sound_active(event.sint.active);
+		dma_sound_active(machine, event.sint.active ^ (i & 1));
+	dma_sound_active(machine, event.sint.active);
 }
 
 static void sound_event(struct machine *machine, const struct device *device,
@@ -110,7 +110,7 @@ static void sound_event(struct machine *machine, const struct device *device,
 			output.sample(buffer16, n, output.sample_arg);
 		}
 
-	request_event(device, sound_cycle,
+	request_event(machine, device, sound_cycle,
 		cf300588.port.event(&cf300588, module_cycle));
 }
 
@@ -152,7 +152,7 @@ static void sound_wr_u8(struct machine *machine, const struct device *device,
 
 	sound_event(machine, device, sound_cycle);
 
-	request_event(device, sound_cycle,
+	request_event(machine, device, sound_cycle,
 		cf300588.port.wr_da(&cf300588, module_cycle, reg, val));
 }
 
@@ -190,7 +190,8 @@ static void sound_reset(struct machine *machine, const struct device *device)
 
 	cf300588 = cf300588_sound_init(module_cycle);
 
-	request_event(device, sound_cycle, (struct cf300588_sound_event) { });
+	request_event(machine, device, sound_cycle,
+			(struct cf300588_sound_event) { });
 }
 
 void sound_sample(struct machine *machine,

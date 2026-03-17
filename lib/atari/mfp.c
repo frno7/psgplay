@@ -151,7 +151,7 @@ const struct device mfp_device = {
 	.id_u16 = mfp_id_u16,
 };
 
-void dma_sound_active(bool level)
+void dma_sound_active(struct machine *machine, bool level)
 {
 	static bool prev_level = 0;
 

@@ -10,7 +10,7 @@
 
 u32 mfp_irq_vector(void);
 
-void dma_sound_active(bool level);
+void dma_sound_active(struct machine *machine, bool level);
 
 extern const struct device mfp_device;
 
