@@ -42,8 +42,6 @@
 
 struct m68k_module musashi_module;
 
-static u64 cycle;
-
 u64 cycle_transform(u64 to_frequency, u64 from_frequency, u64 cycle)
 {
 	const u64 q = cycle / from_frequency;
@@ -63,7 +61,7 @@ u64 cycle_transform_align(u64 to_frequency, u64 from_frequency, u64 cycle)
 
 u64 machine_cycle(struct machine *machine)
 {
-	return cycle + cpu_cycles_run(machine);
+	return machine->cycle + cpu_cycles_run(machine);
 }
 
 void atari_st_init(struct machine *machine,
@@ -73,7 +71,7 @@ void atari_st_init(struct machine *machine,
 {
 	const u8 *p = prg;
 
-	cycle = 0;
+	machine->cycle = 0;
 	m68k_clear_timeslice(&musashi_module);
 
 #if 0  /* FIXME: Dependency on pr_bug */
@@ -99,7 +97,7 @@ void atari_st_init(struct machine *machine,
 
 bool atari_st_run(struct machine *machine)
 {
-	cycle += device_run(machine, cycle, MACHINE_RUN_SLICE);
+	machine->cycle += device_run(machine, machine->cycle, MACHINE_RUN_SLICE);
 
 	return true;
 }

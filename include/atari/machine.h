@@ -51,6 +51,8 @@ struct machine {
 		const struct machine_ports *ports);
 	bool (*run)(struct machine *machine);
 
+	u64 cycle;
+
 	struct {
 		void (*cb)(uint32_t pc, void *arg);
 		void *arg;
