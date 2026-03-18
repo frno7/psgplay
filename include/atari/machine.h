@@ -49,7 +49,7 @@ u64 cycle_transform(u64 to_frequency, u64 from_frequency, u64 cycle);
 
 u64 cycle_transform_align(u64 to_frequency, u64 from_frequency, u64 cycle);
 
-u64 machine_cycle(void);
+u64 machine_cycle(struct machine *machine);
 
 void atari_st_init(struct machine *machine,
 	const void *prg, size_t size, size_t offset,

@@ -43,13 +43,13 @@ trace:
 
 	if (description[0] != '\0')
 		printf("%s %8" PRIu64 "  %6x: %s %s%.*x %s\n",
-			dev->name, machine_cycle(),
+			dev->name, machine_cycle(machine),
 			dev->bus.address + dev_address,
 			op, spacing, size, value,
 			description);
 	else
 		printf("%s %8" PRIu64 "  %6x: %s %s%.*x\n",
-			dev->name, machine_cycle(),
+			dev->name, machine_cycle(machine),
 			dev->bus.address + dev_address,
 			op, spacing, size, value);
 }

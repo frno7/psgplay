@@ -768,9 +768,9 @@ static int trace_print_insn_fmt(void *arg, const char *fmt, ...)
 	return r;
 }
 
-static void trace_reg(void)
+static void trace_reg(struct machine *machine)
 {
-	printf("reg %8" PRIu64, machine_cycle());
+	printf("reg %8" PRIu64, machine_cycle(machine));
 
 	printf(" pc %6" PRIx32, m68k_get_reg(&musashi_module, NULL, M68K_REG_PC));
 
@@ -811,7 +811,7 @@ static void cpu_instruction_trace(uint32_t pc, void *arg)
 
 	trace->sb.length = 0;
 
-	sbprintf(&trace->sb, "cpu %8" PRIu64 "  ", machine_cycle());
+	sbprintf(&trace->sb, "cpu %8" PRIu64 "  ", machine_cycle(trace->machine));
 
 	const union m68kda_insn insn = {
 		.word = probe_read_memory_16(trace->machine, pc)
@@ -847,7 +847,7 @@ trace_reg:
 	check_stack_bounds(trace);
 
 	if (TRACE_ENABLE(&trace->options->trace, REG))
-		trace_reg();
+		trace_reg(trace->machine);
 }
 
 void sndh_trace(struct options *options, struct file file)

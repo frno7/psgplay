@@ -79,7 +79,7 @@ struct device_cycle device_cycle(struct machine *machine,
 {
 	return (struct device_cycle) {
 		.c = cycle_transform(device->clk.frequency / device->clk.divisor,
-			CPU_FREQUENCY, machine_cycle())
+			CPU_FREQUENCY, machine_cycle(machine))
 	};
 }
 

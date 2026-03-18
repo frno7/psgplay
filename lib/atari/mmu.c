@@ -17,7 +17,7 @@
 #include "m68k/m68k.h"
 #include "m68k/m68kcpu.h"
 
-static void mmu_bus_wait(const struct device *dev)
+static void mmu_bus_wait(struct machine *machine, const struct device *dev)
 {
 	if (!dev->main_bus)
 		return;
@@ -27,7 +27,7 @@ static void mmu_bus_wait(const struct device *dev)
 	 * every fourth cycle.
 	 */
 
-	const u64 mc = machine_cycle();
+	const u64 mc = machine_cycle(machine);
 	const unsigned wait_cycles = ALIGN(mc, 4) - mc;
 
 	if (wait_cycles) {
@@ -116,7 +116,7 @@ u32 m68k_read_memory_8(struct m68k_module *module, u32 bus_address)
 	const struct device *dev = device_for_bus_address(bus_address);
 	const u32 dev_address = bus_address - dev->bus.address;
 
-	mmu_bus_wait(dev);
+	mmu_bus_wait(machine, dev);
 
 	const u8 value = dev->rd_u8(machine, dev, dev_address);
 
@@ -132,7 +132,7 @@ u32 m68k_read_memory_16(struct m68k_module *module, u32 bus_address)
 	const u32 dev_address = bus_address - dev->bus.address;
 	const u16 value = dev->rd_u16(machine, dev, dev_address);
 
-	mmu_bus_wait(dev);
+	mmu_bus_wait(machine, dev);
 
 	mmu_trace_rd_u16(machine, dev_address, value, dev);
 
@@ -153,7 +153,7 @@ void m68k_write_memory_8(struct m68k_module *module, u32 bus_address, u32 value)
 	const struct device *dev = device_for_bus_address(bus_address);
 	const u32 dev_address = bus_address - dev->bus.address;
 
-	mmu_bus_wait(dev);
+	mmu_bus_wait(machine, dev);
 
 	mmu_trace_wr_u8(machine, dev_address, value, dev);
 
@@ -166,7 +166,7 @@ void m68k_write_memory_16(struct m68k_module *module, u32 bus_address, u32 value
 	const struct device *dev = device_for_bus_address(bus_address);
 	const u32 dev_address = bus_address - dev->bus.address;
 
-	mmu_bus_wait(dev);
+	mmu_bus_wait(machine, dev);
 
 	mmu_trace_wr_u16(machine, dev_address, value, dev);
 

@@ -61,7 +61,7 @@ u64 cycle_transform_align(u64 to_frequency, u64 from_frequency, u64 cycle)
 		(r * to_frequency + from_frequency - 1) / from_frequency;
 }
 
-u64 machine_cycle(void)
+u64 machine_cycle(struct machine *machine)
 {
 	return cycle + cpu_cycles_run();
 }
