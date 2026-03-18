@@ -55,7 +55,7 @@ static void request_vbl_event(struct machine *machine,
 
 	vbl_cycle.c = device_cycle.c + (pal_vbl - (device_cycle.c % pal_vbl));
 
-	request_device_event(&glue_device, vbl_cycle);
+	request_device_event(machine, &glue_device, vbl_cycle);
 }
 
 static void vbl_execute(struct machine *machine,

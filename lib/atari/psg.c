@@ -67,7 +67,7 @@ static void psg_event(struct machine *machine, const struct device *device,
 {
 	psg_emit(psg_cycle);
 
-	request_device_event(device,
+	request_device_event(machine, device,
 		(struct device_cycle) { .c = psg_cycle.c + PSG_EVENT_CYCLES });
 }
 

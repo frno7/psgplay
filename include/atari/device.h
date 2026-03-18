@@ -72,8 +72,8 @@ struct device_cycle device_cycle(struct machine *machine,
 struct device_cycle device_from_machine_cycle(
 	const struct device *device, u64 machine_cycle);
 
-void request_device_event(const struct device *device,
-	struct device_cycle device_cycle);
+void request_device_event(struct machine *machine,
+	const struct device *device, struct device_cycle device_cycle);
 
 void device_reset(struct machine *machine);
 

@@ -60,12 +60,12 @@ static void request_event(struct machine *machine, const struct device *device,
 	struct device_cycle sound_cycle, struct cf300588_sound_event event)
 {
 	if (event.cycle.c)
-		request_device_event(device, (struct device_cycle) {
+		request_device_event(machine, device, (struct device_cycle) {
 			/* FIXME: Avoid max */
 			.c = max(event.cycle.c, sound_cycle.c + 1)
 		});
 
-	request_device_event(device, (struct device_cycle) {
+	request_device_event(machine, device, (struct device_cycle) {
 			.c = sound_cycle.c + SOUND_EVENT_CYCLES
 		});
 

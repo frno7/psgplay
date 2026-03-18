@@ -115,8 +115,8 @@ static u64 machine_from_device_slice(const struct device *device,
 			device->clk.frequency / device->clk.divisor, device_slice.s);
 }
 
-void request_device_event(const struct device *device,
-	struct device_cycle device_cycle)
+void request_device_event(struct machine *machine,
+	const struct device *device, struct device_cycle device_cycle)
 {
 	const u64 machine_cycle =
 		machine_from_device_cycle_align(device, device_cycle);

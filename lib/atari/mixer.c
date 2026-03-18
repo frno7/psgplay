@@ -115,7 +115,7 @@ static void mixer_event(struct machine *machine, const struct device *device,
 {
 	mixer_emit(mixer_cycle);
 
-	request_device_event(device, (struct device_cycle) {
+	request_device_event(machine, device, (struct device_cycle) {
 			.c = mixer_cycle.c + MIXER_EVENT_CYCLES
 		});
 }
