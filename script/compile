@@ -80,7 +80,7 @@ arch()
 	ppc64le |\
 	aarch64)
 		cc --version | sed -n 1p
-		make_jv ALSA=1 all test
+		make_jv ALSA=1 all test global
 		;;
 	x86_64)
 		gcc --version | sed -n 1p
@@ -96,7 +96,7 @@ arch()
 		clean
 
 		cc --version | sed -n 1p
-		make_jv ALSA=1 psgplay
+		make_jv ALSA=1 psgplay global
 		;;
 	*)
 		echo "$compile: '$1' is not an arch." >&2
