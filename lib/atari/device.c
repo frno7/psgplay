@@ -74,7 +74,8 @@ const struct device *device_for_bus_address(u32 bus_address)
 	return &bus_device_error;
 }
 
-struct device_cycle device_cycle(const struct device *device)
+struct device_cycle device_cycle(struct machine *machine,
+	const struct device *device)
 {
 	return (struct device_cycle) {
 		.c = cycle_transform(device->clk.frequency / device->clk.divisor,

@@ -74,7 +74,7 @@ static void psg_event(struct machine *machine, const struct device *device,
 static u8 psg_rd_u8(struct machine *machine, const struct device *device,
 	u32 dev_address)
 {
-	const struct device_cycle psg_cycle = device_cycle(device);
+	const struct device_cycle psg_cycle = device_cycle(machine, device);
 	const struct cf2149_cycle cycle = cf2149_cycle_from_device(psg_cycle);
 
 	switch (dev_address) {
@@ -102,7 +102,7 @@ static u16 psg_rd_u16(struct machine *machine, const struct device *device,
 static void psg_wr_u8(struct machine *machine, const struct device *device,
 	u32 dev_address, u8 data)
 {
-	const struct device_cycle psg_cycle = device_cycle(device);
+	const struct device_cycle psg_cycle = device_cycle(machine, device);
 	const struct cf2149_cycle cycle = cf2149_cycle_from_device(psg_cycle);
 
 	psg_emit(psg_cycle);
@@ -164,14 +164,14 @@ static size_t psg_id_u16(struct machine *machine,
 
 static void psg_reset(struct machine *machine, const struct device *device)
 {
-	const struct device_cycle psg_cycle = device_cycle(device);
+	const struct device_cycle psg_cycle = device_cycle(machine, device);
 	const struct cf2149_cycle cycle = cf2149_cycle_from_device(psg_cycle);
 
 	cf2149 = cf2149_init();
 
 	cf2149.port.select_l(&cf2149, cycle, CF2149_SELECT_MODE_CLKDIV8);
 
-	psg_event(machine, device, device_cycle(device));
+	psg_event(machine, device, device_cycle(machine, device));
 }
 
 void psg_sample(struct machine *machine,

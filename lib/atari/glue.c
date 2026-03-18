@@ -97,7 +97,7 @@ static void glue_event(struct machine *machine, const struct device *device,
 
 static void glue_reset(struct machine *machine, const struct device *device)
 {
-	request_vbl_event(machine, device_cycle(&glue_device));
+	request_vbl_event(machine, device_cycle(machine, &glue_device));
 }
 
 int m68k_int_ack_callback(struct m68k_module *module, int level)

@@ -117,7 +117,7 @@ static void sound_event(struct machine *machine, const struct device *device,
 static u8 sound_rd_u8(struct machine *machine, const struct device *device,
 	u32 dev_address)
 {
-	const struct device_cycle sound_cycle = device_cycle(device);
+	const struct device_cycle sound_cycle = device_cycle(machine, device);
 	struct cf300588_sound_cycle module_cycle =
 		cf300588_sound_cycle_from_device(sound_cycle);
 	const u32 reg = dev_address >> 1;
@@ -139,7 +139,7 @@ static u16 sound_rd_u16(struct machine *machine, const struct device *device,
 static void sound_wr_u8(struct machine *machine, const struct device *device,
 	u32 dev_address, u8 val)
 {
-	const struct device_cycle sound_cycle = device_cycle(device);
+	const struct device_cycle sound_cycle = device_cycle(machine, device);
 	struct cf300588_sound_cycle module_cycle =
 		cf300588_sound_cycle_from_device(sound_cycle);
 	const u32 reg = dev_address >> 1;
@@ -183,7 +183,7 @@ static size_t sound_id_u16(struct machine *machine, const struct device *device,
 
 static void sound_reset(struct machine *machine, const struct device *device)
 {
-	const struct device_cycle sound_cycle = device_cycle(device);
+	const struct device_cycle sound_cycle = device_cycle(machine, device);
 
 	struct cf300588_sound_cycle module_cycle =
 		cf300588_sound_cycle_from_device(sound_cycle);
@@ -216,7 +216,7 @@ void sound_check(struct machine *machine, u32 bus_address)
 	extern const struct device sound_device;
 	const struct device *device = &sound_device;
 
-	sound_event(machine, device, device_cycle(device));
+	sound_event(machine, device, device_cycle(machine, device));
 }
 
 const struct device sound_device = {

@@ -66,7 +66,7 @@ static void mfp_event(struct machine *machine, const struct device *device,
 static u8 mfp_rd_u8(struct machine *machine, const struct device *device,
 	u32 dev_address)
 {
-	const struct device_cycle mfp_cycle = device_cycle(device);
+	const struct device_cycle mfp_cycle = device_cycle(machine, device);
 	const struct cf68901_clk clk = cf68901_clk_cycle(mfp_cycle.c);
 	const u32 reg = dev_address >> 1;
 
@@ -85,7 +85,7 @@ static u16 mfp_rd_u16(struct machine *machine, const struct device *device,
 static void mfp_wr_u8(struct machine *machine, const struct device *device,
 	u32 dev_address, u8 data)
 {
-	const struct device_cycle mfp_cycle = device_cycle(device);
+	const struct device_cycle mfp_cycle = device_cycle(machine, device);
 	const struct cf68901_clk clk = cf68901_clk_cycle(mfp_cycle.c);
 	const u32 reg = dev_address >> 1;
 
@@ -122,7 +122,7 @@ static size_t mfp_id_u16(struct machine *machine, const struct device *device,
 
 static void mfp_reset(struct machine *machine, const struct device *device)
 {
-	const struct device_cycle mfp_cycle = device_cycle(&mfp_device);
+	const struct device_cycle mfp_cycle = device_cycle(machine, &mfp_device);
 	const struct cf68901_clk clk = cf68901_clk_cycle(mfp_cycle.c);
 
 	cf68901 = cf68901_init(MFP_FREQUENCY, MFP_TIMER_FREQUENCY);
@@ -158,7 +158,7 @@ void dma_sound_active(struct machine *machine, bool level)
 	if (level == prev_level)
 		return;
 
-	const struct device_cycle mfp_cycle = device_cycle(&mfp_device);
+	const struct device_cycle mfp_cycle = device_cycle(machine, &mfp_device);
 	const struct cf68901_clk clk = cf68901_clk_cycle(mfp_cycle.c);
 
 	request_event(machine, &mfp_device, cf68901.port.tai(&cf68901, clk, level));

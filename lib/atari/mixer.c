@@ -181,7 +181,7 @@ static void microwire(const struct device *device,
 static u8 mixer_rd_u8(struct machine *machine, const struct device *device,
 	u32 dev_address)
 {
-	mixer_emit(device_cycle(device));
+	mixer_emit(device_cycle(machine, device));
 
 	return dev_address < ARRAY_SIZE(state.microwire.rd.byte) ?
 		state.microwire.rd.byte[dev_address] : 0;
@@ -192,7 +192,7 @@ static u16 mixer_rd_u16(struct machine *machine, const struct device *device,
 {
 	const u32 reg = dev_address >> 1;
 
-	mixer_emit(device_cycle(device));
+	mixer_emit(device_cycle(machine, device));
 
 	return reg < ARRAY_SIZE(state.microwire.rd.halfword) ?
 		state.microwire.rd.halfword[reg] : 0;
@@ -201,7 +201,7 @@ static u16 mixer_rd_u16(struct machine *machine, const struct device *device,
 static void mixer_wr_u8(struct machine *machine, const struct device *device,
 	u32 dev_address, u8 data)
 {
-	const struct device_cycle mixer_cycle = device_cycle(device);
+	const struct device_cycle mixer_cycle = device_cycle(machine, device);
 	const u32 reg = dev_address >> 1;
 
 	/* Writing is ignored during the 16 us Microwire transmission. */
@@ -220,7 +220,7 @@ static void mixer_wr_u8(struct machine *machine, const struct device *device,
 static void mixer_wr_u16(struct machine *machine, const struct device *device,
 	u32 dev_address, u16 data)
 {
-	const struct device_cycle mixer_cycle = device_cycle(device);
+	const struct device_cycle mixer_cycle = device_cycle(machine, device);
 	const u32 reg = dev_address >> 1;
 
 	/* Writing is ignored during the 16 us Microwire transmission. */
@@ -273,7 +273,7 @@ static void mixer_reset(struct machine *machine, const struct device *device)
 
 	mixer_emit_latest_cycle = 0;
 
-	mixer_event(machine, device, device_cycle(device));
+	mixer_event(machine, device, device_cycle(machine, device));
 }
 
 void mixer_sample(struct machine *machine,
