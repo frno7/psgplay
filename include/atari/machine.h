@@ -56,6 +56,12 @@ struct machine {
 	} instruction_callback;
 
 	struct {
+		struct device_run_cycle {
+			uint64_t machine_slice_end;
+		} device_run_cycle;
+	} device;
+
+	struct {
 		u32 irq_pending;
 
 		struct device_cycle vbl_cycle;

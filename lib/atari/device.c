@@ -38,10 +38,6 @@ static struct machine_device {
 	{ .device = &cpu_device     },
 };
 
-static struct device_run_cycle {
-	uint64_t machine_slice_end;
-} device_run_cycle;
-
 #define for_each_device(device_)					\
 	for (struct machine_device *machine_device_ = &list[0];		\
 	     (machine_device_) - &list[0] < ARRAY_SIZE(list) &&		\
@@ -123,8 +119,8 @@ void request_device_event(struct machine *machine,
 		machine_from_device_cycle_align(device, device_cycle);
 	struct machine_device *machine_device = NULL;
 
-	if (device_run_cycle.machine_slice_end &&
-	    device_run_cycle.machine_slice_end > machine_cycle)
+	if (machine->device.device_run_cycle.machine_slice_end &&
+	    machine->device.device_run_cycle.machine_slice_end > machine_cycle)
 		m68k_end_timeslice(&musashi_module);
 
 	for (size_t i = 0; i < ARRAY_SIZE(list); i++)
@@ -156,7 +152,7 @@ static struct device_slice run(struct machine *machine,
 	if (!device->run)
 		return (struct device_slice) { };
 
-	device_run_cycle = (struct device_run_cycle) {
+	machine->device.device_run_cycle = (struct device_run_cycle) {
 		.machine_slice_end = machine_cycle + machine_slice,
 	};
 
@@ -165,7 +161,7 @@ static struct device_slice run(struct machine *machine,
 			device_from_machine_cycle(device, machine_cycle),
 			device_from_machine_slice(device, machine_slice));
 
-	device_run_cycle = (struct device_run_cycle) { };
+	machine->device.device_run_cycle = (struct device_run_cycle) { };
 
 	return slice;
 }
