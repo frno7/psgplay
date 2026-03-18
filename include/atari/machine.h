@@ -56,6 +56,10 @@ struct machine {
 	} instruction_callback;
 
 	struct {
+		struct device_cycle vbl_cycle;
+	} glue;
+
+	struct {
 		bool cpu_execute;
 	} cpu;
 

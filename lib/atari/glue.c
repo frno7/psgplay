@@ -17,8 +17,6 @@
 #include "m68k/m68k.h"
 #include "m68k/m68kcpu.h"
 
-static struct device_cycle vbl_cycle;
-
 static u32 irq_pending;
 
 void glue_irq_set(struct machine *machine, int irq)
@@ -53,15 +51,15 @@ static void request_vbl_event(struct machine *machine,
 {
 	const u64 pal_vbl = ATARI_STE_CYCLES_PER_VBL_PAL;
 
-	vbl_cycle.c = device_cycle.c + (pal_vbl - (device_cycle.c % pal_vbl));
+	machine->glue.vbl_cycle.c = device_cycle.c + (pal_vbl - (device_cycle.c % pal_vbl));
 
-	request_device_event(machine, &glue_device, vbl_cycle);
+	request_device_event(machine, &glue_device, machine->glue.vbl_cycle);
 }
 
 static void vbl_execute(struct machine *machine,
 	struct device_cycle device_cycle)
 {
-	if (vbl_cycle.c)
+	if (machine->glue.vbl_cycle.c)
 		glue_irq_set(machine, IRQ_VBL);
 }
 
@@ -89,7 +87,7 @@ static int glue_mfp(struct machine *machine)
 static void glue_event(struct machine *machine, const struct device *device,
 	struct device_cycle device_cycle)
 {
-	if (vbl_cycle.c <= device_cycle.c)
+	if (machine->glue.vbl_cycle.c <= device_cycle.c)
 		vbl_execute(machine, device_cycle);
 
 	request_vbl_event(machine, device_cycle);
