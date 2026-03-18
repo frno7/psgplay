@@ -28,7 +28,7 @@ void glue_irq_set(struct machine *machine, int irq)
 	machine->glue.irq_pending |= 1 << irq;
 
 	if (machine->glue.irq_pending > p)
-		m68k_set_irq(&musashi_module, irq);
+		m68k_set_irq(&machine->cpu.m68k, irq);
 }
 
 void glue_irq_clr(struct machine *machine, int irq)
@@ -41,7 +41,7 @@ void glue_irq_clr(struct machine *machine, int irq)
 		if (machine->glue.irq_pending & (1u << i))
 			break;
 
-	m68k_set_irq(&musashi_module, i);
+	m68k_set_irq(&machine->cpu.m68k, i);
 }
 
 static void request_vbl_event(struct machine *machine,

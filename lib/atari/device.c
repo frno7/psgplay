@@ -107,7 +107,7 @@ void request_device_event(struct machine *machine,
 
 	if (machine->device.device_run_cycle.machine_slice_end &&
 	    machine->device.device_run_cycle.machine_slice_end > machine_cycle)
-		m68k_end_timeslice(&musashi_module);
+		m68k_end_timeslice(&machine->cpu.m68k);
 
 	for (size_t i = 0; i < ARRAY_SIZE(list->d); i++)
 		if (list->d[i].device == device) {

@@ -40,8 +40,6 @@
 	reg(6, a, A)							\
 	reg(7, a, A)
 
-struct m68k_module musashi_module;
-
 u64 cycle_transform(u64 to_frequency, u64 from_frequency, u64 cycle)
 {
 	const u64 q = cycle / from_frequency;
@@ -72,7 +70,7 @@ void atari_st_init(struct machine *machine,
 	const u8 *p = prg;
 
 	machine->cycle = 0;
-	m68k_clear_timeslice(&musashi_module);
+	m68k_clear_timeslice(&machine->cpu.m68k);
 
 #if 0  /* FIXME: Dependency on pr_bug */
 	if (offset + size >= ram_device.bus.size)
@@ -83,7 +81,7 @@ void atari_st_init(struct machine *machine,
 	device_reset(machine);
 
 #define MACHINE_REGISTER_SET(index_, field_, label_)			\
-	m68k_set_reg(&musashi_module, M68K_REG_##label_##index_, regs->field_[index_]);
+	m68k_set_reg(&machine->cpu.m68k, M68K_REG_##label_##index_, regs->field_[index_]);
 	MACHINE_REGISTERS(MACHINE_REGISTER_SET)
 
 	for (size_t i = 0; i < size; i++)

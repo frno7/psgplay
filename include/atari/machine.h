@@ -78,6 +78,8 @@ struct machine {
 	} glue;
 
 	struct {
+		struct m68k_module m68k;
+
 		bool cpu_execute;
 	} cpu;
 
@@ -157,7 +159,5 @@ static inline struct machine *machine_from_m68k_module(
 {
 	return module->callback.arg;
 }
-
-extern struct m68k_module musashi_module;
 
 #endif /* ATARI_MACHINE_H */

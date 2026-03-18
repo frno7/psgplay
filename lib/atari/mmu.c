@@ -31,7 +31,7 @@ static void mmu_bus_wait(struct machine *machine, const struct device *dev)
 	const unsigned wait_cycles = ALIGN(mc, 4) - mc;
 
 	if (wait_cycles) {
-		struct m68k_module *module = &musashi_module;
+		struct m68k_module *module = &machine->cpu.m68k;
 
 		USE_CYCLES(wait_cycles);
 	}

@@ -37,7 +37,7 @@ void cpu_instruction_callback(struct machine *machine,
 u64 cpu_cycles_run(struct machine *machine)
 {
 	const int cycles_run = machine->cpu.cpu_execute ?
-		m68k_cycles_run(&musashi_module) : 0;
+		m68k_cycles_run(&machine->cpu.m68k) : 0;
 
 #if 0  /* FIXME: Dependency on pr_bug */
 	BUG_ON(cycles_run < 0);
@@ -51,7 +51,7 @@ static struct device_slice cpu_run(struct machine *machine,
 	struct device_slice device_slice)
 {
 	machine->cpu.cpu_execute = true;
-	const int s = m68k_execute(&musashi_module, device_slice.s);
+	const int s = m68k_execute(&machine->cpu.m68k, device_slice.s);
 	machine->cpu.cpu_execute = false;
 
 #if 0  /* FIXME: Dependency on pr_bug */
@@ -66,10 +66,10 @@ static void cpu_reset(struct machine *machine, const struct device *device)
 	machine->instruction_callback.cb = NULL;
 	machine->instruction_callback.arg = NULL;
 
-	m68k_init(&musashi_module);
-	m68k_set_callback_arg(&musashi_module, machine);
-	m68k_set_cpu_type(&musashi_module, M68K_CPU_TYPE_68000);
-	m68k_pulse_reset(&musashi_module);
+	m68k_init(&machine->cpu.m68k);
+	m68k_set_callback_arg(&machine->cpu.m68k, machine);
+	m68k_set_cpu_type(&machine->cpu.m68k, M68K_CPU_TYPE_68000);
+	m68k_pulse_reset(&machine->cpu.m68k);
 }
 
 const struct device cpu_device = {
