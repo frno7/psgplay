@@ -17,19 +17,17 @@
 #include "m68k/m68k.h"
 #include "m68k/m68kcpu.h"
 
-static u32 irq_pending;
-
 void glue_irq_set(struct machine *machine, int irq)
 {
-	const u32 p = irq_pending;
+	const u32 p = machine->glue.irq_pending;
 
 #if 0  /* FIXME: Dependency on pr_bug */
 	BUG_ON(irq < 1 || 7 < irq);
 #endif
 
-	irq_pending |= 1 << irq;
+	machine->glue.irq_pending |= 1 << irq;
 
-	if (irq_pending > p)
+	if (machine->glue.irq_pending > p)
 		m68k_set_irq(&musashi_module, irq);
 }
 
@@ -37,10 +35,10 @@ void glue_irq_clr(struct machine *machine, int irq)
 {
 	int i;
 
-	irq_pending &= ~(1u << irq);
+	machine->glue.irq_pending &= ~(1u << irq);
 
 	for (i = 7; i > 0; i--)
-		if (irq_pending & (1u << i))
+		if (machine->glue.irq_pending & (1u << i))
 			break;
 
 	m68k_set_irq(&musashi_module, i);

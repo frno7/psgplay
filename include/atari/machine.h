@@ -56,6 +56,8 @@ struct machine {
 	} instruction_callback;
 
 	struct {
+		u32 irq_pending;
+
 		struct device_cycle vbl_cycle;
 	} glue;
 
