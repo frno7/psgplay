@@ -12,8 +12,6 @@
 #include "m68k/m68k.h"
 #include "m68k/m68kcpu.h"
 
-bool cpu_execute;
-
 void m68k_instruction_callback(struct m68k_module *module, int pc)
 {
 	struct machine *machine = machine_from_m68k_module(module);
@@ -38,7 +36,7 @@ void cpu_instruction_callback(struct machine *machine,
 
 u64 cpu_cycles_run(struct machine *machine)
 {
-	const int cycles_run = cpu_execute ?
+	const int cycles_run = machine->cpu.cpu_execute ?
 		m68k_cycles_run(&musashi_module) : 0;
 
 #if 0  /* FIXME: Dependency on pr_bug */
@@ -52,9 +50,9 @@ static struct device_slice cpu_run(struct machine *machine,
 	const struct device *device, struct device_cycle device_cycle,
 	struct device_slice device_slice)
 {
-	cpu_execute = true;
+	machine->cpu.cpu_execute = true;
 	const int s = m68k_execute(&musashi_module, device_slice.s);
-	cpu_execute = false;
+	machine->cpu.cpu_execute = false;
 
 #if 0  /* FIXME: Dependency on pr_bug */
 	BUG_ON(s < 0);

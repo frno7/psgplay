@@ -56,6 +56,10 @@ struct machine {
 	} instruction_callback;
 
 	struct {
+		bool cpu_execute;
+	} cpu;
+
+	struct {
 		struct cf68901_module cf68901;
 
 		bool dma_sound_active_prev_level;
