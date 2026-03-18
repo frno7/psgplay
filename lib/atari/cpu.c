@@ -36,7 +36,7 @@ void cpu_instruction_callback(struct machine *machine,
 	machine->instruction_callback.arg = arg;
 }
 
-u64 cpu_cycles_run(void)
+u64 cpu_cycles_run(struct machine *machine)
 {
 	const int cycles_run = cpu_execute ?
 		m68k_cycles_run(&musashi_module) : 0;

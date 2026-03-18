@@ -15,7 +15,7 @@ void m68k_instruction_callback(struct m68k_module *module, int pc);
 void cpu_instruction_callback(struct machine *machine,
 	void (*cb)(uint32_t pc, void *arg), void *arg);
 
-u64 cpu_cycles_run(void);
+u64 cpu_cycles_run(struct machine *machine);
 
 extern const struct device cpu_device;
 
