@@ -520,10 +520,9 @@ static int default_illg_instr_callback(struct m68k_module *module, int opcode)
 }
 
 /* Called when the program counter changed by a large value */
-static unsigned int default_pc_changed_callback_data;
 static void default_pc_changed_callback(struct m68k_module *module, unsigned int new_pc)
 {
-	default_pc_changed_callback_data = new_pc;
+	module->default_pc_changed_callback_data = new_pc;
 }
 
 /* Called every time there's bus activity (read/write to/from memory */
