@@ -484,10 +484,9 @@ static int default_int_ack_callback(struct m68k_module *module, int int_level)
 }
 
 /* Breakpoint acknowledge */
-static unsigned int default_bkpt_ack_callback_data;
 static void default_bkpt_ack_callback(struct m68k_module *module, unsigned int data)
 {
-	default_bkpt_ack_callback_data = data;
+	module->default_bkpt_ack_callback_data = data;
 }
 
 /* Called when a reset instruction is executed */
