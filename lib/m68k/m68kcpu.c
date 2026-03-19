@@ -526,10 +526,9 @@ static void default_pc_changed_callback(struct m68k_module *module, unsigned int
 }
 
 /* Called every time there's bus activity (read/write to/from memory */
-static unsigned int default_set_fc_callback_data;
 static void default_set_fc_callback(struct m68k_module *module, unsigned int new_fc)
 {
-	default_set_fc_callback_data = new_fc;
+	module->default_set_fc_callback_data = new_fc;
 }
 
 /* Called every instruction cycle prior to execution */
