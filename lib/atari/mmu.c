@@ -113,7 +113,7 @@ void probe_copy_memory_16(struct machine *machine,
 u32 m68k_read_memory_8(struct m68k_module *module, u32 bus_address)
 {
 	struct machine *machine = machine_from_m68k_module(module);
-	const struct device *dev = device_for_bus_address(bus_address);
+	const struct device *dev = device_for_bus_address(machine, bus_address);
 	const u32 dev_address = bus_address - dev->bus.address;
 
 	mmu_bus_wait(machine, dev);
@@ -128,7 +128,7 @@ u32 m68k_read_memory_8(struct m68k_module *module, u32 bus_address)
 u32 m68k_read_memory_16(struct m68k_module *module, u32 bus_address)
 {
 	struct machine *machine = machine_from_m68k_module(module);
-	const struct device *dev = device_for_bus_address(bus_address);
+	const struct device *dev = device_for_bus_address(machine, bus_address);
 	const u32 dev_address = bus_address - dev->bus.address;
 	const u16 value = dev->rd_u16(machine, dev, dev_address);
 
@@ -150,7 +150,7 @@ u32 m68k_read_memory_32(struct m68k_module *module, u32 bus_address)
 void m68k_write_memory_8(struct m68k_module *module, u32 bus_address, u32 value)
 {
 	struct machine *machine = machine_from_m68k_module(module);
-	const struct device *dev = device_for_bus_address(bus_address);
+	const struct device *dev = device_for_bus_address(machine, bus_address);
 	const u32 dev_address = bus_address - dev->bus.address;
 
 	mmu_bus_wait(machine, dev);
@@ -163,7 +163,7 @@ void m68k_write_memory_8(struct m68k_module *module, u32 bus_address, u32 value)
 void m68k_write_memory_16(struct m68k_module *module, u32 bus_address, u32 value)
 {
 	struct machine *machine = machine_from_m68k_module(module);
-	const struct device *dev = device_for_bus_address(bus_address);
+	const struct device *dev = device_for_bus_address(machine, bus_address);
 	const u32 dev_address = bus_address - dev->bus.address;
 
 	mmu_bus_wait(machine, dev);
@@ -182,7 +182,7 @@ void m68k_write_memory_32(struct m68k_module *module, u32 bus_address, u32 value
 u32 m68k_read_disassembler_16(struct m68k_module *module, u32 bus_address)
 {
 	struct machine *machine = machine_from_m68k_module(module);
-	const struct device *dev = device_for_bus_address(bus_address);
+	const struct device *dev = device_for_bus_address(machine, bus_address);
 	const u32 dev_address = bus_address - dev->bus.address;
 
 	return dev->rd_u16(machine, dev, dev_address);

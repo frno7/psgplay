@@ -63,7 +63,8 @@ bool valid_device_bus_address(u32 bus_address, const struct device *dev)
 		bus_address < dev->bus.address + dev->bus.size;
 }
 
-const struct device *device_for_bus_address(u32 bus_address)
+const struct device *device_for_bus_address(struct machine *machine,
+	u32 bus_address)
 {
 	const struct device *device;
 

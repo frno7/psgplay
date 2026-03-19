@@ -64,7 +64,8 @@ struct device {
 
 bool valid_device_bus_address(u32 bus_address, const struct device *dev);
 
-const struct device *device_for_bus_address(u32 bus_address);
+const struct device *device_for_bus_address(struct machine *machine,
+	u32 bus_address);
 
 struct device_cycle device_cycle(struct machine *machine,
 	const struct device *device);
