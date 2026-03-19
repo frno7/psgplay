@@ -22,35 +22,19 @@
 
 #include "m68k/m68kcpu.h"
 
-static struct machine_device {
-	u64 machine_cycle_event;
-	const struct device *device;
-} list[] = {
-	{ .device = &rom_device     },
-	{ .device = &glue_device    },
-	{ .device = &ram_device     },
-	{ .device = &mfp_device     },
-	{ .device = &shifter_device },
-	{ .device = &psg_device     },
-	{ .device = &sound_device   },
-	{ .device = &mixer_device   },
-	{ .device = &fdc_device     },
-	{ .device = &cpu_device     },
-};
-
-#define for_each_device(device_)					\
-	for (struct machine_device *machine_device_ = &list[0];		\
-	     (machine_device_) - &list[0] < ARRAY_SIZE(list) &&		\
+#define for_each_device(list, device_)					\
+	for (struct machine_device *machine_device_ = &(list)->d[0];	\
+	     (machine_device_) - &(list)->d[0] < ARRAY_SIZE((list)->d) && \
 	     ((device_) = machine_device_->device);			\
 	     (machine_device_)++)
 
-#define for_each_device_state(machine_device_)				\
-	for ((machine_device_) = &list[0];				\
-	     (machine_device_) - &list[0] < ARRAY_SIZE(list);		\
+#define for_each_device_state(list, machine_device_)			\
+	for ((machine_device_) = &(list)->d[0];				\
+	     (machine_device_) - &(list)->d[0] < ARRAY_SIZE((list)->d);	\
 	     (machine_device_)++)
 
-#define for_each_device_event(machine_device_)				\
-	for_each_device_state(machine_device_)				\
+#define for_each_device_event(list, machine_device_)			\
+	for_each_device_state((list), machine_device_)			\
 		if (!(machine_device_)->machine_cycle_event) continue; else
 
 bool valid_device_bus_address(u32 bus_address, const struct device *dev)
@@ -62,9 +46,10 @@ bool valid_device_bus_address(u32 bus_address, const struct device *dev)
 const struct device *device_for_bus_address(struct machine *machine,
 	u32 bus_address)
 {
+	struct machine_device_list *list = &machine->device.list;
 	const struct device *device;
 
-	for_each_device (device)
+	for_each_device (list, device)
 		if (valid_device_bus_address(bus_address, device))
 			return device;
 
@@ -115,6 +100,7 @@ static u64 machine_from_device_slice(const struct device *device,
 void request_device_event(struct machine *machine,
 	const struct device *device, struct device_cycle device_cycle)
 {
+	struct machine_device_list *list = &machine->device.list;
 	const u64 machine_cycle =
 		machine_from_device_cycle_align(device, device_cycle);
 	struct machine_device *machine_device = NULL;
@@ -123,9 +109,9 @@ void request_device_event(struct machine *machine,
 	    machine->device.device_run_cycle.machine_slice_end > machine_cycle)
 		m68k_end_timeslice(&musashi_module);
 
-	for (size_t i = 0; i < ARRAY_SIZE(list); i++)
-		if (list[i].device == device) {
-			machine_device = &list[i];
+	for (size_t i = 0; i < ARRAY_SIZE(list->d); i++)
+		if (list->d[i].device == device) {
+			machine_device = &list->d[i];
 			break;
 		}
 #if 0  /* FIXME: Dependency on pr_bug */
@@ -139,9 +125,25 @@ void request_device_event(struct machine *machine,
 
 void device_reset(struct machine *machine)
 {
+	struct machine_device_list *list = &machine->device.list;
 	const struct device *device;
 
-	for_each_device (device)
+	*list = (struct machine_device_list) {
+		{
+			{ .device = &rom_device     },
+			{ .device = &glue_device    },
+			{ .device = &ram_device     },
+			{ .device = &mfp_device     },
+			{ .device = &shifter_device },
+			{ .device = &psg_device     },
+			{ .device = &sound_device   },
+			{ .device = &mixer_device   },
+			{ .device = &fdc_device     },
+			{ .device = &cpu_device     },
+		}
+	};
+
+	for_each_device (list, device)
 		if (device->reset)
 			device->reset(machine, device);
 }
@@ -168,9 +170,10 @@ static struct device_slice run(struct machine *machine,
 
 u64 device_run(struct machine *machine, u64 machine_cycle, u64 machine_slice)
 {
+	struct machine_device_list *list = &machine->device.list;
 	struct machine_device *machine_device;
 
-	for_each_device_event (machine_device)
+	for_each_device_event (list, machine_device)
 		if (machine_device->machine_cycle_event <= machine_cycle) {
 			machine_device->machine_cycle_event = 0;
 
@@ -180,7 +183,7 @@ u64 device_run(struct machine *machine, u64 machine_cycle, u64 machine_slice)
 					machine_device->device, machine_cycle));
 		}
 
-	for_each_device_event (machine_device)
+	for_each_device_event (list, machine_device)
 		if (machine_device->machine_cycle_event <= machine_cycle)
 			machine_slice = 0;
 		else
@@ -192,7 +195,7 @@ u64 device_run(struct machine *machine, u64 machine_cycle, u64 machine_slice)
 
 	const struct device *device;
 
-	for_each_device (device) {
+	for_each_device (list, device) {
 		struct device_slice device_slice =
 			run(machine, device, machine_cycle, machine_slice);
 

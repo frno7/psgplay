@@ -41,6 +41,7 @@ struct machine_ports {
 
 enum {
 	MACHINE_RAM_SIZE = 4 * 1024 * 1024,	/* 4 MiB of RAM */
+	DEVICE_LIST_MAX = 16,
 };
 
 struct machine {
@@ -56,6 +57,13 @@ struct machine {
 	} instruction_callback;
 
 	struct {
+		struct machine_device_list {
+			struct machine_device {
+				u64 machine_cycle_event;
+				const struct device *device;
+			} d[DEVICE_LIST_MAX];
+		} list;
+
 		struct device_run_cycle {
 			uint64_t machine_slice_end;
 		} device_run_cycle;
