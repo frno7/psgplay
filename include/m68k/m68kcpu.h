@@ -983,6 +983,8 @@ struct m68k_module {
 	uint m68ki_aerr_write_mode;
 	uint m68ki_aerr_fc;
 
+	int default_int_ack_callback_data;
+
 	unsigned char m68ki_cycles[NUM_CPU_TYPES][0x10000]; /* Cycles used by CPU type */
 
 	void (*m68ki_instruction_jump_table[0x10000])(struct m68k_module *module); /* opcode handler jump table */

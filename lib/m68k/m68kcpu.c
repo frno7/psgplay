@@ -476,10 +476,9 @@ const uint8 m68ki_ea_idx_cycle_table[64] =
  */
 
 /* Interrupt acknowledge */
-static int default_int_ack_callback_data;
 static int default_int_ack_callback(struct m68k_module *module, int int_level)
 {
-	default_int_ack_callback_data = int_level;
+	module->default_int_ack_callback_data = int_level;
 	CPU_INT_LEVEL = 0;
 	return M68K_INT_ACK_AUTOVECTOR;
 }
