@@ -28,12 +28,9 @@ SNDH music files can be played with PSG play in several ways:
 - [Open Cubic Player](https://github.com/mywave82/opencubicplayer) is a
   free software music player, especially for chip music and other formats
   related to [demoscene](https://en.wikipedia.org/wiki/Demoscene) music.
-- A PSG play plugin for the
-  [Music Player Daemon](https://en.wikipedia.org/wiki/Music_Player_Daemon) (MPD)
-  is being prepared in issue [#16](https://github.com/frno7/psgplay/issues/16).
-  An [MPD pull request](https://github.com/MusicPlayerDaemon/MPD/pull/2444)
-  is available for testing. MPD is a free software player server for music in
-  general, with playlists and many other features.
+- [Music Player Daemon](https://en.wikipedia.org/wiki/Music_Player_Daemon) (MPD)
+  is a free software player server for music in general, with playlists and
+  many other features.
 - [Cowbell](https://github.com/demozoo/cowbell) is a web player for
   [Demozoo](https://demozoo.org/).
   [Example](https://demozoo.org/music/114756/). Cowbell is also used
