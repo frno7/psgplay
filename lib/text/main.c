@@ -134,7 +134,9 @@ static void track_update(struct vt_buffer *vtb,
 	view->op.current = model->op.current;
 
 	if (view->op.current == TRACK_PLAY ||
-	    view->op.current == TRACK_PAUSE)
+	    view->op.current == TRACK_PAUSE ||
+	    view->op.current == TRACK_SEEK_REW ||
+	    view->op.current == TRACK_SEEK_FF)
 		main_track(vtb, view->track, true);
 }
 
@@ -154,19 +156,36 @@ static void volume_update(struct vt_buffer *vtb,
 			"               ");
 }
 
+static void op_update(struct vt_buffer *vtb,
+	struct text_state *view, const struct text_state *model)
+{
+	const int col = vtb->server.size.cols - 8;
+
+	if (view->op.current == model->op.current)
+		return;
+
+	vt_printf(vtb, 0, col, vt_attr_reverse,
+		model->op.current == TRACK_SEEK_REW ? "<<"  :
+		model->op.current == TRACK_SEEK_FF  ? ">>"  : "  ");
+}
+
 static uint64_t time_update(struct vt_buffer *vtb, struct text_state *view,
 	const struct text_state *model, uint64_t timestamp)
 {
 	const int col = vtb->server.size.cols - 5;
 
 	if (view->op.current != TRACK_PLAY &&
-	    view->op.current != TRACK_PAUSE) {
+	    view->op.current != TRACK_PAUSE &&
+	    view->op.current != TRACK_SEEK_REW &&
+	    view->op.current != TRACK_SEEK_FF) {
 		vt_printf(vtb, 0, col, vt_attr_reverse, "     ");
 
 		return 0;
 	}
 
-	if (view->timestamp <= timestamp) {
+	if (view->timestamp <= timestamp  ||
+	    view->op.current == TRACK_SEEK_REW ||
+	    view->op.current == TRACK_SEEK_FF) {
 		const int s = model->frame / model->frequency;
 		const int m = s / 60;
 		const int d = (s + 1) * model->frequency - model->frame;
@@ -206,6 +225,8 @@ static uint64_t main_view(struct vt_buffer *vtb, struct text_state *view,
 
 		main_init(vtb, view, model, sndh, timestamp);
 	}
+
+	op_update(vtb, view, model);
 
 	cursor_update(vtb, view, model);
 
@@ -247,6 +268,14 @@ static void main_ctrl(const unicode_t key, struct text_state *ctrl,
 	}
 	case 's':
 		ctrl->op.current = TRACK_STOP;
+		break;
+	case 'r':
+	case U_ARROW_LEFT:
+		ctrl->op.current = TRACK_REW;
+		break;
+	case 'f':
+	case U_ARROW_RIGHT:
+		ctrl->op.current = TRACK_FF;
 		break;
 	case ' ':
 	case 'p':

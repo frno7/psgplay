@@ -21,8 +21,12 @@ struct text_state {
 			TRACK_STOP = 0,
 			TRACK_PLAY,
 			TRACK_PAUSE,
+			TRACK_REW,
+			TRACK_FF,
+			TRACK_SEEK_REW,
+			TRACK_SEEK_FF,
 			TRACK_RESTART,
-		} current;
+		} current, next;
 	} op;
 	struct text_mixer {
 		int volume;

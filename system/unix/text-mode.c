@@ -45,6 +45,7 @@ struct sample_buffer {
 	uint64_t timestamp;	/* ms */
 
 	uint64_t frame;
+	uint64_t seek;
 
 	size_t size;
 	size_t index;
@@ -192,19 +193,41 @@ static bool sample_buffer_play(struct sample_buffer *sb,
 	return true;
 }
 
-static uint64_t sample_buffer_update(struct sample_buffer *sb, uint64_t timestamp)
+static uint64_t sample_buffer_update(struct sample_buffer *sb,
+	const struct options *options, struct text_state *model,
+	uint64_t timestamp)
 {
 	if (!sb->pp)
 		return 0;
 
-	if (timestamp < sb->timestamp)
-		return sb->timestamp;
-
 	if (sb->index == sb->size) {
+		if (sb->frame < sb->seek) {
+			/* Seek at most 100 ms at the time. */
+			const size_t s = min_t(uint32_t,
+				options->frequency / 10, sb->seek - sb->frame);
+			const ssize_t r = psgplay_read_stereo(sb->pp, NULL, s);
+
+			if (r <= 0)
+				sb->seek = 0;
+			else
+				sb->frame += r;
+		}
+
+		if (sb->frame < sb->seek)
+			return sb->timestamp = timestamp;
+
+		if (model->op.current == TRACK_SEEK_REW ||
+		    model->op.current == TRACK_SEEK_FF)
+			model->op.current = model->op.next;
+
+		sb->seek = 0;
 		sb->index = 0;
 		sb->size = psgplay_read_stereo(sb->pp,
 			sb->buffer, ARRAY_SIZE(sb->buffer));
 	}
+
+	if (timestamp < sb->timestamp)
+		return sb->timestamp;
 
 	for (sb->timestamp = timestamp; sb->index < sb->size; sb->index++) {
 		if (!sb->output->sample(
@@ -281,6 +304,80 @@ static void tty_resume(void *arg)
 	vt_redraw(vtb);
 }
 
+static void model_fast_forward(struct sample_buffer *sb,
+	struct sample_mixer *sm, const struct options *options,
+	struct text_state *model, const struct text_state *ctrl,
+	const struct text_sndh *sndh, uint64_t timestamp)
+{
+	const int skip = options->frequency;	/* 1 s in frames */
+
+	if (model->op.current != TRACK_PLAY &&
+	    model->op.current != TRACK_PAUSE &&
+	    model->op.current != TRACK_SEEK_REW &&
+	    model->op.current != TRACK_SEEK_FF)
+		return;
+
+	sb->seek = max(sb->frame, sb->seek) + skip;
+	sb->index = sb->size;
+
+	if (model->op.current != TRACK_SEEK_REW &&
+	    model->op.current != TRACK_SEEK_FF)
+		model->op.next = model->op.current;
+
+	model->op.current = TRACK_SEEK_FF;
+}
+
+static void model_rewind(struct sample_buffer *sb,
+	struct sample_mixer *sm, const struct options *options,
+	struct text_state *model, const struct text_state *ctrl,
+	const struct text_sndh *sndh, uint64_t timestamp)
+{
+	const int skip = options->frequency;	/* 1 s in frames */
+	const int skip_max = 5 * 60 * skip;	/* 5 m in frames */
+
+	if (model->op.current != TRACK_PLAY &&
+	    model->op.current != TRACK_PAUSE &&
+	    model->op.current != TRACK_SEEK_REW &&
+	    model->op.current != TRACK_SEEK_FF)
+		return;
+
+	float duration;
+	if (!sndh_tag_subtune_time(&duration, ctrl->track,
+			sndh->data, sndh->size))
+		duration = 0.0f;
+
+	int64_t seek = max(sb->frame, sb->seek);
+	if (duration) {
+		const int64_t m = duration * options->frequency;
+
+		seek = (m + ((seek - skip) % m)) % m;
+	} else if (seek > skip)
+		seek -= skip;
+	else
+		seek = 0;
+
+	if (seek > skip_max)
+		return;
+	sb->seek = seek;
+	sb->index = sb->size;
+
+	if (model->op.current != TRACK_SEEK_REW &&
+	    model->op.current != TRACK_SEEK_FF)
+		model->op.next = model->op.current;
+	model->op.current = TRACK_SEEK_REW;
+
+	if (sb->frame < sb->seek)
+		return;
+
+	model->frame = 0;
+
+	psgplay_free(sb->pp);
+	sb->pp = NULL;
+	sb->frame = sb->size = sb->index = 0;
+	sample_buffer_play(sb, sm, sndh->data, sndh->size,
+		ctrl->track, options->frequency, timestamp);
+}
+
 static void model_restart(struct sample_buffer *sb,
 	struct sample_mixer *sm, const struct options *options,
 	struct text_state *model, const struct text_state *ctrl,
@@ -300,6 +397,18 @@ static void model_restart(struct sample_buffer *sb,
 		return;
 	}
 
+	if (ctrl->op.current == TRACK_REW)
+		return model_rewind(sb, sm, options,
+			model, ctrl, sndh, timestamp);
+
+	if (ctrl->op.current == TRACK_FF)
+		return model_fast_forward(sb, sm, options,
+			model, ctrl, sndh, timestamp);
+
+	if (ctrl->op.current == TRACK_SEEK_REW ||
+	    ctrl->op.current == TRACK_SEEK_FF)
+		return;
+
 	if (model->op.current == TRACK_PLAY)
 		sample_buffer_flush(sb);
 
@@ -318,6 +427,7 @@ static void model_restart(struct sample_buffer *sb,
 		model->op.current = TRACK_PLAY;
 		model->timestamp = timestamp;
 		model->frame = 0;
+		sb->seek = 0;
 	}
 }
 
@@ -337,10 +447,10 @@ static uint64_t model_update(struct sample_buffer *sb,
 	    ctrl->op.current != model->op.current)
 		model_restart(sb, sm, options, model, ctrl, sndh, timestamp);
 
-	const uint64_t t = sample_buffer_update(sb, timestamp);
+	const uint64_t t = sample_buffer_update(sb, options, model, timestamp);
 
 	model->timestamp = timestamp;
-	model->frame = sb->frame;
+	model->frame = max(sb->seek, sb->frame);
 
 	return t;
 }
