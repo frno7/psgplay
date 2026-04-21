@@ -28,8 +28,8 @@ static volatile bool model_play_call;
 static uint8_t pause_iomix;
 
 static struct {
-	s32 period;	/* Timer duration in ns */
-	s32 timestamp;	/* Timestamp for next event in ns */
+	int32_t period;	/* Timer duration in ns */
+	int32_t timestamp;	/* Timestamp for next event in ns */
 } timer;
 
 struct sndh_init_arg {

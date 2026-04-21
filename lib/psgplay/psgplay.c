@@ -134,7 +134,7 @@ static int16_t sample_lowpass(int16_t sample, struct fir8 *lowpass)
 {
 	lowpass->xn[lowpass->k++ % ARRAY_SIZE(lowpass->xn)] = sample;
 
-	s32 x = 0;
+	int32_t x = 0;
 	for (int i = 0; i < ARRAY_SIZE(lowpass->xn); i++)
 		x += lowpass->xn[i];	/* Simplistic 8 tap FIR filter. */
 
