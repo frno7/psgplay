@@ -52,7 +52,7 @@ static void vt_printf_centre(struct vt_buffer *vtb, int row,
 
 static void load_bar(struct vt_buffer *vtb, struct text_state *view,
 	const struct text_state *model, const struct text_sndh *sndh,
-	u64 timestamp)
+	uint64_t timestamp)
 {
 	const size_t progress = (27 * model->progress) / 100;
 
@@ -63,7 +63,7 @@ static void load_bar(struct vt_buffer *vtb, struct text_state *view,
 
 static void load_init(struct vt_buffer *vtb, struct text_state *view,
 	const struct text_state *model, const struct text_sndh *sndh,
-	u64 timestamp)
+	uint64_t timestamp)
 {
 	vt_clear(vtb);
 
@@ -78,9 +78,9 @@ static void load_init(struct vt_buffer *vtb, struct text_state *view,
 	load_bar(vtb, view, model, sndh, timestamp);
 }
 
-static u64 load_view(struct vt_buffer *vtb, struct text_state *view,
+static uint64_t load_view(struct vt_buffer *vtb, struct text_state *view,
 	const struct text_state *model, const struct text_sndh *sndh,
-	u64 timestamp)
+	uint64_t timestamp)
 {
 	if (view->mode != model->mode) {
 		view->mode = model->mode;

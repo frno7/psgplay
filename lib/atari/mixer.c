@@ -57,7 +57,7 @@ static void mixer_emit(struct machine *machine,
 	struct mixer_sample buffer[256];
 	size_t count = 0;
 
-	for (u64 c = ALIGN(machine->mixer.mixer_emit_latest_cycle,
+	for (uint64_t c = ALIGN(machine->mixer.mixer_emit_latest_cycle,
 			   MIXER_SAMPLE_CYCLES);
 	     c < mixer_cycle.c;
 	     c += MIXER_SAMPLE_CYCLES) {

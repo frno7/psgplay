@@ -26,9 +26,9 @@ struct fifo_utf32 {
 	struct fifo_utf32 id_ = INIT_FIFO(id_)
 
 struct text_mode {
-	u64 (*view)(struct vt_buffer *vtb, struct text_state *view,
+	uint64_t (*view)(struct vt_buffer *vtb, struct text_state *view,
 		const struct text_state *model, const struct text_sndh *sndh,
-		u64 timestamp);
+		uint64_t timestamp);
 	void (*ctrl)(const unicode_t key, struct text_state *ctrl,
 		const struct text_state *model, const struct text_sndh *sndh);
 };

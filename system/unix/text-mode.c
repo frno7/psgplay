@@ -42,7 +42,7 @@
 #define BUFFER_UPDATE_TIME 20	/* 20 ms */
 
 struct sample_buffer {
-	u64 timestamp;
+	uint64_t timestamp;
 
 	size_t size;
 	size_t index;
@@ -179,7 +179,7 @@ static bool sample_buffer_resume(struct sample_buffer *sb)
 
 static bool sample_buffer_play(struct sample_buffer *sb,
 	struct sample_mixer *sm, const void *data, size_t size,
-	int track, int frequency, u64 timestamp)
+	int track, int frequency, uint64_t timestamp)
 {
 	BUG_ON(sb->pp);
 
@@ -188,7 +188,7 @@ static bool sample_buffer_play(struct sample_buffer *sb,
 	return true;
 }
 
-static u64 sample_buffer_update(struct sample_buffer *sb, u64 timestamp)
+static uint64_t sample_buffer_update(struct sample_buffer *sb, uint64_t timestamp)
 {
 	if (!sb->pp)
 		return 0;
@@ -277,7 +277,7 @@ static void tty_resume(void *arg)
 static void model_restart(struct sample_buffer *sb,
 	struct sample_mixer *sm, const struct options *options,
 	struct text_state *model, const struct text_state *ctrl,
-	const struct text_sndh *sndh, u64 timestamp)
+	const struct text_sndh *sndh, uint64_t timestamp)
 {
 	if (model->op == TRACK_PLAY && ctrl->op == TRACK_PAUSE) {
 		model->pause_timestamp = timestamp;
@@ -316,10 +316,10 @@ static void model_restart(struct sample_buffer *sb,
 	}
 }
 
-static u64 model_update(struct sample_buffer *sb,
+static uint64_t model_update(struct sample_buffer *sb,
 	struct sample_mixer *sm, const struct options *options,
 	struct text_state *model, const struct text_state *ctrl,
-	const struct text_sndh *sndh, u64 timestamp)
+	const struct text_sndh *sndh, uint64_t timestamp)
 {
 	if (ctrl->quit)
 		model->quit = true;

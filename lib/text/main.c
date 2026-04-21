@@ -151,8 +151,8 @@ static void volume_update(struct vt_buffer *vtb,
 			"               ");
 }
 
-static u64 time_update(struct vt_buffer *vtb, struct text_state *view,
-	const struct text_state *model, u64 timestamp)
+static uint64_t time_update(struct vt_buffer *vtb, struct text_state *view,
+	const struct text_state *model, uint64_t timestamp)
 {
 	const int col = vtb->server.size.cols - 5;
 
@@ -164,7 +164,7 @@ static u64 time_update(struct vt_buffer *vtb, struct text_state *view,
 	}
 
 	if (view->timestamp <= timestamp) {
-		const u64 p = model->pause_offset + (model->pause_timestamp ?
+		const uint64_t p = model->pause_offset + (model->pause_timestamp ?
 			timestamp - model->pause_timestamp : 0);
 		const int s = (timestamp - model->timestamp - p) / 1000;
 		const int m = s / 60;
@@ -183,7 +183,7 @@ static u64 time_update(struct vt_buffer *vtb, struct text_state *view,
 
 static void main_init(struct vt_buffer *vtb, struct text_state *view,
 	const struct text_state *model, const struct text_sndh *sndh,
-	u64 timestamp)
+	uint64_t timestamp)
 {
 	vt_clear(vtb);
 
@@ -194,9 +194,9 @@ static void main_init(struct vt_buffer *vtb, struct text_state *view,
 	main_data(vtb, sndh);
 }
 
-static u64 main_view(struct vt_buffer *vtb, struct text_state *view,
+static uint64_t main_view(struct vt_buffer *vtb, struct text_state *view,
 	const struct text_state *model, const struct text_sndh *sndh,
-	u64 timestamp)
+	uint64_t timestamp)
 {
 	if (view->mode != model->mode) {
 		view->mode = model->mode;

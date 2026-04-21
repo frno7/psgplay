@@ -23,7 +23,7 @@
 #define MACHINE_RUN_SLICE   10000
 
 struct device_cycle {
-	u64 c;
+	uint64_t c;
 };
 
 struct machine_registers {
@@ -51,7 +51,7 @@ struct machine {
 		const struct machine_ports *ports);
 	bool (*run)(struct machine *machine);
 
-	u64 cycle;
+	uint64_t cycle;
 
 	struct {
 		void (*cb)(uint32_t pc, void *arg);
@@ -61,7 +61,7 @@ struct machine {
 	struct {
 		struct machine_device_list {
 			struct machine_device {
-				u64 machine_cycle_event;
+				uint64_t machine_cycle_event;
 				const struct device *device;
 			} d[DEVICE_LIST_MAX];
 		} list;
@@ -107,7 +107,7 @@ struct machine {
 			struct mixer_sample sample;
 		} state;
 
-		u64 mixer_emit_latest_cycle;
+		uint64_t mixer_emit_latest_cycle;
 
 		struct {
 			mixer_sample_f sample;
@@ -141,11 +141,11 @@ struct machine {
 	} sound;
 };
 
-u64 cycle_transform(u64 to_frequency, u64 from_frequency, u64 cycle);
+uint64_t cycle_transform(uint64_t to_frequency, uint64_t from_frequency, uint64_t cycle);
 
-u64 cycle_transform_align(u64 to_frequency, u64 from_frequency, u64 cycle);
+uint64_t cycle_transform_align(uint64_t to_frequency, uint64_t from_frequency, uint64_t cycle);
 
-u64 machine_cycle(struct machine *machine);
+uint64_t machine_cycle(struct machine *machine);
 
 void atari_st_init(struct machine *machine,
 	const void *prg, size_t size, size_t offset,

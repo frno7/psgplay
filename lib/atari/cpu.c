@@ -34,7 +34,7 @@ void cpu_instruction_callback(struct machine *machine,
 	machine->instruction_callback.arg = arg;
 }
 
-u64 cpu_cycles_run(struct machine *machine)
+uint64_t cpu_cycles_run(struct machine *machine)
 {
 	const int cycles_run = machine->cpu.cpu_execute ?
 		m68k_cycles_run(&machine->cpu.m68k) : 0;

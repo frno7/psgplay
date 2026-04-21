@@ -20,10 +20,6 @@
 #error "bitfield neither big nor little endian?"
 #endif
 
-typedef int64_t s64;	/* FIXME: Deprecate */
-
-typedef uint64_t u64;	/* FIXME: Deprecate */
-
 /* Macro definitions from the Linux kernel. */
 
 /* Are two types/vars the same type (ignoring qualifiers)? */

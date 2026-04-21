@@ -27,7 +27,7 @@ static void mmu_bus_wait(struct machine *machine, const struct device *dev)
 	 * every fourth cycle.
 	 */
 
-	const u64 mc = machine_cycle(machine);
+	const uint64_t mc = machine_cycle(machine);
 	const unsigned wait_cycles = ALIGN(mc, 4) - mc;
 
 	if (wait_cycles) {

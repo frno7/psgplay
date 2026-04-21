@@ -301,7 +301,7 @@ ssize_t vt_write_fifo_utf8_from_charset(struct vt_buffer *vtb, struct fifo *f,
 	return w;
 }
 
-u64 vt_event(struct vt_buffer *vtb, u64 timestamp)
+uint64_t vt_event(struct vt_buffer *vtb, uint64_t timestamp)
 {
 	if (!vtb->input.escape)
 		return 0;
@@ -317,7 +317,7 @@ u64 vt_event(struct vt_buffer *vtb, u64 timestamp)
 	return 0;
 }
 
-static char vt_deescape_char(struct vt_buffer *vtb, char c, u64 timestamp)
+static char vt_deescape_char(struct vt_buffer *vtb, char c, uint64_t timestamp)
 {
 	if (!vtb->input.escape) {
 		vtb->input.escape = (c == '\033');
@@ -371,7 +371,7 @@ static char vt_deescape_char(struct vt_buffer *vtb, char c, u64 timestamp)
 }
 
 ssize_t vt_deescape_fifo(struct vt_buffer *vtb,
-	struct fifo *dst, struct fifo *src, u64 timestamp)
+	struct fifo *dst, struct fifo *src, uint64_t timestamp)
 {
 	size_t t = 0;
 

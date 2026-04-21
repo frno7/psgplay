@@ -68,7 +68,7 @@ struct vt_buffer {
 	struct {
 		bool escape;
 		bool drain;
-		u64 timestamp;
+		uint64_t timestamp;
 		size_t size;
 		size_t index;
 		char buffer[16];
@@ -137,10 +137,10 @@ ssize_t vt_read_utf8_from_charset(struct vt_buffer *vtb,
 ssize_t vt_write_fifo_utf8_from_charset(struct vt_buffer *vtb, struct fifo *f,
 	unicode_t (*charset_to_utf32)(uint8_t c, void *arg), void *arg);
 
-u64 vt_event(struct vt_buffer *vtb, u64 timestamp);
+uint64_t vt_event(struct vt_buffer *vtb, uint64_t timestamp);
 
 ssize_t vt_deescape_fifo(struct vt_buffer *vtb,
-	struct fifo *dst, struct fifo *src, u64 timestamp);
+	struct fifo *dst, struct fifo *src, uint64_t timestamp);
 
 void vt_clear(struct vt_buffer *vtb);
 

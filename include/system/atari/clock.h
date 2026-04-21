@@ -10,6 +10,6 @@
 
 void clock_tick(void);
 
-u64 clock_ms(void);
+uint64_t clock_ms(void);
 
 #endif /* PSGPLAY_SYSTEM_ATARI_CLOCK_H */

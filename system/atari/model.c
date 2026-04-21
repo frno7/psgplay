@@ -87,7 +87,7 @@ static int sndh_frequency(const struct text_sndh *sndh)
 }
 
 static void model_play(struct text_state *model, int track,
-	struct text_sndh *sndh, u64 timestamp)
+	struct text_sndh *sndh, uint64_t timestamp)
 {
 	model->track = track;
 	model->op = TRACK_PLAY;
@@ -108,7 +108,7 @@ static void model_play(struct text_state *model, int track,
 }
 
 static void model_update_play(struct text_state *model, const struct text_state *ctrl,
-	struct text_sndh *sndh, u64 timestamp)
+	struct text_sndh *sndh, uint64_t timestamp)
 {
 	if (model->op == TRACK_PLAY && ctrl->op == TRACK_PAUSE) {
 		model->pause_timestamp = timestamp;
@@ -161,7 +161,7 @@ static int default_subtune(struct file file)
 }
 
 static bool model_update_load(struct text_state *model, const struct text_state *ctrl,
-	struct text_sndh *sndh, u64 timestamp)
+	struct text_sndh *sndh, uint64_t timestamp)
 {
 	if (model->path) {
 		const char *name = file_basename(model->path);
@@ -202,7 +202,7 @@ static bool model_update_load(struct text_state *model, const struct text_state 
 }
 
 void model_update(struct text_state *model, const struct text_state *ctrl,
-	struct text_sndh *sndh, u64 timestamp)
+	struct text_sndh *sndh, uint64_t timestamp)
 {
 	if (ctrl->quit)
 		model->quit = true;

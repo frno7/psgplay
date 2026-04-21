@@ -40,24 +40,24 @@
 	reg(6, a, A)							\
 	reg(7, a, A)
 
-u64 cycle_transform(u64 to_frequency, u64 from_frequency, u64 cycle)
+uint64_t cycle_transform(uint64_t to_frequency, uint64_t from_frequency, uint64_t cycle)
 {
-	const u64 q = cycle / from_frequency;
-	const u64 r = cycle % from_frequency;
+	const uint64_t q = cycle / from_frequency;
+	const uint64_t r = cycle % from_frequency;
 
 	return q * to_frequency + (r * to_frequency) / from_frequency;
 }
 
-u64 cycle_transform_align(u64 to_frequency, u64 from_frequency, u64 cycle)
+uint64_t cycle_transform_align(uint64_t to_frequency, uint64_t from_frequency, uint64_t cycle)
 {
-	const u64 q = cycle / from_frequency;
-	const u64 r = cycle % from_frequency;
+	const uint64_t q = cycle / from_frequency;
+	const uint64_t r = cycle % from_frequency;
 
 	return q * to_frequency +
 		(r * to_frequency + from_frequency - 1) / from_frequency;
 }
 
-u64 machine_cycle(struct machine *machine)
+uint64_t machine_cycle(struct machine *machine)
 {
 	return machine->cycle + cpu_cycles_run(machine);
 }

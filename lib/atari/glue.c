@@ -47,7 +47,7 @@ void glue_irq_clr(struct machine *machine, int irq)
 static void request_vbl_event(struct machine *machine,
 	struct device_cycle device_cycle)
 {
-	const u64 pal_vbl = ATARI_STE_CYCLES_PER_VBL_PAL;
+	const uint64_t pal_vbl = ATARI_STE_CYCLES_PER_VBL_PAL;
 
 	machine->glue.vbl_cycle.c = device_cycle.c + (pal_vbl - (device_cycle.c % pal_vbl));
 

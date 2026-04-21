@@ -11,7 +11,7 @@
 #include "atari/machine.h"
 
 struct device_slice {
-	u64 s;
+	uint64_t s;
 };
 
 struct device_state {
@@ -67,13 +67,13 @@ struct device_cycle device_cycle(struct machine *machine,
 	const struct device *device);
 
 struct device_cycle device_from_machine_cycle(
-	const struct device *device, u64 machine_cycle);
+	const struct device *device, uint64_t machine_cycle);
 
 void request_device_event(struct machine *machine,
 	const struct device *device, struct device_cycle device_cycle);
 
 void device_reset(struct machine *machine);
 
-u64 device_run(struct machine *machine, u64 machine_cycle, u64 machine_slice);
+uint64_t device_run(struct machine *machine, uint64_t machine_cycle, uint64_t machine_slice);
 
 #endif /* ATARI_DEVICE_H */

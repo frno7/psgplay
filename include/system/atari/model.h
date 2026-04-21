@@ -13,6 +13,6 @@
 void model_timer(struct text_sndh *sndh);
 
 void model_update(struct text_state *model, const struct text_state *ctrl,
-	struct text_sndh *sndh, u64 timestamp);
+	struct text_sndh *sndh, uint64_t timestamp);
 
 #endif /* PSGPLAY_SYSTEM_ATARI_MODEL_H */

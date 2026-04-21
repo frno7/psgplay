@@ -12,14 +12,14 @@
 
 #include "system/unix/clock.h"
 
-static u64 start;
-static u64 suspend;
-static u64 offset;
-static u64 now;
+static uint64_t start;
+static uint64_t suspend;
+static uint64_t offset;
+static uint64_t now;
 
-static u64 request;
+static uint64_t request;
 
-static u64 clock_now(void)
+static uint64_t clock_now(void)
 {
 	struct timespec tp;
 
@@ -54,7 +54,7 @@ uint32_t clock_s(void)
 	return clock_ms() / 1000;
 }
 
-u64 clock_ms(void)
+uint64_t clock_ms(void)
 {
 	return now / 1000000;
 }
@@ -67,12 +67,12 @@ void clock_request_s(const uint32_t timestamp)
 	clock_request_ms(1000 * timestamp);
 }
 
-void clock_request_ms(const u64 timestamp)
+void clock_request_ms(const uint64_t timestamp)
 {
 	if (!timestamp)
 		return;
 
-	const u64 t = timestamp * 1000000;
+	const uint64_t t = timestamp * 1000000;
 
 	request = !request ? t : min(request, t);
 }
@@ -82,7 +82,7 @@ int clock_poll(void)
 	if (!request)
 		return -1;
 
-	const u64 r = request;
+	const uint64_t r = request;
 
 	request = 0;
 

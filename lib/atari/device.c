@@ -66,7 +66,7 @@ struct device_cycle device_cycle(struct machine *machine,
 }
 
 struct device_cycle device_from_machine_cycle(
-	const struct device *device, u64 machine_cycle)
+	const struct device *device, uint64_t machine_cycle)
 {
 	return (struct device_cycle) {
 		.c = cycle_transform(device->clk.frequency / device->clk.divisor,
@@ -75,7 +75,7 @@ struct device_cycle device_from_machine_cycle(
 }
 
 static struct device_slice device_from_machine_slice(
-	const struct device *device, u64 machine_slice)
+	const struct device *device, uint64_t machine_slice)
 {
 	return (struct device_slice) {
 		.s = cycle_transform(device->clk.frequency / device->clk.divisor,
@@ -83,14 +83,14 @@ static struct device_slice device_from_machine_slice(
 	};
 }
 
-static u64 machine_from_device_cycle_align(const struct device *device,
+static uint64_t machine_from_device_cycle_align(const struct device *device,
 	const struct device_cycle device_cycle)
 {
 	return cycle_transform_align(CPU_FREQUENCY,
 			device->clk.frequency / device->clk.divisor, device_cycle.c);
 }
 
-static u64 machine_from_device_slice(const struct device *device,
+static uint64_t machine_from_device_slice(const struct device *device,
 	const struct device_slice device_slice)
 {
 	return cycle_transform(CPU_FREQUENCY,
@@ -101,7 +101,7 @@ void request_device_event(struct machine *machine,
 	const struct device *device, struct device_cycle device_cycle)
 {
 	struct machine_device_list *list = &machine->device.list;
-	const u64 machine_cycle =
+	const uint64_t machine_cycle =
 		machine_from_device_cycle_align(device, device_cycle);
 	struct machine_device *machine_device = NULL;
 
@@ -149,7 +149,7 @@ void device_reset(struct machine *machine)
 }
 
 static struct device_slice run(struct machine *machine,
-	const struct device *device, u64 machine_cycle, u64 machine_slice)
+	const struct device *device, uint64_t machine_cycle, uint64_t machine_slice)
 {
 	if (!device->run)
 		return (struct device_slice) { };
@@ -168,7 +168,7 @@ static struct device_slice run(struct machine *machine,
 	return slice;
 }
 
-u64 device_run(struct machine *machine, u64 machine_cycle, u64 machine_slice)
+uint64_t device_run(struct machine *machine, uint64_t machine_cycle, uint64_t machine_slice)
 {
 	struct machine_device_list *list = &machine->device.list;
 	struct machine_device *machine_device;

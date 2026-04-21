@@ -18,11 +18,11 @@ void clock_update(void);
 
 uint32_t clock_s(void);
 
-u64 clock_ms(void);
+uint64_t clock_ms(void);
 
 void clock_request_s(const uint32_t timestamp);
 
-void clock_request_ms(const u64 timestamp);
+void clock_request_ms(const uint64_t timestamp);
 
 int clock_poll(void);
 
