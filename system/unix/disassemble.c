@@ -791,8 +791,8 @@ TRACE_REGS(TRACE_REG)
 
 static void check_stack_bounds(struct trace *trace)
 {
-	const u32 usp = m68k_get_reg(&trace->machine->cpu.m68k, NULL, M68K_REG_USP);
-	const u32 isp = m68k_get_reg(&trace->machine->cpu.m68k, NULL, M68K_REG_ISP);
+	const uint32_t usp = m68k_get_reg(&trace->machine->cpu.m68k, NULL, M68K_REG_USP);
+	const uint32_t isp = m68k_get_reg(&trace->machine->cpu.m68k, NULL, M68K_REG_ISP);
 
 	if ((0 < usp && usp < 2048) ||
 	    (0 < isp && isp < 2048) || isp < usp)

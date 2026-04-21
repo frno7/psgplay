@@ -19,7 +19,7 @@
 #define PSG_EVENT_FREQUENCY 100		/* 10 ms */
 #define PSG_EVENT_CYCLES (PSG_FREQUENCY / PSG_EVENT_FREQUENCY)
 
-static char *psg_register_name(u32 reg)
+static char *psg_register_name(uint32_t reg)
 {
 	switch (reg) {
 #define PSG_REG_NAME(register_, symbol_, label_, description_)		\
@@ -66,7 +66,7 @@ static void psg_event(struct machine *machine, const struct device *device,
 }
 
 static uint8_t psg_rd_u8(struct machine *machine, const struct device *device,
-	u32 dev_address)
+	uint32_t dev_address)
 {
 	struct cf2149_module *cf2149 = &machine->psg.cf2149;
 	const struct device_cycle psg_cycle = device_cycle(machine, device);
@@ -89,13 +89,13 @@ static uint8_t psg_rd_u8(struct machine *machine, const struct device *device,
 }
 
 static uint16_t psg_rd_u16(struct machine *machine, const struct device *device,
-	u32 dev_address)
+	uint32_t dev_address)
 {
 	return psg_rd_u8(machine, device, dev_address) << 8;
 }
 
 static void psg_wr_u8(struct machine *machine, const struct device *device,
-	u32 dev_address, uint8_t data)
+	uint32_t dev_address, uint8_t data)
 {
 	struct cf2149_module *cf2149 = &machine->psg.cf2149;
 	const struct device_cycle psg_cycle = device_cycle(machine, device);
@@ -124,13 +124,13 @@ static void psg_wr_u8(struct machine *machine, const struct device *device,
 }
 
 static void psg_wr_u16(struct machine *machine, const struct device *device,
-	u32 dev_address, uint16_t data)
+	uint32_t dev_address, uint16_t data)
 {
 	psg_wr_u8(machine, device, dev_address, data >> 8);
 }
 
 static size_t psg_id_u8(struct machine *machine,
-	const struct device *device, u32 dev_address, char *buf, size_t size)
+	const struct device *device, uint32_t dev_address, char *buf, size_t size)
 {
 	struct cf2149_module *cf2149 = &machine->psg.cf2149;
 
@@ -155,7 +155,7 @@ static size_t psg_id_u8(struct machine *machine,
 }
 
 static size_t psg_id_u16(struct machine *machine,
-	const struct device *device, u32 dev_address, char *buf, size_t size)
+	const struct device *device, uint32_t dev_address, char *buf, size_t size)
 {
 	return psg_id_u8(machine, device, dev_address, buf, size);
 }

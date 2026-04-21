@@ -9,9 +9,9 @@
 #include "internal/types.h"
 
 struct ice_decrunch_inplace {
-	u32 d[8];
+	uint32_t d[8];
 	void *a[7];
-	u32 d0;
+	uint32_t d0;
 	uint8_t save[120];
 	size_t size;
 };

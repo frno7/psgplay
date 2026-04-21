@@ -25,7 +25,7 @@ struct ice_header {
 	struct ice_u32 decrunched_size;
 };
 
-static u32 ice_u32(struct ice_u32 value)
+static uint32_t ice_u32(struct ice_u32 value)
 {
 	return (value.d[0] << 24) |
 	       (value.d[1] << 16) |

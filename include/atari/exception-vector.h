@@ -135,6 +135,6 @@
 	e(126, "Reserved")						\
 	e(127, "Reserved")						\
 
-const char *exception_vector_description(u32 address);
+const char *exception_vector_description(uint32_t address);
 
 #endif /* ATARI_EXCEPTION_VECTOR_H */

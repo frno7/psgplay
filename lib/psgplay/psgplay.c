@@ -533,7 +533,7 @@ static void record_digital(uint64_t cycle, void *arg)
 		pp->record.play = cycle;
 }
 
-static u32 parse_timer(const void *data, size_t size)
+static uint32_t parse_timer(const void *data, size_t size)
 {
 	struct sndh_timer timer;
 
@@ -554,7 +554,7 @@ struct psgplay *psgplay_init(const void *data, size_t size,
 	if (!pp)
 		return NULL;
 
-	const u32 offset = MACHINE_PROGRAM;
+	const uint32_t offset = MACHINE_PROGRAM;
 	const struct machine_registers regs = {
 		.d = { size, track, parse_timer(data, size) },
 		.a = { offset },

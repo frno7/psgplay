@@ -27,8 +27,8 @@ struct device_cycle {
 };
 
 struct machine_registers {
-	u32 d[8];	/* Data registers */
-	u32 a[8];	/* Address registers */
+	uint32_t d[8];	/* Data registers */
+	uint32_t a[8];	/* Address registers */
 };
 
 struct machine_ports {
@@ -72,7 +72,7 @@ struct machine {
 	} device;
 
 	struct {
-		u32 irq_pending;
+		uint32_t irq_pending;
 
 		struct device_cycle vbl_cycle;
 	} glue;

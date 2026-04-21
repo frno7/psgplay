@@ -19,7 +19,7 @@
 
 void glue_irq_set(struct machine *machine, int irq)
 {
-	const u32 p = machine->glue.irq_pending;
+	const uint32_t p = machine->glue.irq_pending;
 
 #if 0  /* FIXME: Dependency on pr_bug */
 	BUG_ON(irq < 1 || 7 < irq);

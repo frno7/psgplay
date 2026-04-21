@@ -24,13 +24,13 @@ struct device {
 
 	bool main_bus;
 	struct {
-		u32 frequency;
-		u32 divisor;
+		uint32_t frequency;
+		uint32_t divisor;
 	} clk;
 
 	struct {
-		u32 address;
-		u32 size;
+		uint32_t address;
+		uint32_t size;
 	} bus;
 
 	struct device_state state;
@@ -43,25 +43,25 @@ struct device {
 		struct device_cycle device_cycle);
 
 	uint8_t (*rd_u8)(struct machine *machine, const struct device *device,
-		u32 dev_address);
+		uint32_t dev_address);
 	uint16_t (*rd_u16)(struct machine *machine,const struct device *device,
-		u32 dev_address);
+		uint32_t dev_address);
 
 	void (*wr_u8)(struct machine *machine, const struct device *device,
-		u32 dev_address, uint8_t data);
+		uint32_t dev_address, uint8_t data);
 	void (*wr_u16)(struct machine *machine, const struct device *device,
-		u32 dev_address, uint16_t data);
+		uint32_t dev_address, uint16_t data);
 
 	size_t (*id_u8)(struct machine *machine, const struct device *device,
-		u32 dev_address, char *buf, size_t size);
+		uint32_t dev_address, char *buf, size_t size);
 	size_t (*id_u16)(struct machine *machine, const struct device *device,
-		u32 dev_address, char *buf, size_t size);
+		uint32_t dev_address, char *buf, size_t size);
 };
 
-bool valid_device_bus_address(u32 bus_address, const struct device *dev);
+bool valid_device_bus_address(uint32_t bus_address, const struct device *dev);
 
 const struct device *device_for_bus_address(struct machine *machine,
-	u32 bus_address);
+	uint32_t bus_address);
 
 struct device_cycle device_cycle(struct machine *machine,
 	const struct device *device);

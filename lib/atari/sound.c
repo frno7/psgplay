@@ -27,7 +27,7 @@
 #define SOUND_EVENT_FREQUENCY 100		/* 10 ms */
 #define SOUND_EVENT_CYCLES (SOUND_FREQUENCY / SOUND_EVENT_FREQUENCY)
 
-static char *sound_register_name(u32 reg)
+static char *sound_register_name(uint32_t reg)
 {
 	switch (reg) {
 #define SOUND_REG_NAME(register_, symbol_, label_, description_)	\
@@ -105,13 +105,13 @@ static void sound_event(struct machine *machine, const struct device *device,
 }
 
 static uint8_t sound_rd_u8(struct machine *machine, const struct device *device,
-	u32 dev_address)
+	uint32_t dev_address)
 {
 	struct cf300588_sound_module *cf300588 = &machine->sound.cf300588;
 	const struct device_cycle sound_cycle = device_cycle(machine, device);
 	struct cf300588_sound_cycle module_cycle =
 		cf300588_sound_cycle_from_device(sound_cycle);
-	const u32 reg = dev_address >> 1;
+	const uint32_t reg = dev_address >> 1;
 
 	if ((dev_address & 1) == 0)
 		return 0;
@@ -122,19 +122,19 @@ static uint8_t sound_rd_u8(struct machine *machine, const struct device *device,
 }
 
 static uint16_t sound_rd_u16(struct machine *machine, const struct device *device,
-	u32 dev_address)
+	uint32_t dev_address)
 {
 	return sound_rd_u8(machine, device, dev_address + 1);
 }
 
 static void sound_wr_u8(struct machine *machine, const struct device *device,
-	u32 dev_address, uint8_t val)
+	uint32_t dev_address, uint8_t val)
 {
 	struct cf300588_sound_module *cf300588 = &machine->sound.cf300588;
 	const struct device_cycle sound_cycle = device_cycle(machine, device);
 	struct cf300588_sound_cycle module_cycle =
 		cf300588_sound_cycle_from_device(sound_cycle);
-	const u32 reg = dev_address >> 1;
+	const uint32_t reg = dev_address >> 1;
 
 	if ((dev_address & 1) == 0)
 		return;
@@ -150,16 +150,16 @@ static void sound_wr_u8(struct machine *machine, const struct device *device,
 }
 
 static void sound_wr_u16(struct machine *machine, const struct device *device,
-	u32 dev_address, uint16_t data)
+	uint32_t dev_address, uint16_t data)
 {
 	sound_wr_u8(machine, device, dev_address + 1, data);
 }
 
 static size_t sound_id_u8(struct machine *machine, const struct device *device,
-	u32 dev_address, char *buf, size_t size)
+	uint32_t dev_address, char *buf, size_t size)
 {
 	struct cf300588_sound_module *cf300588 = &machine->sound.cf300588;
-	const u32 reg = dev_address >> 1;
+	const uint32_t reg = dev_address >> 1;
 
 	if ((dev_address & 1) == 0 || ARRAY_SIZE(cf300588->state.regs.reg) <= reg)
 		snprintf(buf, size, "%2u", dev_address);
@@ -170,7 +170,7 @@ static size_t sound_id_u8(struct machine *machine, const struct device *device,
 }
 
 static size_t sound_id_u16(struct machine *machine, const struct device *device,
-	u32 dev_address, char *buf, size_t size)
+	uint32_t dev_address, char *buf, size_t size)
 {
 	return sound_id_u8(machine, device, dev_address + 1, buf, size);
 }
@@ -203,7 +203,7 @@ void record_sample(struct machine *machine,
 	machine->sound.output.record_arg = record_arg;
 }
 
-void sound_check(struct machine *machine, u32 bus_address)
+void sound_check(struct machine *machine, uint32_t bus_address)
 {
 	struct cf300588_sound_module *cf300588 = &machine->sound.cf300588;
 

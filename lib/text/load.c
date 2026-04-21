@@ -13,7 +13,7 @@
 #include "text/load.h"
 #include "text/mode.h"
 
-static const u32 logo[] = {
+static const uint32_t logo[] = {
 	0b00000111111011111110011111100000,
 	0b00000110011011000000011001100000,
 	0b00000110011011111110011000000000,

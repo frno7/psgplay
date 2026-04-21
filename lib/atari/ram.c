@@ -37,20 +37,20 @@ static void ram_reset(struct machine *machine, const struct device *device)
 }
 
 static uint8_t ram_rd_u8(struct machine *machine, const struct device *device,
-	u32 dev_address)
+	uint32_t dev_address)
 {
 	return machine->ram.u8[dev_address];
 }
 
 static uint16_t ram_rd_u16(struct machine *machine, const struct device *device,
-	u32 dev_address)
+	uint32_t dev_address)
 {
 	return (machine->ram.u8[dev_address] << 8) |
 		machine->ram.u8[dev_address + 1];
 }
 
 static void ram_wr_u8(struct machine *machine, const struct device *device,
-	u32 dev_address, uint8_t data)
+	uint32_t dev_address, uint8_t data)
 {
 	sound_check(machine, dev_address);
 
@@ -58,7 +58,7 @@ static void ram_wr_u8(struct machine *machine, const struct device *device,
 }
 
 static void ram_wr_u16(struct machine *machine, const struct device *device,
-	u32 dev_address, uint16_t data)
+	uint32_t dev_address, uint16_t data)
 {
 	sound_check(machine, dev_address);
 
@@ -67,7 +67,7 @@ static void ram_wr_u16(struct machine *machine, const struct device *device,
 }
 
 static size_t ram_id_u8(struct machine *machine,
-	const struct device *device, u32 dev_address, char *buf, size_t size)
+	const struct device *device, uint32_t dev_address, char *buf, size_t size)
 {
 	const char *description = exception_vector_description(dev_address);
 
@@ -80,7 +80,7 @@ static size_t ram_id_u8(struct machine *machine,
 }
 
 static size_t ram_id_u16(struct machine *machine,
-	const struct device *device, u32 dev_address, char *buf, size_t size)
+	const struct device *device, uint32_t dev_address, char *buf, size_t size)
 {
 	return ram_id_u8(machine, device, dev_address, buf, size);
 }

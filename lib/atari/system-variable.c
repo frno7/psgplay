@@ -8,21 +8,21 @@
 #include "atari/system-variable.h"
 
 struct system_variable {
-	u32 address;
-	u32 count;
-	u32 size;
+	uint32_t address;
+	uint32_t count;
+	uint32_t size;
 	const char *label;
 	const char *description;
 };
 
-static bool valid_system_variable(u32 address,
+static bool valid_system_variable(uint32_t address,
 	const struct system_variable *sv)
 {
 	return sv->address <= address &&
 			      address < sv->address + sv->count * sv->size;
 }
 
-const char *system_variable_label(u32 address)
+const char *system_variable_label(uint32_t address)
 {
 	static const struct system_variable list[] = {
 #define SYSTEM_VARIABLE_DESCRIPTION(					\

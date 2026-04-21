@@ -16,11 +16,11 @@ void clock_resume(void);
 
 void clock_update(void);
 
-u32 clock_s(void);
+uint32_t clock_s(void);
 
 u64 clock_ms(void);
 
-void clock_request_s(const u32 timestamp);
+void clock_request_s(const uint32_t timestamp);
 
 void clock_request_ms(const u64 timestamp);
 

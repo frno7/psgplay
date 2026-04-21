@@ -10,6 +10,6 @@
 
 #include "toslibc/tos/system-variable.h"
 
-const char *system_variable_label(u32 address);
+const char *system_variable_label(uint32_t address);
 
 #endif /* ATARI_SYSTEM_VARIABLE_H */

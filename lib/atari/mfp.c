@@ -26,7 +26,7 @@ static bool mono_monitor_detect(void)
 	return true;	/* FIXME: Only color monitor as of now */
 }
 
-static char *mfp_register_name(u32 reg)
+static char *mfp_register_name(uint32_t reg)
 {
 	switch (reg) {
 #define MFP_REG_NAME(register_, symbol_, label_, description_)		\
@@ -63,12 +63,12 @@ static void mfp_event(struct machine *machine, const struct device *device,
 }
 
 static uint8_t mfp_rd_u8(struct machine *machine, const struct device *device,
-	u32 dev_address)
+	uint32_t dev_address)
 {
 	struct cf68901_module *cf68901 = &machine->mfp.cf68901;
 	const struct device_cycle mfp_cycle = device_cycle(machine, device);
 	const struct cf68901_clk clk = cf68901_clk_cycle(mfp_cycle.c);
-	const u32 reg = dev_address >> 1;
+	const uint32_t reg = dev_address >> 1;
 
 	if ((dev_address & 1) == 0)
 		return 0;
@@ -77,18 +77,18 @@ static uint8_t mfp_rd_u8(struct machine *machine, const struct device *device,
 }
 
 static uint16_t mfp_rd_u16(struct machine *machine, const struct device *device,
-	u32 dev_address)
+	uint32_t dev_address)
 {
 	return mfp_rd_u8(machine, device, dev_address + 1);
 }
 
 static void mfp_wr_u8(struct machine *machine, const struct device *device,
-	u32 dev_address, uint8_t data)
+	uint32_t dev_address, uint8_t data)
 {
 	struct cf68901_module *cf68901 = &machine->mfp.cf68901;
 	const struct device_cycle mfp_cycle = device_cycle(machine, device);
 	const struct cf68901_clk clk = cf68901_clk_cycle(mfp_cycle.c);
-	const u32 reg = dev_address >> 1;
+	const uint32_t reg = dev_address >> 1;
 
 	if ((dev_address & 1) == 0)
 		return;
@@ -97,15 +97,15 @@ static void mfp_wr_u8(struct machine *machine, const struct device *device,
 }
 
 static void mfp_wr_u16(struct machine *machine, const struct device *device,
-	u32 dev_address, uint16_t data)
+	uint32_t dev_address, uint16_t data)
 {
 	mfp_wr_u8(machine, device, dev_address + 1, data & 0xff);
 }
 
 static size_t mfp_id_u8(struct machine *machine, const struct device *device,
-	u32 dev_address, char *buf, size_t size)
+	uint32_t dev_address, char *buf, size_t size)
 {
-	const u32 reg = dev_address >> 1;
+	const uint32_t reg = dev_address >> 1;
 
 	if ((dev_address & 1) == 0 || 24 <= reg)
 		snprintf(buf, size, "%2u", dev_address);
@@ -116,7 +116,7 @@ static size_t mfp_id_u8(struct machine *machine, const struct device *device,
 }
 
 static size_t mfp_id_u16(struct machine *machine, const struct device *device,
-	u32 dev_address, char *buf, size_t size)
+	uint32_t dev_address, char *buf, size_t size)
 {
 	return mfp_id_u8(machine, device, dev_address + 1, buf, size);
 }

@@ -49,7 +49,7 @@ void clock_update(void)
 	now = clock_now() - start - offset;
 }
 
-u32 clock_s(void)
+uint32_t clock_s(void)
 {
 	return clock_ms() / 1000;
 }
@@ -59,7 +59,7 @@ u64 clock_ms(void)
 	return now / 1000000;
 }
 
-void clock_request_s(const u32 timestamp)
+void clock_request_s(const uint32_t timestamp)
 {
 	if (!timestamp)
 		return;

@@ -65,8 +65,8 @@ _rom:	bra.s	.reset
 	move.l	#timer_c_exception,0x114
 	move.l	#timer_d_exception,0x110
 
-	move.l	d2,-(sp)	/* u32 timer */
-	move.l	d1,-(sp)	/* u32 track */
+	move.l	d2,-(sp)	/* uint32_t timer */
+	move.l	d1,-(sp)	/* uint32_t track */
 	move.l	a0,-(sp)	/* void *sndh */
 	move.l	d0,-(sp)	/* size_t size */
 	jsr	start

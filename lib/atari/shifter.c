@@ -11,7 +11,7 @@
 #include "atari/device.h"
 #include "atari/shifter.h"
 
-static char *shifter_register_name(u32 reg)
+static char *shifter_register_name(uint32_t reg)
 {
 	switch (reg) {
 #define SHIFTER_REG_NAME(register_, symbol_, label_, description_)	\
@@ -23,31 +23,31 @@ SHIFTER_REGISTERS(SHIFTER_REG_NAME)
 }
 
 static uint8_t shifter_rd_u8(struct machine *machine, const struct device *device,
-	u32 dev_address)
+	uint32_t dev_address)
 {
 	return 0;	/* FIXME */
 }
 
 static uint16_t shifter_rd_u16(struct machine *machine, const struct device *device,
-	u32 dev_address)
+	uint32_t dev_address)
 {
 	return 0;	/* FIXME */
 }
 
 static void shifter_wr_u8(struct machine *machine, const struct device *device,
-	u32 dev_address, uint8_t data)
+	uint32_t dev_address, uint8_t data)
 {
 	/* FIXME */
 }
 
 static void shifter_wr_u16(struct machine *machine, const struct device *device,
-	u32 dev_address, uint16_t data)
+	uint32_t dev_address, uint16_t data)
 {
 	/* FIXME */
 }
 
 static size_t shifter_id_u16(struct machine *machine,
-	const struct device *device, u32 dev_address, char *buf, size_t size)
+	const struct device *device, uint32_t dev_address, char *buf, size_t size)
 {
 	snprintf(buf, size, "wr %s", shifter_register_name(dev_address / 2));	/* FIXME */
 
@@ -55,7 +55,7 @@ static size_t shifter_id_u16(struct machine *machine,
 }
 
 static size_t shifter_id_u8(struct machine *machine,
-	const struct device *device, u32 dev_address, char *buf, size_t size)
+	const struct device *device, uint32_t dev_address, char *buf, size_t size)
 {
 	snprintf(buf, size, "wr %s", shifter_register_name(dev_address / 2));	/* FIXME */
 

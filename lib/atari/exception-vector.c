@@ -5,7 +5,7 @@
 
 #include "atari/exception-vector.h"
 
-const char *exception_vector_description(u32 address)
+const char *exception_vector_description(uint32_t address)
 {
 	switch (address >> 2) {
 #define EXCEPTION_VECTOR_DESCRIPTION(vector_, description_)		\

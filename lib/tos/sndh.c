@@ -53,26 +53,26 @@ static struct {
 	bool play;
 } timer_state;
 
-static u32 gemdos_malloc(const u32 amount)
+static uint32_t gemdos_malloc(const uint32_t amount)
 {
-	const u32 address = (__system_variables->_membot & ~(u32)0xf) + 0x10;
+	const uint32_t address = (__system_variables->_membot & ~(uint32_t)0xf) + 0x10;
 
 	__system_variables->_membot = address + amount;
 
 	return address;
 }
 
-u32 gemdos_trap(uint8_t *sp)
+uint32_t gemdos_trap(uint8_t *sp)
 {
 	switch (*(uint16_t*)sp) {
 		case 72:
-			return gemdos_malloc(*(u32*)&sp[2]);
+			return gemdos_malloc(*(uint32_t*)&sp[2]);
 	}
 
 	return 0;
 }
 
-u32 xbios_trap(void)
+uint32_t xbios_trap(void)
 {
 	return 0;
 }
@@ -89,20 +89,20 @@ MFP_CTRL_DIV(MFP_CTRL_DIV_PRESCALE)
 	if (frequency < 1)
 		return false;
 
-	const u32 f = frequency;
+	const uint32_t f = frequency;
 
 	for (size_t divisor = 1; divisor <= 8; divisor++)
 	for (size_t i = 0; i < ARRAY_SIZE(prescale_div); i++) {
-		const u32 d = prescale_div[i] * divisor;
+		const uint32_t d = prescale_div[i] * divisor;
 		if (f > U32_MAX / d)
 			continue;
 
 		/* FIXME: Report unobtainable frequencies. */
-		const u32 xtal = ATARI_MFP_XTAL;
-		const u32 count = clamp_t(u32,
+		const uint32_t xtal = ATARI_MFP_XTAL;
+		const uint32_t count = clamp_t(uint32_t,
 			DIV_ROUND_CLOSEST_U32(xtal, d * f), 1, 255);
 		/* Prefer lower divisors over higher ones, all else equal. */
-		const u32 err = 10 * abs(d * count * f - xtal) + divisor;
+		const uint32_t err = 10 * abs(d * count * f - xtal) + divisor;
 
 		if (best >= 0 && err >= best)
 			continue;
@@ -210,7 +210,7 @@ static void idle_indefinitely(void)
 		idle();
 }
 
-void start(size_t size, void *sndh, u32 track, u32 timer_)
+void start(size_t size, void *sndh, uint32_t track, uint32_t timer_)
 {
 	const struct sndh_timer timer = u32_to_sndh_timer(timer_);
 
@@ -218,7 +218,7 @@ void start(size_t size, void *sndh, u32 track, u32 timer_)
 
 	file = (struct sndh_file) { .size = size, .sndh = sndh };
 
-	__system_variables->_membot = (u32)sndh + size + 1024;
+	__system_variables->_membot = (uint32_t)sndh + size + 1024;
 	__system_variables->nvbls = ARRAY_SIZE(vblqueue);
 	__system_variables->_vblqueue = vblqueue;
 	__system_variables->_p_cookies = cookie_jar;

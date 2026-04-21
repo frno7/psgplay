@@ -43,14 +43,14 @@ static void mmu_bus_wait(struct machine *machine, const struct device *dev)
 	DMA_DEVICE(bus_address, &ram_device) :				\
 	DMA_DEVICE(bus_address, &rom_device) : NULL
 
-uint8_t dma_read_memory_8(struct machine *machine, u32 bus_address)
+uint8_t dma_read_memory_8(struct machine *machine, uint32_t bus_address)
 {
 	const struct device *dev = DMA_DEVICES(bus_address);
 
 	if (!dev)
 		return 0;
 
-	const u32 dev_address = bus_address - dev->bus.address;
+	const uint32_t dev_address = bus_address - dev->bus.address;
 	const uint8_t value = dev->rd_u8(machine, dev, dev_address);
 
 	mmu_trace_rd_u8(machine, dev_address, value, dev);
@@ -58,14 +58,14 @@ uint8_t dma_read_memory_8(struct machine *machine, u32 bus_address)
 	return value;
 }
 
-uint16_t dma_read_memory_16(struct machine *machine, u32 bus_address)
+uint16_t dma_read_memory_16(struct machine *machine, uint32_t bus_address)
 {
 	const struct device *dev = DMA_DEVICES(bus_address);
 
 	if (!dev)
 		return 0;
 
-	const u32 dev_address = bus_address - dev->bus.address;
+	const uint32_t dev_address = bus_address - dev->bus.address;
 	const uint16_t value = dev->rd_u16(machine, dev, dev_address);
 
 	mmu_trace_rd_u16(machine, dev_address, value, dev);
@@ -73,14 +73,14 @@ uint16_t dma_read_memory_16(struct machine *machine, u32 bus_address)
 	return value;
 }
 
-uint8_t probe_read_memory_8(struct machine *machine, u32 bus_address)
+uint8_t probe_read_memory_8(struct machine *machine, uint32_t bus_address)
 {
 	const struct device *dev = DMA_DEVICES(bus_address);
 
 	return dev ? dev->rd_u8(machine, dev, bus_address - dev->bus.address) : 0;
 }
 
-uint16_t probe_read_memory_16(struct machine *machine, u32 bus_address)
+uint16_t probe_read_memory_16(struct machine *machine, uint32_t bus_address)
 {
 	const struct device *dev = DMA_DEVICES(bus_address);
 
@@ -88,7 +88,7 @@ uint16_t probe_read_memory_16(struct machine *machine, u32 bus_address)
 }
 
 void probe_copy_memory_8(struct machine *machine,
-	void *buffer, u32 bus_address, size_t byte_count)
+	void *buffer, uint32_t bus_address, size_t byte_count)
 {
 	uint8_t *b = buffer;
 
@@ -97,7 +97,7 @@ void probe_copy_memory_8(struct machine *machine,
 }
 
 void probe_copy_memory_16(struct machine *machine,
-	void *buffer, u32 bus_address, size_t word_count)
+	void *buffer, uint32_t bus_address, size_t word_count)
 {
 	uint8_t *b = buffer;
 
@@ -110,11 +110,11 @@ void probe_copy_memory_16(struct machine *machine,
 	}
 }
 
-u32 m68k_read_memory_8(struct m68k_module *module, u32 bus_address)
+uint32_t m68k_read_memory_8(struct m68k_module *module, uint32_t bus_address)
 {
 	struct machine *machine = machine_from_m68k_module(module);
 	const struct device *dev = device_for_bus_address(machine, bus_address);
-	const u32 dev_address = bus_address - dev->bus.address;
+	const uint32_t dev_address = bus_address - dev->bus.address;
 
 	mmu_bus_wait(machine, dev);
 
@@ -125,11 +125,11 @@ u32 m68k_read_memory_8(struct m68k_module *module, u32 bus_address)
 	return value;
 }
 
-u32 m68k_read_memory_16(struct m68k_module *module, u32 bus_address)
+uint32_t m68k_read_memory_16(struct m68k_module *module, uint32_t bus_address)
 {
 	struct machine *machine = machine_from_m68k_module(module);
 	const struct device *dev = device_for_bus_address(machine, bus_address);
-	const u32 dev_address = bus_address - dev->bus.address;
+	const uint32_t dev_address = bus_address - dev->bus.address;
 	const uint16_t value = dev->rd_u16(machine, dev, dev_address);
 
 	mmu_bus_wait(machine, dev);
@@ -139,19 +139,19 @@ u32 m68k_read_memory_16(struct m68k_module *module, u32 bus_address)
 	return value;
 }
 
-u32 m68k_read_memory_32(struct m68k_module *module, u32 bus_address)
+uint32_t m68k_read_memory_32(struct m68k_module *module, uint32_t bus_address)
 {
-	const u32 hi = m68k_read_memory_16(module, bus_address);
+	const uint32_t hi = m68k_read_memory_16(module, bus_address);
 	const uint16_t lo = m68k_read_memory_16(module, bus_address + 2);
 
 	return (hi << 16) | lo;
 }
 
-void m68k_write_memory_8(struct m68k_module *module, u32 bus_address, u32 value)
+void m68k_write_memory_8(struct m68k_module *module, uint32_t bus_address, uint32_t value)
 {
 	struct machine *machine = machine_from_m68k_module(module);
 	const struct device *dev = device_for_bus_address(machine, bus_address);
-	const u32 dev_address = bus_address - dev->bus.address;
+	const uint32_t dev_address = bus_address - dev->bus.address;
 
 	mmu_bus_wait(machine, dev);
 
@@ -160,11 +160,11 @@ void m68k_write_memory_8(struct m68k_module *module, u32 bus_address, u32 value)
 	dev->wr_u8(machine, dev, dev_address, value & 0xff);
 }
 
-void m68k_write_memory_16(struct m68k_module *module, u32 bus_address, u32 value)
+void m68k_write_memory_16(struct m68k_module *module, uint32_t bus_address, uint32_t value)
 {
 	struct machine *machine = machine_from_m68k_module(module);
 	const struct device *dev = device_for_bus_address(machine, bus_address);
-	const u32 dev_address = bus_address - dev->bus.address;
+	const uint32_t dev_address = bus_address - dev->bus.address;
 
 	mmu_bus_wait(machine, dev);
 
@@ -173,24 +173,24 @@ void m68k_write_memory_16(struct m68k_module *module, u32 bus_address, u32 value
 	dev->wr_u16(machine, dev, dev_address, value & 0xffff);
 }
 
-void m68k_write_memory_32(struct m68k_module *module, u32 bus_address, u32 value)
+void m68k_write_memory_32(struct m68k_module *module, uint32_t bus_address, uint32_t value)
 {
 	m68k_write_memory_16(module, bus_address, value >> 16);
 	m68k_write_memory_16(module, bus_address + 2, value & 0xffff);
 }
 
-u32 m68k_read_disassembler_16(struct m68k_module *module, u32 bus_address)
+uint32_t m68k_read_disassembler_16(struct m68k_module *module, uint32_t bus_address)
 {
 	struct machine *machine = machine_from_m68k_module(module);
 	const struct device *dev = device_for_bus_address(machine, bus_address);
-	const u32 dev_address = bus_address - dev->bus.address;
+	const uint32_t dev_address = bus_address - dev->bus.address;
 
 	return dev->rd_u16(machine, dev, dev_address);
 }
 
-u32 m68k_read_disassembler_32(struct m68k_module *module, u32 bus_address)
+uint32_t m68k_read_disassembler_32(struct m68k_module *module, uint32_t bus_address)
 {
-	const u32 hi = m68k_read_disassembler_16(module, bus_address);
+	const uint32_t hi = m68k_read_disassembler_16(module, bus_address);
 	const uint16_t lo = m68k_read_disassembler_16(module, bus_address + 2);
 
 	return (hi << 16) | lo;

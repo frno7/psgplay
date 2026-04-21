@@ -47,7 +47,7 @@ static unicode_t read_key(void)
 	if (!gemdos_cconis())
 		return 0;
 
-	const u32 k = gemdos_cnecin();
+	const uint32_t k = gemdos_cnecin();
 
 	switch ((k >> 16) & 0xff) {
 	case 0x4b: return U_ARROW_LEFT;

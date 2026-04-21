@@ -19,30 +19,30 @@ static void fdc_event(struct machine *machine, const struct device *device,
 }
 
 static uint8_t fdc_rd_u8(struct machine *machine, const struct device *device,
-	u32 dev_address)
+	uint32_t dev_address)
 {
 	return 0;
 }
 
 static uint16_t fdc_rd_u16(struct machine *machine, const struct device *device,
-	u32 dev_address)
+	uint32_t dev_address)
 {
 	return fdc_rd_u8(machine, device, dev_address) << 8;
 }
 
 static void fdc_wr_u8(struct machine *machine, const struct device *device,
-	u32 dev_address, uint8_t data)
+	uint32_t dev_address, uint8_t data)
 {
 }
 
 static void fdc_wr_u16(struct machine *machine, const struct device *device,
-	u32 dev_address, uint16_t data)
+	uint32_t dev_address, uint16_t data)
 {
 	fdc_wr_u8(machine, device, dev_address, data >> 8);
 }
 
 static size_t fdc_id_u8(struct machine *machine, const struct device *device,
-	u32 dev_address, char *buf, size_t size)
+	uint32_t dev_address, char *buf, size_t size)
 {
 	buf[0] = '\0';
 
@@ -50,7 +50,7 @@ static size_t fdc_id_u8(struct machine *machine, const struct device *device,
 }
 
 static size_t fdc_id_u16(struct machine *machine, const struct device *device,
-	u32 dev_address, char *buf, size_t size)
+	uint32_t dev_address, char *buf, size_t size)
 {
 	return fdc_id_u8(machine, device, dev_address, buf, size);
 }

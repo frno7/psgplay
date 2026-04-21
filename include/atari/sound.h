@@ -17,6 +17,6 @@ void sound_sample(struct machine *machine,
 void record_sample(struct machine *machine,
 	record_sample_f record, void *record_arg);
 
-void sound_check(struct machine *machine, u32 bus_address);
+void sound_check(struct machine *machine, uint32_t bus_address);
 
 #endif /* ATARI_SOUND_H */

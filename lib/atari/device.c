@@ -37,14 +37,14 @@
 	for_each_device_state((list), machine_device_)			\
 		if (!(machine_device_)->machine_cycle_event) continue; else
 
-bool valid_device_bus_address(u32 bus_address, const struct device *dev)
+bool valid_device_bus_address(uint32_t bus_address, const struct device *dev)
 {
 	return dev->bus.address <= bus_address &&
 		bus_address < dev->bus.address + dev->bus.size;
 }
 
 const struct device *device_for_bus_address(struct machine *machine,
-	u32 bus_address)
+	uint32_t bus_address)
 {
 	struct machine_device_list *list = &machine->device.list;
 	const struct device *device;
