@@ -19,11 +19,11 @@
 #include "system/unix/memory.h"
 
 typedef char wave_str[4];
-typedef u8 wave_u16[2];
-typedef u8 wave_u32[4];
+typedef uint8_t wave_u16[2];
+typedef uint8_t wave_u32[4];
 
 struct wave_sample {
-	u8 lo;
+	uint8_t lo;
 	s8 hi;
 };
 

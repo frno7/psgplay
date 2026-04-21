@@ -20,9 +20,9 @@ typedef char vt_char;
 struct vt_attr {
 	union {
 		struct {
-			u8 reverse : 1;
+			uint8_t reverse : 1;
 		};
-		u8 state;
+		uint8_t state;
 	};
 };
 
@@ -62,7 +62,7 @@ struct vt_buffer {
 		size_t offset;
 		size_t index;
 		size_t size;
-		u8 chars[32];
+		uint8_t chars[32];
 		bool redraw;
 	} output;
 	struct {
@@ -124,7 +124,7 @@ int vt_printf(struct vt_buffer *vtb, int row, int col,
 int vt_vprintf(struct vt_buffer *vtb, int row, int col,
 	struct vt_attr attr, const char *fmt, va_list ap);
 
-u8 vt_getc(struct vt_buffer *vtb);
+uint8_t vt_getc(struct vt_buffer *vtb);
 
 ssize_t vt_read(struct vt_buffer *vtb, void *data, size_t count);
 
@@ -132,10 +132,10 @@ ssize_t vt_write_fifo(struct vt_buffer *vtb, struct fifo *f);
 
 ssize_t vt_read_utf8_from_charset(struct vt_buffer *vtb,
 	void *data, size_t count,
-	unicode_t (*charset_to_utf32)(u8 c, void *arg), void *arg);
+	unicode_t (*charset_to_utf32)(uint8_t c, void *arg), void *arg);
 
 ssize_t vt_write_fifo_utf8_from_charset(struct vt_buffer *vtb, struct fifo *f,
-	unicode_t (*charset_to_utf32)(u8 c, void *arg), void *arg);
+	unicode_t (*charset_to_utf32)(uint8_t c, void *arg), void *arg);
 
 u64 vt_event(struct vt_buffer *vtb, u64 timestamp);
 

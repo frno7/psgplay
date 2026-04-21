@@ -167,7 +167,7 @@ static void microwire(struct machine *machine, const struct device *device,
 	}
 }
 
-static u8 mixer_rd_u8(struct machine *machine, const struct device *device,
+static uint8_t mixer_rd_u8(struct machine *machine, const struct device *device,
 	u32 dev_address)
 {
 	struct mixer_state *state = &machine->mixer.state;
@@ -192,7 +192,7 @@ static u16 mixer_rd_u16(struct machine *machine, const struct device *device,
 }
 
 static void mixer_wr_u8(struct machine *machine, const struct device *device,
-	u32 dev_address, u8 data)
+	u32 dev_address, uint8_t data)
 {
 	struct mixer_state *state = &machine->mixer.state;
 	const struct device_cycle mixer_cycle = device_cycle(machine, device);

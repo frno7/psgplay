@@ -13,7 +13,7 @@
 #include "system/unix/print.h"
 
 static void pr_printables(FILE *f,
-	size_t offset, size_t columns, size_t size, const u8 *b)
+	size_t offset, size_t columns, size_t size, const uint8_t *b)
 {
 	const size_t d = size - offset;
 	for (size_t i = 0; i < (d < columns ? columns - d : 0); i++)
@@ -27,7 +27,7 @@ static void pr_printables(FILE *f,
 void pr_mem(FILE *f, const void *data, size_t size, size_t offset)
 {
 	const int columns = 16;
-	const u8 *b = data;
+	const uint8_t *b = data;
 
 	for (size_t i = 0; i < size; i++) {
 		char address[32];

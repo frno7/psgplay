@@ -43,7 +43,7 @@ static void mmu_bus_wait(struct machine *machine, const struct device *dev)
 	DMA_DEVICE(bus_address, &ram_device) :				\
 	DMA_DEVICE(bus_address, &rom_device) : NULL
 
-u8 dma_read_memory_8(struct machine *machine, u32 bus_address)
+uint8_t dma_read_memory_8(struct machine *machine, u32 bus_address)
 {
 	const struct device *dev = DMA_DEVICES(bus_address);
 
@@ -51,7 +51,7 @@ u8 dma_read_memory_8(struct machine *machine, u32 bus_address)
 		return 0;
 
 	const u32 dev_address = bus_address - dev->bus.address;
-	const u8 value = dev->rd_u8(machine, dev, dev_address);
+	const uint8_t value = dev->rd_u8(machine, dev, dev_address);
 
 	mmu_trace_rd_u8(machine, dev_address, value, dev);
 
@@ -73,7 +73,7 @@ u16 dma_read_memory_16(struct machine *machine, u32 bus_address)
 	return value;
 }
 
-u8 probe_read_memory_8(struct machine *machine, u32 bus_address)
+uint8_t probe_read_memory_8(struct machine *machine, u32 bus_address)
 {
 	const struct device *dev = DMA_DEVICES(bus_address);
 
@@ -118,7 +118,7 @@ u32 m68k_read_memory_8(struct m68k_module *module, u32 bus_address)
 
 	mmu_bus_wait(machine, dev);
 
-	const u8 value = dev->rd_u8(machine, dev, dev_address);
+	const uint8_t value = dev->rd_u8(machine, dev, dev_address);
 
 	mmu_trace_rd_u8(machine, dev_address, value, dev);
 

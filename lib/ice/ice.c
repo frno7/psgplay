@@ -9,14 +9,14 @@
 
 struct ice_decrunch_state
 {
-	u8 *unpacked_stop;
-	u8 *unpacked;
-	const u8 *packed;
+	uint8_t *unpacked_stop;
+	uint8_t *unpacked;
+	const uint8_t *packed;
 	int bits;
 };
 
 struct ice_u32 {
-	u8 d[4];
+	uint8_t d[4];
 };
 
 struct ice_header {
@@ -85,7 +85,7 @@ static size_t ice_valid_decrunched_size(const void *data, size_t size)
 	return ds && cs && size >= cs ? ds : 0;
 }
 
-static void memcpybwd(u8 *to, const u8 *from, size_t n)
+static void memcpybwd(uint8_t *to, const uint8_t *from, size_t n)
 {
 	to += n;
 	from += n;
@@ -220,8 +220,8 @@ ssize_t ice_decrunch(void *out, const void *in, size_t insize)
 {
 	const size_t unpacked_length = ice_valid_decrunched_size(in, insize);
 	const size_t packed_length = ice_valid_crunched_size(in, insize);
-	const u8 *p = in;
-	u8 *u = out;
+	const uint8_t *p = in;
+	uint8_t *u = out;
 
 	if (packed_length && unpacked_length) {
 		struct ice_decrunch_state state = {

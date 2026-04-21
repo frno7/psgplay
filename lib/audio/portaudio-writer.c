@@ -27,7 +27,7 @@
 #define PORTAUDIO_SAMPLE(s) ((struct portaudio_sample) { .lo = (s), .hi = (s) >> 8 })
 
 struct portaudio_sample {
-	u8 lo;
+	uint8_t lo;
 	s8 hi;
 };
 

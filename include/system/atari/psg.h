@@ -10,8 +10,8 @@
 
 void psg_init(void);
 
-u8 psg_mute(void);
+uint8_t psg_mute(void);
 
-void psg_unmute(u8 iomix);
+void psg_unmute(uint8_t iomix);
 
 #endif /* PSGPLAY_SYSTEM_ATARI_PSG_H */

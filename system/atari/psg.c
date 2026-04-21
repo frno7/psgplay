@@ -43,16 +43,16 @@ void psg_init(void)
 	atexit(psg_exit);
 }
 
-u8 psg_mute(void)
+uint8_t psg_mute(void)
 {
-	const u8 iomix = xbios_giaccess(0, CF2149_REG_IOMIX);
+	const uint8_t iomix = xbios_giaccess(0, CF2149_REG_IOMIX);
 
 	xbios_giaccess(0x3f | iomix, XBIOS_GIACCESS_SET | CF2149_REG_IOMIX);
 
 	return iomix;
 }
 
-void psg_unmute(u8 iomix)
+void psg_unmute(uint8_t iomix)
 {
 	xbios_giaccess(iomix, XBIOS_GIACCESS_SET | CF2149_REG_IOMIX);
 }

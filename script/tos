@@ -16,7 +16,7 @@ hex() {
 	od -A n -vt x1 <lib/tos/tos | sed 's/\([0-9a-fA-F]\{2\}\)/0x\1,/g'
 }
 
-echo 'static const u8 tos[] = {'	 >"$dst".tmp
+echo 'static const uint8_t tos[] = {'	 >"$dst".tmp
 hex				<"$src"	>>"$dst".tmp
 echo '};'				>>"$dst".tmp
 mv "$dst".tmp "$dst"

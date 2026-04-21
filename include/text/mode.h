@@ -17,7 +17,7 @@
 #include "vt/vt.h"
 
 struct fifo_utf32 {
-	u8 buffer[64];
+	uint8_t buffer[64];
 	struct fifo fifo;
 	struct utf8_to_utf32_adapter uua;
 };

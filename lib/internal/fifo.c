@@ -13,8 +13,8 @@ size_t fifo_write(struct fifo *f, const void *buf, size_t size)
 	const size_t s = min(f->capacity - f->size, size);
 	const size_t i = f->index + f->size < f->capacity ?
 		f->index + f->size : f->index + f->size - f->capacity;
-	const u8 *src = buf;
-	u8 *dst = f->buffer;
+	const uint8_t *src = buf;
+	uint8_t *dst = f->buffer;
 
 	if (!s)
 		return 0;
@@ -35,8 +35,8 @@ size_t fifo_write(struct fifo *f, const void *buf, size_t size)
 size_t fifo_read(struct fifo *f, void *buf, size_t size)
 {
 	const size_t s = min(f->size, size);
-	const u8 *src = f->buffer;
-	u8 *dst = buf;
+	const uint8_t *src = f->buffer;
+	uint8_t *dst = buf;
 
 	if (!s)
 		return 0;
@@ -60,7 +60,7 @@ size_t fifo_read(struct fifo *f, void *buf, size_t size)
 
 size_t fifo_peek(struct fifo *f, const void **buf)
 {
-	const u8 *src = f->buffer;
+	const uint8_t *src = f->buffer;
 
 	if (buf != NULL)
 		*buf = &src[f->index];

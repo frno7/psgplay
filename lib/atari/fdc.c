@@ -18,7 +18,7 @@ static void fdc_event(struct machine *machine, const struct device *device,
 {
 }
 
-static u8 fdc_rd_u8(struct machine *machine, const struct device *device,
+static uint8_t fdc_rd_u8(struct machine *machine, const struct device *device,
 	u32 dev_address)
 {
 	return 0;
@@ -31,7 +31,7 @@ static u16 fdc_rd_u16(struct machine *machine, const struct device *device,
 }
 
 static void fdc_wr_u8(struct machine *machine, const struct device *device,
-	u32 dev_address, u8 data)
+	u32 dev_address, uint8_t data)
 {
 }
 

@@ -49,7 +49,7 @@ bool poll_fifo(const struct poll_fifo *pfs, size_t n, int timeout)
 
 	for (size_t i = 0; i < n; i++) {
 		if (pfs[i].in && (pfds[i].revents & POLLIN)) {
-			u8 buffer[1024];
+			uint8_t buffer[1024];
 
 			const size_t s = min(sizeof(buffer),
 				fifo_remaining(pfs[i].in));

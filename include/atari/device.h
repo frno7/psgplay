@@ -42,13 +42,13 @@ struct device {
 	void (*event)(struct machine *machine, const struct device *device,
 		struct device_cycle device_cycle);
 
-	u8 (*rd_u8)(struct machine *machine, const struct device *device,
+	uint8_t (*rd_u8)(struct machine *machine, const struct device *device,
 		u32 dev_address);
 	u16 (*rd_u16)(struct machine *machine,const struct device *device,
 		u32 dev_address);
 
 	void (*wr_u8)(struct machine *machine, const struct device *device,
-		u32 dev_address, u8 data);
+		u32 dev_address, uint8_t data);
 	void (*wr_u16)(struct machine *machine, const struct device *device,
 		u32 dev_address, u16 data);
 

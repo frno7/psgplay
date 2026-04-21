@@ -65,7 +65,7 @@ static void psg_event(struct machine *machine, const struct device *device,
 		(struct device_cycle) { .c = psg_cycle.c + PSG_EVENT_CYCLES });
 }
 
-static u8 psg_rd_u8(struct machine *machine, const struct device *device,
+static uint8_t psg_rd_u8(struct machine *machine, const struct device *device,
 	u32 dev_address)
 {
 	struct cf2149_module *cf2149 = &machine->psg.cf2149;
@@ -95,7 +95,7 @@ static u16 psg_rd_u16(struct machine *machine, const struct device *device,
 }
 
 static void psg_wr_u8(struct machine *machine, const struct device *device,
-	u32 dev_address, u8 data)
+	u32 dev_address, uint8_t data)
 {
 	struct cf2149_module *cf2149 = &machine->psg.cf2149;
 	const struct device_cycle psg_cycle = device_cycle(machine, device);

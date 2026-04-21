@@ -104,7 +104,7 @@ static void sound_event(struct machine *machine, const struct device *device,
 		cf300588->port.event(cf300588, module_cycle));
 }
 
-static u8 sound_rd_u8(struct machine *machine, const struct device *device,
+static uint8_t sound_rd_u8(struct machine *machine, const struct device *device,
 	u32 dev_address)
 {
 	struct cf300588_sound_module *cf300588 = &machine->sound.cf300588;
@@ -128,7 +128,7 @@ static u16 sound_rd_u16(struct machine *machine, const struct device *device,
 }
 
 static void sound_wr_u8(struct machine *machine, const struct device *device,
-	u32 dev_address, u8 val)
+	u32 dev_address, uint8_t val)
 {
 	struct cf300588_sound_module *cf300588 = &machine->sound.cf300588;
 	const struct device_cycle sound_cycle = device_cycle(machine, device);

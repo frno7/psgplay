@@ -12,7 +12,7 @@
 
 struct mfp_map {
 #define MFP_REG_MAP(register_, symbol_, label_, description_)		\
-	u8 : 8;								\
+	uint8_t : 8;								\
 	__volatile__ struct cf68901_##symbol_ symbol_;
 CF68901_REGISTERS(MFP_REG_MAP)
 };

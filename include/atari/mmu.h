@@ -8,11 +8,11 @@
 
 #include "internal/types.h"
 
-u8 dma_read_memory_8(struct machine *machine, u32 bus_address);
+uint8_t dma_read_memory_8(struct machine *machine, u32 bus_address);
 
 u16 dma_read_memory_16(struct machine *machine, u32 bus_address);
 
-u8 probe_read_memory_8(struct machine *machine, u32 bus_address);
+uint8_t probe_read_memory_8(struct machine *machine, u32 bus_address);
 
 u16 probe_read_memory_16(struct machine *machine, u32 bus_address);
 

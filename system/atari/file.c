@@ -47,7 +47,7 @@ bool file_valid(struct file *file)
 bool sndh_read_first(const char *path, struct file *file,
 	struct file_cursor *file_cursor)
 {
-	u8 prologue[max(ICE_HEADER_SIZE, SNDH_PROLOGUE_SIZE)];
+	uint8_t prologue[max(ICE_HEADER_SIZE, SNDH_PROLOGUE_SIZE)];
 	void *data = NULL;
 
 	*file = (struct file) { };
@@ -157,8 +157,8 @@ bool sndh_read_next(struct file_cursor *file_cursor)
 	if (file_cursor->file_offset < file_cursor->file_size) {
 		const size_t size = min_t(size_t, SNDH_CHUNK_SIZE,
 			file_cursor->file_size - file_cursor->file_offset);
-		u8 *b = file_cursor->file->data;
-		u8 *d = &b[file_cursor->file_offset];
+		uint8_t *b = file_cursor->file->data;
+		uint8_t *d = &b[file_cursor->file_offset];
 
 		ssize_t r = read(file_cursor->fd, d, size);
 		if (r == -1)
@@ -199,7 +199,7 @@ bool sndh_read_next(struct file_cursor *file_cursor)
 		if (!file_cursor->ice.crunched ||
 				file_cursor->ice.offset ==
 				file_cursor->file->size) {
-			u8 *b = file_cursor->file->data;
+			uint8_t *b = file_cursor->file->data;
 
 			b[file_cursor->file->size] = '\0'; /* Apply final NUL */
 		}

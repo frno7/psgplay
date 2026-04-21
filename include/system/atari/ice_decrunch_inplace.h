@@ -12,7 +12,7 @@ struct ice_decrunch_inplace {
 	u32 d[8];
 	void *a[7];
 	u32 d0;
-	u8 save[120];
+	uint8_t save[120];
 	size_t size;
 };
 

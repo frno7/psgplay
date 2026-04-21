@@ -62,7 +62,7 @@ static void mfp_event(struct machine *machine, const struct device *device,
 	request_event(machine, device, cf68901->port.event(cf68901, clk));
 }
 
-static u8 mfp_rd_u8(struct machine *machine, const struct device *device,
+static uint8_t mfp_rd_u8(struct machine *machine, const struct device *device,
 	u32 dev_address)
 {
 	struct cf68901_module *cf68901 = &machine->mfp.cf68901;
@@ -83,7 +83,7 @@ static u16 mfp_rd_u16(struct machine *machine, const struct device *device,
 }
 
 static void mfp_wr_u8(struct machine *machine, const struct device *device,
-	u32 dev_address, u8 data)
+	u32 dev_address, uint8_t data)
 {
 	struct cf68901_module *cf68901 = &machine->mfp.cf68901;
 	const struct device_cycle mfp_cycle = device_cycle(machine, device);

@@ -67,7 +67,7 @@ void atari_st_init(struct machine *machine,
 	const struct machine_registers *regs,
 	const struct machine_ports *ports)
 {
-	const u8 *p = prg;
+	const uint8_t *p = prg;
 
 	machine->cycle = 0;
 	m68k_clear_timeslice(&machine->cpu.m68k);

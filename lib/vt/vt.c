@@ -113,7 +113,7 @@ static inline void vt_output_append_char(struct vt_buffer *vtb, vt_char c)
 	vtb->output.size++;
 }
 
-static u8 vt_getc_reset(struct vt_buffer *vtb)
+static uint8_t vt_getc_reset(struct vt_buffer *vtb)
 {
 	vtb->output.redraw = false;
 
@@ -138,7 +138,7 @@ static u8 vt_getc_reset(struct vt_buffer *vtb)
 	return vt_getc(vtb);
 }
 
-static u8 vt_getc_clear(struct vt_buffer *vtb)
+static uint8_t vt_getc_clear(struct vt_buffer *vtb)
 {
 	vtb->clear = false;
 
@@ -206,7 +206,7 @@ static inline vt_char vt_getc_output(struct vt_buffer *vtb)
 	return vt_getc(vtb);
 }
 
-u8 vt_getc(struct vt_buffer *vtb)
+uint8_t vt_getc(struct vt_buffer *vtb)
 {
 	if (vtb->output.index < vtb->output.size)
 		return vtb->output.chars[vtb->output.index++];
@@ -232,10 +232,10 @@ u8 vt_getc(struct vt_buffer *vtb)
 
 ssize_t vt_read(struct vt_buffer *vtb, void *data, size_t count)
 {
-	u8 *b = data;
+	uint8_t *b = data;
 
 	for (size_t i = 0; i < count; i++) {
-		const u8 c = vt_getc(vtb);
+		const uint8_t c = vt_getc(vtb);
 
 		if (!c)
 			return i;
@@ -248,7 +248,7 @@ ssize_t vt_read(struct vt_buffer *vtb, void *data, size_t count)
 
 ssize_t vt_write_fifo(struct vt_buffer *vtb, struct fifo *f)
 {
-	u8 buffer[256];
+	uint8_t buffer[256];
 
 	const size_t r = vt_read(vtb, buffer,
 		min(sizeof(buffer), fifo_remaining(f)));
@@ -261,19 +261,19 @@ ssize_t vt_write_fifo(struct vt_buffer *vtb, struct fifo *f)
 
 ssize_t vt_read_utf8_from_charset(struct vt_buffer *vtb,
 	void *data, size_t count,
-	unicode_t (*charset_to_utf32)(u8 c, void *arg), void *arg)
+	unicode_t (*charset_to_utf32)(uint8_t c, void *arg), void *arg)
 {
-	u8 *b = data;
+	uint8_t *b = data;
 	size_t i = 0;
 
 	while (i + 4 < count) {
-		const u8 c = vt_getc(vtb);
+		const uint8_t c = vt_getc(vtb);
 
 		if (!c)
 			return i;
 
 		const unicode_t u = charset_to_utf32(c, arg);
-		u8 s[4];
+		uint8_t s[4];
 		const int r = utf32_to_utf8(u, s, sizeof(s));
 
 		if (r > 0) {
@@ -287,9 +287,9 @@ ssize_t vt_read_utf8_from_charset(struct vt_buffer *vtb,
 }
 
 ssize_t vt_write_fifo_utf8_from_charset(struct vt_buffer *vtb, struct fifo *f,
-	unicode_t (*charset_to_utf32)(u8 c, void *arg), void *arg)
+	unicode_t (*charset_to_utf32)(uint8_t c, void *arg), void *arg)
 {
-	u8 buffer[256];
+	uint8_t buffer[256];
 
 	const size_t r = vt_read_utf8_from_charset(vtb, buffer,
 		min(sizeof(buffer), fifo_remaining(f)),

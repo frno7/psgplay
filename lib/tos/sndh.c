@@ -62,7 +62,7 @@ static u32 gemdos_malloc(const u32 amount)
 	return address;
 }
 
-u32 gemdos_trap(u8 *sp)
+u32 gemdos_trap(uint8_t *sp)
 {
 	switch (*(u16*)sp) {
 		case 72:
@@ -79,7 +79,7 @@ u32 xbios_trap(void)
 
 static bool timer_prescale(struct timer_prescale *prescale, int frequency)
 {
-	static const u8 prescale_div[] = {
+	static const uint8_t prescale_div[] = {
 #define MFP_CTRL_DIV_PRESCALE(div) div,
 MFP_CTRL_DIV(MFP_CTRL_DIV_PRESCALE)
 	};

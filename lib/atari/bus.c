@@ -11,7 +11,7 @@
 #include "atari/bus.h"
 #include "atari/machine.h"
 
-u8 bus_error_rd_u8(struct machine *machine,const struct device *device,
+uint8_t bus_error_rd_u8(struct machine *machine,const struct device *device,
 	u32 address)
 {
 	/* FIXME: Properly report pr_error("bus error: rd u8 %x\n", device->bus.address + address); */
@@ -32,7 +32,7 @@ u16 bus_error_rd_u16(struct machine *machine, const struct device *device,
 }
 
 void bus_error_wr_u8(struct machine *machine, const struct device *device,
-	u32 address, u8 data)
+	u32 address, uint8_t data)
 {
 	/* FIXME: Properly report pr_error("bus error: wr u8 %x %x\n", device->bus.address + address, data); */
 

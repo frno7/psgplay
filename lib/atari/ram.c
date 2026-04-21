@@ -36,7 +36,7 @@ static void ram_reset(struct machine *machine, const struct device *device)
 	memset(&machine->ram.u8[8], 0, sizeof(machine->ram.u8) - 8);
 }
 
-static u8 ram_rd_u8(struct machine *machine, const struct device *device,
+static uint8_t ram_rd_u8(struct machine *machine, const struct device *device,
 	u32 dev_address)
 {
 	return machine->ram.u8[dev_address];
@@ -50,7 +50,7 @@ static u16 ram_rd_u16(struct machine *machine, const struct device *device,
 }
 
 static void ram_wr_u8(struct machine *machine, const struct device *device,
-	u32 dev_address, u8 data)
+	u32 dev_address, uint8_t data)
 {
 	sound_check(machine, dev_address);
 

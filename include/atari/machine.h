@@ -98,7 +98,7 @@ struct machine {
 						u16 mask;
 					};
 					u16 halfword[2];
-					u8 byte[4];
+					uint8_t byte[4];
 				} wr, rd;
 				struct device_cycle cycle;
 				struct mixer_sample sample;

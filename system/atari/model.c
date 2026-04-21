@@ -25,7 +25,7 @@ static struct file file_load;
 static struct file_cursor file_cursor;
 
 static volatile bool model_play_call;
-static u8 pause_iomix;
+static uint8_t pause_iomix;
 
 static struct {
 	s32 period;	/* Timer duration in ns */

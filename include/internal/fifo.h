@@ -17,7 +17,7 @@ struct fifo {
 
 #define DECLARE_FIFO(capacity_)						\
 	struct {							\
-		u8 buffer[capacity_];					\
+		uint8_t buffer[capacity_];					\
 		struct fifo fifo;					\
 	}
 

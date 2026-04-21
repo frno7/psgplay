@@ -24,7 +24,7 @@
 #define ALSA_SAMPLE(s) ((struct alsa_sample) { .lo = (s), .hi = (s) >> 8 })
 
 struct alsa_sample {
-	u8 lo;
+	uint8_t lo;
 	s8 hi;
 };
 

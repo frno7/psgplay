@@ -335,7 +335,7 @@ static u64 model_update(struct sample_buffer *sb,
 	return sample_buffer_update(sb, timestamp);
 }
 
-static unicode_t nonspace_charset_atari_st_to_utf32(u8 c, void *arg)
+static unicode_t nonspace_charset_atari_st_to_utf32(uint8_t c, void *arg)
 {
 	return isspace(c) || iscntrl(c) ?
 		c : charset_atari_st_to_utf32(c, arg);
