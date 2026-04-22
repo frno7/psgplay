@@ -42,7 +42,9 @@
 #define BUFFER_UPDATE_TIME 20	/* 20 ms */
 
 struct sample_buffer {
-	uint64_t timestamp;
+	uint64_t timestamp;	/* ms */
+
+	uint64_t frame;
 
 	size_t size;
 	size_t index;
@@ -155,6 +157,8 @@ static bool sample_buffer_stop(struct sample_buffer *sb)
 
 	sb->size = sb->index = 0;
 
+	sb->frame = 0;
+
 	if (sb->output->drop)
 		sb->output->drop(sb->output_arg);
 
@@ -202,7 +206,7 @@ static uint64_t sample_buffer_update(struct sample_buffer *sb, uint64_t timestam
 			sb->buffer, ARRAY_SIZE(sb->buffer));
 	}
 
-	for (sb->timestamp = timestamp; sb->index < sb->size; sb->index++)
+	for (sb->timestamp = timestamp; sb->index < sb->size; sb->index++) {
 		if (!sb->output->sample(
 				sb->buffer[sb->index].left,
 				sb->buffer[sb->index].right,
@@ -210,6 +214,9 @@ static uint64_t sample_buffer_update(struct sample_buffer *sb, uint64_t timestam
 			sb->timestamp = timestamp + (BUFFER_UPDATE_TIME);
 			break;
 		}
+
+		sb->frame++;
+	}
 
 	return sb->timestamp;
 }
@@ -280,15 +287,12 @@ static void model_restart(struct sample_buffer *sb,
 	const struct text_sndh *sndh, uint64_t timestamp)
 {
 	if (model->op == TRACK_PLAY && ctrl->op == TRACK_PAUSE) {
-		model->pause_timestamp = timestamp;
 		sample_buffer_pause(sb);
 		model->op = ctrl->op;
 		return;
 	}
 
 	if (model->op == TRACK_PAUSE && ctrl->op == TRACK_PLAY) {
-		model->pause_offset += timestamp - model->pause_timestamp;
-		model->pause_timestamp = 0;
 		sample_buffer_resume(sb);
 		model->op = ctrl->op;
 		return;
@@ -311,8 +315,7 @@ static void model_restart(struct sample_buffer *sb,
 		model->track = ctrl->track;
 		model->op = TRACK_PLAY;
 		model->timestamp = timestamp;
-		model->pause_offset = 0;
-		model->pause_timestamp = 0;
+		model->frame = 0;
 	}
 }
 
@@ -332,7 +335,12 @@ static uint64_t model_update(struct sample_buffer *sb,
 	    ctrl->op != model->op)
 		model_restart(sb, sm, options, model, ctrl, sndh, timestamp);
 
-	return sample_buffer_update(sb, timestamp);
+	const uint64_t t = sample_buffer_update(sb, timestamp);
+
+	model->timestamp = timestamp;
+	model->frame = sb->frame;
+
+	return t;
 }
 
 static unicode_t nonspace_charset_atari_st_to_utf32(uint8_t c, void *arg)
@@ -354,6 +362,7 @@ void text_replay(const struct options *options, struct file file,
 		.cursor = options->track,
 		.track = options->track,
 		.op = TRACK_PLAY,
+		.frequency = options->frequency,
 	};
 	struct text_state view = { };
 	struct text_state ctrl = { };

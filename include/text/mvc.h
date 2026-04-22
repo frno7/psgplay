@@ -26,8 +26,9 @@ struct text_state {
 		int volume;
 	} mixer;
 	uint64_t timestamp;
-	uint64_t pause_offset;
-	uint64_t pause_timestamp;
+
+	uint64_t frame;
+	uint32_t frequency;
 
 	bool redraw;
 	bool quit;

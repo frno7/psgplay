@@ -27,6 +27,8 @@ static struct file_cursor file_cursor;
 static volatile bool model_play_call;
 static uint8_t pause_iomix;
 
+static uint64_t pause_offset;
+static uint64_t pause_timestamp;
 static struct {
 	int32_t period;	/* Timer duration in ns */
 	int32_t timestamp;	/* Timestamp for next event in ns */
@@ -90,10 +92,12 @@ static void model_play(struct text_state *model, int track,
 	struct text_sndh *sndh, uint64_t timestamp)
 {
 	model->track = track;
-	model->op = TRACK_PLAY;
+	model->op.current = TRACK_PLAY;
 	model->timestamp = timestamp;
-	model->pause_offset = 0;
-	model->pause_timestamp = 0;
+	model->frame = 0;
+	model->frequency = 1;
+	pause_offset = timestamp;
+	pause_timestamp = 0;
 
 	struct sndh_init_arg sndh_init_arg = {
 		.sndh = sndh,
@@ -110,38 +114,41 @@ static void model_play(struct text_state *model, int track,
 static void model_update_play(struct text_state *model, const struct text_state *ctrl,
 	struct text_sndh *sndh, uint64_t timestamp)
 {
-	if (model->op == TRACK_PLAY && ctrl->op == TRACK_PAUSE) {
-		model->pause_timestamp = timestamp;
-		model->op = ctrl->op;
+	if (model->op.current == TRACK_PLAY && ctrl->op.current == TRACK_PAUSE) {
+		pause_timestamp = timestamp;
+		model->op.current = ctrl->op.current;
 
 		model_play_call = false;
 		pause_iomix = psg_mute();
 	}
 
-	if (model->op == TRACK_PAUSE && ctrl->op == TRACK_PLAY) {
-		model->pause_offset += timestamp - model->pause_timestamp;
-		model->pause_timestamp = 0;
-		model->op = ctrl->op;
+	if (model->op.current == TRACK_PAUSE && ctrl->op.current == TRACK_PLAY) {
+		pause_offset += timestamp - pause_timestamp;
+		pause_timestamp = 0;
+		model->op.current = ctrl->op.current;
 
 		psg_unmute(pause_iomix);
 		model_play_call = true;
 	}
 
-	if ((model->op == TRACK_PLAY ||
-	     model->op == TRACK_PAUSE) &&
-	    (ctrl->op == TRACK_STOP ||
-	     ctrl->op == TRACK_RESTART ||
+	if (model->op.current == TRACK_PLAY)
+		model->frame = (timestamp - pause_offset) / 1000;
+
+	if ((model->op.current == TRACK_PLAY ||
+	     model->op.current == TRACK_PAUSE) &&
+	    (ctrl->op.current == TRACK_STOP ||
+	     ctrl->op.current == TRACK_RESTART ||
 	     model->quit)) {
 		model_play_call = false;
-		model->op = TRACK_STOP;
+		model->op.current = TRACK_STOP;
 
 		xbios_supexecarg(sndh_exit_super, sndh);
 		psg_mute();
 	}
 
-	if ((model->op == TRACK_STOP && !model->quit) &&
-	    (ctrl->op == TRACK_PLAY ||
-	     ctrl->op == TRACK_RESTART))
+	if ((model->op.current == TRACK_STOP && !model->quit) &&
+	    (ctrl->op.current == TRACK_PLAY ||
+	     ctrl->op.current == TRACK_RESTART))
 		model_play(model, ctrl->track, sndh, timestamp);
 
 	if (ctrl->cursor)

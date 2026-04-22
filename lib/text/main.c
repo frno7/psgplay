@@ -167,10 +167,9 @@ static uint64_t time_update(struct vt_buffer *vtb, struct text_state *view,
 	}
 
 	if (view->timestamp <= timestamp) {
-		const uint64_t p = model->pause_offset + (model->pause_timestamp ?
-			timestamp - model->pause_timestamp : 0);
-		const int s = (timestamp - model->timestamp - p) / 1000;
+		const int s = model->frame / model->frequency;
 		const int m = s / 60;
+		const int d = (s + 1) * model->frequency - model->frame;
 
 		if (m < 60)
 			vt_printf(vtb, 0, col, vt_attr_reverse,
@@ -178,10 +177,11 @@ static uint64_t time_update(struct vt_buffer *vtb, struct text_state *view,
 		else
 			vt_printf(vtb, 0, col, vt_attr_reverse, "--:--");
 
-		view->timestamp = model->timestamp + p + (s + 1) * 1000;
+		view->timestamp = model->timestamp +
+			(1000 * d) / model->frequency;
 	}
 
-	return view->timestamp;
+	return view->timestamp + 100;
 }
 
 static void main_init(struct vt_buffer *vtb, struct text_state *view,
