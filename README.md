@@ -113,7 +113,7 @@ Play options:
 
     -o, --output=<file>    write audio output to the file in WAVE format
                            or to an ALSA handle if prefixed with "alsa:".
-			   See Notes below on post-processing audio
+                           See Notes below on post-processing audio
 
     --start=<[mm:]ss.ss>   start playing at the given time
     --stop=<[mm:]ss.ss|auto|never>
