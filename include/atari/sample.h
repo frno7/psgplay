@@ -23,13 +23,13 @@ typedef void (*sound_sample_f)(
 
 struct mixer_sample {
 	struct {
-		s8 main;
-		s8 left;
-		s8 right;
+		int8_t main;
+		int8_t left;
+		int8_t right;
 	} volume;
 	struct {
-		s8 bass;
-		s8 treble;
+		int8_t bass;
+		int8_t treble;
 	} tone;
 	bool mix;
 };

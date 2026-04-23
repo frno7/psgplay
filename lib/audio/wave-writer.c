@@ -24,7 +24,7 @@ typedef uint8_t wave_u32[4];
 
 struct wave_sample {
 	uint8_t lo;
-	s8 hi;
+	int8_t hi;
 };
 
 struct wave_state {
