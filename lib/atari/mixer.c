@@ -130,7 +130,7 @@ static void microwire(struct machine *machine, const struct device *device,
 	const uint16_t cmd = microwire_cmd(machine, device);
 	const uint16_t addr = cmd >> 9;
 	const uint16_t reg = (cmd >> 6) & 0x7;
-	const s16 data = cmd & 0x3f;
+	const int16_t data = cmd & 0x3f;
 
 	if (addr != 2)
 		return;

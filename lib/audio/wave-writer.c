@@ -133,7 +133,7 @@ static bool wave_sample_flush(struct wave_state *state)
 	return true;
 }
 
-static bool wave_sample(s16 left, s16 right, void *arg)
+static bool wave_sample(int16_t left, int16_t right, void *arg)
 {
 	struct wave_state *state = arg;
 

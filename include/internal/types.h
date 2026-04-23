@@ -20,7 +20,6 @@
 #error "bitfield neither big nor little endian?"
 #endif
 
-typedef int16_t s16;	/* FIXME: Deprecate */
 typedef int32_t s32;	/* FIXME: Deprecate */
 typedef int64_t s64;	/* FIXME: Deprecate */
 

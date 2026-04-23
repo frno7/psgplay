@@ -11,7 +11,7 @@
 struct audio_writer {
 	void *(*open)(const char *output, int frequency,
 		bool nonblocking, size_t sample_length);
-	bool (*sample)(s16 left, s16 right, void *arg);
+	bool (*sample)(int16_t left, int16_t right, void *arg);
 	bool (*pause)(void *arg);
 	bool (*resume)(void *arg);
 	void (*flush)(void *arg);

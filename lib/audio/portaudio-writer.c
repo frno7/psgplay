@@ -72,7 +72,7 @@ static void portaudio_sample_flush(struct portaudio_state *state)
 	fifo_skip(&state->fifo, write_count * sizeof(*buffer));
 }
 
-static bool portaudio_sample(s16 left, s16 right, void *arg)
+static bool portaudio_sample(int16_t left, int16_t right, void *arg)
 {
 	struct portaudio_state *state = arg;
 

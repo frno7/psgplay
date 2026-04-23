@@ -14,8 +14,8 @@ typedef void (*psg_sample_f)(
 	const struct cf2149_ac *sample, size_t count, void *arg);
 
 struct sound_sample {
-	s16 left;
-	s16 right;
+	int16_t left;
+	int16_t right;
 };
 
 typedef void (*sound_sample_f)(

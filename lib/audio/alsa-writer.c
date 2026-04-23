@@ -75,7 +75,7 @@ static void alsa_sample_flush(struct alsa_state *state)
 	}
 }
 
-static bool alsa_sample(s16 left, s16 right, void *arg)
+static bool alsa_sample(int16_t left, int16_t right, void *arg)
 {
 	struct alsa_state *state = arg;
 
