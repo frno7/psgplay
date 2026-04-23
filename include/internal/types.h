@@ -24,7 +24,6 @@ typedef int16_t s16;	/* FIXME: Deprecate */
 typedef int32_t s32;	/* FIXME: Deprecate */
 typedef int64_t s64;	/* FIXME: Deprecate */
 
-typedef uint16_t u16;	/* FIXME: Deprecate */
 typedef uint32_t u32;	/* FIXME: Deprecate */
 typedef uint64_t u64;	/* FIXME: Deprecate */
 

@@ -44,13 +44,13 @@ struct device {
 
 	uint8_t (*rd_u8)(struct machine *machine, const struct device *device,
 		u32 dev_address);
-	u16 (*rd_u16)(struct machine *machine,const struct device *device,
+	uint16_t (*rd_u16)(struct machine *machine,const struct device *device,
 		u32 dev_address);
 
 	void (*wr_u8)(struct machine *machine, const struct device *device,
 		u32 dev_address, uint8_t data);
 	void (*wr_u16)(struct machine *machine, const struct device *device,
-		u32 dev_address, u16 data);
+		u32 dev_address, uint16_t data);
 
 	size_t (*id_u8)(struct machine *machine, const struct device *device,
 		u32 dev_address, char *buf, size_t size);

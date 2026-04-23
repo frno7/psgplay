@@ -64,7 +64,7 @@ static u32 gemdos_malloc(const u32 amount)
 
 u32 gemdos_trap(uint8_t *sp)
 {
-	switch (*(u16*)sp) {
+	switch (*(uint16_t*)sp) {
 		case 72:
 			return gemdos_malloc(*(u32*)&sp[2]);
 	}

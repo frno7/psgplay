@@ -42,7 +42,7 @@ static uint8_t ram_rd_u8(struct machine *machine, const struct device *device,
 	return machine->ram.u8[dev_address];
 }
 
-static u16 ram_rd_u16(struct machine *machine, const struct device *device,
+static uint16_t ram_rd_u16(struct machine *machine, const struct device *device,
 	u32 dev_address)
 {
 	return (machine->ram.u8[dev_address] << 8) |
@@ -58,7 +58,7 @@ static void ram_wr_u8(struct machine *machine, const struct device *device,
 }
 
 static void ram_wr_u16(struct machine *machine, const struct device *device,
-	u32 dev_address, u16 data)
+	u32 dev_address, uint16_t data)
 {
 	sound_check(machine, dev_address);
 

@@ -28,7 +28,7 @@ static uint8_t shifter_rd_u8(struct machine *machine, const struct device *devic
 	return 0;	/* FIXME */
 }
 
-static u16 shifter_rd_u16(struct machine *machine, const struct device *device,
+static uint16_t shifter_rd_u16(struct machine *machine, const struct device *device,
 	u32 dev_address)
 {
 	return 0;	/* FIXME */
@@ -41,7 +41,7 @@ static void shifter_wr_u8(struct machine *machine, const struct device *device,
 }
 
 static void shifter_wr_u16(struct machine *machine, const struct device *device,
-	u32 dev_address, u16 data)
+	u32 dev_address, uint16_t data)
 {
 	/* FIXME */
 }

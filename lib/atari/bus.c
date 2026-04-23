@@ -21,7 +21,7 @@ uint8_t bus_error_rd_u8(struct machine *machine,const struct device *device,
 	return 0;
 }
 
-u16 bus_error_rd_u16(struct machine *machine, const struct device *device,
+uint16_t bus_error_rd_u16(struct machine *machine, const struct device *device,
 	u32 address)
 {
 	/* FIXME: Properly report pr_error("bus error: rd u16 %x\n", device->bus.address + address); */
@@ -40,7 +40,7 @@ void bus_error_wr_u8(struct machine *machine, const struct device *device,
 }
 
 void bus_error_wr_u16(struct machine *machine, const struct device *device,
-	u32 address, u16 data)
+	u32 address, uint16_t data)
 {
 	/* FIXME: Properly report pr_error("bus error: wr u16 %x %x\n", device->bus.address + address, data); */
 

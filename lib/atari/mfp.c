@@ -76,7 +76,7 @@ static uint8_t mfp_rd_u8(struct machine *machine, const struct device *device,
 	return cf68901->port.rd_da(cf68901, clk, reg);
 }
 
-static u16 mfp_rd_u16(struct machine *machine, const struct device *device,
+static uint16_t mfp_rd_u16(struct machine *machine, const struct device *device,
 	u32 dev_address)
 {
 	return mfp_rd_u8(machine, device, dev_address + 1);
@@ -97,7 +97,7 @@ static void mfp_wr_u8(struct machine *machine, const struct device *device,
 }
 
 static void mfp_wr_u16(struct machine *machine, const struct device *device,
-	u32 dev_address, u16 data)
+	u32 dev_address, uint16_t data)
 {
 	mfp_wr_u8(machine, device, dev_address + 1, data & 0xff);
 }

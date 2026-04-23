@@ -106,10 +106,10 @@ static void mixer_event(struct machine *machine, const struct device *device,
 		});
 }
 
-static u16 microwire_cmd(struct machine *machine, const struct device *device)
+static uint16_t microwire_cmd(struct machine *machine, const struct device *device)
 {
 	struct mixer_state *state = &machine->mixer.state;
-	u16 cmd = 0;
+	uint16_t cmd = 0;
 
 	for (int i = 0; i < 16; i++)
 		if (state->microwire.wr.mask & (0x8000 >> i)) {
@@ -127,9 +127,9 @@ static void microwire(struct machine *machine, const struct device *device,
 
 	state->microwire.cycle = (struct device_cycle) { .c = mixer_cycle.c };
 
-	const u16 cmd = microwire_cmd(machine, device);
-	const u16 addr = cmd >> 9;
-	const u16 reg = (cmd >> 6) & 0x7;
+	const uint16_t cmd = microwire_cmd(machine, device);
+	const uint16_t addr = cmd >> 9;
+	const uint16_t reg = (cmd >> 6) & 0x7;
 	const s16 data = cmd & 0x3f;
 
 	if (addr != 2)
@@ -178,7 +178,7 @@ static uint8_t mixer_rd_u8(struct machine *machine, const struct device *device,
 		state->microwire.rd.byte[dev_address] : 0;
 }
 
-static u16 mixer_rd_u16(struct machine *machine, const struct device *device,
+static uint16_t mixer_rd_u16(struct machine *machine, const struct device *device,
 	u32 dev_address)
 {
 	struct mixer_state *state = &machine->mixer.state;
@@ -212,7 +212,7 @@ static void mixer_wr_u8(struct machine *machine, const struct device *device,
 }
 
 static void mixer_wr_u16(struct machine *machine, const struct device *device,
-	u32 dev_address, u16 data)
+	u32 dev_address, uint16_t data)
 {
 	struct mixer_state *state = &machine->mixer.state;
 	const struct device_cycle mixer_cycle = device_cycle(machine, device);

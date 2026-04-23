@@ -94,10 +94,10 @@ struct machine {
 			struct {
 				union {
 					struct {
-						u16 data;
-						u16 mask;
+						uint16_t data;
+						uint16_t mask;
 					};
-					u16 halfword[2];
+					uint16_t halfword[2];
 					uint8_t byte[4];
 				} wr, rd;
 				struct device_cycle cycle;

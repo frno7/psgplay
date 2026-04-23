@@ -88,7 +88,7 @@ static uint8_t psg_rd_u8(struct machine *machine, const struct device *device,
 	}
 }
 
-static u16 psg_rd_u16(struct machine *machine, const struct device *device,
+static uint16_t psg_rd_u16(struct machine *machine, const struct device *device,
 	u32 dev_address)
 {
 	return psg_rd_u8(machine, device, dev_address) << 8;
@@ -124,7 +124,7 @@ static void psg_wr_u8(struct machine *machine, const struct device *device,
 }
 
 static void psg_wr_u16(struct machine *machine, const struct device *device,
-	u32 dev_address, u16 data)
+	u32 dev_address, uint16_t data)
 {
 	psg_wr_u8(machine, device, dev_address, data >> 8);
 }
