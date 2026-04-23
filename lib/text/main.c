@@ -101,21 +101,24 @@ static void cursor_hide(struct vt_buffer *vtb, int cursor)
 		vt_putc_normal(vtb, 3 + cursor, 0, ' ');
 }
 
-static void cursor_show(struct vt_buffer *vtb, int cursor)
+static void cursor_show(struct vt_buffer *vtb, int cursor,
+	const struct text_state *model)
 {
 	if (cursor)
-		vt_putc_normal(vtb, 3 + cursor, 0, '>');
+		vt_putc_normal(vtb, 3 + cursor, 0,
+			model->op.current == TRACK_PAUSE ? '=' : '>');
 }
 
 static void cursor_update(struct vt_buffer *vtb,
 	struct text_state *view, const struct text_state *model)
 {
-	if (view->cursor == model->cursor)
+	if (view->cursor == model->cursor &&
+	    view->op.current == model->op.current)
 		return;
 
 	cursor_hide(vtb, view->cursor);
 	view->cursor = model->cursor;
-	cursor_show(vtb, view->cursor);
+	cursor_show(vtb, view->cursor, model);
 }
 
 static void track_update(struct vt_buffer *vtb,
