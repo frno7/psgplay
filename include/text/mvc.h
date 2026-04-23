@@ -16,11 +16,13 @@ struct text_state {
 
 	int cursor;
 	int track;
-	enum {
-		TRACK_STOP = 0,
-		TRACK_PLAY,
-		TRACK_PAUSE,
-		TRACK_RESTART,
+	struct {
+		enum {
+			TRACK_STOP = 0,
+			TRACK_PLAY,
+			TRACK_PAUSE,
+			TRACK_RESTART,
+		} current;
 	} op;
 	struct text_mixer {
 		int volume;

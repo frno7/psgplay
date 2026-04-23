@@ -125,16 +125,16 @@ static void track_update(struct vt_buffer *vtb,
 	struct text_state *view, const struct text_state *model)
 {
 	if (view->track == model->track &&
-	    view->op == model->op)
+	    view->op.current == model->op.current)
 		return;
 
 	main_track(vtb, view->track, false);
 
 	view->track = model->track;
-	view->op = model->op;
+	view->op.current = model->op.current;
 
-	if (view->op == TRACK_PLAY ||
-	    view->op == TRACK_PAUSE)
+	if (view->op.current == TRACK_PLAY ||
+	    view->op.current == TRACK_PAUSE)
 		main_track(vtb, view->track, true);
 }
 
@@ -159,8 +159,8 @@ static uint64_t time_update(struct vt_buffer *vtb, struct text_state *view,
 {
 	const int col = vtb->server.size.cols - 5;
 
-	if (view->op != TRACK_PLAY &&
-	    view->op != TRACK_PAUSE) {
+	if (view->op.current != TRACK_PLAY &&
+	    view->op.current != TRACK_PAUSE) {
 		vt_printf(vtb, 0, col, vt_attr_reverse, "     ");
 
 		return 0;
@@ -234,39 +234,39 @@ static void main_ctrl(const unicode_t key, struct text_state *ctrl,
 		break;
 	case '\r':
 		ctrl->track = ctrl->cursor;
-		ctrl->op = TRACK_RESTART;
+		ctrl->op.current = TRACK_RESTART;
 		break;
 	case '1' ... '9': {
 		const int track = key - '0';
 
 		if (valid_track(track, sndh)) {
 			ctrl->track = ctrl->cursor = track;
-			ctrl->op = TRACK_RESTART;
+			ctrl->op.current = TRACK_RESTART;
 		}
 		break;
 	}
 	case 's':
-		ctrl->op = TRACK_STOP;
+		ctrl->op.current = TRACK_STOP;
 		break;
 	case ' ':
 	case 'p':
-		if (ctrl->op == TRACK_PLAY)
-			ctrl->op = TRACK_PAUSE;
-		else if (ctrl->op == TRACK_PAUSE)
-			ctrl->op = TRACK_PLAY;
+		if (ctrl->op.current == TRACK_PLAY)
+			ctrl->op.current = TRACK_PAUSE;
+		else if (ctrl->op.current == TRACK_PAUSE)
+			ctrl->op.current = TRACK_PLAY;
 		break;
 	case '<':
 		if (valid_track(ctrl->track - 1, sndh)) {
 			ctrl->track--;
 			ctrl->cursor = ctrl->track;
-			ctrl->op = TRACK_RESTART;
+			ctrl->op.current = TRACK_RESTART;
 		}
 		break;
 	case '>':
 		if (valid_track(ctrl->track + 1, sndh)) {
 			ctrl->track++;
 			ctrl->cursor = ctrl->track;
-			ctrl->op = TRACK_RESTART;
+			ctrl->op.current = TRACK_RESTART;
 		}
 		break;
 	case '-':
@@ -290,7 +290,7 @@ static void main_ctrl(const unicode_t key, struct text_state *ctrl,
 		break;
 	case 'q':
 	case '\033':	/* Escape */
-		ctrl->op = TRACK_STOP;
+		ctrl->op.current = TRACK_STOP;
 		ctrl->quit = true;
 		break;
 	}

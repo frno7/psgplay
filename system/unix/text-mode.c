@@ -264,7 +264,7 @@ static void tty_suspend(void *arg)
 		vt_text(vt_reset(vtb)),
 		vt_text(vt_cursor_end(vtb)));
 
-	if (model->op == TRACK_PLAY)
+	if (model->op.current == TRACK_PLAY)
 		sample_buffer_pause(sb);
 }
 
@@ -275,7 +275,7 @@ static void tty_resume(void *arg)
 	struct sample_buffer *sb = tty_arg->sb;
 	const struct text_state *model = tty_arg->model;
 
-	if (model->op == TRACK_PLAY)
+	if (model->op.current == TRACK_PLAY)
 		sample_buffer_resume(sb);
 
 	vt_redraw(vtb);
@@ -286,34 +286,36 @@ static void model_restart(struct sample_buffer *sb,
 	struct text_state *model, const struct text_state *ctrl,
 	const struct text_sndh *sndh, uint64_t timestamp)
 {
-	if (model->op == TRACK_PLAY && ctrl->op == TRACK_PAUSE) {
+	if (model->op.current == TRACK_PLAY &&
+	     ctrl->op.current == TRACK_PAUSE) {
 		sample_buffer_pause(sb);
-		model->op = ctrl->op;
+		model->op.current = ctrl->op.current;
 		return;
 	}
 
-	if (model->op == TRACK_PAUSE && ctrl->op == TRACK_PLAY) {
+	if (model->op.current == TRACK_PAUSE &&
+	     ctrl->op.current == TRACK_PLAY) {
 		sample_buffer_resume(sb);
-		model->op = ctrl->op;
+		model->op.current = ctrl->op.current;
 		return;
 	}
 
-	if (model->op == TRACK_PLAY)
+	if (model->op.current == TRACK_PLAY)
 		sample_buffer_flush(sb);
 
 	if (!sample_buffer_stop(sb))
 		return;
 
-	model->op = TRACK_STOP;
+	model->op.current = TRACK_STOP;
 
-	if (ctrl->op != TRACK_PLAY &&
-	    ctrl->op != TRACK_RESTART)
+	if (ctrl->op.current != TRACK_PLAY &&
+	    ctrl->op.current != TRACK_RESTART)
 		return;
 
 	if (sample_buffer_play(sb, sm, sndh->data, sndh->size,
 			ctrl->track, options->frequency, timestamp)) {
 		model->track = ctrl->track;
-		model->op = TRACK_PLAY;
+		model->op.current = TRACK_PLAY;
 		model->timestamp = timestamp;
 		model->frame = 0;
 	}
@@ -332,7 +334,7 @@ static uint64_t model_update(struct sample_buffer *sb,
 	model->mixer = ctrl->mixer;
 
 	if (ctrl->track != model->track ||
-	    ctrl->op != model->op)
+	    ctrl->op.current != model->op.current)
 		model_restart(sb, sm, options, model, ctrl, sndh, timestamp);
 
 	const uint64_t t = sample_buffer_update(sb, timestamp);
@@ -361,7 +363,9 @@ void text_replay(const struct options *options, struct file file,
 		.mode = &text_mode_main,
 		.cursor = options->track,
 		.track = options->track,
-		.op = TRACK_PLAY,
+		.op = {
+			.current = TRACK_PLAY,
+		},
 		.frequency = options->frequency,
 	};
 	struct text_state view = { };
