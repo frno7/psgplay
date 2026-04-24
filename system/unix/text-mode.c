@@ -47,8 +47,8 @@ struct sample_buffer {
 	uint64_t frame;
 	uint64_t seek;
 
-	size_t size;
-	size_t index;
+	ssize_t size;
+	ssize_t index;
 	struct psgplay_stereo buffer[4096];
 
 	struct psgplay *pp;
@@ -104,6 +104,14 @@ static struct psgplay *psgplay_init__(const struct text_sndh *sndh,
 		pr_fatal_error("Failed to init PSG play\n");
 
 	psgplay_digital_to_stereo_callback(pp, digital_to_stereo, sm);
+
+	if (!model->single || !model->repeat) {
+		float duration;
+
+		if (sndh_tag_subtune_time(&duration, model->track,
+				sndh->data, sndh->size))
+			psgplay_stop_at_time(pp, duration);
+	}
 
 	return pp;
 }
@@ -193,9 +201,35 @@ static bool sample_buffer_play(struct sample_buffer *sb,
 	return true;
 }
 
+static void model_advance(struct sample_buffer *sb,
+	struct text_state *model, const struct text_sndh *sndh)
+{
+	int subtune_count;
+
+	if (model->op.current == TRACK_PLAY)
+		sample_buffer_flush(sb);
+
+	model->op.current = TRACK_STOP;
+	sample_buffer_stop(sb);
+
+	if (model->single || !sndh_tag_subtune_count(&subtune_count,
+			sndh->data, sndh->size)) {
+		return;
+	}
+
+	if (model->track < subtune_count) {
+		model->track++;
+		model->op.current = TRACK_RESTART;
+	} else if (model->repeat) {
+		model->track = 1;
+		model->op.current = TRACK_RESTART;
+	} else
+		model->op.current = TRACK_STOP;
+}
+
 static uint64_t sample_buffer_update(struct sample_buffer *sb,
 	const struct options *options, struct text_state *model,
-	uint64_t timestamp)
+	const struct text_sndh *sndh, uint64_t timestamp)
 {
 	if (!sb->pp)
 		return 0;
@@ -224,6 +258,8 @@ static uint64_t sample_buffer_update(struct sample_buffer *sb,
 		sb->index = 0;
 		sb->size = psgplay_read_stereo(sb->pp,
 			sb->buffer, ARRAY_SIZE(sb->buffer));
+		if (sb->size < 0)
+			sb->size = 0;
 	}
 
 	if (timestamp < sb->timestamp)
@@ -239,6 +275,12 @@ static uint64_t sample_buffer_update(struct sample_buffer *sb,
 		}
 
 		sb->frame++;
+	}
+
+	if (!sb->size) {
+		model_advance(sb, model, sndh);
+
+		sb->timestamp = timestamp;
 	}
 
 	return sb->timestamp;
@@ -453,10 +495,12 @@ static uint64_t model_update(struct sample_buffer *sb,
 	model->mixer = ctrl->mixer;
 
 	if (ctrl->track != model->track ||
-	    ctrl->op.current != model->op.current)
+	    ctrl->op.current != model->op.current ||
+	    ctrl->op.current == TRACK_RESTART)
 		model_restart(sb, sm, options, model, ctrl, sndh, timestamp);
 
-	const uint64_t t = sample_buffer_update(sb, options, model, timestamp);
+	const uint64_t t = sample_buffer_update(sb, options,
+		model, sndh, timestamp);
 
 	model->timestamp = timestamp;
 	model->frame = max(sb->seek, sb->frame);
