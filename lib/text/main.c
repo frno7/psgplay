@@ -159,14 +159,19 @@ static void volume_update(struct vt_buffer *vtb,
 static void op_update(struct vt_buffer *vtb,
 	struct text_state *view, const struct text_state *model)
 {
-	const int col = vtb->server.size.cols - 8;
+	const int col = vtb->server.size.cols - 11;
 
-	if (view->op.current == model->op.current)
-		return;
+	if (view->repeat != model->repeat ||
+	    view->single != model->single ||
+	    view->op.current != model->op.current)
+		vt_printf(vtb, 0, col, vt_attr_reverse, "%c%c %s",
+			model->repeat ? 'R' : ' ',
+			model->single ? 'S' : ' ',
+			model->op.current == TRACK_SEEK_REW ? "<<"  :
+			model->op.current == TRACK_SEEK_FF  ? ">>"  : "  ");
 
-	vt_printf(vtb, 0, col, vt_attr_reverse,
-		model->op.current == TRACK_SEEK_REW ? "<<"  :
-		model->op.current == TRACK_SEEK_FF  ? ">>"  : "  ");
+	view->repeat = model->repeat;
+	view->single = model->single;
 }
 
 static uint64_t time_update(struct vt_buffer *vtb, struct text_state *view,
