@@ -446,6 +446,9 @@ static uint64_t model_update(struct sample_buffer *sb,
 		model->quit = true;
 
 	model->cursor = ctrl->cursor;
+	model->repeat = ctrl->repeat;
+	model->single = ctrl->single;
+
 	model->redraw = ctrl->redraw;
 	model->mixer = ctrl->mixer;
 

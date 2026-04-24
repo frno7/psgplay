@@ -284,6 +284,12 @@ static void main_ctrl(const unicode_t key, struct text_state *ctrl,
 		else if (ctrl->op.current == TRACK_PAUSE)
 			ctrl->op.current = TRACK_PLAY;
 		break;
+	case 'R':
+		ctrl->repeat ^= 1;
+		break;
+	case 'S':
+		ctrl->single ^= 1;
+		break;
 	case '<':
 		if (valid_track(ctrl->track - 1, sndh)) {
 			ctrl->track--;

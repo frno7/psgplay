@@ -16,6 +16,8 @@ struct text_state {
 
 	int cursor;
 	int track;
+	bool repeat;
+	bool single;
 	struct {
 		enum {
 			TRACK_STOP = 0,

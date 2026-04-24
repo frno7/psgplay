@@ -197,9 +197,11 @@ A cursor is shown with `>`. Keyboard controls:
 
 - `escape` or `q` to quit;
 - `s` to stop;
-- `p` or `spacebar` to pause;
+- `p` or `spacebar` to toggle pause;
 - `r` or `left arrow` to rewind 1 second (during pause or play);
 - `f` or `right arrow` to fast forward 1 second (during pause or play);
+- `shift`-`R` to toggle repeat tunes;
+- `shift`-`S` to toggle single or all tunes;
 - `1`, `2`, ..., `9` to play tunes 1, 2, ..., 9;
 - `-` to decrease volume;
 - `+` to increase volume;
