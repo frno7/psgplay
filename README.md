@@ -176,7 +176,7 @@ DC offset with a 2-5 Hz high-pass filter before post-processing.
 PSG play defaults to _interactive text mode_ if it is compiled with ALSA
 or PortAudio for Linux or Mac OS, or is compiled for Atari ST. If no audio
 output support is present, PSG play will default to
-[WAVE](https://en.wikipedia.org/wiki/WAV) format output.
+[WAVE](https://en.wikipedia.org/wiki/WAV) format output, and _command mode_.
 
 For Linux and Mac OS, [TTY](https://en.wikipedia.org/wiki/Tty_(Unix)) mode
 and [ECMA-48](https://en.wikipedia.org/wiki/ANSI_escape_code) are used,
