@@ -39,6 +39,9 @@ struct alsa_state {
 
 	snd_pcm_t *pcm_handle;
 	snd_pcm_hw_params_t *hwparams;
+	struct {
+		int count;
+	} error;
 
 	int frequency;
 
@@ -63,11 +66,25 @@ static void alsa_sample_flush(struct alsa_state *state)
 		if (!frame_count || frame_count == -EAGAIN)
 			break;
 
+		if (frame_count == -EPIPE && state->error.count++ < 10) {
+			/*
+			 * ALSA buffer underruns may happen during rewind
+			 * or fast forward.
+			 */
+			int err = snd_pcm_prepare(state->pcm_handle);
+
+			if (err < 0)
+				pr_fatal_error("%s: ALSA snd_pcm_prepare failed: %s\n",
+					state->output, snd_strerror(err));
+			break;
+		}
+
 		if (frame_count < 0)
 			pr_fatal_error("%s: ALSA snd_pcm_writei failed: %zd %s\n",
 				state->output, frame_count,
 				snd_strerror(frame_count));
 
+		state->error.count = 0;
 		fifo_skip(&state->fifo, frame_count * sizeof(*buffer));
 
 		if (frame_count < write_count)
