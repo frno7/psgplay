@@ -94,10 +94,11 @@ void digital_to_stereo(struct psgplay *pp, struct psgplay_stereo *stereo,
 	}
 }
 
-static struct psgplay *psgplay_init__(const void *data,
-	size_t size, int track, int frequency, struct sample_mixer *sm)
+static struct psgplay *psgplay_init__(const struct text_sndh *sndh,
+	struct sample_mixer *sm, const struct text_state *model)
 {
-	struct psgplay *pp = psgplay_init(data, size, track, frequency);
+	struct psgplay *pp = psgplay_init(sndh->data, sndh->size,
+		model->track, model->frequency);
 
 	if (!pp)
 		pr_fatal_error("Failed to init PSG play\n");
@@ -108,14 +109,15 @@ static struct psgplay *psgplay_init__(const void *data,
 }
 
 static struct sample_buffer sample_buffer_init(
-	struct sample_mixer *sm, const void *data, size_t size,
-	const char *option_output, int track, int frequency,
+	struct sample_mixer *sm, const struct text_sndh *sndh,
+	const char *option_output, const struct text_state *model,
 	const struct audio_writer *output)
 {
 	struct sample_buffer sb = {
-		.pp = psgplay_init__(data, size, track, frequency, sm),
+		.pp = psgplay_init__(sndh, sm, model),
 		.output = output,
-		.output_arg = output->open(option_output, frequency, true, 0),
+		.output_arg = output->open(option_output,
+			model->frequency, true, 0),
 	};
 
 	return sb;
@@ -185,12 +187,13 @@ static bool sample_buffer_resume(struct sample_buffer *sb)
 }
 
 static bool sample_buffer_play(struct sample_buffer *sb,
-	struct sample_mixer *sm, const void *data, size_t size,
-	int track, int frequency, uint64_t timestamp)
+	struct sample_mixer *sm, int track, int frequency,
+	struct text_state *model, const struct text_sndh *sndh,
+	uint64_t timestamp)
 {
 	BUG_ON(sb->pp);
 
-	sb->pp = psgplay_init__(data, size, track, frequency, sm);
+	sb->pp = psgplay_init__(sndh, sm, model);
 
 	return true;
 }
@@ -378,8 +381,8 @@ static void model_rewind(struct sample_buffer *sb,
 	psgplay_free(sb->pp);
 	sb->pp = NULL;
 	sb->frame = sb->size = sb->index = 0;
-	sample_buffer_play(sb, sm, sndh->data, sndh->size,
-		ctrl->track, options->frequency, timestamp);
+	sample_buffer_play(sb, sm, ctrl->track, options->frequency,
+		model, sndh, timestamp);
 }
 
 static void model_restart(struct sample_buffer *sb,
@@ -425,9 +428,10 @@ static void model_restart(struct sample_buffer *sb,
 	    ctrl->op.current != TRACK_RESTART)
 		return;
 
-	if (sample_buffer_play(sb, sm, sndh->data, sndh->size,
-			ctrl->track, options->frequency, timestamp)) {
-		model->track = ctrl->track;
+	model->track = ctrl->track;
+
+	if (sample_buffer_play(sb, sm, ctrl->track, options->frequency,
+			model, sndh, timestamp)) {
 		model->op.current = TRACK_PLAY;
 		model->timestamp = timestamp;
 		model->frame = 0;
@@ -493,8 +497,8 @@ void text_replay(const struct options *options, struct file file,
 		.cb = psg_mix_option(),
 		.arg = psg_mix_arg(),
 	};
-	struct sample_buffer sb = sample_buffer_init(&sm, file.data, file.size,
-		options->output, options->track, options->frequency, output);
+	struct sample_buffer sb = sample_buffer_init(&sm, &sndh,
+		options->output, &model, output);
 
 	struct tty_arg tty_arg = {
 		.vtb = &tty_vt.vtb,
