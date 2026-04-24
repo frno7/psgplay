@@ -125,11 +125,6 @@ static struct sample_buffer sample_buffer_init(
 
 static void sample_buffer_flush(struct sample_buffer *sb)
 {
-	if (!sb->pp)
-		return;
-
-	psgplay_stop(sb->pp);
-
 	for (;;) {
 		if (sb->index == sb->size) {
 			sb->index = 0;
@@ -416,8 +411,11 @@ static void model_restart(struct sample_buffer *sb,
 	    ctrl->op.current == TRACK_SEEK_FF)
 		return;
 
-	if (model->op.current == TRACK_PLAY)
+	if (model->op.current == TRACK_PLAY && sb->pp) {
+		psgplay_stop(sb->pp);
+
 		sample_buffer_flush(sb);
+	}
 
 	if (!sample_buffer_stop(sb))
 		return;
