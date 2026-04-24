@@ -142,8 +142,10 @@ static void sample_buffer_flush(struct sample_buffer *sb)
 			if (sb->output->sample(
 					sb->buffer[sb->index].left,
 					sb->buffer[sb->index].right,
-					sb->output_arg))
+					sb->output_arg)) {
 				sb->index++;
+				sb->frame++;
+			}
 	}
 
 	if (sb->output->flush)
@@ -317,6 +319,7 @@ static void model_fast_forward(struct sample_buffer *sb,
 	    model->op.current != TRACK_SEEK_FF)
 		return;
 
+	sb->frame += sb->size - sb->index;
 	sb->seek = max(sb->frame, sb->seek) + skip;
 	sb->index = sb->size;
 
@@ -358,6 +361,7 @@ static void model_rewind(struct sample_buffer *sb,
 
 	if (seek > skip_max)
 		return;
+	sb->frame += sb->size - sb->index;
 	sb->seek = seek;
 	sb->index = sb->size;
 
