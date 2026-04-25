@@ -50,9 +50,6 @@ struct portaudio_state {
 
 static void portaudio_sample_flush(struct portaudio_state *state)
 {
-	if (Pa_IsStreamStopped(state->stream))
-		return;
-
 	if (fifo_empty(&state->fifo))
 		return;
 
@@ -62,6 +59,13 @@ static void portaudio_sample_flush(struct portaudio_state *state)
 
 	BUG_ON(!r);
 	BUG_ON(r % sizeof(*buffer));
+
+	if (Pa_IsStreamStopped(state->stream)) {
+		PaError err = Pa_StartStream(state->stream);
+		if (err != paNoError)
+			pr_fatal_error("PortAudio Pa_StartStream failed: %s\n",
+				Pa_GetErrorText(err));
+	}
 
 	const ssize_t write_count = r / sizeof(*buffer);
 	PaError err = Pa_WriteStream(state->stream, buffer, write_count);
