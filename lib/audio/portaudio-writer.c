@@ -116,6 +116,9 @@ static bool portaudio_resume(void *arg)
 {
 	struct portaudio_state *state = arg;
 
+	if (!Pa_IsStreamStopped(state->stream))
+		return true;
+
 	PaError err = Pa_StartStream(state->stream);
 	if (err != paNoError)
 		pr_fatal_error("PortAudio Pa_StartStream failed: %s\n",
