@@ -67,7 +67,13 @@ static void portaudio_sample_flush(struct portaudio_state *state)
 				Pa_GetErrorText(err));
 	}
 
-	const ssize_t write_count = r / sizeof(*buffer);
+	const long available = Pa_GetStreamWriteAvailable(state->stream);
+	if (available < 0)
+		pr_fatal_error("PortAudio Pa_GetStreamWriteAvailable failed: %s",
+			Pa_GetErrorText(available));
+
+	const ssize_t write_count = min_t(ssize_t,
+		r / sizeof(*buffer), available);
 	PaError err = Pa_WriteStream(state->stream, buffer, write_count);
 	if (err != paNoError)
 		pr_fatal_error("PortAudio Pa_WriteStream failed: %s",
