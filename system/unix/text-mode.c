@@ -265,6 +265,9 @@ static uint64_t sample_buffer_update(struct sample_buffer *sb,
 	if (timestamp < sb->timestamp)
 		return sb->timestamp;
 
+	if (model->op.current == TRACK_PAUSE)
+		return sb->timestamp = 0;
+
 	for (sb->timestamp = timestamp; sb->index < sb->size; sb->index++) {
 		if (!sb->output->sample(
 				sb->buffer[sb->index].left,
