@@ -456,15 +456,13 @@ static void model_restart(struct sample_buffer *sb,
 	    ctrl->op.current == TRACK_SEEK_FF)
 		return;
 
-	if (model->op.current == TRACK_PLAY && sb->pp) {
+	if (model->op.current == TRACK_PLAY) {
 		psgplay_stop(sb->pp);
-
 		sample_buffer_flush(sb);
 	}
 
-	if (!sample_buffer_stop(sb))
-		return;
-
+	if (model->op.current != TRACK_STOP)
+		sample_buffer_stop(sb);
 	model->op.current = TRACK_STOP;
 
 	if (ctrl->op.current != TRACK_PLAY &&
