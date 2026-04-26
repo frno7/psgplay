@@ -67,18 +67,18 @@ static void portaudio_sample_flush(struct portaudio_state *state)
 				Pa_GetErrorText(err));
 	}
 
-	const long available = state->nonblocking ?
+	int restarted = 0;
+again:	const long available = state->nonblocking ?
 		Pa_GetStreamWriteAvailable(state->stream) : 0;
 	if (available < 0)
 		pr_fatal_error("PortAudio Pa_GetStreamWriteAvailable failed: %s",
 			Pa_GetErrorText(available));
 
-	int error_count = 0;
 	const ssize_t frames = r / sizeof(*buffer);
 	const ssize_t available_frames = available ?
 		min_t(ssize_t, available, frames) : frames;
-again:	PaError err = Pa_WriteStream(state->stream, buffer, available_frames);
-	if (err == paOutputUnderflowed && error_count++ < 10) {
+	PaError err = Pa_WriteStream(state->stream, buffer, available_frames);
+	if (err == paOutputUnderflowed && !restarted++) {
 		Pa_StopStream(state->stream);
 		Pa_StartStream(state->stream);
 		goto again;
