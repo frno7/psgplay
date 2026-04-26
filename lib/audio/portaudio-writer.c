@@ -67,14 +67,17 @@ static void portaudio_sample_flush(struct portaudio_state *state)
 				Pa_GetErrorText(err));
 	}
 
-	const long available = Pa_GetStreamWriteAvailable(state->stream);
+	const long available = state->nonblocking ?
+		Pa_GetStreamWriteAvailable(state->stream) : 0;
 	if (available < 0)
 		pr_fatal_error("PortAudio Pa_GetStreamWriteAvailable failed: %s",
 			Pa_GetErrorText(available));
 
 	int error_count = 0;
-	const ssize_t frames = min_t(ssize_t, r / sizeof(*buffer), available);
-again:	PaError err = Pa_WriteStream(state->stream, buffer, frames);
+	const ssize_t frames = r / sizeof(*buffer);
+	const ssize_t available_frames = available ?
+		min_t(ssize_t, available, frames) : frames;
+again:	PaError err = Pa_WriteStream(state->stream, buffer, available_frames);
 	if (err == paOutputUnderflowed && error_count++ < 10) {
 		Pa_StopStream(state->stream);
 		Pa_StartStream(state->stream);
@@ -84,7 +87,7 @@ again:	PaError err = Pa_WriteStream(state->stream, buffer, frames);
 		pr_fatal_error("PortAudio Pa_WriteStream failed: %s",
 			Pa_GetErrorText(err));
 
-	fifo_skip(&state->fifo, frames * sizeof(*buffer));
+	fifo_skip(&state->fifo, available_frames * sizeof(*buffer));
 }
 
 static bool portaudio_sample(int16_t left, int16_t right, void *arg)
@@ -184,8 +187,9 @@ static void *portaudio_open(const char *output, int frequency,
 
 	params.channelCount = 2;
 	params.sampleFormat = paInt16;
-	params.suggestedLatency =
-		Pa_GetDeviceInfo(params.device)->defaultLowOutputLatency;
+	params.suggestedLatency = nonblocking ?
+		Pa_GetDeviceInfo(params.device)->defaultLowOutputLatency :
+		Pa_GetDeviceInfo(params.device)->defaultHighOutputLatency;
 	params.hostApiSpecificStreamInfo = NULL;
 
 	err = Pa_OpenStream(&stream, NULL, &params, frequency,
