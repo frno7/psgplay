@@ -333,8 +333,6 @@ static char vt_deescape_char(struct vt_buffer *vtb, char c, uint64_t timestamp)
 		vtb->input.buffer[0] = c;
 		vtb->input.buffer[1] = '\0';
 
-		vt_event(vtb, timestamp);
-
 		return 0;
 	}
 
