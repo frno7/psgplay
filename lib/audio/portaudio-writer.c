@@ -68,7 +68,8 @@ static void portaudio_sample_flush(struct portaudio_state *state)
 	}
 
 	int restarted = 0;
-again:	const long available = state->nonblocking ?
+again:;	/* Label followed by a declaration is a C23 extension. */
+	const long available = state->nonblocking ?
 		Pa_GetStreamWriteAvailable(state->stream) : 0;
 	if (available < 0)
 		pr_fatal_error("PortAudio Pa_GetStreamWriteAvailable failed: %s",
