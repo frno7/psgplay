@@ -15,6 +15,12 @@ else
 	ver=""
 fi
 
+major=${ver%%.*}
+label=${ver#*[.]}
+minor=${label%%[-.]*}
+label=${label#*[-.]}
+patch=0
+
 if [ $# = 0 ]
 then
 	echo "$ver"
@@ -30,14 +36,34 @@ fi
 for f in "$@"
 do
 	case "$f" in
-		*.h) src=$(echo "// SPDX-License-Identifier: GPL-2.0
+		*.h) src="// SPDX-License-Identifier: GPL-2.0
 
 #ifndef PSGPLAY_VERSION_H
 #define PSGPLAY_VERSION_H
 
-#define PSGPLAY_VERSION_MAJOR $(echo "$ver" | sed 's/^\([^.]\+\).*$/\1/')
-#define PSGPLAY_VERSION_MINOR $(echo "$ver" | sed 's/^[^.]\+\.\([^-]\+\).*$/\1/')
+#define PSGPLAY_VERSION_MAJOR $major
+#define PSGPLAY_VERSION_MINOR $minor
+#define PSGPLAY_VERSION_PATCH $patch
+
+#define PSGPLAY_VERSION_FORMAT(major, minor, patch) \\
+	(((major)<<16) | ((minor)<<8) | (patch))
+
+#define PSGPLAY_VERSION_NUMBER	\\
+	PSGPLAY_VERSION_FORMAT(	\\
+	PSGPLAY_VERSION_MAJOR,	\\
+	PSGPLAY_VERSION_MINOR,	\\
+	PSGPLAY_VERSION_PATCH)
+
 #define PSGPLAY_VERSION "'"'"$ver"'"'"
+
+/**
+ * The PSGPLAY_VERSION_NUMBER and PSGPLAY_VERSION_FORMAT() macros can be used
+ * for conditional C preprocessor directives. Example:
+ *
+ * #if PSGPLAY_VERSION_NUMBER >= PSGPLAY_VERSION_FORMAT(1,2,3)
+ *    ... version is at least 1.2.3 ...
+ * #endf
+ */
 
 /**
  * psgplay_version - return PSG play version
@@ -46,7 +72,7 @@ do
  */
 static inline const char *psgplay_version(void) { return PSGPLAY_VERSION; }
 
-#endif /* PSGPLAY_VERSION_H */")
+#endif /* PSGPLAY_VERSION_H */"
 			;;
 		*) echo "version: error: Unknown file: $f" >&2
 		   exit 1
