@@ -89,13 +89,4 @@ void psgplay_unstop(struct psgplay *pp);
  */
 void psgplay_stop_at_time(struct psgplay *pp, float time);
 
-/**
- * psgplay_instruction_callback - invoke callback for every CPU instruction
- * @pp: PSG play object
- * @cb: callback
- * @arg: optional argument supplied to @cb, can be %NULL
- */
-void psgplay_instruction_callback(struct psgplay *pp,
-	void (*cb)(uint32_t pc, void *arg), void *arg);
-
 #endif /* PSGPLAY_H */

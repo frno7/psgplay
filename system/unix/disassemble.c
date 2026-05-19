@@ -12,6 +12,7 @@
 #include "internal/assert.h"
 #include "internal/compare.h"
 #include "internal/print.h"
+#include "internal/psgplay.h"
 #include "internal/string.h"
 
 #include "m68k/m68k.h"

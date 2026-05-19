@@ -84,4 +84,13 @@ struct psgplay {
 	int errno_;
 };
 
+/**
+ * psgplay_instruction_callback - invoke callback for every CPU instruction
+ * @pp: PSG play object
+ * @cb: callback
+ * @arg: optional argument supplied to @cb, can be %NULL
+ */
+void psgplay_instruction_callback(struct psgplay *pp,
+	void (*cb)(uint32_t pc, void *arg), void *arg);
+
 #endif /* INTERNAL_PSGPLAY_H */
