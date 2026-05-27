@@ -19,7 +19,8 @@ major=${ver%%.*}
 label=${ver#*[.]}
 minor=${label%%[-.]*}
 label=${label#*[-.]}
-patch=0
+patch=${label%%[-.]*}
+label=${label#*[-.]}
 
 if [ $# = 0 ]
 then
