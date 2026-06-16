@@ -59,6 +59,12 @@ struct disassembly {
 	enum sndh_insn sndh_insn_run;
 };
 
+struct insn_arg {
+	struct options *options;
+	struct machine *machine;
+	void *arg;
+};
+
 /**
  * enum m68k_insn_type - instruction type
  * @m68k_insn_inv: invalid instruction
@@ -610,7 +616,10 @@ static void dasm_instruction(uint32_t pc, void *arg)
 		.bra = target_bra,
 	};
 
-	struct disassembly *dasm = arg;
+	struct insn_arg *insn_arg = arg;
+	struct disassembly *dasm = insn_arg->arg;
+
+	dasm->machine = insn_arg->machine;
 
 	if (pc < MACHINE_PROGRAM)
 		return;
@@ -670,7 +679,7 @@ static ssize_t parse_time(const char *s, int frequency)
 
 static void dasm_mark_text_trace_run(
 	void (*insn_cb)(uint32_t pc, void *arg), void *arg,
-	const struct options *options, struct file file)
+	struct options *options, struct file file)
 {
 	int subtune_count;
 
@@ -691,7 +700,13 @@ static void dasm_mark_text_trace_run(
 		if (!pp)
 			continue;
 
-		psgplay_instruction_callback(pp, insn_cb, arg);
+		struct insn_arg insn_arg = {
+			.options = options,
+			.machine = &pp->machine,
+			.arg = arg,
+		};
+
+		psgplay_instruction_callback(pp, insn_cb, &insn_arg);
 
 		psgplay_read_stereo(pp, NULL, sample_count);
 
@@ -701,11 +716,8 @@ static void dasm_mark_text_trace_run(
 
 void sndh_disassemble(struct options *options, struct file file)
 {
-	static struct machine machine;
-
 	struct disassembly dasm = {
 		.options = options,
-		.machine = &machine,
 		.path = file.path,
 		.size = file.size,
 		.data = xmalloc(file.size),
@@ -724,13 +736,20 @@ void sndh_disassemble(struct options *options, struct file file)
 	dasm_label(&dasm, "_play", sndh_play_address(file.data, file.size));
 	dasm_label(&dasm, "_sndh", dasm.header_size);
 
-	if (TRACE_ENABLE(&options->trace, CPU)) {
+	if (TRACE_ENABLE(&options->trace, CPU))
 		dasm_mark_text_trace_run(dasm_instruction,
 			&dasm, options, file);
 
+	const int frequency = 1000;
+	struct psgplay *pp = psgplay_init(file.data, file.size, 1, frequency);
+	if (!pp)
+		pr_fatal_error("%s: psgplay_init failed\n", progname);
+
+	dasm.machine = &pp->machine;
+
+	if (TRACE_ENABLE(&options->trace, CPU))
 		probe_copy_memory_8(dasm.machine,
 			dasm.data, MACHINE_PROGRAM, dasm.size);
-	}
 
 	dasm_mark_text_trace_entries(&dasm);
 
@@ -748,11 +767,11 @@ void sndh_disassemble(struct options *options, struct file file)
 	free(dasm.sb.s);
 	free(dasm.data);
 	free(dasm.m);
+
+	psgplay_free(pp);
 }
 
 struct trace {
-	struct options *options;
-	struct machine *machine;
 	struct strbuf sb;
 };
 
@@ -790,32 +809,34 @@ TRACE_REGS(TRACE_REG)
 	printf("\n");
 }
 
-static void check_stack_bounds(struct trace *trace)
+static void check_stack_bounds(struct trace *trace,
+	struct machine *machine, struct options *options)
 {
-	const uint32_t usp = m68k_get_reg(&trace->machine->cpu.m68k, NULL, M68K_REG_USP);
-	const uint32_t isp = m68k_get_reg(&trace->machine->cpu.m68k, NULL, M68K_REG_ISP);
+	const uint32_t usp = m68k_get_reg(&machine->cpu.m68k, NULL, M68K_REG_USP);
+	const uint32_t isp = m68k_get_reg(&machine->cpu.m68k, NULL, M68K_REG_ISP);
 
 	if ((0 < usp && usp < 2048) ||
 	    (0 < isp && isp < 2048) || isp < usp)
 		fprintf(stderr, "%s: stack bounds error usp %" PRIu32 " isp %" PRIu32 "\n",
-			trace->options->input, usp, isp);
+			options->input, usp, isp);
 }
 
 static void cpu_instruction_trace(uint32_t pc, void *arg)
 {
-	struct trace *trace = arg;
+	struct insn_arg *insn_arg = arg;
+	struct trace *trace = insn_arg->arg;
 
-	if (!TRACE_ENABLE(&trace->options->trace, CPU))
+	if (!TRACE_ENABLE(&insn_arg->options->trace, CPU))
 		goto trace_reg;
 
 	BUG_ON(pc % 2 != 0);
 
 	trace->sb.length = 0;
 
-	sbprintf(&trace->sb, "cpu %8" PRIu64 "  ", machine_cycle(trace->machine));
+	sbprintf(&trace->sb, "cpu %8" PRIu64 "  ", machine_cycle(insn_arg->machine));
 
 	const union m68kda_insn insn = {
-		.word = probe_read_memory_16(trace->machine, pc)
+		.word = probe_read_memory_16(insn_arg->machine, pc)
 	};
 	const struct m68kda_spec *spec0 = m68kda_insn_find(insn);
 
@@ -832,7 +853,7 @@ static void cpu_instruction_trace(uint32_t pc, void *arg)
 	BUG_ON(insn_size % 2 != 0);
 	BUG_ON(insn_size < 2 || sizeof(buffer) < insn_size);
 
-	probe_copy_memory_16(trace->machine, buffer, pc, insn_size / 2);
+	probe_copy_memory_16(insn_arg->machine, buffer, pc, insn_size / 2);
 
 	print_address(&trace->sb, pc, buffer, insn_size);
 
@@ -845,20 +866,15 @@ static void cpu_instruction_trace(uint32_t pc, void *arg)
 	printf("%s\n", trace->sb.s);
 
 trace_reg:
-	check_stack_bounds(trace);
+	check_stack_bounds(trace, insn_arg->machine, insn_arg->options);
 
-	if (TRACE_ENABLE(&trace->options->trace, REG))
-		trace_reg(trace->machine);
+	if (TRACE_ENABLE(&insn_arg->options->trace, REG))
+		trace_reg(insn_arg->machine);
 }
 
 void sndh_trace(struct options *options, struct file file)
 {
-	static struct machine machine;
-
-	struct trace trace = {
-		.options = options,
-		.machine = &machine,
-	};
+	struct trace trace = { };
 
 	dasm_mark_text_trace_run(cpu_instruction_trace, &trace, options, file);
 
