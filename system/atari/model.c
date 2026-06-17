@@ -18,6 +18,8 @@
 #include "system/atari/model.h"
 #include "system/atari/psg.h"
 
+#include "internal/sndh.h"
+
 #define TIMER_C_FREQUENCY 200
 #define TIMER_C_PERIOD (1000000000 / TIMER_C_FREQUENCY)		/* ns */
 

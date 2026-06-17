@@ -18,6 +18,7 @@
 #include "internal/macro.h"
 #include "internal/build-assert.h"
 #include "internal/check-compiler.h"
+#include "internal/sndh.h"
 #include "internal/types.h"
 #include "internal/limits.h"
 
