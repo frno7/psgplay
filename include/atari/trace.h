@@ -10,9 +10,17 @@
 #include <stdint.h>
 
 #define TRACE_DEVICE(dev)						\
-	dev(all, ALL, 0)						\
-	dev(cpu, CPU, 1)						\
-	dev(reg, REG, 2)
+	dev(all, ALL,  0)						\
+	dev(wch, WCH,  1)						\
+	dev(cpu, CPU,  2)						\
+	dev(reg, REG,  3)						\
+	dev(dma, DMA,  6)						\
+	dev(psg, PSG,  6)						\
+	dev(snd, SND,  7)						\
+	dev(mfp, MFP,  8)						\
+	dev(ram, RAM,  9)						\
+	dev(rom, ROM, 10)						\
+	dev(zro, ZRO, 11)
 
 enum trace_device {
 	TRACE_DEVICE_NONE = 0,

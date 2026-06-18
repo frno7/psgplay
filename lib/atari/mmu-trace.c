@@ -26,8 +26,24 @@ static void mmu_trace(struct machine *machine,
 	if (!machine->trace || machine->trace->m == TRACE_DEVICE_NONE)
 		return;
 
+	if (strcmp(dev->name, "dma") == 0 && TRACE_ENABLE(machine->trace, DMA))
+		goto trace;
+	if (strcmp(dev->name, "psg") == 0 && TRACE_ENABLE(machine->trace, PSG))
+		goto trace;
+	if (strcmp(dev->name, "snd") == 0 && TRACE_ENABLE(machine->trace, SND))
+		goto trace;
+	if (strcmp(dev->name, "mfp") == 0 && TRACE_ENABLE(machine->trace, MFP))
+		goto trace;
+	if (strcmp(dev->name, "ram") == 0 && TRACE_ENABLE(machine->trace, RAM))
+		goto trace;
+	if (strcmp(dev->name, "rom") == 0 && TRACE_ENABLE(machine->trace, ROM))
+		goto trace;
+	if (dev->bus.address + dev_address < 2048 && TRACE_ENABLE(machine->trace, ZRO))
+		goto trace;
+
 	return;
 
+trace:
 	if (sh)
 		sh(machine, dev, dev_address, description, sizeof(description));
 	else

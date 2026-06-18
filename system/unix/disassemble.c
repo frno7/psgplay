@@ -825,6 +825,19 @@ static void check_stack_bounds(struct trace *trace,
 			options->input, usp, isp);
 }
 
+static void wch_trace(struct machine *machine,
+	uint32_t pc, union m68kda_insn insn)
+{
+	const uint64_t c = machine_cycle(machine);
+
+	     if (pc == MACHINE_PROGRAM + 0)
+		fprintf(machine->trace->file, "wch %8" PRIu64 " %7x: sndh init\n", c, pc);
+	else if (pc == MACHINE_PROGRAM + 4)
+		fprintf(machine->trace->file, "wch %8" PRIu64 " %7x: sndh exit\n", c, pc);
+	else if (pc == MACHINE_PROGRAM + 8)
+		fprintf(machine->trace->file, "wch %8" PRIu64 " %7x: sndh play\n", c, pc);
+}
+
 static void cpu_instruction_trace(uint32_t pc, void *arg)
 {
 	struct insn_arg *insn_arg = arg;
@@ -866,6 +879,9 @@ static void cpu_instruction_trace(uint32_t pc, void *arg)
 
 	BUG_ON(spec0 != spec1);
 	BUG_ON(!trace->sb.length);
+
+	if (TRACE_ENABLE(&insn_arg->options->trace, WCH))
+		wch_trace(insn_arg->machine, pc, insn);
 
 	if (TRACE_ENABLE(&insn_arg->options->trace, CPU))
 		fprintf(insn_arg->machine->trace->file, "%s\n", trace->sb.s);
