@@ -41,7 +41,15 @@ uint32_t mfp_irq_vector(struct machine *machine)
 {
 	struct cf68901_module *cf68901 = &machine->mfp.cf68901;
 
-	return cf68901->port.vector(cf68901);
+	const uint32_t irq = cf68901->port.vector(cf68901);
+
+	const struct device_cycle mfp_cycle = device_cycle(machine, &mfp_device);
+	const struct cf68901_clk clk = cf68901_clk_cycle(mfp_cycle.c);
+
+	request_device_event(machine, &mfp_device,
+		(struct device_cycle) { .c = clk.c });
+
+	return irq;
 }
 
 static void request_event(struct machine *machine,
