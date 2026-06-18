@@ -10,6 +10,7 @@
 #include "atari/bus.h"
 #include "atari/glue.h"
 #include "atari/irq.h"
+#include "atari/irq-trace.h"
 #include "atari/m68k.h"
 #include "atari/mfp.h"
 #include "atari/machine.h"
@@ -99,14 +100,14 @@ static void glue_reset(struct machine *machine, const struct device *device)
 int m68k_int_ack_callback(struct m68k_module *module, int level)
 {
 	struct machine *machine = machine_from_m68k_module(module);
+	const int vector =
+		level == IRQ_HBL ? glue_hbl(machine) :
+		level == IRQ_VBL ? glue_vbl(machine) :
+		level == IRQ_MFP ? glue_mfp(machine) : M68K_INT_ACK_SPURIOUS;
 
-	switch(level)
-	{
-	case IRQ_HBL: return glue_hbl(machine);
-	case IRQ_VBL: return glue_vbl(machine);
-	case IRQ_MFP: return glue_mfp(machine);
-	default: return M68K_INT_ACK_SPURIOUS;
-	}
+	irq_trace_ack(machine, level, vector);
+
+	return vector;
 }
 
 const struct device glue_device = {

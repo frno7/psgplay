@@ -159,7 +159,7 @@ Trace options:
 
     --trace-output=<file>  write trace events to file (default stdout)
     --trace=<device>,...   trace device operations of SNDH file and exit:
-                           all wch cpu reg dma psg snd mfp ram rom zro
+                           all cpu irq mfp psg ram reg rom snd wch zro
 
 Notes:
 

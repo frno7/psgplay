@@ -11,16 +11,16 @@
 
 #define TRACE_DEVICE(dev)						\
 	dev(all, ALL,  0)						\
-	dev(wch, WCH,  1)						\
-	dev(cpu, CPU,  2)						\
-	dev(reg, REG,  3)						\
-	dev(dma, DMA,  6)						\
-	dev(psg, PSG,  6)						\
-	dev(snd, SND,  7)						\
-	dev(mfp, MFP,  8)						\
-	dev(ram, RAM,  9)						\
-	dev(rom, ROM, 10)						\
-	dev(zro, ZRO, 11)
+	dev(cpu, CPU,  1)						\
+	dev(irq, IRQ,  2)						\
+	dev(mfp, MFP,  3)						\
+	dev(psg, PSG,  4)						\
+	dev(ram, RAM,  5)						\
+	dev(reg, REG,  6)						\
+	dev(rom, ROM,  7)						\
+	dev(snd, SND,  8)						\
+	dev(wch, WCH,  9)						\
+	dev(zro, ZRO, 10)
 
 enum trace_device {
 	TRACE_DEVICE_NONE = 0,
@@ -30,7 +30,7 @@ TRACE_DEVICE(TRACE_DEVICE_ENUM)
 };
 
 #define TRACE_ENABLE(trace_mode_, label_)				\
-	((trace_mode_)->m & TRACE_DEVICE_ ## label_)
+	((trace_mode_) && ((trace_mode_)->m & TRACE_DEVICE_ ## label_))
 
 struct trace_mode {
 	uint32_t m;

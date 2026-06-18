@@ -10,6 +10,7 @@ ATARI_SRC := $(addprefix lib/atari/,					\
 	exception-vector.c						\
 	fdc.c								\
 	glue.c								\
+	irq-trace.c							\
 	machine.c							\
 	mfp.c								\
 	mixer.c								\

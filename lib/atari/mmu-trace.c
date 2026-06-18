@@ -27,8 +27,6 @@ static void mmu_trace(struct machine *machine,
 	if (!machine->trace || machine->trace->m == TRACE_DEVICE_NONE)
 		return;
 
-	if (strcmp(dev->name, "dma") == 0 && TRACE_ENABLE(machine->trace, DMA))
-		goto trace;
 	if (strcmp(dev->name, "psg") == 0 && TRACE_ENABLE(machine->trace, PSG))
 		goto trace;
 	if (strcmp(dev->name, "snd") == 0 && TRACE_ENABLE(machine->trace, SND))

@@ -22,6 +22,7 @@
 #include "psgplay/psgplay.h"
 #include "psgplay/sndh.h"
 
+#include "atari/irq-trace.h"
 #include "atari/machine.h"
 #include "atari/mmu.h"
 #include "atari/trace.h"
@@ -845,6 +846,8 @@ static void cpu_instruction_trace(uint32_t pc, void *arg)
 
 	if (insn_arg->options->trace.m == TRACE_DEVICE_NONE)
 		return;
+
+	irq_trace_ret_probe(insn_arg->machine);
 
 	BUG_ON(pc % 2 != 0);
 

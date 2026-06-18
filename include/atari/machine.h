@@ -44,6 +44,10 @@ enum {
 	DEVICE_LIST_MAX = 16,
 };
 
+enum {
+	IRQ_TRACE_STACK_MAX = 32
+};
+
 struct machine {
 	void (*init)(struct machine *machine,
 		const void *prg, size_t size, size_t offset,
@@ -54,6 +58,17 @@ struct machine {
 	uint64_t cycle;
 
 	struct trace_mode *trace;
+	struct {
+		int n;
+
+		struct irq_trace_entry {
+			int level;
+			int vector;
+			uint32_t isp;
+		} stack[IRQ_TRACE_STACK_MAX];
+
+		uint32_t pc;
+	} irq_trace;
 
 	struct {
 		void (*cb)(uint32_t pc, void *arg);
