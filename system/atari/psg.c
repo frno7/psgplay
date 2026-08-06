@@ -9,8 +9,6 @@
 #include <tos/system-variable.h>
 #include <tos/xbios.h>
 
-#include "atari/psg.h"
-
 #include "system/atari/psg.h"
 
 #include "cf2149/module/cf2149.h"
