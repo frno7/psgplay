@@ -245,20 +245,23 @@ static bool sndh_subtunes(struct sndh_cursor *cursor)
 
 static bool sndh_time_subtag(struct sndh_cursor *cursor)
 {
+	const bool unaligned = cursor->offset & 1;
 	const uint8_t *b = cursor->file.data;
-	const uint8_t *d = &b[cursor->offset];
+	const uint8_t *d = &b[cursor->offset + unaligned];
 	const int t = (d[0] << 8) | d[1];
 
 	snprintf(cursor->buffer, sizeof(cursor->buffer), "%d", t);
 	tag_update(cursor->buffer, t, cursor);
 
-	cursor->offset += 2;
+	cursor->offset += unaligned + 2;
 
 	return true;
 }
 
 static bool sndh_time(struct sndh_cursor *cursor)
 {
+	const bool unaligned = cursor->offset & 1;
+
 	if (!cursor->subtunes) {
 		diag_warn(cursor, "tag %s without any subtunes",
 			cursor->tag->name);
@@ -267,7 +270,7 @@ static bool sndh_time(struct sndh_cursor *cursor)
 	}
 
 	cursor->subtag.start = cursor->offset - strlen(cursor->tag->name);
-	cursor->subtag.bound = cursor->offset + cursor->subtunes * 2;
+	cursor->subtag.bound = cursor->offset + unaligned + cursor->subtunes * 2;
 
 	if (cursor->bound < cursor->subtag.bound) {
 		diag_error(cursor, "tag %s too short", cursor->tag->name);
@@ -282,8 +285,9 @@ static bool sndh_time(struct sndh_cursor *cursor)
 
 static bool sndh_frames_subtag(struct sndh_cursor *cursor)
 {
+	const bool unaligned = cursor->offset & 1;
 	const uint8_t *b = cursor->file.data;
-	const uint8_t *d = &b[cursor->offset];
+	const uint8_t *d = &b[cursor->offset + unaligned];
 	const uint32_t t = (d[0] << 24) |
 			   (d[1] << 16) |
 			   (d[2] <<  8) |
@@ -293,13 +297,15 @@ static bool sndh_frames_subtag(struct sndh_cursor *cursor)
 			(long unsigned int)t);
 	tag_update(cursor->buffer, t, cursor);
 
-	cursor->offset += 4;
+	cursor->offset += unaligned + 4;
 
 	return true;
 }
 
 static bool sndh_frames(struct sndh_cursor *cursor)
 {
+	const bool unaligned = cursor->offset & 1;
+
 	if (!cursor->subtunes) {
 		diag_warn(cursor, "tag %s without any subtunes",
 			cursor->tag->name);
@@ -308,7 +314,7 @@ static bool sndh_frames(struct sndh_cursor *cursor)
 	}
 
 	cursor->subtag.start = cursor->offset - strlen(cursor->tag->name);
-	cursor->subtag.bound = cursor->offset + cursor->subtunes * 4;
+	cursor->subtag.bound = cursor->offset + unaligned + cursor->subtunes * 4;
 
 	if (cursor->bound < cursor->subtag.bound) {
 		diag_error(cursor, "tag %s too short", cursor->tag->name);
