@@ -25,16 +25,19 @@ SNDH music files can be played with PSG play in several ways:
   for Linux, Mac and BSD operating systems. The main intent is rather to
   link the PSG play library with other music players, described in the
   following.
-- [Open Cubic Player](https://github.com/mywave82/opencubicplayer) is a
-  free software music player, especially for chip music and other formats
-  related to [demoscene](https://en.wikipedia.org/wiki/Demoscene) music.
-- [Music Player Daemon](https://en.wikipedia.org/wiki/Music_Player_Daemon) (MPD)
-  is a free software player server for music in general, with playlists and
-  many other features.
 - [Cowbell](https://github.com/demozoo/cowbell) is a web player for
   [Demozoo](https://demozoo.org/).
   [Example](https://demozoo.org/music/114756/). Cowbell is also used
   for the [SNDH archive](http://sndh.atari.org/).
+- [Music Player Daemon](https://en.wikipedia.org/wiki/Music_Player_Daemon) (MPD)
+  is a free software player server for music in general, with playlists and
+  many other features.
+- [Open Cubic Player](https://github.com/mywave82/opencubicplayer) is a
+  free software music player, especially for chip music and formats related
+  to [demoscene](https://en.wikipedia.org/wiki/Demoscene) music.
+- [Rewamp](https://rewamp.app/) is a free software music player,
+  especially for games and [demoscene](https://en.wikipedia.org/wiki/Demoscene)
+  music.
 
 # How to download
 
