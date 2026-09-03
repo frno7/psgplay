@@ -11,6 +11,7 @@
 
 #include "atari/bus.h"
 #include "atari/machine.h"
+#include "atari/mmu-trace.h"
 #include "atari/trace.h"
 
 static void mmu_trace(struct machine *machine,
