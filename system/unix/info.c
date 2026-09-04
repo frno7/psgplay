@@ -65,8 +65,12 @@ void sndh_print(struct file file)
 		if (strcmp(name, "FRMS") == 0) {
 			print_frms(name, sndh_tag_integer, ++frms_count, file);
 		} else if (strcmp(name, "TIME") == 0) {
-			printf("tag field %s %d %s\n",
-				name, ++time_count, v);
+			const int seconds = sndh_tag_integer % 60;
+			const int minutes = sndh_tag_integer / 60;
+
+			printf("tag field %s %d %d %02d:%02d\n",
+				name, ++time_count, sndh_tag_integer,
+				minutes, seconds);
 		} else if (strcmp(name, "!#SN") == 0) {
 			printf("tag field %s %d %s\n",
 				name, ++subname_count, v);
