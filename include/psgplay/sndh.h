@@ -13,23 +13,43 @@
 #define SNDH_PROLOGUE_SIZE 20
 
 #define SNDH_FLAG(f)							\
-	f('y', PSG, "YM2149 PSG")					\
-	f('e', DMA, "STE/TT DMA sound")					\
-	f('a', MFP_TA, "MFP timer A")					\
-	f('b', MFP_TB, "MFP timer B")					\
-	f('c', MFP_TC, "MFP timer C")					\
-	f('d', MFP_TD, "MFP timer D")					\
-	f('p', AGA, "Amiga AGA")					\
-	f('l', LMC, "STE/TT LMC1992")					\
-	f('s', DSP, "Falcon DSP 56001")					\
-	f('t', BLT, "BLITTER")						\
-	f('h', HBL, "Horizontal blank")
+	f('0', EDMA6,   "STE DMA 6.26 kHz")				\
+	f('1', EDMA12,  "STE DMA 12.5 kHz")				\
+	f('2', EDMA25,  "STE DMA 25.0 kHz")				\
+	f('3', EDMA50,  "STE DMA 50.1 kHz")				\
+	f('4', FDMA12,  "Falcon DMA 12.3 kHz")				\
+	f('5', FDMA14,  "Falcon DMA 14.0 kHz")				\
+	f('6', FDMA16,  "Falcon DMA 16.4 kHz")				\
+	f('7', FDMA19,  "Falcon DMA 19.7 kHz")				\
+	f('8', FDMA24,  "Falcon DMA 24.6 kHz")				\
+	f('9', FDMA32,  "Falcon DMA 32.8 kHz")				\
+	f('A', FDMA49,  "Falcon DMA 49.2 kHz")				\
+	f('B', BLITTER, "Blitter")					\
+	f('C', 68020,   "68020")					\
+	f('F', FILTER,  "Filters")					\
+	f('S', STEREO,  "Stereo")					\
+	f('a', MFP_TA,  "MFP timer A")					\
+	f('b', MFP_TB,  "MFP timer B")					\
+	f('c', MFP_TC,  "MFP timer C")					\
+	f('d', MFP_TD,  "MFP timer D")					\
+	f('e', STE,     "Atari STE")					\
+	f('f', SFX,     "SFX")						\
+	f('g', DIGITAL, "Digital")					\
+	f('h', HBL,     "Horizontal blank")				\
+	f('j', JINGLES, "Jingles")					\
+	f('k', KILLSYS, "Kill System")					\
+	f('l', LMC1992, "LMC1992")					\
+	f('p', AGA,     "Amiga AGA")					\
+	f('s', DSP56K,  "DSP 56001")					\
+	f('t', BLITTER, "Blitter")					\
+	f('x', SFX,     "SFX")						\
+	f('y', YM2149,  "YM2149")
 
 enum sndh_timer_type {
-	SNDH_TIMER_A = 'A',
-	SNDH_TIMER_B = 'B',
-	SNDH_TIMER_C = 'C',
-	SNDH_TIMER_D = 'D',
+	SNDH_TIMER_A = 'A',	/* MFP timer A */
+	SNDH_TIMER_B = 'B',	/* MFP timer B */
+	SNDH_TIMER_C = 'C',	/* MFP timer C */
+	SNDH_TIMER_D = 'D',	/* MFP timer D */
 	SNDH_TIMER_V = 'V',	/* Vertical blank (VBL) */
 };
 
