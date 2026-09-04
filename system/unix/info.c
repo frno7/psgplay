@@ -4,6 +4,7 @@
  */
 
 #include <ctype.h>
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -28,10 +29,27 @@ SNDH_FLAG(PRINT_SNDH_FLAG)
 		}
 }
 
+static void print_frms(const char *name,
+	int frms, int subtune, struct file file)
+{
+	float duration = 0.0f;
+
+	if (sndh_tag_subtune_time(&duration, subtune, file.data, file.size)) {
+		const int d = roundf(duration);
+		const int seconds = d % 60;
+		const int minutes = d / 60;
+
+		printf("tag field %s %-2d %6d %8.3f  %02d:%02d\n",
+			name, subtune, frms, duration, minutes, seconds);
+	} else
+		printf("tag field %s %d %d - -\n", name, subtune, frms);
+}
+
 void sndh_print(struct file file)
 {
 	size_t header_size;
 
+	int frms_count = 0;
 	int time_count = 0;
 	int subname_count = 0;
 	int subflag_count = 0;
@@ -44,14 +62,15 @@ void sndh_print(struct file file)
 
 		char *v = strrep(text, "\n", "\n\t");
 
-		if (strcmp(name, "TIME") == 0) {
+		if (strcmp(name, "FRMS") == 0) {
+			print_frms(name, sndh_tag_integer, ++frms_count, file);
+		} else if (strcmp(name, "TIME") == 0) {
 			printf("tag field %s %d %s\n",
 				name, ++time_count, v);
 		} else if (strcmp(name, "!#SN") == 0) {
 			printf("tag field %s %d %s\n",
 				name, ++subname_count, v);
 		} else if (strcmp(name, "FLAG~") == 0) {
-			/* FIXME: Document FLAG~ and FLAG in doc/sndhv21.txt */
 			printf("tag field FLAG ~ %s", v);
 			print_flags(v, file);
 			printf("\n");
